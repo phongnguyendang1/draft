@@ -163,6 +163,17 @@
 .promo__top { display: flex; align-items: flex-start; justify-content: space-between; }
 .team__sub { margin-top: var(--s-8); }
 
+/* Savings and plan cards */
+.savings__sub { margin-top: var(--s-8); }
+.savings__num { margin: var(--s-16) 0 var(--s-12); }
+.savings__math { margin-top: var(--s-16); display: flex; flex-direction: column; gap: var(--s-8); }
+
+.plan__sub { margin-top: var(--s-8); }
+.plan__price { display: flex; align-items: flex-end; gap: var(--s-12); margin: var(--s-16) 0 var(--s-12); }
+.services__head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--s-8); }
+.services__hint { margin: var(--s-8) 0; }
+.services__list { margin-top: var(--s-16); }
+
 /* Footer */
 .footer { background: var(--surface); border-top: 1px solid var(--border); }
 .footer__inner { max-width: var(--container); margin: 0 auto; padding: var(--s-24) 0; display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); }

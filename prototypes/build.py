@@ -26,6 +26,10 @@ OPTIONS = [
         "slug": "option-2-membership-at-work",
         "name": "Option 2 · Membership at Work",
     },
+    {
+        "slug": "option-3-home-health",
+        "name": "Option 3 · Home Health",
+    },
 ]
 
 FRAMES = {

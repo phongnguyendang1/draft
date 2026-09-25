@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+{{STYLES}}
+</head>
+<body class="{{FRAME}} is-welcome is-multi">
+{{ICONS}}
+
+<div class="app">
+
+  <!-- @include top -->
+
+  <main class="page">
+
+    <section class="intro">
+      <div class="intro__text">
+        <h1 class="t-display">Good morning, Sarah</h1>
+        <p class="t-desc">Friday, September 25</p>
+      </div>
+
+      <div class="menu-wrap when-multi">
+        <button class="switcher" data-menu="home-menu" aria-expanded="false" aria-haspopup="true">
+          <svg class="i"><use href="#ri-home-4-line"/></svg>
+          <span class="switcher__label" data-home-label>4817 Mueller Blvd</span>
+          <svg class="i i--16"><use href="#ri-arrow-down-s-line"/></svg>
+        </button>
+        <div class="menu menu--homes" id="home-menu" role="menu" hidden>
+          <p class="menu__label">Your homes</p>
+          <button class="menu__item" role="menuitemradio" aria-checked="true" data-home="mueller" data-address="4817 Mueller Blvd">
+            <span>
+              <span class="t-label t-ink">4817 Mueller Blvd</span>
+              <span class="t-meta menu__sub">Austin, TX 78723 &middot; 1 critical</span>
+            </span>
+            <svg class="i i--check"><use href="#ri-check-line"/></svg>
+          </button>
+          <button class="menu__item" role="menuitemradio" aria-checked="false" data-home="elm" data-address="1206 Elm Ridge Dr">
+            <span>
+              <span class="t-label t-ink">1206 Elm Ridge Dr</span>
+              <span class="t-meta menu__sub">Round Rock, TX 78664 &middot; no concerns</span>
+            </span>
+            <svg class="i i--check"><use href="#ri-check-line"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- @include welcome -->
+
+    <!-- 1. Ready to schedule: a compact bar above the home -->
+    <section class="card todo" id="actions" aria-labelledby="todo-title">
+      <div class="todo__head">
+        <div class="card__title-row">
+          <h2 class="t-strong" id="todo-title"><span class="when-actions">3 visits ready to schedule</span><span class="when-caught-up">Nothing to schedule</span></h2>
+        </div>
+        <p class="t-meta when-multi"><svg class="i i--16 inline-icon"><use href="#ri-home-4-line"/></svg>1206 Elm Ridge Dr has <strong class="t-ink">1 visit</strong> to schedule. <button class="link" data-switch-home="elm">Switch home</button></p>
+      </div>
+
+      <ul class="todo__list when-actions">
+        <li class="todo__item todo__item--pm">
+          <div class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-door-closed-line"/></svg></div>
+          <div class="todo__main">
+            <p class="t-strong">Fall preventive maintenance <span class="badge badge--on-tint">Included in your membership</span></p>
+            <p class="t-meta">30-point home check &middot; about 2 hours &middot; earliest opening Tue, Oct 13</p>
+          </div>
+          <a class="btn btn--primary" href="#">Schedule visit</a>
+        </li>
+        <li class="todo__item">
+          <div class="tile-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></div>
+          <div class="todo__main">
+            <p class="t-strong">Kitchen faucet leak and garbage disposal jam</p>
+            <p class="t-meta">Service visit &middot; 2 tasks &middot; about 1.5 hours &middot; requested Sep 22</p>
+          </div>
+          <a class="btn btn--secondary" href="#">Schedule visit</a>
+        </li>
+        <li class="todo__item">
+          <div class="tile-icon"><svg class="i"><use href="#ri-drop-line"/></svg></div>
+          <div class="todo__main">
+            <p class="t-strong">HVAC condensate line flush</p>
+            <p class="t-meta">Service visit &middot; 1 task &middot; about 1 hour &middot; from a recommendation you approved</p>
+          </div>
+          <a class="btn btn--secondary" href="#">Schedule visit</a>
+        </li>
+      </ul>
+      <p class="t-meta todo__done when-caught-up"><svg class="i i--16 inline-icon"><use href="#ri-checkbox-circle-line"/></svg>Your next visit is Mon, Sep 28. Your Spring visit opens for scheduling in February.</p>
+    </section>
+
+    <!-- 2. The home: condition, preventive maintenance, team -->
+    <section class="card home" id="home" aria-labelledby="home-title">
+      <div class="home__top">
+        <div class="home__id">
+          <h2 class="t-display" id="home-title" data-home-label>4817 Mueller Blvd</h2>
+          <p class="t-desc">Austin, TX 78723 &middot; 2 HVAC systems &middot; PreFix Protect since March 2023</p>
+        </div>
+        <div class="home__links">
+          <a class="link" href="#">Latest snapshot<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
+          <a class="btn btn--secondary" href="#"><svg class="i"><use href="#ri-heart-pulse-line"/></svg>Home Health Report</a>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="home__grid">
+        <div class="home__health">
+          <p class="group-label">Condition at your Spring visit</p>
+          <p class="t-meta">Tue, Apr 14 &middot; 30 checks by Priya Shah</p>
+          <div class="stats">
+            <div class="stat">
+              <p class="t-display t-num stat__n stat__n--red">1</p>
+              <p class="t-label stat__label"><svg class="i i--16"><use href="#ri-error-warning-fill"/></svg>Critical</p>
+            </div>
+            <div class="stat">
+              <p class="t-display t-num stat__n">3</p>
+              <p class="t-label stat__label"><svg class="i i--16"><use href="#ri-alert-line"/></svg>Cause for concern</p>
+            </div>
+            <div class="stat">
+              <p class="t-display t-num stat__n stat__n--blue">26</p>
+              <p class="t-label stat__label"><svg class="i i--16"><use href="#ri-checkbox-circle-fill"/></svg>No concern</p>
+            </div>
+          </div>
+          <div class="stat-bar" aria-hidden="true"><span class="stat-bar__red" style="width:3.33%"></span><span class="stat-bar__ink" style="width:10%"></span><span class="stat-bar__blue"></span></div>
+          <p class="t-meta home__recs"><span class="t-red"><span data-rec-open-count>4</span> recommendations</span> need your decision. You&rsquo;ll find each one with its system below.</p>
+        </div>
+
+        <div class="home__pm">
+          <p class="group-label">Preventive maintenance</p>
+          <ul class="features">
+            <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Spring visit<span class="feature__sub">Done Tue, Apr 14</span></span></li>
+            <li class="feature when-actions"><span class="i-box"><svg class="i"><use href="#ri-door-closed-line"/></svg></span><span class="feature__text">Fall visit<span class="feature__sub">Ready to schedule</span></span></li>
+            <li class="feature when-caught-up"><span class="i-box"><svg class="i"><use href="#ri-calendar-line"/></svg></span><span class="feature__text">Fall visit<span class="feature__sub">Tue, Oct 13 &middot; 9:00&ndash;11:00 AM</span></span></li>
+          </ul>
+          <p class="t-meta home__pm-note">Both visits are included in your membership.</p>
+        </div>
+
+        <div class="home__team">
+          <p class="group-label">Your team</p>
+          <ul class="people people--compact">
+            <li class="person">
+              <span class="avatar">MR</span>
+              <div class="person__main">
+                <p class="t-strong">Marcus Reyes</p>
+                <p class="t-meta">Home Manager &middot; repairs</p>
+              </div>
+            </li>
+            <li class="person">
+              <span class="avatar">PS</span>
+              <div class="person__main">
+                <p class="t-strong">Priya Shah</p>
+                <p class="t-meta">PM technician</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <div class="main">
+        <div class="systems__head">
+          <h2 class="t-title">Your home&rsquo;s systems</h2>
+          <p class="t-desc">What needs attention comes first. Each system shows its last check, open recommendations and recent work.</p>
+        </div>
+
+        <div class="systems">
+
+          <!-- Water heater: critical -->
+          <article class="card tile" id="sys-water-heater" aria-labelledby="sys-wh">
+            <div class="tile__head">
+              <div class="tile-icon"><svg class="i"><use href="#ri-fire-line"/></svg></div>
+              <div class="tile__name">
+                <span class="badge badge--critical">Critical</span>
+                <h3 class="t-strong" id="sys-wh">Water heater</h3>
+                <p class="t-meta">Checked Apr 14 &middot; <a class="link" href="#">Snapshot</a></p>
+              </div>
+            </div>
+            <div class="tile__rec">
+              <!-- @include rec-water-heater -->
+            </div>
+            <ul class="features tile__facts">
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Sediment flushed at your Spring visit</span></li>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Drain pan dry, no tank leaks</span></li>
+            </ul>
+            <div class="tile__foot">
+              <button class="link" data-toggle="hist-wh" aria-expanded="false" aria-controls="hist-wh" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+              <a class="link" href="#">Request service</a>
+            </div>
+            <ul class="features tile__history" id="hist-wh" hidden>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Sediment flushed<span class="feature__sub">Spring visit, Apr 14</span></span></li>
+              <li class="feature feature--cross"><span class="i-box"><svg class="i"><use href="#ri-close-line"/></svg></span><span class="feature__text">Relief valve inspected, leak found<span class="feature__sub">Spring visit, Apr 14</span></span></li>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Drain pan checked for leaks<span class="feature__sub">Fall visit, Oct 20, 2025</span></span></li>
+            </ul>
+          </article>
+
+          <!-- HVAC: cause for concern, with the seasonal tip -->
+          <article class="card tile" id="sys-hvac" aria-labelledby="sys-hv">
+            <div class="tile__head">
+              <div class="tile-icon"><svg class="i"><use href="#ri-windy-line"/></svg></div>
+              <div class="tile__name">
+                <span class="badge badge--high">Cause for concern</span>
+                <h3 class="t-strong" id="sys-hv">Heating and cooling</h3>
+                <p class="t-meta">2 systems &middot; checked Apr 14 &middot; <a class="link" href="#">Snapshot</a></p>
+              </div>
+            </div>
+            <div class="tile__rec">
+              <!-- @include rec-upstairs-ac -->
+            </div>
+            <ul class="features tile__facts">
+              <li class="feature"><span class="i-box"><svg class="i"><use href="#ri-drop-line"/></svg></span><span class="feature__text">Condensate line flush approved<span class="feature__sub when-actions">Ready to schedule</span><span class="feature__sub when-caught-up">Scheduled with your Fall visit</span></span></li>
+            </ul>
+            <div class="tip">
+              <svg class="i tip__icon"><use href="#ri-temp-cold-line"/></svg>
+              <div class="tip__text">
+                <p class="t-label">Heating season is coming</p>
+                <p class="t-meta">Your Fall visit includes a heating check. Your <span class="t-blue">$50 HVAC credit</span> covers part of a tune-up.</p>
+                <a class="link" href="#">Book a heating tune-up</a>
+              </div>
+            </div>
+            <div class="tile__foot">
+              <button class="link" data-toggle="hist-hv" aria-expanded="false" aria-controls="hist-hv" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+              <a class="link" href="#">Request service</a>
+            </div>
+            <ul class="features tile__history" id="hist-hv" hidden>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Filters changed, filters included<span class="feature__sub">Spring visit, Apr 14</span></span></li>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Supply and return temperatures recorded<span class="feature__sub">Spring visit, Apr 14</span></span></li>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Condenser coils cleaned<span class="feature__sub">Fall visit, Oct 20, 2025</span></span></li>
+            </ul>
+          </article>
+
+          <!-- Appliances: cause for concern, with appliance list and Sibi offer -->
+          <article class="card tile" id="sys-appliances" aria-labelledby="sys-ap">
+            <div class="tile__head">
+              <div class="tile-icon"><svg class="i"><use href="#ri-fridge-line"/></svg></div>
+              <div class="tile__name">
+                <span class="badge badge--high">Cause for concern</span>
+                <h3 class="t-strong" id="sys-ap">Appliances</h3>
+                <p class="t-meta">4 on file &middot; checked Apr 14 &middot; <a class="link" href="#">Snapshot</a></p>
+              </div>
+            </div>
+            <div class="tile__rec">
+              <!-- @include rec-dryer-vent -->
+            </div>
+            <button class="link tile__toggle" data-toggle="appliance-list" aria-expanded="false" aria-controls="appliance-list" data-open="Hide appliances" data-closed="See your 4 appliances"><span data-label>See your 4 appliances</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+            <dl class="appliances" id="appliance-list" hidden>
+              <div class="appliances__row"><dt>Refrigerator</dt><dd>Whirlpool &middot; 6 years</dd></div>
+              <div class="appliances__row"><dt>Washer</dt><dd>LG &middot; 4 years</dd></div>
+              <div class="appliances__row"><dt>Dryer</dt><dd>LG &middot; 4 years</dd></div>
+              <div class="appliances__row"><dt>Dishwasher</dt><dd>Bosch &middot; 9 years</dd></div>
+              <p class="t-meta appliances__note">From your enrollment visit. Tell us if something has changed.</p>
+            </dl>
+            <div class="tip tip--neutral">
+              <svg class="i tip__icon"><use href="#ri-shopping-bag-3-line"/></svg>
+              <div class="tip__text">
+                <p class="t-label">Replacing an appliance?</p>
+                <p class="t-meta">Member pricing through our partner Sibi. Your Home Manager can handle the install.</p>
+                <a class="link" href="#">Shop appliances<svg class="i"><use href="#ri-arrow-right-up-line"/></svg></a>
+              </div>
+            </div>
+            <div class="tile__foot">
+              <button class="link" data-toggle="hist-ap" aria-expanded="false" aria-controls="hist-ap" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+              <a class="link" href="#">Request service</a>
+            </div>
+            <ul class="features tile__history" id="hist-ap" hidden>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Refrigerator condenser coils cleaned<span class="feature__sub">Spring visit, Apr 14</span></span></li>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Washer and dishwasher sanitized<span class="feature__sub">Spring visit, Apr 14</span></span></li>
+              <li class="feature feature--cross"><span class="i-box"><svg class="i"><use href="#ri-close-line"/></svg></span><span class="feature__text">Dryer vent lint buildup found<span class="feature__sub">Spring visit, Apr 14</span></span></li>
+            </ul>
+          </article>
+
+          <!-- Structure and exterior: cause for concern -->
+          <article class="card tile" id="sys-structure" aria-labelledby="sys-st">
+            <div class="tile__head">
+              <div class="tile-icon"><svg class="i"><use href="#ri-home-gear-line"/></svg></div>
+              <div class="tile__name">
+                <span class="badge badge--high">Cause for concern</span>
+                <h3 class="t-strong" id="sys-st">Structure and exterior</h3>
+                <p class="t-meta">Roof, walls, windows, doors &middot; <a class="link" href="#">Snapshot</a></p>
+              </div>
+            </div>
+            <div class="tile__rec">
+              <!-- @include rec-kitchen-window -->
+            </div>
+            <ul class="features tile__facts">
+              <li class="feature"><span class="i-box"><svg class="i"><use href="#ri-calendar-line"/></svg></span><span class="feature__text">2 visits booked<span class="feature__sub">Back door and hinges, Mon, Sep 28 &middot; Ceiling stain, Wed, Oct 21</span></span></li>
+            </ul>
+            <div class="tile__foot">
+              <button class="link" data-toggle="hist-st" aria-expanded="false" aria-controls="hist-st" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+              <a class="link" href="#">Request service</a>
+            </div>
+            <ul class="features tile__history" id="hist-st" hidden>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Roof leak repaired by a licensed roofer<span class="feature__sub">Managed by PreFix, Feb 11</span></span></li>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Garage door functional check<span class="feature__sub">Spring visit, Apr 14</span></span></li>
+            </ul>
+          </article>
+
+          <!-- Plumbing: no concern -->
+          <article class="card tile" id="sys-plumbing" aria-labelledby="sys-pl">
+            <div class="tile__head">
+              <div class="tile-icon"><svg class="i"><use href="#ri-drop-line"/></svg></div>
+              <div class="tile__name">
+                <span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>No concern</span>
+                <h3 class="t-strong" id="sys-pl">Plumbing and drains</h3>
+                <p class="t-meta">Checked Apr 14 &middot; <a class="link" href="#">Snapshot</a></p>
+              </div>
+            </div>
+            <ul class="features tile__facts">
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Exposed plumbing checked for leaks</span></li>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">All drains checked for flow</span></li>
+              <li class="feature when-actions"><span class="i-box"><svg class="i"><use href="#ri-hammer-line"/></svg></span><span class="feature__text">Kitchen faucet and disposal visit<span class="feature__sub">Ready to schedule</span></span></li>
+            </ul>
+            <div class="tile__foot">
+              <button class="link" data-toggle="hist-pl" aria-expanded="false" aria-controls="hist-pl" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+              <a class="link" href="#">Request service</a>
+            </div>
+            <ul class="features tile__history" id="hist-pl" hidden>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Toilet fill valve replaced<span class="feature__sub">Marcus Reyes, Mar 3</span></span></li>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Bathroom exhaust fan replaced<span class="feature__sub">Marcus Reyes, Jun 9</span></span></li>
+            </ul>
+          </article>
+
+          <!-- Safety: no concern -->
+          <article class="card tile" id="sys-safety" aria-labelledby="sys-sa">
+            <div class="tile__head">
+              <div class="tile-icon"><svg class="i"><use href="#ri-alarm-warning-line"/></svg></div>
+              <div class="tile__name">
+                <span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>No concern</span>
+                <h3 class="t-strong" id="sys-sa">Safety</h3>
+                <p class="t-meta">Smoke and CO detectors &middot; <a class="link" href="#">Snapshot</a></p>
+              </div>
+            </div>
+            <ul class="features tile__facts">
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">6 detectors tested, batteries changed</span></li>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Water and gas shutoffs located</span></li>
+            </ul>
+            <div class="tip tip--neutral">
+              <svg class="i tip__icon"><use href="#ri-lightbulb-line"/></svg>
+              <div class="tip__text">
+                <p class="t-meta">Press each detector&rsquo;s test button once a month. We&rsquo;ll change the batteries again at your Fall visit.</p>
+              </div>
+            </div>
+            <div class="tile__foot">
+              <button class="link" data-toggle="hist-sa" aria-expanded="false" aria-controls="hist-sa" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+              <a class="link" href="#">Request service</a>
+            </div>
+            <ul class="features tile__history" id="hist-sa" hidden>
+              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Detectors tested, batteries changed<span class="feature__sub">Fall visit, Oct 20, 2025</span></span></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+
+      <aside class="rail" aria-label="Visits and membership">
+
+        <!-- Upcoming visits -->
+        <section class="card" id="upcoming" aria-labelledby="upcoming-title">
+          <div class="card__head">
+            <div class="card__heading">
+              <h2 class="t-title" id="upcoming-title">Upcoming visits</h2>
+            </div>
+            <a class="link card__head-link" href="#">All visits<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
+          </div>
+          <div class="card__body visits">
+            <!-- @include visits -->
+          </div>
+        </section>
+
+        <!-- @include savings-credits -->
+
+        <!-- @include plan-usage -->
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <!-- @include footer -->
+</div>
+
+<!-- @include overlays -->
+{{SCRIPTS}}
+</body>
+</html>

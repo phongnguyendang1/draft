@@ -1,0 +1,44 @@
+        <!-- 7. Savings and credits -->
+        <section class="card" id="savings" aria-labelledby="savings-title">
+          <h2 class="t-title" id="savings-title">Your savings</h2>
+          <p class="t-desc savings__sub">This year vs. Austin market rates</p>
+          <p class="t-hero t-num savings__num">$1,240</p>
+          <button class="link" data-toggle="savings-math" aria-expanded="false" aria-controls="savings-math" data-open="Hide the math" data-closed="How we calculate">
+            <span data-label>How we calculate</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg>
+          </button>
+          <div class="savings__math" id="savings-math" hidden>
+            <dl class="ledger">
+              <div class="ledger__row"><dt>Market rate for the same work</dt><dd class="t-num">$1,652</dd></div>
+              <div class="ledger__row"><dt>What you paid PreFix</dt><dd class="t-num">&minus;$412</dd></div>
+              <div class="ledger__row ledger__row--total"><dt>You saved</dt><dd class="t-num">$1,240</dd></div>
+            </dl>
+            <p class="t-meta">Covers your 4 visits in 2026. Your membership fee is not included.</p>
+          </div>
+
+          <hr class="divider">
+
+          <div class="credits">
+            <div class="credits__row">
+              <span class="i-box"><svg class="i"><use href="#ri-coupon-3-line"/></svg></span>
+              <p class="t-body credits__label">Credits available</p>
+              <p class="t-strong t-num">$75</p>
+            </div>
+            <button class="link credits__toggle" data-toggle="credits-list" aria-expanded="false" aria-controls="credits-list" data-open="Hide credits" data-closed="See your credits">
+              <span data-label>See your credits</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg>
+            </button>
+            <ul class="credits__list" id="credits-list" hidden>
+              <li class="credit">
+                <div class="credit__top"><p class="t-strong">$50 HVAC credit</p><span class="badge badge--included">HVAC only</span></div>
+                <p class="t-meta">From PreFix &middot; expires Dec 31, 2026</p>
+              </li>
+              <li class="credit">
+                <div class="credit__top"><p class="t-strong">$25 credit</p><span class="badge badge--neutral">Any service</span></div>
+                <p class="t-meta">Referral: Jamie L. joined in May &middot; no expiry</p>
+              </li>
+              <li class="credit credit--refer">
+                <svg class="i"><use href="#ri-gift-line"/></svg>
+                <a class="link" href="#">Refer a friend to earn more credit</a>
+              </li>
+            </ul>
+          </div>
+        </section>

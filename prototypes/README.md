@@ -6,6 +6,7 @@ HTML/CSS prototypes for the Member Portal (HomeHub) dashboard redesign. Each opt
 | --- | --- | --- |
 | 1 · Action Center | [desktop.html](option-1-action-center/desktop.html) | [mobile.html](option-1-action-center/mobile.html) |
 | 2 · Membership at Work | [desktop.html](option-2-membership-at-work/desktop.html) | [mobile.html](option-2-membership-at-work/mobile.html) |
+| 3 · Home Health | [desktop.html](option-3-home-health/desktop.html) | [mobile.html](option-3-home-health/mobile.html) |
 
 Links to other pages are inert. Interactions on the page work: expand/collapse panels, the home switcher, the account and mobile menus, sending, declining (with a reason) or undoing recommendations, and swiping the mobile carousel in Option 2.
 
