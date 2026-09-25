@@ -1,0 +1,55 @@
+/*
+  HomeHub design tokens
+  Source: Figma "Prefix – Phong", Plans page, frames 12:10199 (plan cards) and 12:7872 (comparison table).
+  Values marked "ref" are measured from those frames. Values marked "a11y" are the closest
+  WCAG 2.1 AA-passing replacements for reference colors that fail as text.
+*/
+
+@font-face {
+  font-family: "DM Sans";
+  src: url("{{FONT_DM_SANS}}") format("woff2-variations");
+  font-weight: 100 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Color */
+  --ink: #0a2041;          /* ref: primary text and default icon color */
+  --text-2: #6b6b6b;       /* a11y: secondary text (ref #888888 is 3.5:1 on white) */
+  --slate: #587188;        /* ref: text links, tertiary text */
+  --on-yellow: #333333;    /* ref: label on yellow button */
+  --blue: #4498e5;         /* ref: selected borders, outline buttons, icons, active dots */
+  --blue-text: #1f6fc0;    /* a11y: blue used as text or behind white text (ref #4498e5 is 3.1:1) */
+  --blue-tint: #ebf5fe;    /* ref: selected / recommended surface */
+  --blue-faint: #f7fbff;   /* ref: secondary tinted surface */
+  --yellow: #f7cf46;       /* ref: primary action */
+  --yellow-hover: #f2c42a;
+  --red: #e0310a;          /* ref: deficit, negative, critical */
+  --red-tint: #fceae6;     /* ref: negative surface */
+  --border: #ccd7dc;       /* ref: 1px card borders and dividers */
+  --dot: #cecece;          /* ref: inactive pager dot */
+  --page: #f5f5f5;         /* page background behind white cards */
+  --surface: #ffffff;
+
+  /* Radius */
+  --r-card: 24px;          /* ref */
+  --r-inner: 16px;
+  --r-pill: 44px;          /* ref */
+
+  /* Space: 4pt scale */
+  --s-4: 4px;
+  --s-8: 8px;
+  --s-12: 12px;
+  --s-16: 16px;
+  --s-20: 20px;            /* ref: card padding */
+  --s-24: 24px;            /* ref: space around dividers */
+  --s-32: 32px;            /* ref: space between major blocks in a card */
+  --s-40: 40px;
+  --s-48: 48px;
+
+  /* Type: DM Sans, opsz 14, -2% tracking (ref) */
+  --track: -0.02em;
+}

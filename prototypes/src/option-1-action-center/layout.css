@@ -1,0 +1,52 @@
+/* Option 1 · Action Center
+   Desktop: two-up hero (Ready to schedule | Recommendations), then main column + 360px rail.
+   Mobile: one column ordered by priority. */
+
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-areas: "hero hero" "main rail"; gap: var(--s-24); }
+.hero { grid-area: hero; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-24); align-items: stretch; }
+.main { grid-area: main; display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
+.rail { grid-area: rail; display: flex; flex-direction: column; gap: var(--s-24); }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-24); }
+
+#actions, #recs { display: flex; flex-direction: column; }
+#actions .card__foot, #recs .card__foot { margin-top: auto; }
+#actions .card__body + .card__foot, #recs .recs + .card__foot { margin-top: auto; }
+#actions .card__foot { padding-top: var(--s-20); }
+#actions .request-prompt { margin-bottom: var(--s-24); }
+#recs .card__foot { padding-top: var(--s-24); }
+
+#seasonal, #promo { display: flex; flex-direction: column; }
+.duo__title { margin: var(--s-16) 0 var(--s-8); }
+.duo__list { margin: var(--s-16) 0 var(--s-24); }
+.duo .btn { margin-top: auto; }
+.promo__top { display: flex; align-items: flex-start; justify-content: space-between; }
+
+.savings__sub { margin-top: var(--s-8); }
+.savings__num { margin: var(--s-16) 0 var(--s-12); }
+.savings__math { margin-top: var(--s-16); display: flex; flex-direction: column; gap: var(--s-8); }
+
+.plan__sub { margin-top: var(--s-8); }
+.plan__price { display: flex; align-items: flex-end; gap: var(--s-12); margin: var(--s-16) 0 var(--s-12); }
+.services__head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--s-8); }
+.services__hint { margin: var(--s-8) 0; }
+.services__list { margin-top: var(--s-16); }
+.team__sub { margin-top: var(--s-8); }
+
+@container app (max-width: 767px) {
+  .layout { display: flex; flex-direction: column; gap: var(--s-16); }
+  .hero, .main, .rail, .duo { display: contents; }
+  #actions { order: 1; }
+  #recs { order: 2; }
+  #upcoming { order: 3; }
+  #savings { order: 4; }
+  #plan { order: 5; }
+  #team { order: 6; }
+  #recent { order: 7; }
+  #seasonal { order: 8; }
+  #promo { order: 9; }
+
+  #recs .card__foot { flex-direction: column-reverse; align-items: stretch; }
+  #recs .card__foot .btn { width: 100%; }
+  #recs .card__foot .link { align-self: center; }
+}
+body:not(.is-multi) #actions .request-prompt { margin-bottom: 0; }
