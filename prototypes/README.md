@@ -8,6 +8,7 @@ HTML/CSS prototypes for the Member Portal (HomeHub) dashboard redesign. Each opt
 | 2 · Membership at Work | [desktop.html](option-2-membership-at-work/desktop.html) | [mobile.html](option-2-membership-at-work/mobile.html) |
 | 3 · Home Health | [desktop.html](option-3-home-health/desktop.html) | [mobile.html](option-3-home-health/mobile.html) |
 | 4 · Timeline | [desktop.html](option-4-timeline/desktop.html) | [mobile.html](option-4-timeline/mobile.html) |
+| 5 · Adaptive Stack | [desktop.html](option-5-adaptive-stack/desktop.html) | [mobile.html](option-5-adaptive-stack/mobile.html) |
 
 Links to other pages are inert. Interactions on the page work: expand/collapse panels, the home switcher, the account and mobile menus, sending, declining (with a reason) or undoing recommendations, and swiping the mobile carousel in Option 2.
 
@@ -19,6 +20,8 @@ The dark **Prototype states** button in the bottom-right corner is not part of t
 - Welcome card
 - Nothing to schedule (the action center's empty state)
 - Member has 2 homes (home switcher and the other-home nudge)
+
+In Option 5 the panel also has a **Member stage** picker (Active member, Getting started, Payment issue, Prepaid year ending). Picking a stage reorders the cards and swaps the lead card, which is the point of that option.
 
 ## Design language
 

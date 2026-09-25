@@ -34,6 +34,10 @@ OPTIONS = [
         "slug": "option-4-timeline",
         "name": "Option 4 · Timeline",
     },
+    {
+        "slug": "option-5-adaptive-stack",
+        "name": "Option 5 · Adaptive Stack",
+    },
 ]
 
 FRAMES = {

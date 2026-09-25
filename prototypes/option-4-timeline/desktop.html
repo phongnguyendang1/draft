@@ -1616,6 +1616,18 @@ body.is-multi .when-single { display: none !important; }
   });
 
   document.addEventListener("change", function (e) {
+    var stage = e.target.closest("[data-stage-radio]");
+    if (stage) {
+      var prev = (body.className.match(/\bstage-([a-z]+)/) || [])[1];
+      ["active", "new", "payment", "renewal"].forEach(function (s) { body.classList.remove("stage-" + s); });
+      body.classList.add("stage-" + stage.value);
+      if (stage.value === "payment") applyState("payment", true);
+      else if (prev === "payment") applyState("payment", false);
+      refreshAll();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      toast("Dashboard reordered for: " + stage.nextElementSibling.textContent);
+      return;
+    }
     var sw = e.target.closest("[data-state-switch]");
     if (sw) { applyState(sw.getAttribute("data-state-switch"), sw.checked); return; }
     if (e.target.closest("[data-rec-select]")) updateRecCounts();
