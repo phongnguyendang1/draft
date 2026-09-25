@@ -65,7 +65,8 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+[id] { scroll-margin-top: 24px; }
 
 body {
   margin: 0;
@@ -457,6 +458,14 @@ body.is-multi .when-single { display: none !important; }
 .person__main { display: flex; flex-direction: column; gap: 2px; }
 .person__next { display: flex; align-items: center; gap: 6px; margin-top: var(--s-4); }
 
+/* Seasonal and promotion cards */
+#seasonal, #promo { display: flex; flex-direction: column; }
+#seasonal > .btn, #promo > .btn { margin-top: auto; }
+.duo__title { margin: var(--s-16) 0 var(--s-8); }
+.duo__list { margin: var(--s-16) 0 var(--s-24); }
+.promo__top { display: flex; align-items: flex-start; justify-content: space-between; }
+.team__sub { margin-top: var(--s-8); }
+
 /* Footer */
 .footer { background: var(--surface); border-top: 1px solid var(--border); }
 .footer__inner { max-width: var(--container); margin: 0 auto; padding: var(--s-24) 0; display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); }
@@ -534,11 +543,7 @@ body.is-multi .when-single { display: none !important; }
 #actions .request-prompt { margin-bottom: var(--s-24); }
 #recs .card__foot { padding-top: var(--s-24); }
 
-#seasonal, #promo { display: flex; flex-direction: column; }
-.duo__title { margin: var(--s-16) 0 var(--s-8); }
-.duo__list { margin: var(--s-16) 0 var(--s-24); }
 .duo .btn { margin-top: auto; }
-.promo__top { display: flex; align-items: flex-start; justify-content: space-between; }
 
 .savings__sub { margin-top: var(--s-8); }
 .savings__num { margin: var(--s-16) 0 var(--s-12); }
@@ -549,7 +554,6 @@ body.is-multi .when-single { display: none !important; }
 .services__head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--s-8); }
 .services__hint { margin: var(--s-8) 0; }
 .services__list { margin-top: var(--s-16); }
-.team__sub { margin-top: var(--s-8); }
 
 @container app (max-width: 767px) {
   .layout { display: flex; flex-direction: column; gap: var(--s-16); }
@@ -1354,6 +1358,48 @@ body:not(.is-multi) #actions .request-prompt { margin-bottom: 0; }
     if (id !== "mueller") toast("Prototype: sample data is the same for every home");
   }
 
+  function isShown(el) { return el.getClientRects().length > 0; }
+
+  /* Visible counts: <span data-count-visible=".selector"> */
+  function updateVisibleCounts() {
+    $all("[data-count-visible]").forEach(function (el) {
+      var n = $all(el.getAttribute("data-count-visible")).filter(isShown).length;
+      el.textContent = n;
+      el.hidden = n === 0;
+    });
+  }
+
+  /* Carousels: horizontal scroll with pager dots and "1 of N" (ref: plan pager) */
+  function refreshCarousel(root) {
+    var track = $("[data-carousel-track]", root);
+    var dots = $("[data-carousel-dots]", root);
+    var caption = $("[data-carousel-caption]", root);
+    if (!track) return;
+    var items = Array.prototype.slice.call(track.children).filter(isShown);
+    var n = items.length;
+    var index = 0;
+    var best = Infinity;
+    items.forEach(function (item, i) {
+      var d = Math.abs(item.offsetLeft - track.offsetLeft - track.scrollLeft - parseFloat(getComputedStyle(track).paddingLeft || 0));
+      if (d < best) { best = d; index = i; }
+    });
+    if (dots) {
+      if (dots.children.length !== n) {
+        dots.innerHTML = "";
+        for (var i = 0; i < n; i++) dots.appendChild(document.createElement("span"));
+      }
+      Array.prototype.forEach.call(dots.children, function (dot, i) { dot.classList.toggle("is-active", i === index); });
+    }
+    if (caption) caption.textContent = (index + 1) + " of " + n;
+  }
+  function refreshCarousels() { $all("[data-carousel]").forEach(refreshCarousel); }
+  $all("[data-carousel-track]").forEach(function (track) {
+    track.addEventListener("scroll", function () { refreshCarousel(track.closest("[data-carousel]")); }, { passive: true });
+  });
+  window.addEventListener("resize", refreshCarousels);
+
+  function refreshAll() { updateVisibleCounts(); refreshCarousels(); }
+
   /* Recommendations */
   function updateRecCounts() {
     var open = $all(".rec").filter(function (r) { return r.getAttribute("data-state") === "open" || r.getAttribute("data-state") === "declining"; }).length;
@@ -1368,6 +1414,11 @@ body:not(.is-multi) #actions .request-prompt { margin-bottom: 0; }
       el.hidden = n === 0;
     });
     $all("[data-rec-nav-count]").forEach(function (el) { el.textContent = open; el.hidden = open === 0; });
+    $all("[data-rec-mirror]").forEach(function (el) {
+      var rec = $('.rec[data-title="' + el.getAttribute("data-rec-mirror") + '"]');
+      var st = rec ? rec.getAttribute("data-state") : "open";
+      el.hidden = !(st === "open" || st === "declining");
+    });
     var selected = $all("[data-rec-select]").filter(function (c) {
       var rec = c.closest(".rec");
       return c.checked && rec && rec.getAttribute("data-state") === "open";
@@ -1376,6 +1427,7 @@ body:not(.is-multi) #actions .request-prompt { margin-bottom: 0; }
       btn.disabled = selected === 0;
       $("[data-label]", btn).textContent = selected > 0 ? "Submit selected (" + selected + ")" : "Submit selected";
     });
+    refreshAll();
   }
 
   function setRecState(rec, state, note) {
@@ -1392,6 +1444,7 @@ body:not(.is-multi) #actions .request-prompt { margin-bottom: 0; }
   function applyState(name, on) {
     body.classList.toggle("is-" + name, on);
     $all('[data-state-switch="' + name + '"]').forEach(function (input) { input.checked = on; });
+    refreshAll();
   }
 
   document.addEventListener("click", function (e) {

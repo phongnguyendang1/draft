@@ -1,0 +1,101 @@
+/* Option 2 · Membership at Work
+   Desktop: action strip, then the member's plan card (ribbon, selected style) beside the value table
+   (comparison-table grammar), then main column + 360px rail.
+   Mobile: the action strip becomes a swipe carousel with pager dots; everything else stacks. */
+
+/* Needs your attention */
+.attn { margin-bottom: var(--s-32); }
+.attn__head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); margin-bottom: var(--s-16); }
+.attn__other { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.attn__other .inline-icon { margin-right: 0; }
+.attn__track { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--s-16); }
+.attn-card { display: flex; flex-direction: column; gap: var(--s-4); padding: var(--s-20); border: 1px solid var(--border); border-radius: var(--r-card); background: var(--surface); }
+.attn-card__top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-8); margin-bottom: var(--s-12); }
+.attn-card__cta { margin-top: auto; padding-top: var(--s-16); }
+.attn-card--pm { background: var(--blue-tint); border-color: var(--blue-tint); }
+.attn-card--critical { background: var(--red-tint); border-color: var(--red-tint); }
+.attn-card--done { background: var(--blue-faint); }
+.attn__pager { display: none; }
+
+/* Scorecard: plan card + value card, bottom-aligned like the reference plan cards */
+.score { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: var(--s-24); align-items: stretch; margin-bottom: var(--s-24); }
+
+.plancard { display: flex; flex-direction: column; }
+.plancard__ribbon {
+  height: 52px; margin-bottom: -24px; padding: 6px var(--s-20);
+  border-radius: var(--r-card) var(--r-card) 0 0; background: var(--blue-text); color: #fff;
+  text-align: center; font-size: 12px; line-height: 16px; font-weight: 600;
+}
+.plancard__body { position: relative; flex: 1; padding: var(--s-20); border: 2px solid var(--blue-text); border-radius: var(--r-card); background: var(--blue-tint); }
+.plancard__desc { margin-top: var(--s-8); }
+.plancard__num { margin: var(--s-16) 0 var(--s-4); }
+.plancard__cta { margin-top: var(--s-32); }
+.plancard__credits { display: flex; margin-top: 2px; }
+.plancard .credits__list { margin: var(--s-16) 0 0 58px; }
+.credit--on-tint { background: var(--surface); }
+.plancard__price { display: flex; align-items: flex-end; gap: var(--s-12); margin-bottom: var(--s-12); }
+.plancard__links { display: flex; flex-wrap: wrap; gap: var(--s-8) var(--s-20); }
+
+.value { margin-top: 28px; }
+
+/* Value table (ref: comparison table) */
+.vt { margin-top: var(--s-24); }
+.vt__row { display: grid; grid-template-columns: minmax(0, 1fr) 128px 128px; column-gap: var(--s-8); }
+.vt__label { padding: var(--s-12) 0; display: flex; flex-direction: column; justify-content: center; gap: 2px; min-width: 0; }
+.vt__label .t-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 6px; }
+.vt__cell { display: flex; align-items: center; justify-content: center; padding: var(--s-12) var(--s-8); text-align: center; font-size: 16px; line-height: 24px; }
+.vt__cell--you { background: var(--blue-tint); }
+.vt__row--head .vt__label { padding: var(--s-8) 0; justify-content: flex-end; }
+.vt__row--head .vt__cell { align-items: flex-end; padding-top: var(--s-12); padding-bottom: var(--s-8); font-size: 14px; line-height: 20px; font-weight: 600; }
+.vt__row--head .vt__cell--you { border-radius: var(--r-inner) var(--r-inner) 0 0; }
+.vt__rule { height: 2px; background: var(--ink); }
+.vt__included { display: inline-flex; align-items: center; gap: var(--s-4); color: var(--blue-text); font-size: 14px; line-height: 20px; font-weight: 600; }
+.vt__row--total { border-top: 1px solid var(--border); }
+.vt__row--total .vt__cell { font-weight: 600; }
+.vt__row--total .vt__cell--you { border-radius: 0 0 var(--r-inner) var(--r-inner); }
+.value__note { margin-top: var(--s-16); }
+.value__how { margin-top: var(--s-16); }
+
+/* Services used */
+.svc__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-16); flex-wrap: wrap; }
+.svc .progress { margin: var(--s-12) 0 var(--s-20); }
+.svc__grid { display: grid; grid-auto-flow: column; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(5, auto); gap: var(--s-8) var(--s-24); }
+.svc__todo .i-box { color: var(--slate); }
+
+/* Lower section */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: var(--s-24); align-items: start; }
+.main, .rail { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
+
+@container app (max-width: 767px) {
+  .attn { margin-bottom: var(--s-24); }
+  .attn__head { flex-direction: column; align-items: flex-start; gap: var(--s-8); }
+  .attn__track {
+    display: flex; gap: var(--s-12); overflow-x: auto; scroll-snap-type: x mandatory;
+    margin: 0 calc(var(--s-16) * -1); padding: 0 var(--s-16); scroll-padding: 0 var(--s-16);
+    scrollbar-width: none;
+  }
+  .attn__track::-webkit-scrollbar { display: none; }
+  .attn-card { flex: 0 0 calc(100% - 40px); scroll-snap-align: start; }
+  .attn__pager { display: flex; flex-direction: column; align-items: center; gap: var(--s-8); margin-top: var(--s-16); }
+
+  .score { display: flex; flex-direction: column; gap: var(--s-16); margin-bottom: var(--s-16); }
+  .value { margin-top: 0; }
+  .value .card__head { flex-direction: column; gap: var(--s-8); }
+  .value .card__head-link { margin-top: 0; }
+  .vt__row { grid-template-columns: minmax(0, 1fr) 76px 76px; column-gap: var(--s-4); }
+  .vt__cell { padding-left: var(--s-4); padding-right: var(--s-4); }
+  .vt__row--head .vt__cell { font-size: 12px; line-height: 16px; }
+  .plancard .credits__list { margin-left: 0; }
+  .svc__grid { grid-auto-flow: row; grid-template-columns: 1fr; grid-template-rows: none; }
+
+  .layout { display: flex; flex-direction: column; gap: var(--s-16); }
+  .main, .rail { display: contents; }
+  #recs { order: 1; }
+  #upcoming { order: 2; }
+  #team { order: 3; }
+  #seasonal { order: 4; }
+  #promo { order: 5; }
+  #recs .card__foot { flex-direction: column-reverse; align-items: stretch; }
+  #recs .card__foot .btn { width: 100%; }
+  #recs .card__foot .link { align-self: center; }
+}

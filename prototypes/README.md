@@ -5,8 +5,9 @@ HTML/CSS prototypes for the Member Portal (HomeHub) dashboard redesign. Each opt
 | Option | Desktop | Mobile |
 | --- | --- | --- |
 | 1 · Action Center | [desktop.html](option-1-action-center/desktop.html) | [mobile.html](option-1-action-center/mobile.html) |
+| 2 · Membership at Work | [desktop.html](option-2-membership-at-work/desktop.html) | [mobile.html](option-2-membership-at-work/mobile.html) |
 
-Links to other pages are inert. Interactions on the page work: expand/collapse panels, the home switcher, the account and mobile menus, and sending, declining (with a reason) or undoing recommendations.
+Links to other pages are inert. Interactions on the page work: expand/collapse panels, the home switcher, the account and mobile menus, sending, declining (with a reason) or undoing recommendations, and swiping the mobile carousel in Option 2.
 
 ## Prototype states
 
@@ -40,6 +41,7 @@ Source lives in `src/`:
 - `src/shared/prototype.js`: in-page interactions
 - `src/shared/icons/`: Remix Icon SVGs (Apache 2.0) used by the templates
 - `src/shared/fonts/`: DM Sans variable font (SIL OFL)
+- `src/shared/partials/`: markup shared by every option (header, welcome, recommendations, visits, team, promotion, footer), pulled in with `<!-- @include name -->`
 - `src/<option>/dashboard.html` and `layout.css`: one template per option; the desktop and mobile screens share the markup, and the layout switches on the frame width with container queries
 
 After editing, rebuild the pages:

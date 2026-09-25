@@ -15,11 +15,7 @@
 #actions .request-prompt { margin-bottom: var(--s-24); }
 #recs .card__foot { padding-top: var(--s-24); }
 
-#seasonal, #promo { display: flex; flex-direction: column; }
-.duo__title { margin: var(--s-16) 0 var(--s-8); }
-.duo__list { margin: var(--s-16) 0 var(--s-24); }
 .duo .btn { margin-top: auto; }
-.promo__top { display: flex; align-items: flex-start; justify-content: space-between; }
 
 .savings__sub { margin-top: var(--s-8); }
 .savings__num { margin: var(--s-16) 0 var(--s-12); }
@@ -30,7 +26,6 @@
 .services__head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--s-8); }
 .services__hint { margin: var(--s-8) 0; }
 .services__list { margin-top: var(--s-16); }
-.team__sub { margin-top: var(--s-8); }
 
 @container app (max-width: 767px) {
   .layout { display: flex; flex-direction: column; gap: var(--s-16); }

@@ -1,0 +1,33 @@
+            <article class="rec" data-priority="high" data-state="open" data-title="Dryer vent cleaning">
+              <div class="rec__open">
+                <label class="check" aria-label="Select dryer vent cleaning"><input type="checkbox" data-rec-select><span class="check__box"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
+                <div class="rec__main">
+                  <div class="rec__tags"><span class="badge badge--high">High</span><span class="t-meta t-ink">Dryer vent</span></div>
+                  <h3 class="t-strong">Lint buildup is blocking airflow</h3>
+                  <p class="t-meta">A blocked vent makes drying slower and raises the risk of a dryer fire.</p>
+                  <ul class="rec__meta">
+                    <li><svg class="i i--16"><use href="#ri-user-line"/></svg>Home Manager &middot; about 1 hour</li>
+                    <li><svg class="i i--16"><use href="#ri-camera-line"/></svg>1 photo</li>
+                  </ul>
+                  <div class="rec__actions">
+                    <button class="btn btn--secondary" data-rec-submit>Send to PreFix</button>
+                    <button class="link" data-rec-decline>Decline</button>
+                  </div>
+                </div>
+              </div>
+              <div class="rec__reasons">
+                <p class="t-strong">Why are you declining &ldquo;Lint buildup is blocking airflow&rdquo;?</p>
+                <div class="chips">
+                  <button class="chip" data-reason="already taken care of">Already taken care of</button>
+                  <button class="chip" data-reason="not a priority right now">Not a priority right now</button>
+                  <button class="chip" data-reason="cost">Cost</button>
+                  <button class="chip" data-reason="I&rsquo;ll handle it myself">I&rsquo;ll handle it myself</button>
+                </div>
+                <button class="link" data-rec-cancel-decline>Keep it open</button>
+              </div>
+              <div class="rec__done">
+                <svg class="i rec__done-icon"><use href="#ri-checkbox-circle-line"/></svg>
+                <p class="t-meta t-ink" data-rec-note></p>
+                <button class="link" data-rec-undo>Undo</button>
+              </div>
+            </article>

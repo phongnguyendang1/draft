@@ -1,0 +1,64 @@
+  <!-- Payment banner: one line, locked above the navigation on every page -->
+  <div class="paybar when-payment" role="alert">
+    <div class="paybar__inner">
+      <svg class="i paybar__icon"><use href="#ri-error-warning-fill"/></svg>
+      <p class="paybar__text"><strong>Your payment didn&rsquo;t go through.</strong> Update your card to keep visits on schedule at 4817 Mueller Blvd<span class="when-multi"> and 1206 Elm Ridge Dr</span>.</p>
+      <a class="btn btn--secondary paybar__btn" href="#">Update payment</a>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="#" aria-label="PreFix HomeHub">
+        <span class="brand__mark"><svg class="i"><use href="#ri-home-4-fill"/></svg></span>
+        <span class="brand__name">PreFix</span>
+        <span class="brand__product">HomeHub</span>
+      </a>
+
+      <nav class="nav" aria-label="Main">
+        <a class="nav__link is-active" href="#" aria-current="page">Dashboard</a>
+        <a class="nav__link" href="#">Visits &amp; requests</a>
+        <a class="nav__link" href="#">Recommendations <span class="count count--red" data-rec-nav-count>4</span></a>
+        <a class="nav__link" href="#">Home Health</a>
+        <a class="nav__link" href="#">Billing</a>
+      </nav>
+
+      <div class="topbar__actions">
+        <a class="icon-btn icon-btn--bare" href="#" aria-label="Get help" title="Get help"><svg class="i"><use href="#ri-question-line"/></svg></a>
+        <a class="btn btn--secondary" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Request service</a>
+        <div class="menu-wrap">
+          <button class="avatar-btn" data-menu="account-menu" aria-expanded="false" aria-label="Account menu">SM</button>
+          <div class="menu" id="account-menu" hidden>
+            <div class="menu__who">
+              <p class="t-strong">Sarah Mitchell</p>
+              <p class="t-meta">sarah.mitchell@example.com</p>
+            </div>
+            <div class="menu__sep"></div>
+            <a class="menu__item" href="#"><svg class="i"><use href="#ri-user-line"/></svg>Account</a>
+            <a class="menu__item" href="#"><svg class="i"><use href="#ri-bank-card-line"/></svg>Payment method</a>
+            <a class="menu__item" href="#"><svg class="i"><use href="#ri-logout-box-r-line"/></svg>Sign out</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar__mobile">
+        <a class="btn btn--secondary btn--compact" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Request</a>
+        <button class="icon-btn" data-toggle="mobile-nav" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu">
+          <svg class="i icon-when-closed"><use href="#ri-menu-line"/></svg>
+          <svg class="i icon-when-open"><use href="#ri-close-line"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <nav class="mnav" id="mobile-nav" aria-label="Main" hidden>
+      <a class="mnav__link is-active" href="#" aria-current="page">Dashboard</a>
+      <a class="mnav__link" href="#">Visits &amp; requests</a>
+      <a class="mnav__link" href="#">Recommendations <span class="count count--red" data-rec-nav-count>4</span></a>
+      <a class="mnav__link" href="#">Home Health</a>
+      <a class="mnav__link" href="#">Billing</a>
+      <div class="mnav__sep"></div>
+      <a class="mnav__link mnav__link--quiet" href="#"><svg class="i"><use href="#ri-question-line"/></svg>Get help</a>
+      <a class="mnav__link mnav__link--quiet" href="#"><svg class="i"><use href="#ri-user-line"/></svg>Account</a>
+      <a class="mnav__link mnav__link--quiet" href="#"><svg class="i"><use href="#ri-logout-box-r-line"/></svg>Sign out</a>
+    </nav>
+  </header>

@@ -49,6 +49,48 @@
     if (id !== "mueller") toast("Prototype: sample data is the same for every home");
   }
 
+  function isShown(el) { return el.getClientRects().length > 0; }
+
+  /* Visible counts: <span data-count-visible=".selector"> */
+  function updateVisibleCounts() {
+    $all("[data-count-visible]").forEach(function (el) {
+      var n = $all(el.getAttribute("data-count-visible")).filter(isShown).length;
+      el.textContent = n;
+      el.hidden = n === 0;
+    });
+  }
+
+  /* Carousels: horizontal scroll with pager dots and "1 of N" (ref: plan pager) */
+  function refreshCarousel(root) {
+    var track = $("[data-carousel-track]", root);
+    var dots = $("[data-carousel-dots]", root);
+    var caption = $("[data-carousel-caption]", root);
+    if (!track) return;
+    var items = Array.prototype.slice.call(track.children).filter(isShown);
+    var n = items.length;
+    var index = 0;
+    var best = Infinity;
+    items.forEach(function (item, i) {
+      var d = Math.abs(item.offsetLeft - track.offsetLeft - track.scrollLeft - parseFloat(getComputedStyle(track).paddingLeft || 0));
+      if (d < best) { best = d; index = i; }
+    });
+    if (dots) {
+      if (dots.children.length !== n) {
+        dots.innerHTML = "";
+        for (var i = 0; i < n; i++) dots.appendChild(document.createElement("span"));
+      }
+      Array.prototype.forEach.call(dots.children, function (dot, i) { dot.classList.toggle("is-active", i === index); });
+    }
+    if (caption) caption.textContent = (index + 1) + " of " + n;
+  }
+  function refreshCarousels() { $all("[data-carousel]").forEach(refreshCarousel); }
+  $all("[data-carousel-track]").forEach(function (track) {
+    track.addEventListener("scroll", function () { refreshCarousel(track.closest("[data-carousel]")); }, { passive: true });
+  });
+  window.addEventListener("resize", refreshCarousels);
+
+  function refreshAll() { updateVisibleCounts(); refreshCarousels(); }
+
   /* Recommendations */
   function updateRecCounts() {
     var open = $all(".rec").filter(function (r) { return r.getAttribute("data-state") === "open" || r.getAttribute("data-state") === "declining"; }).length;
@@ -63,6 +105,11 @@
       el.hidden = n === 0;
     });
     $all("[data-rec-nav-count]").forEach(function (el) { el.textContent = open; el.hidden = open === 0; });
+    $all("[data-rec-mirror]").forEach(function (el) {
+      var rec = $('.rec[data-title="' + el.getAttribute("data-rec-mirror") + '"]');
+      var st = rec ? rec.getAttribute("data-state") : "open";
+      el.hidden = !(st === "open" || st === "declining");
+    });
     var selected = $all("[data-rec-select]").filter(function (c) {
       var rec = c.closest(".rec");
       return c.checked && rec && rec.getAttribute("data-state") === "open";
@@ -71,6 +118,7 @@
       btn.disabled = selected === 0;
       $("[data-label]", btn).textContent = selected > 0 ? "Submit selected (" + selected + ")" : "Submit selected";
     });
+    refreshAll();
   }
 
   function setRecState(rec, state, note) {
@@ -87,6 +135,7 @@
   function applyState(name, on) {
     body.classList.toggle("is-" + name, on);
     $all('[data-state-switch="' + name + '"]').forEach(function (input) { input.checked = on; });
+    refreshAll();
   }
 
   document.addEventListener("click", function (e) {

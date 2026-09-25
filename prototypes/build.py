@@ -22,6 +22,10 @@ OPTIONS = [
         "slug": "option-1-action-center",
         "name": "Option 1 · Action Center",
     },
+    {
+        "slug": "option-2-membership-at-work",
+        "name": "Option 2 · Membership at Work",
+    },
 ]
 
 FRAMES = {
@@ -36,8 +40,25 @@ def icon_symbol(name):
     return f'<symbol id="ri-{name}" viewBox="0 0 24 24">{inner}</symbol>'
 
 
+INCLUDE = re.compile(r"^[ ]*<!-- @include ([a-z0-9-]+) -->\n", re.M)
+
+
+def resolve_includes(html, depth=0):
+    """Replace <!-- @include name --> lines with src/shared/partials/name.html."""
+    if depth > 5:
+        sys.exit("Includes nested too deeply")
+
+    def sub(match):
+        path = SHARED / "partials" / f"{match.group(1)}.html"
+        if not path.exists():
+            sys.exit(f"Missing partial: {path.relative_to(ROOT)}")
+        return resolve_includes(path.read_text(), depth + 1)
+
+    return INCLUDE.sub(sub, html)
+
+
 def build_page(option, frame_key):
-    template = (SRC / option["slug"] / "dashboard.html").read_text()
+    template = resolve_includes((SRC / option["slug"] / "dashboard.html").read_text())
 
     names = sorted(set(re.findall(r'href="#ri-([a-z0-9-]+)"', template)))
     missing = [n for n in names if not (SHARED / "icons" / f"{n}.svg").exists()]

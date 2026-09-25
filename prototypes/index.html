@@ -65,7 +65,8 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+[id] { scroll-margin-top: 24px; }
 
 body {
   margin: 0;
@@ -316,6 +317,13 @@ body.is-multi .when-single { display: none !important; }
         <div class="index__links">
           <a class="btn btn--secondary" href="option-1-action-center/desktop.html">Desktop · 1280</a>
           <a class="btn btn--secondary" href="option-1-action-center/mobile.html">Mobile · 390</a>
+        </div>
+      </li>
+      <li class="card index__row">
+        <p class="t-title">Option 2 · Membership at Work</p>
+        <div class="index__links">
+          <a class="btn btn--secondary" href="option-2-membership-at-work/desktop.html">Desktop · 1280</a>
+          <a class="btn btn--secondary" href="option-2-membership-at-work/mobile.html">Mobile · 390</a>
         </div>
       </li>
     </ul>

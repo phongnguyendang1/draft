@@ -155,6 +155,14 @@
 .person__main { display: flex; flex-direction: column; gap: 2px; }
 .person__next { display: flex; align-items: center; gap: 6px; margin-top: var(--s-4); }
 
+/* Seasonal and promotion cards */
+#seasonal, #promo { display: flex; flex-direction: column; }
+#seasonal > .btn, #promo > .btn { margin-top: auto; }
+.duo__title { margin: var(--s-16) 0 var(--s-8); }
+.duo__list { margin: var(--s-16) 0 var(--s-24); }
+.promo__top { display: flex; align-items: flex-start; justify-content: space-between; }
+.team__sub { margin-top: var(--s-8); }
+
 /* Footer */
 .footer { background: var(--surface); border-top: 1px solid var(--border); }
 .footer__inner { max-width: var(--container); margin: 0 auto; padding: var(--s-24) 0; display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); }

@@ -11,70 +11,7 @@
 
 <div class="app">
 
-  <!-- Payment banner: one line, locked above the navigation on every page -->
-  <div class="paybar when-payment" role="alert">
-    <div class="paybar__inner">
-      <svg class="i paybar__icon"><use href="#ri-error-warning-fill"/></svg>
-      <p class="paybar__text"><strong>Your payment didn&rsquo;t go through.</strong> Update your card to keep visits on schedule at 4817 Mueller Blvd<span class="when-multi"> and 1206 Elm Ridge Dr</span>.</p>
-      <a class="btn btn--secondary paybar__btn" href="#">Update payment</a>
-    </div>
-  </div>
-
-  <header class="topbar">
-    <div class="topbar__inner">
-      <a class="brand" href="#" aria-label="PreFix HomeHub">
-        <span class="brand__mark"><svg class="i"><use href="#ri-home-4-fill"/></svg></span>
-        <span class="brand__name">PreFix</span>
-        <span class="brand__product">HomeHub</span>
-      </a>
-
-      <nav class="nav" aria-label="Main">
-        <a class="nav__link is-active" href="#" aria-current="page">Dashboard</a>
-        <a class="nav__link" href="#">Visits &amp; requests</a>
-        <a class="nav__link" href="#">Recommendations <span class="count count--red" data-rec-nav-count>4</span></a>
-        <a class="nav__link" href="#">Home Health</a>
-        <a class="nav__link" href="#">Billing</a>
-      </nav>
-
-      <div class="topbar__actions">
-        <a class="icon-btn icon-btn--bare" href="#" aria-label="Get help" title="Get help"><svg class="i"><use href="#ri-question-line"/></svg></a>
-        <a class="btn btn--secondary" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Request service</a>
-        <div class="menu-wrap">
-          <button class="avatar-btn" data-menu="account-menu" aria-expanded="false" aria-label="Account menu">SM</button>
-          <div class="menu" id="account-menu" hidden>
-            <div class="menu__who">
-              <p class="t-strong">Sarah Mitchell</p>
-              <p class="t-meta">sarah.mitchell@example.com</p>
-            </div>
-            <div class="menu__sep"></div>
-            <a class="menu__item" href="#"><svg class="i"><use href="#ri-user-line"/></svg>Account</a>
-            <a class="menu__item" href="#"><svg class="i"><use href="#ri-bank-card-line"/></svg>Payment method</a>
-            <a class="menu__item" href="#"><svg class="i"><use href="#ri-logout-box-r-line"/></svg>Sign out</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="topbar__mobile">
-        <a class="btn btn--secondary btn--compact" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Request</a>
-        <button class="icon-btn" data-toggle="mobile-nav" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu">
-          <svg class="i icon-when-closed"><use href="#ri-menu-line"/></svg>
-          <svg class="i icon-when-open"><use href="#ri-close-line"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <nav class="mnav" id="mobile-nav" aria-label="Main" hidden>
-      <a class="mnav__link is-active" href="#" aria-current="page">Dashboard</a>
-      <a class="mnav__link" href="#">Visits &amp; requests</a>
-      <a class="mnav__link" href="#">Recommendations <span class="count count--red" data-rec-nav-count>4</span></a>
-      <a class="mnav__link" href="#">Home Health</a>
-      <a class="mnav__link" href="#">Billing</a>
-      <div class="mnav__sep"></div>
-      <a class="mnav__link mnav__link--quiet" href="#"><svg class="i"><use href="#ri-question-line"/></svg>Get help</a>
-      <a class="mnav__link mnav__link--quiet" href="#"><svg class="i"><use href="#ri-user-line"/></svg>Account</a>
-      <a class="mnav__link mnav__link--quiet" href="#"><svg class="i"><use href="#ri-logout-box-r-line"/></svg>Sign out</a>
-    </nav>
-  </header>
+  <!-- @include top -->
 
   <main class="page">
 
@@ -110,16 +47,7 @@
       </div>
     </section>
 
-    <!-- Welcome: dismissible, shown for 30 days -->
-    <section class="welcome when-welcome" aria-label="Welcome">
-      <div class="welcome__icon tile-icon tile-icon--tint"><svg class="i i--24"><use href="#ri-sparkling-line"/></svg></div>
-      <div class="welcome__text">
-        <h2 class="t-strong">Welcome to the new HomeHub</h2>
-        <p class="t-body">Anything that needs you is now at the top. Past visits and summaries live in <strong>Visits &amp; requests</strong>.</p>
-      </div>
-      <button class="btn btn--secondary welcome__ok" data-dismiss="welcome">Got it</button>
-      <button class="icon-btn icon-btn--bare welcome__close" data-dismiss="welcome" aria-label="Dismiss"><svg class="i"><use href="#ri-close-line"/></svg></button>
-    </section>
+    <!-- @include welcome -->
 
     <div class="layout">
 
@@ -251,143 +179,16 @@
           </div>
 
           <div class="recs">
-            <article class="rec rec--critical" data-priority="critical" data-state="open" data-title="Water heater relief valve">
-              <div class="rec__open">
-                <label class="check" aria-label="Select water heater relief valve"><input type="checkbox" data-rec-select><span class="check__box"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <div class="rec__main">
-                  <div class="rec__tags"><span class="badge badge--critical">Critical</span><span class="t-meta t-ink">Water heater</span></div>
-                  <h3 class="t-strong">Relief valve is leaking</h3>
-                  <p class="t-meta">Water is dripping from the temperature and pressure relief valve. Left alone, it can damage the floor and drywall.</p>
-                  <ul class="rec__meta">
-                    <li><svg class="i i--16"><use href="#ri-user-line"/></svg>Home Manager &middot; about 1 hour</li>
-                    <li><svg class="i i--16"><use href="#ri-camera-line"/></svg>2 photos</li>
-                  </ul>
-                  <div class="rec__actions">
-                    <button class="btn btn--secondary" data-rec-submit>Send to PreFix</button>
-                    <button class="link" data-rec-decline>Decline</button>
-                  </div>
-                </div>
-              </div>
-              <div class="rec__reasons">
-                <p class="t-strong">Why are you declining &ldquo;Relief valve is leaking&rdquo;?</p>
-                <div class="chips">
-                  <button class="chip" data-reason="already taken care of">Already taken care of</button>
-                  <button class="chip" data-reason="not a priority right now">Not a priority right now</button>
-                  <button class="chip" data-reason="cost">Cost</button>
-                  <button class="chip" data-reason="I&rsquo;ll handle it myself">I&rsquo;ll handle it myself</button>
-                </div>
-                <button class="link" data-rec-cancel-decline>Keep it open</button>
-              </div>
-              <div class="rec__done">
-                <svg class="i rec__done-icon"><use href="#ri-checkbox-circle-line"/></svg>
-                <p class="t-meta t-ink" data-rec-note></p>
-                <button class="link" data-rec-undo>Undo</button>
-              </div>
-            </article>
+            <!-- @include rec-water-heater -->
 
-            <article class="rec" data-priority="high" data-state="open" data-title="Dryer vent cleaning">
-              <div class="rec__open">
-                <label class="check" aria-label="Select dryer vent cleaning"><input type="checkbox" data-rec-select><span class="check__box"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <div class="rec__main">
-                  <div class="rec__tags"><span class="badge badge--high">High</span><span class="t-meta t-ink">Dryer vent</span></div>
-                  <h3 class="t-strong">Lint buildup is blocking airflow</h3>
-                  <p class="t-meta">A blocked vent makes drying slower and raises the risk of a dryer fire.</p>
-                  <ul class="rec__meta">
-                    <li><svg class="i i--16"><use href="#ri-user-line"/></svg>Home Manager &middot; about 1 hour</li>
-                    <li><svg class="i i--16"><use href="#ri-camera-line"/></svg>1 photo</li>
-                  </ul>
-                  <div class="rec__actions">
-                    <button class="btn btn--secondary" data-rec-submit>Send to PreFix</button>
-                    <button class="link" data-rec-decline>Decline</button>
-                  </div>
-                </div>
-              </div>
-              <div class="rec__reasons">
-                <p class="t-strong">Why are you declining &ldquo;Lint buildup is blocking airflow&rdquo;?</p>
-                <div class="chips">
-                  <button class="chip" data-reason="already taken care of">Already taken care of</button>
-                  <button class="chip" data-reason="not a priority right now">Not a priority right now</button>
-                  <button class="chip" data-reason="cost">Cost</button>
-                  <button class="chip" data-reason="I&rsquo;ll handle it myself">I&rsquo;ll handle it myself</button>
-                </div>
-                <button class="link" data-rec-cancel-decline>Keep it open</button>
-              </div>
-              <div class="rec__done">
-                <svg class="i rec__done-icon"><use href="#ri-checkbox-circle-line"/></svg>
-                <p class="t-meta t-ink" data-rec-note></p>
-                <button class="link" data-rec-undo>Undo</button>
-              </div>
-            </article>
+            <!-- @include rec-dryer-vent -->
 
-            <article class="rec" data-priority="high" data-state="open" data-title="Upstairs AC diagnostic">
-              <div class="rec__open">
-                <label class="check" aria-label="Select upstairs AC diagnostic"><input type="checkbox" data-rec-select><span class="check__box"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <div class="rec__main">
-                  <div class="rec__tags"><span class="badge badge--high">High</span><span class="t-meta t-ink">Upstairs AC</span></div>
-                  <h3 class="t-strong">System turns on and off too often</h3>
-                  <p class="t-meta">Short cycling wears out the compressor faster. A specialist should find the cause.</p>
-                  <ul class="rec__meta">
-                    <li><svg class="i i--16"><use href="#ri-tools-line"/></svg>Specialty HVAC &middot; diagnostic visit</li>
-                    <li><svg class="i i--16"><use href="#ri-camera-line"/></svg>1 photo</li>
-                  </ul>
-                  <div class="rec__actions">
-                    <button class="btn btn--secondary" data-rec-submit>Send to PreFix</button>
-                    <button class="link" data-rec-decline>Decline</button>
-                  </div>
-                </div>
-              </div>
-              <div class="rec__reasons">
-                <p class="t-strong">Why are you declining &ldquo;System turns on and off too often&rdquo;?</p>
-                <div class="chips">
-                  <button class="chip" data-reason="already taken care of">Already taken care of</button>
-                  <button class="chip" data-reason="not a priority right now">Not a priority right now</button>
-                  <button class="chip" data-reason="cost">Cost</button>
-                  <button class="chip" data-reason="I&rsquo;ll handle it myself">I&rsquo;ll handle it myself</button>
-                </div>
-                <button class="link" data-rec-cancel-decline>Keep it open</button>
-              </div>
-              <div class="rec__done">
-                <svg class="i rec__done-icon"><use href="#ri-checkbox-circle-line"/></svg>
-                <p class="t-meta t-ink" data-rec-note></p>
-                <button class="link" data-rec-undo>Undo</button>
-              </div>
-            </article>
+            <!-- @include rec-upstairs-ac -->
 
             <div id="recs-more" hidden>
               
 
-              <article class="rec" data-priority="normal" data-state="open" data-title="Kitchen window caulking">
-                <div class="rec__open">
-                  <label class="check" aria-label="Select kitchen window caulking"><input type="checkbox" data-rec-select><span class="check__box"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                  <div class="rec__main">
-                    <div class="rec__tags"><span class="badge badge--normal">Normal</span><span class="t-meta t-ink">Kitchen window</span></div>
-                    <h3 class="t-strong">Caulk has cracked around the frame</h3>
-                    <p class="t-meta">Gaps let in drafts and moisture. Resealing helps keep energy bills down.</p>
-                    <ul class="rec__meta">
-                      <li><svg class="i i--16"><use href="#ri-tools-line"/></svg>Specialty carpentry &middot; about 1 hour</li>
-                    </ul>
-                    <div class="rec__actions">
-                      <button class="btn btn--secondary" data-rec-submit>Send to PreFix</button>
-                      <button class="link" data-rec-decline>Decline</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="rec__reasons">
-                  <p class="t-strong">Why are you declining &ldquo;Caulk has cracked around the frame&rdquo;?</p>
-                  <div class="chips">
-                    <button class="chip" data-reason="already taken care of">Already taken care of</button>
-                    <button class="chip" data-reason="not a priority right now">Not a priority right now</button>
-                    <button class="chip" data-reason="cost">Cost</button>
-                    <button class="chip" data-reason="I&rsquo;ll handle it myself">I&rsquo;ll handle it myself</button>
-                  </div>
-                  <button class="link" data-rec-cancel-decline>Keep it open</button>
-                </div>
-                <div class="rec__done">
-                  <svg class="i rec__done-icon"><use href="#ri-checkbox-circle-line"/></svg>
-                  <p class="t-meta t-ink" data-rec-note></p>
-                  <button class="link" data-rec-undo>Undo</button>
-                </div>
-              </article>
+              <!-- @include rec-kitchen-window -->
             </div>
           </div>
 
@@ -412,73 +213,7 @@
           </div>
 
           <div class="card__body visits">
-            <article class="visit">
-              <div class="date-tile"><span class="date-tile__m">Sep</span><span class="date-tile__d">28</span></div>
-              <div class="visit__main">
-                <div class="visit__top">
-                  <h3 class="t-strong">Back door and cabinet hinges</h3>
-                  <span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>Confirmed</span>
-                </div>
-                <ul class="visit__meta">
-                  <li><svg class="i i--16"><use href="#ri-calendar-line"/></svg><span><strong class="t-ink">Mon, Sep 28</strong> &middot; arrives 8:00&ndash;10:00 AM</span></li>
-                  <li><svg class="i i--16"><use href="#ri-user-line"/></svg><span>Marcus Reyes, Home Manager &middot; service visit</span></li>
-                </ul>
-                <p class="visit__note"><svg class="i i--16"><use href="#ri-information-line"/></svg><span>This visit is less than 72 hours away. To change it, call <a href="#">(512) 555-0142</a>.</span></p>
-                <div class="visit__actions">
-                  <button class="link" data-toggle="visit-1" aria-expanded="false" aria-controls="visit-1" data-open="Hide details" data-closed="Visit details"><span data-label>Visit details</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-                </div>
-                <div class="visit__details" id="visit-1" hidden>
-                  <p class="group-label">2 tasks</p>
-                  <ul class="features">
-                    <li class="feature"><span class="i-box"><svg class="i"><use href="#ri-hammer-line"/></svg></span><span class="feature__text">Back door sticks when closing<span class="feature__sub">Plane and adjust the door, check the strike plate</span></span></li>
-                    <li class="feature"><span class="i-box"><svg class="i"><use href="#ri-hammer-line"/></svg></span><span class="feature__text">Kitchen cabinet hinges are loose<span class="feature__sub">Tighten or replace 4 hinges</span></span></li>
-                  </ul>
-                </div>
-              </div>
-            </article>
-
-            <article class="visit visit--pm when-caught-up">
-              <div class="date-tile date-tile--pm"><span class="date-tile__m">Oct</span><span class="date-tile__d">13</span></div>
-              <div class="visit__main">
-                <div class="visit__top">
-                  <h3 class="t-strong">Fall preventive maintenance</h3>
-                  <span class="badge badge--included">Included in your membership</span>
-                </div>
-                <ul class="visit__meta">
-                  <li><svg class="i i--16"><use href="#ri-calendar-line"/></svg><span><strong class="t-ink">Tue, Oct 13</strong> &middot; arrives 9:00&ndash;11:00 AM</span></li>
-                  <li><svg class="i i--16"><use href="#ri-user-line"/></svg><span>Priya Shah, PM technician &middot; about 2 hours</span></li>
-                </ul>
-                <div class="visit__actions">
-                  <a class="link" href="#">Reschedule</a>
-                  <a class="link" href="#">Cancel visit</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="visit">
-              <div class="date-tile"><span class="date-tile__m">Oct</span><span class="date-tile__d">21</span></div>
-              <div class="visit__main">
-                <div class="visit__top">
-                  <h3 class="t-strong">Ceiling water stain repair</h3>
-                  <span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>Confirmed</span>
-                </div>
-                <ul class="visit__meta">
-                  <li><svg class="i i--16"><use href="#ri-calendar-line"/></svg><span><strong class="t-ink">Wed, Oct 21</strong> &middot; arrives 1:00&ndash;3:00 PM</span></li>
-                  <li><svg class="i i--16"><use href="#ri-user-line"/></svg><span>Dana Whitfield &middot; specialty painting and drywall</span></li>
-                </ul>
-                <div class="visit__actions">
-                  <button class="link" data-toggle="visit-2" aria-expanded="false" aria-controls="visit-2" data-open="Hide details" data-closed="Visit details"><span data-label>Visit details</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-                  <a class="link" href="#">Reschedule</a>
-                  <a class="link" href="#">Cancel visit</a>
-                </div>
-                <div class="visit__details" id="visit-2" hidden>
-                  <p class="group-label">1 task</p>
-                  <ul class="features">
-                    <li class="feature"><span class="i-box"><svg class="i"><use href="#ri-paint-brush-line"/></svg></span><span class="feature__text">Repair and repaint water-stained ceiling in the upstairs hallway<span class="feature__sub">Quoted at $125/hour specialty rate, about 3 hours</span></span></li>
-                  </ul>
-                </div>
-              </div>
-            </article>
+            <!-- @include visits -->
           </div>
         </section>
 
@@ -549,20 +284,7 @@
             <a class="btn btn--secondary btn--block" href="#">Book a heating tune-up</a>
           </section>
 
-          <!-- 6. Evergreen promotion -->
-          <section class="card" id="promo" aria-labelledby="promo-title">
-            <div class="promo__top">
-              <div class="tile-icon"><svg class="i"><use href="#ri-shopping-bag-3-line"/></svg></div>
-              <span class="badge badge--normal">Partner offer</span>
-            </div>
-            <h2 class="t-title duo__title" id="promo-title">Member pricing on appliances</h2>
-            <p class="t-desc">Shop new appliances through our partner Sibi. Your Home Manager can handle the install.</p>
-            <ul class="features duo__list">
-              <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Refrigerators, washers, dryers and more</span></li>
-              <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Delivered to your door</span></li>
-            </ul>
-            <a class="btn btn--secondary btn--block" href="#">Shop appliances<svg class="i"><use href="#ri-arrow-right-up-line"/></svg></a>
-          </section>
+          <!-- @include promo -->
         </div>
       </div>
 
@@ -686,56 +408,16 @@
         <section class="card" id="team" aria-labelledby="team-title">
           <h2 class="t-title" id="team-title">Your PreFix team</h2>
           <p class="t-desc team__sub">The people who look after <span data-home-label>4817 Mueller Blvd</span></p>
-          <ul class="people">
-            <li class="person">
-              <span class="avatar avatar--lg">MR</span>
-              <div class="person__main">
-                <p class="t-strong">Marcus Reyes</p>
-                <p class="t-meta">Home Manager &middot; repairs and service</p>
-                <p class="t-meta t-ink person__next"><svg class="i i--16"><use href="#ri-calendar-line"/></svg>Next visit Mon, Sep 28</p>
-              </div>
-            </li>
-            <li class="person">
-              <span class="avatar avatar--lg">PS</span>
-              <div class="person__main">
-                <p class="t-strong">Priya Shah</p>
-                <p class="t-meta">PM technician &middot; spring and fall visits</p>
-                <p class="t-meta t-ink person__next when-actions"><svg class="i i--16"><use href="#ri-door-closed-line"/></svg>Fall visit not booked yet</p>
-                <p class="t-meta t-ink person__next when-caught-up"><svg class="i i--16"><use href="#ri-calendar-line"/></svg>Next visit Tue, Oct 13</p>
-              </div>
-            </li>
-          </ul>
+          <!-- @include team-people -->
         </section>
       </aside>
     </div>
   </main>
 
-  <footer class="footer">
-    <div class="footer__inner">
-      <p class="t-meta">&copy; 2026 PreFix, Inc. &middot; Austin &middot; Dallas &middot; Houston &middot; San Antonio &middot; Denver</p>
-      <nav class="footer__links" aria-label="Footer">
-        <a class="link" href="#">Help center</a>
-        <a class="link" href="#">Privacy</a>
-        <a class="link" href="#">Terms</a>
-      </nav>
-    </div>
-  </footer>
+  <!-- @include footer -->
 </div>
 
-<div class="toast" id="toast" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span data-toast-text></span></div>
-
-<!-- Prototype only: preview conditional states -->
-<div class="proto">
-  <div class="proto__panel" data-proto-panel hidden>
-    <p class="proto__title">Prototype states</p>
-    <label class="proto__opt">Payment issue banner<span class="switch"><input type="checkbox" data-state-switch="payment"><span class="switch__track"></span></span></label>
-    <label class="proto__opt">Welcome card<span class="switch"><input type="checkbox" data-state-switch="welcome" checked><span class="switch__track"></span></span></label>
-    <label class="proto__opt">Nothing to schedule<span class="switch"><input type="checkbox" data-state-switch="caught-up"><span class="switch__track"></span></span></label>
-    <label class="proto__opt">Member has 2 homes<span class="switch"><input type="checkbox" data-state-switch="multi" checked><span class="switch__track"></span></span></label>
-  </div>
-  <button class="proto__toggle" data-proto-toggle aria-expanded="false"><svg class="i"><use href="#ri-equalizer-line"/></svg>Prototype states</button>
-</div>
-
+<!-- @include overlays -->
 {{SCRIPTS}}
 </body>
 </html>
