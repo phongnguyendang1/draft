@@ -196,6 +196,30 @@
       return;
     }
 
+    var filter = target.closest("[data-filter]");
+    if (filter) {
+      var group = filter.closest("[data-filter-group]");
+      var kind = filter.getAttribute("data-filter");
+      $all("[data-filter]", group).forEach(function (b) { b.setAttribute("aria-pressed", String(b === filter)); });
+      $all("[data-kind]").forEach(function (item) {
+        item.classList.toggle("is-filtered", kind !== "all" && item.getAttribute("data-kind") !== kind);
+      });
+      $all("[data-tl-section]").forEach(function (section) {
+        var any = $all("[data-kind]", section).some(function (item) { return !item.classList.contains("is-filtered"); });
+        section.classList.toggle("is-filtered", !any);
+      });
+      return;
+    }
+
+    var problem = target.closest("[data-problem]");
+    if (problem) {
+      var box = problem.closest(".problem");
+      $(".problem__ask", box).hidden = true;
+      $("[data-problem-note]", box).textContent = "Thanks. We\u2019ve told the team \u201c" + problem.textContent.trim() + "\u201d and will get back to you within 2 business hours.";
+      $(".problem__done", box).hidden = false;
+      return;
+    }
+
     var protoToggle = target.closest("[data-proto-toggle]");
     if (protoToggle) {
       var panel = $("[data-proto-panel]");

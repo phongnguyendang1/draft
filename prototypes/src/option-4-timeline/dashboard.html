@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+{{STYLES}}
+</head>
+<body class="{{FRAME}} is-welcome is-multi">
+{{ICONS}}
+
+<div class="app">
+
+  <!-- @include top -->
+
+  <main class="page">
+
+    <section class="intro">
+      <div class="intro__text">
+        <h1 class="t-display">Good morning, Sarah</h1>
+        <p class="t-desc">Friday, September 25</p>
+      </div>
+
+      <div class="menu-wrap when-multi">
+        <button class="switcher" data-menu="home-menu" aria-expanded="false" aria-haspopup="true">
+          <svg class="i"><use href="#ri-home-4-line"/></svg>
+          <span class="switcher__label" data-home-label>4817 Mueller Blvd</span>
+          <svg class="i i--16"><use href="#ri-arrow-down-s-line"/></svg>
+        </button>
+        <div class="menu menu--homes" id="home-menu" role="menu" hidden>
+          <p class="menu__label">Your homes</p>
+          <button class="menu__item" role="menuitemradio" aria-checked="true" data-home="mueller" data-address="4817 Mueller Blvd">
+            <span>
+              <span class="t-label t-ink">4817 Mueller Blvd</span>
+              <span class="t-meta menu__sub">Austin, TX 78723 &middot; 4 items need you</span>
+            </span>
+            <svg class="i i--check"><use href="#ri-check-line"/></svg>
+          </button>
+          <button class="menu__item" role="menuitemradio" aria-checked="false" data-home="elm" data-address="1206 Elm Ridge Dr">
+            <span>
+              <span class="t-label t-ink">1206 Elm Ridge Dr</span>
+              <span class="t-meta menu__sub">Round Rock, TX 78664 &middot; 1 item needs you</span>
+            </span>
+            <svg class="i i--check"><use href="#ri-check-line"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- @include welcome -->
+
+    <div class="layout">
+      <div class="main">
+
+        <!-- 1. Needs you: pinned above the timeline -->
+        <section class="card needs" id="needs" aria-labelledby="needs-title">
+          <div class="card__head">
+            <div class="card__heading">
+              <div class="card__title-row">
+                <svg class="i needs__pin"><use href="#ri-pushpin-line"/></svg>
+                <h2 class="t-title" id="needs-title">Needs you</h2>
+              </div>
+              <p class="t-desc">Pinned until you act. Everything else is in your timeline below.</p>
+            </div>
+          </div>
+
+          <ul class="needs__list">
+            <li class="needs__item needs__item--pm when-actions">
+              <div class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-door-closed-line"/></svg></div>
+              <div class="needs__main">
+                <p class="t-strong">Schedule your Fall preventive maintenance</p>
+                <p class="t-meta">Included in your membership &middot; 30-point check &middot; earliest opening Tue, Oct 13</p>
+              </div>
+              <a class="btn btn--primary" href="#">Schedule visit</a>
+            </li>
+            <li class="needs__item when-actions">
+              <div class="tile-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></div>
+              <div class="needs__main">
+                <p class="t-strong">Schedule: kitchen faucet leak and garbage disposal jam</p>
+                <p class="t-meta">Service visit &middot; 2 tasks &middot; about 1.5 hours &middot; requested Sep 22</p>
+              </div>
+              <a class="btn btn--secondary" href="#">Schedule visit</a>
+            </li>
+            <li class="needs__item when-actions">
+              <div class="tile-icon"><svg class="i"><use href="#ri-drop-line"/></svg></div>
+              <div class="needs__main">
+                <p class="t-strong">Schedule: HVAC condensate line flush</p>
+                <p class="t-meta">Service visit &middot; 1 task &middot; from a recommendation you approved</p>
+              </div>
+              <a class="btn btn--secondary" href="#">Schedule visit</a>
+            </li>
+            <li class="needs__item needs__item--quiet when-caught-up">
+              <div class="tile-icon tile-icon--blue"><svg class="i"><use href="#ri-checkbox-circle-line"/></svg></div>
+              <div class="needs__main">
+                <p class="t-strong">Nothing to schedule</p>
+                <p class="t-meta">Your next visit is Mon, Sep 28.</p>
+              </div>
+            </li>
+          </ul>
+
+          <div class="needs__recs">
+            <div class="needs__recs-head">
+              <p class="t-strong">Recommendations to decide on</p>
+              <span class="count count--red" data-rec-open-count>4</span>
+            </div>
+            <div class="recs">
+              <!-- @include rec-water-heater -->
+              <div id="needs-more-recs" hidden>
+                <!-- @include rec-dryer-vent -->
+                <!-- @include rec-upstairs-ac -->
+                <!-- @include rec-kitchen-window -->
+              </div>
+            </div>
+            <div class="card__foot">
+              <button class="link" data-toggle="needs-more-recs" aria-expanded="false" aria-controls="needs-more-recs" data-open="Show fewer" data-closed="Show 3 more recommendations"><span data-label>Show 3 more recommendations</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+              <button class="btn btn--primary" data-rec-submit-selected disabled><span data-label>Submit selected</span></button>
+            </div>
+          </div>
+
+          <div class="card__foot card__foot--split when-multi">
+            <p class="t-meta"><svg class="i i--16 inline-icon"><use href="#ri-home-4-line"/></svg>1206 Elm Ridge Dr has <strong class="t-ink">1 visit</strong> to schedule.</p>
+            <button class="link" data-switch-home="elm">Switch home<svg class="i"><use href="#ri-arrow-right-line"/></svg></button>
+          </div>
+        </section>
+
+        <!-- 2. Timeline: upcoming above today, history below -->
+        <section class="card timeline" id="timeline" aria-labelledby="tl-title">
+          <div class="card__head timeline__head">
+            <div class="card__heading">
+              <h2 class="t-title" id="tl-title">Your timeline</h2>
+              <p class="t-desc">Everything at <span data-home-label>4817 Mueller Blvd</span>, newest first. Canceled and expired items are hidden.</p>
+            </div>
+          </div>
+
+          <div class="filters" role="group" aria-label="Filter the timeline" data-filter-group>
+            <button class="filter" aria-pressed="true" data-filter="all">All</button>
+            <button class="filter" aria-pressed="false" data-filter="visit">Visits</button>
+            <button class="filter" aria-pressed="false" data-filter="rec">Recommendations</button>
+            <button class="filter" aria-pressed="false" data-filter="billing">Billing and credits</button>
+          </div>
+
+          <!-- Coming up -->
+          <div class="tl-section" data-tl-section>
+            <p class="section-head">Coming up</p>
+            <div class="rule"></div>
+            <ol class="tl">
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Feb</span><span class="t-meta">2027</span></div>
+                <span class="tl__icon tl__icon--future"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">February 2027</p>
+                  <div class="tl__top"><p class="t-strong">Spring preventive maintenance</p><span class="badge badge--included">Included</span></div>
+                  <p class="t-meta">Opens for scheduling in February. We&rsquo;ll email you a link.</p>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Oct 21</span><span class="t-meta">Wed</span></div>
+                <span class="tl__icon tl__icon--future"><svg class="i"><use href="#ri-calendar-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Wed, Oct 21</p>
+                  <div class="tl__top"><p class="t-strong">Ceiling water stain repair</p><span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>Confirmed</span></div>
+                  <p class="t-meta">Arrives 1:00&ndash;3:00 PM &middot; Dana Whitfield, specialty painting and drywall</p>
+                  <div class="tl__links"><a class="link" href="#">Reschedule</a><a class="link" href="#">Cancel visit</a></div>
+                </div>
+              </li>
+              <li class="tl__item when-caught-up" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Oct 13</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--pm"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Oct 13</p>
+                  <div class="tl__top"><p class="t-strong">Fall preventive maintenance</p><span class="badge badge--included">Included</span></div>
+                  <p class="t-meta">Arrives 9:00&ndash;11:00 AM &middot; Priya Shah, PM technician</p>
+                  <div class="tl__links"><a class="link" href="#">Reschedule</a><a class="link" href="#">Cancel visit</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="billing">
+                <div class="tl__date"><span class="t-label">Oct 1</span><span class="t-meta">Thu</span></div>
+                <span class="tl__icon tl__icon--future"><svg class="i"><use href="#ri-bank-card-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Thu, Oct 1</p>
+                  <div class="tl__top"><p class="t-strong">Membership payment</p><p class="t-strong t-num tl__amount">$69</p></div>
+                  <p class="t-meta">PreFix Protect, 2 HVAC systems &middot; card ending 4242</p>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Sep 28</span><span class="t-meta">Mon</span></div>
+                <span class="tl__icon tl__icon--future"><svg class="i"><use href="#ri-calendar-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Mon, Sep 28</p>
+                  <div class="tl__top"><p class="t-strong">Back door and cabinet hinges</p><span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>Confirmed</span></div>
+                  <p class="t-meta">Arrives 8:00&ndash;10:00 AM &middot; Marcus Reyes, Home Manager</p>
+                  <p class="visit__note"><svg class="i i--16"><use href="#ri-information-line"/></svg><span>Less than 72 hours away. To change it, call <a href="#">(512) 555-0142</a>.</span></p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Today -->
+          <div class="today" aria-label="Today">
+            <span class="today__pill">Today &middot; Fri, Sep 25</span>
+          </div>
+          <div class="tl-season">
+            <div class="tile-icon tile-icon--blue"><svg class="i"><use href="#ri-temp-cold-line"/></svg></div>
+            <div class="tl-season__text">
+              <p class="t-strong">This month: heating season is coming</p>
+              <p class="t-meta">Your Fall visit includes a heating check. Test smoke and CO detectors, and use your <span class="t-blue">$50 HVAC credit</span> on a tune-up.</p>
+              <a class="link" href="#">Book a heating tune-up</a>
+            </div>
+          </div>
+
+          <!-- 2026 -->
+          <div class="tl-section" data-tl-section>
+            <div class="tl-year">
+              <p class="section-head">2026</p>
+              <p class="t-meta">4 visits &middot; <strong class="t-ink">$1,240 saved</strong></p>
+            </div>
+            <div class="rule"></div>
+            <ol class="tl">
+              <li class="tl__item" data-kind="rec">
+                <div class="tl__date"><span class="t-label">Sep 20</span><span class="t-meta">Sun</span></div>
+                <span class="tl__icon"><svg class="i"><use href="#ri-thumb-up-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Sun, Sep 20</p>
+                  <p class="t-strong">You approved: HVAC condensate line flush</p>
+                  <p class="t-meta">From your Spring visit. It&rsquo;s ready to schedule.</p>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="billing">
+                <div class="tl__date"><span class="t-label">Sep 1</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon"><svg class="i"><use href="#ri-bank-card-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Sep 1</p>
+                  <div class="tl__top"><p class="t-strong">Membership payment</p><p class="t-strong t-num tl__amount">$69</p></div>
+                  <div class="tl__links"><a class="link" href="#">Receipt</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Jun 9</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--done"><svg class="i"><use href="#ri-check-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Jun 9</p>
+                  <div class="tl__top"><p class="t-strong">Bathroom exhaust fan replaced</p><p class="t-strong t-num tl__amount">$110</p></div>
+                  <p class="t-meta">Marcus Reyes, Home Manager &middot; 1 task completed &middot; market rate $382</p>
+                  <div class="tl__links"><a class="link" href="#">Visit summary</a><button class="link" data-toggle="prob-jun9" aria-expanded="false" aria-controls="prob-jun9">I have a problem with this</button></div>
+                  <div class="problem" id="prob-jun9" hidden>
+                    <div class="problem__ask">
+                      <p class="t-label">What&rsquo;s wrong with this visit?</p>
+                      <div class="chips">
+                        <button class="chip" data-problem>Something isn&rsquo;t fixed</button>
+                        <button class="chip" data-problem>The invoice looks wrong</button>
+                        <button class="chip" data-problem>I have a question</button>
+                      </div>
+                    </div>
+                    <p class="problem__done" hidden><svg class="i"><use href="#ri-checkbox-circle-line"/></svg><span class="t-meta t-ink" data-problem-note></span></p>
+                  </div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="billing">
+                <div class="tl__date"><span class="t-label">May 12</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon"><svg class="i"><use href="#ri-coupon-3-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, May 12</p>
+                  <div class="tl__top"><p class="t-strong">Referral credit added</p><p class="t-strong t-num tl__amount tl__amount--blue">+$25</p></div>
+                  <p class="t-meta">Jamie L. joined PreFix with your referral code. Use it on any service.</p>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="rec">
+                <div class="tl__date"><span class="t-label">Apr 16</span><span class="t-meta">Thu</span></div>
+                <span class="tl__icon tl__icon--report"><svg class="i"><use href="#ri-heart-pulse-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Thu, Apr 16</p>
+                  <p class="t-strong">Home Health Snapshot ready</p>
+                  <p class="t-meta">1 critical, 3 cause for concern, 26 no concern &middot; 4 recommendations</p>
+                  <div class="tl__links"><a class="link" href="#">Home Health Snapshot</a><a class="link" href="#needs">Review recommendations</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Apr 14</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--pm"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Apr 14</p>
+                  <div class="tl__top"><p class="t-strong">Spring preventive maintenance</p><span class="badge badge--included">Included</span></div>
+                  <p class="t-meta">Priya Shah, PM technician &middot; 30 checks &middot; market rate $650</p>
+                  <div class="tl__links"><a class="link" href="#">Visit summary</a><button class="link" data-toggle="prob-apr14" aria-expanded="false" aria-controls="prob-apr14">I have a problem with this</button></div>
+                  <div class="problem" id="prob-apr14" hidden>
+                    <div class="problem__ask">
+                      <p class="t-label">What&rsquo;s wrong with this visit?</p>
+                      <div class="chips">
+                        <button class="chip" data-problem>Something was missed</button>
+                        <button class="chip" data-problem>The snapshot looks wrong</button>
+                        <button class="chip" data-problem>I have a question</button>
+                      </div>
+                    </div>
+                    <p class="problem__done" hidden><svg class="i"><use href="#ri-checkbox-circle-line"/></svg><span class="t-meta t-ink" data-problem-note></span></p>
+                  </div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Mar 3</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--done"><svg class="i"><use href="#ri-check-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Mar 3</p>
+                  <div class="tl__top"><p class="t-strong">Toilet fill valve replaced</p><p class="t-strong t-num tl__amount">$80</p></div>
+                  <p class="t-meta">Marcus Reyes, Home Manager &middot; market rate $240</p>
+                  <div class="tl__links"><a class="link" href="#">Visit summary</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Feb 11</span><span class="t-meta">Wed</span></div>
+                <span class="tl__icon tl__icon--done"><svg class="i"><use href="#ri-check-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Wed, Feb 11</p>
+                  <div class="tl__top"><p class="t-strong">Roof leak repaired by a licensed roofer</p><p class="t-strong t-num tl__amount">$222</p></div>
+                  <p class="t-meta">Contractor managed by PreFix at no charge &middot; market rate $380</p>
+                  <div class="tl__links"><a class="link" href="#">Invoice</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="billing">
+                <div class="tl__date"><span class="t-label">Jan 2</span><span class="t-meta">Fri</span></div>
+                <span class="tl__icon"><svg class="i"><use href="#ri-coupon-3-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Fri, Jan 2</p>
+                  <div class="tl__top"><p class="t-strong">HVAC credit from PreFix</p><p class="t-strong t-num tl__amount tl__amount--blue">+$50</p></div>
+                  <p class="t-meta">For Specialty HVAC work &middot; expires Dec 31, 2026</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <!-- 2025, collapsed -->
+          <div class="tl-section" data-tl-section>
+            <div class="tl-year">
+              <p class="section-head">2025</p>
+              <p class="t-meta">3 visits &middot; <strong class="t-ink">$1,570 saved</strong></p>
+            </div>
+            <div class="rule"></div>
+            <ol class="tl" id="tl-2025" hidden>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Oct 20</span><span class="t-meta">Mon</span></div>
+                <span class="tl__icon tl__icon--pm"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Mon, Oct 20, 2025</p>
+                  <div class="tl__top"><p class="t-strong">Fall preventive maintenance</p><span class="badge badge--included">Included</span></div>
+                  <p class="t-meta">Priya Shah &middot; 30 checks &middot; 2 recommendations</p>
+                  <div class="tl__links"><a class="link" href="#">Home Health Snapshot</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Jul 8</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--done"><svg class="i"><use href="#ri-check-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Jul 8, 2025</p>
+                  <div class="tl__top"><p class="t-strong">Kitchen cabinet door rebuilt</p><p class="t-strong t-num tl__amount">$250</p></div>
+                  <p class="t-meta">Specialty carpentry &middot; market rate $520</p>
+                  <div class="tl__links"><a class="link" href="#">Visit summary</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Apr 22</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--pm"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Apr 22, 2025</p>
+                  <div class="tl__top"><p class="t-strong">Spring preventive maintenance</p><span class="badge badge--included">Included</span></div>
+                  <p class="t-meta">Priya Shah &middot; 30 checks</p>
+                  <div class="tl__links"><a class="link" href="#">Home Health Snapshot</a></div>
+                </div>
+              </li>
+            </ol>
+            <div class="tl-more">
+              <button class="link" data-toggle="tl-2025" aria-expanded="false" aria-controls="tl-2025" data-open="Hide 2025" data-closed="Show 2025"><span data-label>Show 2025</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+              <a class="link" href="#">Full history since 2023<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="rail" aria-label="Your team and membership">
+        <section class="card" id="team" aria-labelledby="team-title">
+          <h2 class="t-title" id="team-title">Your PreFix team</h2>
+          <p class="t-desc team__sub">The people who look after <span data-home-label>4817 Mueller Blvd</span></p>
+          <!-- @include team-people -->
+        </section>
+
+        <!-- @include savings-credits -->
+
+        <!-- @include plan-usage -->
+
+          <hr class="divider">
+
+          <a class="report-link" href="#">
+            <span class="tile-icon tile-icon--blue"><svg class="i"><use href="#ri-heart-pulse-line"/></svg></span>
+            <span class="report-link__text">
+              <span class="t-strong">Home Health Report</span>
+              <span class="t-meta">Updated after your Spring visit</span>
+            </span>
+            <svg class="i report-link__arrow"><use href="#ri-arrow-right-s-line"/></svg>
+          </a>
+        </section>
+
+        <!-- @include promo -->
+      </aside>
+    </div>
+  </main>
+
+  <!-- @include footer -->
+</div>
+
+<!-- @include overlays -->
+{{SCRIPTS}}
+</body>
+</html>

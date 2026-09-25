@@ -30,6 +30,10 @@ OPTIONS = [
         "slug": "option-3-home-health",
         "name": "Option 3 · Home Health",
     },
+    {
+        "slug": "option-4-timeline",
+        "name": "Option 4 · Timeline",
+    },
 ]
 
 FRAMES = {

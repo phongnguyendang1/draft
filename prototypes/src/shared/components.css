@@ -22,7 +22,7 @@ h1, h2, h3, h4, p, ul, ol, figure { margin: 0; }
 ul, ol { padding: 0; list-style: none; }
 button { font: inherit; color: inherit; letter-spacing: inherit; }
 a { color: inherit; }
-[hidden] { display: none !important; }
+[hidden], .is-filtered { display: none !important; }
 
 :focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; }
 
@@ -86,7 +86,7 @@ a { color: inherit; }
 [aria-expanded="true"] > .icon-when-closed, [aria-expanded="false"] > .icon-when-open { display: none; }
 
 /* Cards (ref: white, 1px #ccd7dc, radius 24, padding 20) */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: var(--s-20); }
+.card { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: var(--s-20); }
 .card--tint { background: var(--blue-tint); border-color: var(--blue-tint); }
 .card--selected { background: var(--blue-tint); border: 2px solid var(--blue); }
 .card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-16); }

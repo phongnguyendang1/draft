@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HomeHub · Option 3 · Home Health · Desktop</title>
+<title>HomeHub · Option 4 · Timeline · Desktop</title>
 <style>
 /*
   HomeHub design tokens
@@ -537,108 +537,101 @@ body.is-multi .when-single { display: none !important; }
   .footer__inner { flex-direction: column; align-items: flex-start; padding: var(--s-24) var(--s-16); }
 }
 
-/* Option 3 · Home Health
-   Desktop: compact ready-to-schedule bar, the home card (condition, PM, team), then a grid of system
-   tiles with their recommendations beside a 360px rail (visits, savings, plan).
-   Mobile: one column; tiles stack by severity. */
+/* Option 4 · Timeline
+   Desktop: "Needs you" pinned above one timeline (coming up, today, then history by year, newest first)
+   beside a 360px rail (team, savings and credits, plan, offer).
+   Mobile: one column; the date column folds into each entry. */
 
-/* Ready to schedule bar */
-.todo { margin-bottom: var(--s-24); }
-.todo__head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); flex-wrap: wrap; }
-.todo__list { margin-top: var(--s-16); }
-.todo__item { display: flex; align-items: center; gap: var(--s-16); padding: var(--s-12) 0; border-top: 1px solid var(--border); }
-.todo__item:first-child { border-top: 0; }
-.todo__item--pm { padding: var(--s-12) var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); }
-.todo__item--pm + .todo__item { border-top: 0; }
-.todo__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.todo__main .t-strong { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s-4) var(--s-8); }
-.todo__item .tile-icon { width: 40px; height: 40px; }
-.todo__done { margin-top: var(--s-4); }
-
-/* Home card */
-.home { margin-bottom: var(--s-32); padding: var(--s-32); }
-.home__top { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s-24); flex-wrap: wrap; }
-.home__id { display: flex; flex-direction: column; gap: var(--s-4); }
-.home__links { display: flex; align-items: center; gap: var(--s-20); }
-.home__grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-40); }
-.home__health .group-label { margin-bottom: 0; }
-.stats { display: flex; flex-wrap: wrap; gap: var(--s-16) var(--s-40); margin-top: var(--s-16); }
-.stat__n { font-variant-numeric: tabular-nums; }
-.stat__n--red { color: var(--red); }
-.stat__n--blue { color: var(--blue-text); }
-.stat__label { display: flex; align-items: center; gap: 6px; margin-top: var(--s-4); white-space: nowrap; }
-.stat:nth-child(1) .stat__label .i { color: var(--red); }
-.stat:nth-child(3) .stat__label .i { color: var(--blue-text); }
-.stat-bar { display: flex; height: 8px; margin-top: var(--s-16); border-radius: 4px; overflow: hidden; gap: 2px; }
-.stat-bar__red { background: var(--red); }
-.stat-bar__ink { background: var(--ink); }
-.stat-bar__blue { flex: 1; background: var(--blue); }
-.home__recs { margin-top: var(--s-16); }
-.home__pm-note { margin-top: var(--s-12); }
-.people--compact { margin-top: var(--s-4); gap: var(--s-16); }
-
-/* Systems */
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: var(--s-24); align-items: start; }
-.main { min-width: 0; }
-.rail { display: flex; flex-direction: column; gap: var(--s-24); }
-.systems__head { display: flex; flex-direction: column; gap: var(--s-8); margin-bottom: var(--s-16); }
-.systems { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-24); }
+.main, .rail { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
 
-.tile { display: flex; flex-direction: column; gap: var(--s-16); }
-.tile__head { display: flex; align-items: flex-start; gap: var(--s-12); }
-.tile__head .tile-icon { width: 44px; height: 44px; }
-.tile__name { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.tile__name .t-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 6px; }
-.tile__name .badge { align-self: flex-start; margin-bottom: var(--s-4); }
-.tile__rec .rec__tags { display: none; }
-.tile__rec .check { display: none; }
-.tile__rec .rec { padding: var(--s-16); border: 0; border-radius: var(--r-inner); background: var(--page); }
-.tile__rec .rec--critical { background: var(--red-tint); }
-.tile__rec .rec__open { gap: 0; }
-.tile__rec .rec__actions { flex-wrap: wrap; }
-.tile__facts { gap: var(--s-8); }
-.tile__foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); padding-top: var(--s-16); border-top: 1px solid var(--border); }
-.tile__history { padding-top: var(--s-4); }
-.tile__toggle { align-self: flex-start; }
+/* Needs you */
+.needs__pin { color: var(--ink); }
+.needs__list { margin-top: var(--s-24); }
+.needs__item { display: flex; align-items: center; gap: var(--s-16); padding: var(--s-12) 0; border-top: 1px solid var(--border); }
+.needs__item:first-child { border-top: 0; }
+.needs__item--pm { padding: var(--s-12) var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); }
+.needs__item--pm + .needs__item { border-top: 0; }
+.needs__item--quiet { padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-faint); border-top: 0; }
+.needs__item .tile-icon { width: 40px; height: 40px; }
+.needs__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.needs__recs { margin-top: var(--s-24); padding-top: var(--s-24); border-top: 1px solid var(--border); }
+.needs__recs-head { display: flex; align-items: center; gap: var(--s-8); margin-bottom: var(--s-16); }
+.needs__recs .recs { margin-top: 0; }
+#needs-more-recs .rec:first-child { border-top: 0; }
 
-.tip { display: flex; gap: var(--s-12); padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); }
-.tip--neutral { background: var(--page); }
-.tip__icon { color: var(--blue-text); margin-top: 2px; }
-.tip--neutral .tip__icon { color: var(--ink); }
-.tip__text { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-4); }
+/* Timeline */
+.filters { display: flex; flex-wrap: wrap; gap: var(--s-8); margin-top: var(--s-20); }
+.filter {
+  height: 40px; padding: 0 var(--s-16); border: 1px solid var(--border); border-radius: var(--r-pill);
+  background: var(--surface); color: var(--ink); cursor: pointer;
+  font-size: 14px; line-height: 20px; font-weight: 600;
+}
+.filter:hover { border-color: var(--blue); }
+.filter[aria-pressed="true"] { padding: 0 15px; border: 2px solid var(--blue); background: var(--blue-tint); color: var(--blue-text); }
 
-.appliances { margin: 0; padding: var(--s-4) 0 0; }
-.appliances__row { display: flex; justify-content: space-between; gap: var(--s-16); padding: var(--s-8) 0; border-top: 1px solid var(--border); font-size: 14px; line-height: 20px; }
-.appliances__row:first-child { border-top: 0; }
-.appliances__row dt { font-weight: 600; }
-.appliances__row dd { margin: 0; color: var(--text-2); }
-.appliances__note { margin-top: var(--s-8); }
+.tl-section { margin-top: var(--s-24); }
+.tl-year { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-16); }
+.tl { padding-top: var(--s-8); }
+.tl__item { display: grid; grid-template-columns: 64px 32px minmax(0, 1fr); column-gap: var(--s-16); padding: var(--s-12) 0; }
+.tl__date { display: flex; flex-direction: column; padding-top: 4px; }
+.tl__date-inline { display: none; }
+.tl__icon { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--page); color: var(--ink); }
+.tl__icon .i { width: 16px; height: 16px; }
+.tl__icon--done, .tl__icon--pm, .tl__icon--report { background: var(--blue-tint); color: var(--blue-text); }
+.tl__icon--future { background: var(--surface); box-shadow: inset 0 0 0 1px var(--border); }
+.tl__body { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; padding-top: 4px; }
+.tl__top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-12); }
+.tl__amount { flex: none; }
+.tl__amount--blue { color: var(--blue-text); }
+.tl__links { display: flex; flex-wrap: wrap; gap: var(--s-4) var(--s-20); margin-top: var(--s-4); }
+.tl .visit__note { margin-top: var(--s-4); }
+.tl-more { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); flex-wrap: wrap; padding-top: var(--s-16); }
 
-/* Rail visits are narrow: stack title and status */
-.rail .visit__top { flex-direction: column; gap: var(--s-8); }
+.problem { margin-top: var(--s-12); padding: var(--s-16); border-radius: var(--r-inner); background: var(--page); }
+.problem__ask { display: flex; flex-direction: column; gap: var(--s-12); }
+.problem__done { display: flex; align-items: flex-start; gap: var(--s-8); }
+.problem__done .i { color: var(--blue-text); flex: none; }
+
+.today { display: flex; align-items: center; gap: var(--s-12); margin: var(--s-24) 0 var(--s-16); }
+.today::after { content: ""; flex: 1; height: 2px; background: var(--blue); }
+.today__pill { padding: 4px var(--s-12); border-radius: 24px; background: var(--blue-text); color: #fff; font-size: 12px; line-height: 16px; font-weight: 600; }
+.tl-season { display: flex; gap: var(--s-16); padding: var(--s-16) var(--s-20); border-radius: var(--r-inner); background: var(--blue-tint); }
+.tl-season .tile-icon { background: var(--surface); width: 40px; height: 40px; }
+.tl-season__text { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-4); }
 
 @container app (max-width: 767px) {
-  .todo__head { flex-direction: column; align-items: flex-start; gap: var(--s-8); }
-  .todo__item { flex-wrap: wrap; }
-  .todo__main { flex: 1 1 calc(100% - 56px); }
-  .todo__item .btn { width: 100%; }
-
-  .home { padding: var(--s-20); margin-bottom: var(--s-24); }
-  .home .t-display#home-title { font-size: 24px; line-height: 32px; }
-  .home__links { width: 100%; flex-direction: column-reverse; align-items: stretch; gap: var(--s-12); }
-  .home__links .link { align-self: center; }
-  .home__grid { grid-template-columns: 1fr; gap: var(--s-24); }
-  .stats { gap: var(--s-16) var(--s-24); }
-
   .layout { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
-  .systems { grid-template-columns: 1fr; gap: var(--s-16); }
-  .rail { gap: var(--s-16); }
+  .main, .rail { display: contents; }
+  #needs { order: 1; }
+  #timeline { order: 2; }
+  #team { order: 3; }
+  #savings { order: 4; }
+  #plan { order: 5; }
+  #promo { order: 6; }
+
+  .needs__item { flex-wrap: wrap; }
+  .needs__main { flex: 1 1 calc(100% - 56px); }
+  .needs__item .btn { width: 100%; }
+  #needs .card__foot:not(.card__foot--split) { flex-direction: column-reverse; align-items: stretch; }
+  #needs .card__foot:not(.card__foot--split) .btn { width: 100%; }
+  #needs .card__foot:not(.card__foot--split) .link { align-self: center; }
+
+  .filters { flex-wrap: nowrap; overflow-x: auto; margin-left: calc(var(--s-20) * -1); margin-right: calc(var(--s-20) * -1); padding: 0 var(--s-20); scrollbar-width: none; }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter { flex: none; }
+
+  .tl__item { grid-template-columns: 32px minmax(0, 1fr); column-gap: var(--s-12); }
+  .tl__date { display: none; }
+  .tl__date-inline { display: block; }
+  .tl__body { padding-top: 0; }
+  .tl-season { padding: var(--s-16); }
 }
 
 </style>
 </head>
 <body class="frame-desktop is-welcome is-multi">
-<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="ri-add-circle-line" viewBox="0 0 24 24"><path d="M11 11V7H13V11H17V13H13V17H11V13H7V11H11ZM12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"/></symbol><symbol id="ri-add-line" viewBox="0 0 24 24"><path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z"/></symbol><symbol id="ri-alarm-warning-line" viewBox="0 0 24 24"><path d="M4.00001 20V14C4.00001 9.58172 7.58173 6 12 6C16.4183 6 20 9.58172 20 14V20H21V22H3.00001V20H4.00001ZM6.00001 20H18V14C18 10.6863 15.3137 8 12 8C8.6863 8 6.00001 10.6863 6.00001 14V20ZM11 2H13V5H11V2ZM19.7782 4.80761L21.1924 6.22183L19.0711 8.34315L17.6569 6.92893L19.7782 4.80761ZM2.80762 6.22183L4.22183 4.80761L6.34315 6.92893L4.92894 8.34315L2.80762 6.22183ZM7.00001 14C7.00001 11.2386 9.23858 9 12 9V11C10.3432 11 9.00001 12.3431 9.00001 14H7.00001Z"/></symbol><symbol id="ri-alert-line" viewBox="0 0 24 24"><path d="M12.8659 3.00017L22.3922 19.5002C22.6684 19.9785 22.5045 20.5901 22.0262 20.8662C21.8742 20.954 21.7017 21.0002 21.5262 21.0002H2.47363C1.92135 21.0002 1.47363 20.5525 1.47363 20.0002C1.47363 19.8246 1.51984 19.6522 1.60761 19.5002L11.1339 3.00017C11.41 2.52187 12.0216 2.358 12.4999 2.63414C12.6519 2.72191 12.7782 2.84815 12.8659 3.00017ZM4.20568 19.0002H19.7941L11.9999 5.50017L4.20568 19.0002ZM10.9999 16.0002H12.9999V18.0002H10.9999V16.0002ZM10.9999 9.00017H12.9999V14.0002H10.9999V9.00017Z"/></symbol><symbol id="ri-arrow-down-s-line" viewBox="0 0 24 24"><path d="M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z"/></symbol><symbol id="ri-arrow-right-line" viewBox="0 0 24 24"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"/></symbol><symbol id="ri-arrow-right-up-line" viewBox="0 0 24 24"><path d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z"/></symbol><symbol id="ri-bank-card-line" viewBox="0 0 24 24"><path d="M3.00488 2.99979H21.0049C21.5572 2.99979 22.0049 3.4475 22.0049 3.99979V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979ZM20.0049 10.9998H4.00488V18.9998H20.0049V10.9998ZM20.0049 8.99979V4.99979H4.00488V8.99979H20.0049ZM14.0049 14.9998H18.0049V16.9998H14.0049V14.9998Z"/></symbol><symbol id="ri-calendar-line" viewBox="0 0 24 24"><path d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"/></symbol><symbol id="ri-camera-line" viewBox="0 0 24 24"><path d="M9.82843 5L7.82843 7H4V19H20V7H16.1716L14.1716 5H9.82843ZM9 3H15L17 5H21C21.5523 5 22 5.44772 22 6V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V6C2 5.44772 2.44772 5 3 5H7L9 3ZM12 18C8.96243 18 6.5 15.5376 6.5 12.5C6.5 9.46243 8.96243 7 12 7C15.0376 7 17.5 9.46243 17.5 12.5C17.5 15.5376 15.0376 18 12 18ZM12 16C13.933 16 15.5 14.433 15.5 12.5C15.5 10.567 13.933 9 12 9C10.067 9 8.5 10.567 8.5 12.5C8.5 14.433 10.067 16 12 16Z"/></symbol><symbol id="ri-check-line" viewBox="0 0 24 24"><path d="M9.9997 15.1709L19.1921 5.97852L20.6063 7.39273L9.9997 17.9993L3.63574 11.6354L5.04996 10.2212L9.9997 15.1709Z"/></symbol><symbol id="ri-checkbox-blank-circle-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"/></symbol><symbol id="ri-checkbox-circle-fill" viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM17.4571 9.45711L11 15.9142L6.79289 11.7071L8.20711 10.2929L11 13.0858L16.0429 8.04289L17.4571 9.45711Z"/></symbol><symbol id="ri-checkbox-circle-line" viewBox="0 0 24 24"><path d="M4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12ZM12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM17.4571 9.45711L16.0429 8.04289L11 13.0858L8.20711 10.2929L6.79289 11.7071L11 15.9142L17.4571 9.45711Z"/></symbol><symbol id="ri-close-line" viewBox="0 0 24 24"><path d="M11.9997 10.5865L16.9495 5.63672L18.3637 7.05093L13.4139 12.0007L18.3637 16.9504L16.9495 18.3646L11.9997 13.4149L7.04996 18.3646L5.63574 16.9504L10.5855 12.0007L5.63574 7.05093L7.04996 5.63672L11.9997 10.5865Z"/></symbol><symbol id="ri-coupon-3-line" viewBox="0 0 24 24"><path d="M2.00488 3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979H21.0049C21.5572 2.99979 22.0049 3.4475 22.0049 3.99979V9.49979C20.6242 9.49979 19.5049 10.6191 19.5049 11.9998C19.5049 13.3805 20.6242 14.4998 22.0049 14.4998V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979ZM8.09024 18.9998C8.29615 18.4172 8.85177 17.9998 9.50488 17.9998C10.158 17.9998 10.7136 18.4172 10.9195 18.9998H20.0049V16.032C18.5232 15.2957 17.5049 13.7666 17.5049 11.9998C17.5049 10.2329 18.5232 8.7039 20.0049 7.96755V4.99979H10.9195C10.7136 5.58238 10.158 5.99979 9.50488 5.99979C8.85177 5.99979 8.29615 5.58238 8.09024 4.99979H4.00488V18.9998H8.09024ZM9.50488 10.9998C8.67646 10.9998 8.00488 10.3282 8.00488 9.49979C8.00488 8.67136 8.67646 7.99979 9.50488 7.99979C10.3333 7.99979 11.0049 8.67136 11.0049 9.49979C11.0049 10.3282 10.3333 10.9998 9.50488 10.9998ZM9.50488 15.9998C8.67646 15.9998 8.00488 15.3282 8.00488 14.4998C8.00488 13.6714 8.67646 12.9998 9.50488 12.9998C10.3333 12.9998 11.0049 13.6714 11.0049 14.4998C11.0049 15.3282 10.3333 15.9998 9.50488 15.9998Z"/></symbol><symbol id="ri-door-closed-line" viewBox="0 0 24 24"><path d="M2.99805 21V19H4.99805V4C4.99805 3.44772 5.44576 3 5.99805 3H17.998C18.5503 3 18.998 3.44772 18.998 4V19H20.998V21H2.99805ZM16.998 5H6.99805V19H16.998V5ZM14.998 11V13H12.998V11H14.998Z"/></symbol><symbol id="ri-drop-line" viewBox="0 0 24 24"><path d="M12 3.09723L7.05025 8.04697C4.31658 10.7806 4.31658 15.2128 7.05025 17.9465C9.78392 20.6801 14.2161 20.6801 16.9497 17.9465C19.6834 15.2128 19.6834 10.7806 16.9497 8.04697L12 3.09723ZM12 0.268799L18.364 6.63276C21.8787 10.1475 21.8787 15.846 18.364 19.3607C14.8492 22.8754 9.15076 22.8754 5.63604 19.3607C2.12132 15.846 2.12132 10.1475 5.63604 6.63276L12 0.268799Z"/></symbol><symbol id="ri-equalizer-line" viewBox="0 0 24 24"><path d="M6.17071 18C6.58254 16.8348 7.69378 16 9 16C10.3062 16 11.4175 16.8348 11.8293 18H22V20H11.8293C11.4175 21.1652 10.3062 22 9 22C7.69378 22 6.58254 21.1652 6.17071 20H2V18H6.17071ZM12.1707 11C12.5825 9.83481 13.6938 9 15 9C16.3062 9 17.4175 9.83481 17.8293 11H22V13H17.8293C17.4175 14.1652 16.3062 15 15 15C13.6938 15 12.5825 14.1652 12.1707 13H2V11H12.1707ZM6.17071 4C6.58254 2.83481 7.69378 2 9 2C10.3062 2 11.4175 2.83481 11.8293 4H22V6H11.8293C11.4175 7.16519 10.3062 8 9 8C7.69378 8 6.58254 7.16519 6.17071 6H2V4H6.17071ZM9 6C9.55228 6 10 5.55228 10 5C10 4.44772 9.55228 4 9 4C8.44772 4 8 4.44772 8 5C8 5.55228 8.44772 6 9 6ZM15 13C15.5523 13 16 12.5523 16 12C16 11.4477 15.5523 11 15 11C14.4477 11 14 11.4477 14 12C14 12.5523 14.4477 13 15 13ZM9 20C9.55228 20 10 19.5523 10 19C10 18.4477 9.55228 18 9 18C8.44772 18 8 18.4477 8 19C8 19.5523 8.44772 20 9 20Z"/></symbol><symbol id="ri-error-warning-fill" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 15V17H13V15H11ZM11 7V13H13V7H11Z"/></symbol><symbol id="ri-fire-line" viewBox="0 0 24 24"><path d="M12 23C16.1421 23 19.5 19.6421 19.5 15.5C19.5 14.6345 19.2697 13.8032 19 13.0296C17.3333 14.6765 16.0667 15.5 15.2 15.5C19.1954 8.5 17 5.5 11 1.5C11.5 6.49951 8.20403 8.77375 6.86179 10.0366C5.40786 11.4045 4.5 13.3462 4.5 15.5C4.5 19.6421 7.85786 23 12 23ZM12.7094 5.23498C15.9511 7.98528 15.9666 10.1223 13.463 14.5086C12.702 15.8419 13.6648 17.5 15.2 17.5C15.8884 17.5 16.5841 17.2992 17.3189 16.9051C16.6979 19.262 14.5519 21 12 21C8.96243 21 6.5 18.5376 6.5 15.5C6.5 13.9608 7.13279 12.5276 8.23225 11.4932C8.35826 11.3747 8.99749 10.8081 9.02477 10.7836C9.44862 10.4021 9.7978 10.0663 10.1429 9.69677C11.3733 8.37932 12.2571 6.91631 12.7094 5.23498Z"/></symbol><symbol id="ri-fridge-line" viewBox="0 0 24 24"><path d="M18.998 1C19.5503 1 19.998 1.44772 19.998 2V22C19.998 22.5523 19.5503 23 18.998 23H4.99805C4.44576 23 3.99805 22.5523 3.99805 22V2C3.99805 1.44772 4.44576 1 4.99805 1H18.998ZM17.998 12H5.99805V21H17.998V12ZM9.99805 14V18H7.99805V14H9.99805ZM17.998 3H5.99805V10H17.998V3ZM9.99805 5V8H7.99805V5H9.99805Z"/></symbol><symbol id="ri-gift-line" viewBox="0 0 24 24"><path d="M15.0049 2.00281C17.214 2.00281 19.0049 3.79367 19.0049 6.00281C19.0049 6.73184 18.8098 7.41532 18.4691 8.00392L23.0049 8.00281V10.0028H21.0049V20.0028C21.0049 20.5551 20.5572 21.0028 20.0049 21.0028H4.00488C3.4526 21.0028 3.00488 20.5551 3.00488 20.0028V10.0028H1.00488V8.00281L5.54065 8.00392C5.19992 7.41532 5.00488 6.73184 5.00488 6.00281C5.00488 3.79367 6.79574 2.00281 9.00488 2.00281C10.2001 2.00281 11.2729 2.52702 12.0058 3.35807C12.7369 2.52702 13.8097 2.00281 15.0049 2.00281ZM11.0049 10.0028H5.00488V19.0028H11.0049V10.0028ZM19.0049 10.0028H13.0049V19.0028H19.0049V10.0028ZM9.00488 4.00281C7.90031 4.00281 7.00488 4.89824 7.00488 6.00281C7.00488 7.05717 7.82076 7.92097 8.85562 7.99732L9.00488 8.00281H11.0049V6.00281C11.0049 5.00116 10.2686 4.1715 9.30766 4.02558L9.15415 4.00829L9.00488 4.00281ZM15.0049 4.00281C13.9505 4.00281 13.0867 4.81869 13.0104 5.85355L13.0049 6.00281V8.00281H15.0049C16.0592 8.00281 16.923 7.18693 16.9994 6.15207L17.0049 6.00281C17.0049 4.89824 16.1095 4.00281 15.0049 4.00281Z"/></symbol><symbol id="ri-hammer-line" viewBox="0 0 24 24"><path d="M20 2C20.5523 2 21 2.44772 21 3V8C21 8.55228 20.5523 9 20 9H15V22C15 22.5523 14.5523 23 14 23H10C9.44772 23 9 22.5523 9 22V9H3.5C2.94772 9 2.5 8.55228 2.5 8V5.61803C2.5 5.23926 2.714 4.893 3.05279 4.72361L8.5 2H20ZM15 4H8.97214L4.5 6.23607V7H11V21H13V7H15V4ZM19 4H17V7H19V4Z"/></symbol><symbol id="ri-heart-pulse-line" viewBox="0 0 24 24"><path d="M16.5 3C19.5376 3 22 5.5 22 9C22 16 14.5 20 12 21.5C10.0226 20.3135 4.91699 17.563 2.86894 13.001L1 13V11L2.21045 11.0009C2.07425 10.3633 2 9.69651 2 9C2 5.5 4.5 3 7.5 3C9.35997 3 11 4 12 5C13 4 14.64 3 16.5 3ZM16.5 5C15.4241 5 14.2593 5.56911 13.4142 6.41421L12 7.82843L10.5858 6.41421C9.74068 5.56911 8.5759 5 7.5 5C5.55906 5 4 6.6565 4 9C4 9.68542 4.09035 10.3516 4.26658 11.0004L6.43381 11L8.5 7.55635L11.5 12.5563L12.4338 11H17V13H13.5662L11.5 16.4437L8.5 11.4437L7.56619 13L5.10789 13.0006C5.89727 14.3737 7.09304 15.6681 8.64514 16.9029C9.39001 17.4955 10.1845 18.0485 11.0661 18.6038C11.3646 18.7919 11.6611 18.9729 12 19.1752C12.3389 18.9729 12.6354 18.7919 12.9339 18.6038C13.8155 18.0485 14.61 17.4955 15.3549 16.9029C18.3337 14.533 20 11.9435 20 9C20 6.64076 18.463 5 16.5 5Z"/></symbol><symbol id="ri-home-4-fill" viewBox="0 0 24 24"><path d="M20 20C20 20.5523 19.5523 21 19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20ZM11 13V19H13V13H11Z"/></symbol><symbol id="ri-home-4-line" viewBox="0 0 24 24"><path d="M19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20C20 20.5523 19.5523 21 19 21ZM13 19H18V9.15745L12 3.7029L6 9.15745V19H11V13H13V19Z"/></symbol><symbol id="ri-home-gear-line" viewBox="0 0 24 24"><path d="M19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20C20 20.5523 19.5523 21 19 21ZM6 19H18V9.15745L12 3.7029L6 9.15745V19ZM8.59117 13.8089C8.52937 13.5486 8.49666 13.277 8.49666 12.9978C8.49666 12.7186 8.52936 12.4471 8.59115 12.1868L7.60001 11.6145L8.59952 9.88333L9.59136 10.456C9.98427 10.0843 10.4633 9.80273 10.9954 9.64436V8.49998H12.9945V9.64436C13.5266 9.80272 14.0056 10.0843 14.3985 10.4559L15.3904 9.88323L16.39 11.6144L15.3987 12.1867C15.4605 12.447 15.4932 12.7186 15.4932 12.9978C15.4932 13.277 15.4605 13.5485 15.3988 13.8088L16.39 14.381L15.3905 16.1122L14.3986 15.5396C14.0057 15.9112 13.5267 16.1928 12.9946 16.3512V17.4956H10.9955V16.3512C10.4634 16.1929 9.98437 15.9114 9.59144 15.5397L8.59957 16.1123L7.60001 14.3811L8.59117 13.8089ZM11.995 14.4971C12.823 14.4971 13.4942 13.8258 13.4942 12.9978C13.4942 12.1698 12.823 11.4985 11.995 11.4985C11.1669 11.4985 10.4957 12.1698 10.4957 12.9978C10.4957 13.8258 11.1669 14.4971 11.995 14.4971Z"/></symbol><symbol id="ri-information-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z"/></symbol><symbol id="ri-lightbulb-line" viewBox="0 0 24 24"><path d="M9.97308 18H11V13H13V18H14.0269C14.1589 16.7984 14.7721 15.8065 15.7676 14.7226C15.8797 14.6006 16.5988 13.8564 16.6841 13.7501C17.5318 12.6931 18 11.385 18 10C18 6.68629 15.3137 4 12 4C8.68629 4 6 6.68629 6 10C6 11.3843 6.46774 12.6917 7.31462 13.7484C7.40004 13.855 8.12081 14.6012 8.23154 14.7218C9.22766 15.8064 9.84103 16.7984 9.97308 18ZM10 20V21H14V20H10ZM5.75395 14.9992C4.65645 13.6297 4 11.8915 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10C20 11.8925 19.3428 13.6315 18.2443 15.0014C17.624 15.7748 16 17 16 18.5V21C16 22.1046 15.1046 23 14 23H10C8.89543 23 8 22.1046 8 21V18.5C8 17 6.37458 15.7736 5.75395 14.9992Z"/></symbol><symbol id="ri-logout-box-r-line" viewBox="0 0 24 24"><path d="M5 22C4.44772 22 4 21.5523 4 21V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V6H18V4H6V20H18V18H20V21C20 21.5523 19.5523 22 19 22H5ZM18 16V13H11V11H18V8L23 12L18 16Z"/></symbol><symbol id="ri-menu-line" viewBox="0 0 24 24"><path d="M3 4H21V6H3V4ZM3 11H21V13H3V11ZM3 18H21V20H3V18Z"/></symbol><symbol id="ri-paint-brush-line" viewBox="0 0 24 24"><path d="M5 4.9967V7.9967H19V4.9967H5ZM4 2.9967H20C20.5523 2.9967 21 3.44442 21 3.9967V8.9967C21 9.54899 20.5523 9.9967 20 9.9967H4C3.44772 9.9967 3 9.54899 3 8.9967V3.9967C3 3.44442 3.44772 2.9967 4 2.9967ZM6 11.9967H12C12.5523 11.9967 13 12.4444 13 12.9967V15.9967H14V21.9967H10V15.9967H11V13.9967H5C4.44772 13.9967 4 13.549 4 12.9967V10.9967H6V11.9967ZM17.7322 13.7289L19.5 11.9612L21.2678 13.7289C22.2441 14.7052 22.2441 16.2882 21.2678 17.2645C20.2915 18.2408 18.7085 18.2408 17.7322 17.2645C16.7559 16.2882 16.7559 14.7052 17.7322 13.7289Z"/></symbol><symbol id="ri-question-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM13 13.3551V14H11V12.5C11 11.9477 11.4477 11.5 12 11.5C12.8284 11.5 13.5 10.8284 13.5 10C13.5 9.17157 12.8284 8.5 12 8.5C11.2723 8.5 10.6656 9.01823 10.5288 9.70577L8.56731 9.31346C8.88637 7.70919 10.302 6.5 12 6.5C13.933 6.5 15.5 8.067 15.5 10C15.5 11.5855 14.4457 12.9248 13 13.3551Z"/></symbol><symbol id="ri-shopping-bag-3-line" viewBox="0 0 24 24"><path d="M6.50488 2H17.5049C17.8196 2 18.116 2.14819 18.3049 2.4L21.0049 6V21C21.0049 21.5523 20.5572 22 20.0049 22H4.00488C3.4526 22 3.00488 21.5523 3.00488 21V6L5.70488 2.4C5.89374 2.14819 6.19013 2 6.50488 2ZM19.0049 8H5.00488V20H19.0049V8ZM18.5049 6L17.0049 4H7.00488L5.50488 6H18.5049ZM9.00488 10V12C9.00488 13.6569 10.348 15 12.0049 15C13.6617 15 15.0049 13.6569 15.0049 12V10H17.0049V12C17.0049 14.7614 14.7663 17 12.0049 17C9.24346 17 7.00488 14.7614 7.00488 12V10H9.00488Z"/></symbol><symbol id="ri-sparkling-line" viewBox="0 0 24 24"><path d="M14 4.4375C15.3462 4.4375 16.4375 3.34619 16.4375 2H17.5625C17.5625 3.34619 18.6538 4.4375 20 4.4375V5.5625C18.6538 5.5625 17.5625 6.65381 17.5625 8H16.4375C16.4375 6.65381 15.3462 5.5625 14 5.5625V4.4375ZM1 11C4.31371 11 7 8.31371 7 5H9C9 8.31371 11.6863 11 15 11V13C11.6863 13 9 15.6863 9 19H7C7 15.6863 4.31371 13 1 13V11ZM4.87601 12C6.18717 12.7276 7.27243 13.8128 8 15.124 8.72757 13.8128 9.81283 12.7276 11.124 12 9.81283 11.2724 8.72757 10.1872 8 8.87601 7.27243 10.1872 6.18717 11.2724 4.87601 12ZM17.25 14C17.25 15.7949 15.7949 17.25 14 17.25V18.75C15.7949 18.75 17.25 20.2051 17.25 22H18.75C18.75 20.2051 20.2051 18.75 22 18.75V17.25C20.2051 17.25 18.75 15.7949 18.75 14H17.25Z"/></symbol><symbol id="ri-team-line" viewBox="0 0 24 24"><path d="M12 11C14.7614 11 17 13.2386 17 16V22H15V16C15 14.4023 13.7511 13.0963 12.1763 13.0051L12 13C10.4023 13 9.09634 14.2489 9.00509 15.8237L9 16V22H7V16C7 13.2386 9.23858 11 12 11ZM5.5 14C5.77885 14 6.05009 14.0326 6.3101 14.0942C6.14202 14.594 6.03873 15.122 6.00896 15.6693L6 16L6.0007 16.0856C5.88757 16.0456 5.76821 16.0187 5.64446 16.0069L5.5 16C4.7203 16 4.07955 16.5949 4.00687 17.3555L4 17.5V22H2V17.5C2 15.567 3.567 14 5.5 14ZM18.5 14C20.433 14 22 15.567 22 17.5V22H20V17.5C20 16.7203 19.4051 16.0796 18.6445 16.0069L18.5 16C18.3248 16 18.1566 16.03 18.0003 16.0852L18 16C18 15.3343 17.8916 14.694 17.6915 14.0956C17.9499 14.0326 18.2211 14 18.5 14ZM5.5 8C6.88071 8 8 9.11929 8 10.5C8 11.8807 6.88071 13 5.5 13C4.11929 13 3 11.8807 3 10.5C3 9.11929 4.11929 8 5.5 8ZM18.5 8C19.8807 8 21 9.11929 21 10.5C21 11.8807 19.8807 13 18.5 13C17.1193 13 16 11.8807 16 10.5C16 9.11929 17.1193 8 18.5 8ZM5.5 10C5.22386 10 5 10.2239 5 10.5C5 10.7761 5.22386 11 5.5 11C5.77614 11 6 10.7761 6 10.5C6 10.2239 5.77614 10 5.5 10ZM18.5 10C18.2239 10 18 10.2239 18 10.5C18 10.7761 18.2239 11 18.5 11C18.7761 11 19 10.7761 19 10.5C19 10.2239 18.7761 10 18.5 10ZM12 2C14.2091 2 16 3.79086 16 6C16 8.20914 14.2091 10 12 10C9.79086 10 8 8.20914 8 6C8 3.79086 9.79086 2 12 2ZM12 4C10.8954 4 10 4.89543 10 6C10 7.10457 10.8954 8 12 8C13.1046 8 14 7.10457 14 6C14 4.89543 13.1046 4 12 4Z"/></symbol><symbol id="ri-temp-cold-line" viewBox="0 0 24 24"><path d="M8 5C8 2.79086 9.79086 1 12 1C14.2091 1 16 2.79086 16 5V10.2547C17.8135 11.5196 19 13.6213 19 16C19 19.866 15.866 23 12 23C8.13401 23 5 19.866 5 16C5 13.6213 6.18652 11.5196 8 10.2547V5ZM9.1442 11.8951C7.80943 12.8261 7 14.3432 7 16C7 18.7614 9.23858 21 12 21C14.7614 21 17 18.7614 17 16C17 14.3432 16.1906 12.8261 14.8558 11.8951L14 11.2981V5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5V11.2981L9.1442 11.8951ZM8 16H16C16 18.2091 14.2091 20 12 20C9.79086 20 8 18.2091 8 16Z"/></symbol><symbol id="ri-tools-line" viewBox="0 0 24 24"><path d="M5.32943 3.27158C6.56252 2.8332 7.9923 3.10749 8.97927 4.09446C10.1002 5.21537 10.3019 6.90741 9.5843 8.23385L20.293 18.9437L18.8788 20.3579L8.16982 9.64875C6.84325 10.3669 5.15069 10.1654 4.02952 9.04421C3.04227 8.05696 2.7681 6.62665 3.20701 5.39332L5.44373 7.63C6.02952 8.21578 6.97927 8.21578 7.56505 7.63C8.15084 7.04421 8.15084 6.09446 7.56505 5.50868L5.32943 3.27158ZM15.6968 5.15512L18.8788 3.38736L20.293 4.80157L18.5252 7.98355L16.7574 8.3371L14.6361 10.4584L13.2219 9.04421L15.3432 6.92289L15.6968 5.15512ZM8.97927 13.2868L10.3935 14.7011L5.09018 20.0044C4.69966 20.3949 4.06649 20.3949 3.67597 20.0044C3.31334 19.6417 3.28744 19.0699 3.59826 18.6774L3.67597 18.5902L8.97927 13.2868Z"/></symbol><symbol id="ri-user-line" viewBox="0 0 24 24"><path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z"/></symbol><symbol id="ri-windy-line" viewBox="0 0 24 24"><path d="M10.5 17H4V15H10.5C12.433 15 14 16.567 14 18.5C14 20.433 12.433 22 10.5 22C8.99957 22 7.71966 21.0559 7.22196 19.7293L9.09513 19.0268C9.30843 19.5954 9.85696 20 10.5 20C11.3284 20 12 19.3284 12 18.5C12 17.6716 11.3284 17 10.5 17ZM5 11H18.5C20.433 11 22 12.567 22 14.5C22 16.433 20.433 18 18.5 18C16.9996 18 15.7197 17.0559 15.222 15.7293L17.0951 15.0268C17.3084 15.5954 17.857 16 18.5 16C19.3284 16 20 15.3284 20 14.5C20 13.6716 19.3284 13 18.5 13H5C3.34315 13 2 11.6569 2 10C2 8.34315 3.34315 7 5 7H13.5C14.3284 7 15 6.32843 15 5.5C15 4.67157 14.3284 4 13.5 4C12.857 4 12.3084 4.40463 12.0951 4.97317L10.222 4.27073C10.7197 2.94414 11.9996 2 13.5 2C15.433 2 17 3.567 17 5.5C17 7.433 15.433 9 13.5 9H5C4.44772 9 4 9.44772 4 10C4 10.5523 4.44772 11 5 11Z"/></symbol></svg>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="ri-add-circle-line" viewBox="0 0 24 24"><path d="M11 11V7H13V11H17V13H13V17H11V13H7V11H11ZM12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"/></symbol><symbol id="ri-add-line" viewBox="0 0 24 24"><path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z"/></symbol><symbol id="ri-arrow-down-s-line" viewBox="0 0 24 24"><path d="M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z"/></symbol><symbol id="ri-arrow-right-line" viewBox="0 0 24 24"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"/></symbol><symbol id="ri-arrow-right-s-line" viewBox="0 0 24 24"><path d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z"/></symbol><symbol id="ri-arrow-right-up-line" viewBox="0 0 24 24"><path d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z"/></symbol><symbol id="ri-bank-card-line" viewBox="0 0 24 24"><path d="M3.00488 2.99979H21.0049C21.5572 2.99979 22.0049 3.4475 22.0049 3.99979V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979ZM20.0049 10.9998H4.00488V18.9998H20.0049V10.9998ZM20.0049 8.99979V4.99979H4.00488V8.99979H20.0049ZM14.0049 14.9998H18.0049V16.9998H14.0049V14.9998Z"/></symbol><symbol id="ri-calendar-line" viewBox="0 0 24 24"><path d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"/></symbol><symbol id="ri-camera-line" viewBox="0 0 24 24"><path d="M9.82843 5L7.82843 7H4V19H20V7H16.1716L14.1716 5H9.82843ZM9 3H15L17 5H21C21.5523 5 22 5.44772 22 6V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V6C2 5.44772 2.44772 5 3 5H7L9 3ZM12 18C8.96243 18 6.5 15.5376 6.5 12.5C6.5 9.46243 8.96243 7 12 7C15.0376 7 17.5 9.46243 17.5 12.5C17.5 15.5376 15.0376 18 12 18ZM12 16C13.933 16 15.5 14.433 15.5 12.5C15.5 10.567 13.933 9 12 9C10.067 9 8.5 10.567 8.5 12.5C8.5 14.433 10.067 16 12 16Z"/></symbol><symbol id="ri-check-line" viewBox="0 0 24 24"><path d="M9.9997 15.1709L19.1921 5.97852L20.6063 7.39273L9.9997 17.9993L3.63574 11.6354L5.04996 10.2212L9.9997 15.1709Z"/></symbol><symbol id="ri-checkbox-blank-circle-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"/></symbol><symbol id="ri-checkbox-circle-fill" viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM17.4571 9.45711L11 15.9142L6.79289 11.7071L8.20711 10.2929L11 13.0858L16.0429 8.04289L17.4571 9.45711Z"/></symbol><symbol id="ri-checkbox-circle-line" viewBox="0 0 24 24"><path d="M4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12ZM12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM17.4571 9.45711L16.0429 8.04289L11 13.0858L8.20711 10.2929L6.79289 11.7071L11 15.9142L17.4571 9.45711Z"/></symbol><symbol id="ri-close-line" viewBox="0 0 24 24"><path d="M11.9997 10.5865L16.9495 5.63672L18.3637 7.05093L13.4139 12.0007L18.3637 16.9504L16.9495 18.3646L11.9997 13.4149L7.04996 18.3646L5.63574 16.9504L10.5855 12.0007L5.63574 7.05093L7.04996 5.63672L11.9997 10.5865Z"/></symbol><symbol id="ri-coupon-3-line" viewBox="0 0 24 24"><path d="M2.00488 3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979H21.0049C21.5572 2.99979 22.0049 3.4475 22.0049 3.99979V9.49979C20.6242 9.49979 19.5049 10.6191 19.5049 11.9998C19.5049 13.3805 20.6242 14.4998 22.0049 14.4998V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979ZM8.09024 18.9998C8.29615 18.4172 8.85177 17.9998 9.50488 17.9998C10.158 17.9998 10.7136 18.4172 10.9195 18.9998H20.0049V16.032C18.5232 15.2957 17.5049 13.7666 17.5049 11.9998C17.5049 10.2329 18.5232 8.7039 20.0049 7.96755V4.99979H10.9195C10.7136 5.58238 10.158 5.99979 9.50488 5.99979C8.85177 5.99979 8.29615 5.58238 8.09024 4.99979H4.00488V18.9998H8.09024ZM9.50488 10.9998C8.67646 10.9998 8.00488 10.3282 8.00488 9.49979C8.00488 8.67136 8.67646 7.99979 9.50488 7.99979C10.3333 7.99979 11.0049 8.67136 11.0049 9.49979C11.0049 10.3282 10.3333 10.9998 9.50488 10.9998ZM9.50488 15.9998C8.67646 15.9998 8.00488 15.3282 8.00488 14.4998C8.00488 13.6714 8.67646 12.9998 9.50488 12.9998C10.3333 12.9998 11.0049 13.6714 11.0049 14.4998C11.0049 15.3282 10.3333 15.9998 9.50488 15.9998Z"/></symbol><symbol id="ri-door-closed-line" viewBox="0 0 24 24"><path d="M2.99805 21V19H4.99805V4C4.99805 3.44772 5.44576 3 5.99805 3H17.998C18.5503 3 18.998 3.44772 18.998 4V19H20.998V21H2.99805ZM16.998 5H6.99805V19H16.998V5ZM14.998 11V13H12.998V11H14.998Z"/></symbol><symbol id="ri-drop-line" viewBox="0 0 24 24"><path d="M12 3.09723L7.05025 8.04697C4.31658 10.7806 4.31658 15.2128 7.05025 17.9465C9.78392 20.6801 14.2161 20.6801 16.9497 17.9465C19.6834 15.2128 19.6834 10.7806 16.9497 8.04697L12 3.09723ZM12 0.268799L18.364 6.63276C21.8787 10.1475 21.8787 15.846 18.364 19.3607C14.8492 22.8754 9.15076 22.8754 5.63604 19.3607C2.12132 15.846 2.12132 10.1475 5.63604 6.63276L12 0.268799Z"/></symbol><symbol id="ri-equalizer-line" viewBox="0 0 24 24"><path d="M6.17071 18C6.58254 16.8348 7.69378 16 9 16C10.3062 16 11.4175 16.8348 11.8293 18H22V20H11.8293C11.4175 21.1652 10.3062 22 9 22C7.69378 22 6.58254 21.1652 6.17071 20H2V18H6.17071ZM12.1707 11C12.5825 9.83481 13.6938 9 15 9C16.3062 9 17.4175 9.83481 17.8293 11H22V13H17.8293C17.4175 14.1652 16.3062 15 15 15C13.6938 15 12.5825 14.1652 12.1707 13H2V11H12.1707ZM6.17071 4C6.58254 2.83481 7.69378 2 9 2C10.3062 2 11.4175 2.83481 11.8293 4H22V6H11.8293C11.4175 7.16519 10.3062 8 9 8C7.69378 8 6.58254 7.16519 6.17071 6H2V4H6.17071ZM9 6C9.55228 6 10 5.55228 10 5C10 4.44772 9.55228 4 9 4C8.44772 4 8 4.44772 8 5C8 5.55228 8.44772 6 9 6ZM15 13C15.5523 13 16 12.5523 16 12C16 11.4477 15.5523 11 15 11C14.4477 11 14 11.4477 14 12C14 12.5523 14.4477 13 15 13ZM9 20C9.55228 20 10 19.5523 10 19C10 18.4477 9.55228 18 9 18C8.44772 18 8 18.4477 8 19C8 19.5523 8.44772 20 9 20Z"/></symbol><symbol id="ri-error-warning-fill" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 15V17H13V15H11ZM11 7V13H13V7H11Z"/></symbol><symbol id="ri-gift-line" viewBox="0 0 24 24"><path d="M15.0049 2.00281C17.214 2.00281 19.0049 3.79367 19.0049 6.00281C19.0049 6.73184 18.8098 7.41532 18.4691 8.00392L23.0049 8.00281V10.0028H21.0049V20.0028C21.0049 20.5551 20.5572 21.0028 20.0049 21.0028H4.00488C3.4526 21.0028 3.00488 20.5551 3.00488 20.0028V10.0028H1.00488V8.00281L5.54065 8.00392C5.19992 7.41532 5.00488 6.73184 5.00488 6.00281C5.00488 3.79367 6.79574 2.00281 9.00488 2.00281C10.2001 2.00281 11.2729 2.52702 12.0058 3.35807C12.7369 2.52702 13.8097 2.00281 15.0049 2.00281ZM11.0049 10.0028H5.00488V19.0028H11.0049V10.0028ZM19.0049 10.0028H13.0049V19.0028H19.0049V10.0028ZM9.00488 4.00281C7.90031 4.00281 7.00488 4.89824 7.00488 6.00281C7.00488 7.05717 7.82076 7.92097 8.85562 7.99732L9.00488 8.00281H11.0049V6.00281C11.0049 5.00116 10.2686 4.1715 9.30766 4.02558L9.15415 4.00829L9.00488 4.00281ZM15.0049 4.00281C13.9505 4.00281 13.0867 4.81869 13.0104 5.85355L13.0049 6.00281V8.00281H15.0049C16.0592 8.00281 16.923 7.18693 16.9994 6.15207L17.0049 6.00281C17.0049 4.89824 16.1095 4.00281 15.0049 4.00281Z"/></symbol><symbol id="ri-hammer-line" viewBox="0 0 24 24"><path d="M20 2C20.5523 2 21 2.44772 21 3V8C21 8.55228 20.5523 9 20 9H15V22C15 22.5523 14.5523 23 14 23H10C9.44772 23 9 22.5523 9 22V9H3.5C2.94772 9 2.5 8.55228 2.5 8V5.61803C2.5 5.23926 2.714 4.893 3.05279 4.72361L8.5 2H20ZM15 4H8.97214L4.5 6.23607V7H11V21H13V7H15V4ZM19 4H17V7H19V4Z"/></symbol><symbol id="ri-heart-pulse-line" viewBox="0 0 24 24"><path d="M16.5 3C19.5376 3 22 5.5 22 9C22 16 14.5 20 12 21.5C10.0226 20.3135 4.91699 17.563 2.86894 13.001L1 13V11L2.21045 11.0009C2.07425 10.3633 2 9.69651 2 9C2 5.5 4.5 3 7.5 3C9.35997 3 11 4 12 5C13 4 14.64 3 16.5 3ZM16.5 5C15.4241 5 14.2593 5.56911 13.4142 6.41421L12 7.82843L10.5858 6.41421C9.74068 5.56911 8.5759 5 7.5 5C5.55906 5 4 6.6565 4 9C4 9.68542 4.09035 10.3516 4.26658 11.0004L6.43381 11L8.5 7.55635L11.5 12.5563L12.4338 11H17V13H13.5662L11.5 16.4437L8.5 11.4437L7.56619 13L5.10789 13.0006C5.89727 14.3737 7.09304 15.6681 8.64514 16.9029C9.39001 17.4955 10.1845 18.0485 11.0661 18.6038C11.3646 18.7919 11.6611 18.9729 12 19.1752C12.3389 18.9729 12.6354 18.7919 12.9339 18.6038C13.8155 18.0485 14.61 17.4955 15.3549 16.9029C18.3337 14.533 20 11.9435 20 9C20 6.64076 18.463 5 16.5 5Z"/></symbol><symbol id="ri-home-4-fill" viewBox="0 0 24 24"><path d="M20 20C20 20.5523 19.5523 21 19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20ZM11 13V19H13V13H11Z"/></symbol><symbol id="ri-home-4-line" viewBox="0 0 24 24"><path d="M19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20C20 20.5523 19.5523 21 19 21ZM13 19H18V9.15745L12 3.7029L6 9.15745V19H11V13H13V19Z"/></symbol><symbol id="ri-information-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z"/></symbol><symbol id="ri-logout-box-r-line" viewBox="0 0 24 24"><path d="M5 22C4.44772 22 4 21.5523 4 21V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V6H18V4H6V20H18V18H20V21C20 21.5523 19.5523 22 19 22H5ZM18 16V13H11V11H18V8L23 12L18 16Z"/></symbol><symbol id="ri-menu-line" viewBox="0 0 24 24"><path d="M3 4H21V6H3V4ZM3 11H21V13H3V11ZM3 18H21V20H3V18Z"/></symbol><symbol id="ri-pushpin-line" viewBox="0 0 24 24"><path d="M13.8273 1.69L22.3126 10.1753L20.8984 11.5895L20.1913 10.8824L15.9486 15.125L15.2415 18.6606L13.8273 20.0748L9.58466 15.8321L4.63492 20.7819L3.2207 19.3677L8.17045 14.4179L3.92781 10.1753L5.34202 8.76107L8.87756 8.05396L13.1202 3.81132L12.4131 3.10422L13.8273 1.69ZM14.5344 5.22554L9.86358 9.89637L7.0417 10.4607L13.5418 16.9609L14.1062 14.139L18.7771 9.46818L14.5344 5.22554Z"/></symbol><symbol id="ri-question-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM13 13.3551V14H11V12.5C11 11.9477 11.4477 11.5 12 11.5C12.8284 11.5 13.5 10.8284 13.5 10C13.5 9.17157 12.8284 8.5 12 8.5C11.2723 8.5 10.6656 9.01823 10.5288 9.70577L8.56731 9.31346C8.88637 7.70919 10.302 6.5 12 6.5C13.933 6.5 15.5 8.067 15.5 10C15.5 11.5855 14.4457 12.9248 13 13.3551Z"/></symbol><symbol id="ri-shopping-bag-3-line" viewBox="0 0 24 24"><path d="M6.50488 2H17.5049C17.8196 2 18.116 2.14819 18.3049 2.4L21.0049 6V21C21.0049 21.5523 20.5572 22 20.0049 22H4.00488C3.4526 22 3.00488 21.5523 3.00488 21V6L5.70488 2.4C5.89374 2.14819 6.19013 2 6.50488 2ZM19.0049 8H5.00488V20H19.0049V8ZM18.5049 6L17.0049 4H7.00488L5.50488 6H18.5049ZM9.00488 10V12C9.00488 13.6569 10.348 15 12.0049 15C13.6617 15 15.0049 13.6569 15.0049 12V10H17.0049V12C17.0049 14.7614 14.7663 17 12.0049 17C9.24346 17 7.00488 14.7614 7.00488 12V10H9.00488Z"/></symbol><symbol id="ri-sparkling-line" viewBox="0 0 24 24"><path d="M14 4.4375C15.3462 4.4375 16.4375 3.34619 16.4375 2H17.5625C17.5625 3.34619 18.6538 4.4375 20 4.4375V5.5625C18.6538 5.5625 17.5625 6.65381 17.5625 8H16.4375C16.4375 6.65381 15.3462 5.5625 14 5.5625V4.4375ZM1 11C4.31371 11 7 8.31371 7 5H9C9 8.31371 11.6863 11 15 11V13C11.6863 13 9 15.6863 9 19H7C7 15.6863 4.31371 13 1 13V11ZM4.87601 12C6.18717 12.7276 7.27243 13.8128 8 15.124 8.72757 13.8128 9.81283 12.7276 11.124 12 9.81283 11.2724 8.72757 10.1872 8 8.87601 7.27243 10.1872 6.18717 11.2724 4.87601 12ZM17.25 14C17.25 15.7949 15.7949 17.25 14 17.25V18.75C15.7949 18.75 17.25 20.2051 17.25 22H18.75C18.75 20.2051 20.2051 18.75 22 18.75V17.25C20.2051 17.25 18.75 15.7949 18.75 14H17.25Z"/></symbol><symbol id="ri-team-line" viewBox="0 0 24 24"><path d="M12 11C14.7614 11 17 13.2386 17 16V22H15V16C15 14.4023 13.7511 13.0963 12.1763 13.0051L12 13C10.4023 13 9.09634 14.2489 9.00509 15.8237L9 16V22H7V16C7 13.2386 9.23858 11 12 11ZM5.5 14C5.77885 14 6.05009 14.0326 6.3101 14.0942C6.14202 14.594 6.03873 15.122 6.00896 15.6693L6 16L6.0007 16.0856C5.88757 16.0456 5.76821 16.0187 5.64446 16.0069L5.5 16C4.7203 16 4.07955 16.5949 4.00687 17.3555L4 17.5V22H2V17.5C2 15.567 3.567 14 5.5 14ZM18.5 14C20.433 14 22 15.567 22 17.5V22H20V17.5C20 16.7203 19.4051 16.0796 18.6445 16.0069L18.5 16C18.3248 16 18.1566 16.03 18.0003 16.0852L18 16C18 15.3343 17.8916 14.694 17.6915 14.0956C17.9499 14.0326 18.2211 14 18.5 14ZM5.5 8C6.88071 8 8 9.11929 8 10.5C8 11.8807 6.88071 13 5.5 13C4.11929 13 3 11.8807 3 10.5C3 9.11929 4.11929 8 5.5 8ZM18.5 8C19.8807 8 21 9.11929 21 10.5C21 11.8807 19.8807 13 18.5 13C17.1193 13 16 11.8807 16 10.5C16 9.11929 17.1193 8 18.5 8ZM5.5 10C5.22386 10 5 10.2239 5 10.5C5 10.7761 5.22386 11 5.5 11C5.77614 11 6 10.7761 6 10.5C6 10.2239 5.77614 10 5.5 10ZM18.5 10C18.2239 10 18 10.2239 18 10.5C18 10.7761 18.2239 11 18.5 11C18.7761 11 19 10.7761 19 10.5C19 10.2239 18.7761 10 18.5 10ZM12 2C14.2091 2 16 3.79086 16 6C16 8.20914 14.2091 10 12 10C9.79086 10 8 8.20914 8 6C8 3.79086 9.79086 2 12 2ZM12 4C10.8954 4 10 4.89543 10 6C10 7.10457 10.8954 8 12 8C13.1046 8 14 7.10457 14 6C14 4.89543 13.1046 4 12 4Z"/></symbol><symbol id="ri-temp-cold-line" viewBox="0 0 24 24"><path d="M8 5C8 2.79086 9.79086 1 12 1C14.2091 1 16 2.79086 16 5V10.2547C17.8135 11.5196 19 13.6213 19 16C19 19.866 15.866 23 12 23C8.13401 23 5 19.866 5 16C5 13.6213 6.18652 11.5196 8 10.2547V5ZM9.1442 11.8951C7.80943 12.8261 7 14.3432 7 16C7 18.7614 9.23858 21 12 21C14.7614 21 17 18.7614 17 16C17 14.3432 16.1906 12.8261 14.8558 11.8951L14 11.2981V5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5V11.2981L9.1442 11.8951ZM8 16H16C16 18.2091 14.2091 20 12 20C9.79086 20 8 18.2091 8 16Z"/></symbol><symbol id="ri-thumb-up-line" viewBox="0 0 24 24"><path d="M14.5998 8.00033H21C22.1046 8.00033 23 8.89576 23 10.0003V12.1047C23 12.3659 22.9488 12.6246 22.8494 12.8662L19.755 20.3811C19.6007 20.7558 19.2355 21.0003 18.8303 21.0003H2C1.44772 21.0003 1 20.5526 1 20.0003V10.0003C1 9.44804 1.44772 9.00033 2 9.00033H5.48184C5.80677 9.00033 6.11143 8.84246 6.29881 8.57701L11.7522 0.851355C11.8947 0.649486 12.1633 0.581978 12.3843 0.692483L14.1984 1.59951C15.25 2.12534 15.7931 3.31292 15.5031 4.45235L14.5998 8.00033ZM7 10.5878V19.0003H18.1606L21 12.1047V10.0003H14.5998C13.2951 10.0003 12.3398 8.77128 12.6616 7.50691L13.5649 3.95894C13.6229 3.73105 13.5143 3.49353 13.3039 3.38837L12.6428 3.0578L7.93275 9.73038C7.68285 10.0844 7.36341 10.3746 7 10.5878ZM5 11.0003H3V19.0003H5V11.0003Z"/></symbol><symbol id="ri-tools-line" viewBox="0 0 24 24"><path d="M5.32943 3.27158C6.56252 2.8332 7.9923 3.10749 8.97927 4.09446C10.1002 5.21537 10.3019 6.90741 9.5843 8.23385L20.293 18.9437L18.8788 20.3579L8.16982 9.64875C6.84325 10.3669 5.15069 10.1654 4.02952 9.04421C3.04227 8.05696 2.7681 6.62665 3.20701 5.39332L5.44373 7.63C6.02952 8.21578 6.97927 8.21578 7.56505 7.63C8.15084 7.04421 8.15084 6.09446 7.56505 5.50868L5.32943 3.27158ZM15.6968 5.15512L18.8788 3.38736L20.293 4.80157L18.5252 7.98355L16.7574 8.3371L14.6361 10.4584L13.2219 9.04421L15.3432 6.92289L15.6968 5.15512ZM8.97927 13.2868L10.3935 14.7011L5.09018 20.0044C4.69966 20.3949 4.06649 20.3949 3.67597 20.0044C3.31334 19.6417 3.28744 19.0699 3.59826 18.6774L3.67597 18.5902L8.97927 13.2868Z"/></symbol><symbol id="ri-user-line" viewBox="0 0 24 24"><path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z"/></symbol></svg>
 
 <div class="app">
 
@@ -726,14 +719,14 @@ body.is-multi .when-single { display: none !important; }
           <button class="menu__item" role="menuitemradio" aria-checked="true" data-home="mueller" data-address="4817 Mueller Blvd">
             <span>
               <span class="t-label t-ink">4817 Mueller Blvd</span>
-              <span class="t-meta menu__sub">Austin, TX 78723 &middot; 1 critical</span>
+              <span class="t-meta menu__sub">Austin, TX 78723 &middot; 4 items need you</span>
             </span>
             <svg class="i i--check"><use href="#ri-check-line"/></svg>
           </button>
           <button class="menu__item" role="menuitemradio" aria-checked="false" data-home="elm" data-address="1206 Elm Ridge Dr">
             <span>
               <span class="t-label t-ink">1206 Elm Ridge Dr</span>
-              <span class="t-meta menu__sub">Round Rock, TX 78664 &middot; no concerns</span>
+              <span class="t-meta menu__sub">Round Rock, TX 78664 &middot; 1 item needs you</span>
             </span>
             <svg class="i i--check"><use href="#ri-check-line"/></svg>
           </button>
@@ -752,133 +745,61 @@ body.is-multi .when-single { display: none !important; }
       <button class="icon-btn icon-btn--bare welcome__close" data-dismiss="welcome" aria-label="Dismiss"><svg class="i"><use href="#ri-close-line"/></svg></button>
     </section>
 
-    <!-- 1. Ready to schedule: a compact bar above the home -->
-    <section class="card todo" id="actions" aria-labelledby="todo-title">
-      <div class="todo__head">
-        <div class="card__title-row">
-          <h2 class="t-strong" id="todo-title"><span class="when-actions">3 visits ready to schedule</span><span class="when-caught-up">Nothing to schedule</span></h2>
-        </div>
-        <p class="t-meta when-multi"><svg class="i i--16 inline-icon"><use href="#ri-home-4-line"/></svg>1206 Elm Ridge Dr has <strong class="t-ink">1 visit</strong> to schedule. <button class="link" data-switch-home="elm">Switch home</button></p>
-      </div>
-
-      <ul class="todo__list when-actions">
-        <li class="todo__item todo__item--pm">
-          <div class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-door-closed-line"/></svg></div>
-          <div class="todo__main">
-            <p class="t-strong">Fall preventive maintenance <span class="badge badge--on-tint">Included in your membership</span></p>
-            <p class="t-meta">30-point home check &middot; about 2 hours &middot; earliest opening Tue, Oct 13</p>
-          </div>
-          <a class="btn btn--primary" href="#">Schedule visit</a>
-        </li>
-        <li class="todo__item">
-          <div class="tile-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></div>
-          <div class="todo__main">
-            <p class="t-strong">Kitchen faucet leak and garbage disposal jam</p>
-            <p class="t-meta">Service visit &middot; 2 tasks &middot; about 1.5 hours &middot; requested Sep 22</p>
-          </div>
-          <a class="btn btn--secondary" href="#">Schedule visit</a>
-        </li>
-        <li class="todo__item">
-          <div class="tile-icon"><svg class="i"><use href="#ri-drop-line"/></svg></div>
-          <div class="todo__main">
-            <p class="t-strong">HVAC condensate line flush</p>
-            <p class="t-meta">Service visit &middot; 1 task &middot; about 1 hour &middot; from a recommendation you approved</p>
-          </div>
-          <a class="btn btn--secondary" href="#">Schedule visit</a>
-        </li>
-      </ul>
-      <p class="t-meta todo__done when-caught-up"><svg class="i i--16 inline-icon"><use href="#ri-checkbox-circle-line"/></svg>Your next visit is Mon, Sep 28. Your Spring visit opens for scheduling in February.</p>
-    </section>
-
-    <!-- 2. The home: condition, preventive maintenance, team -->
-    <section class="card home" id="home" aria-labelledby="home-title">
-      <div class="home__top">
-        <div class="home__id">
-          <h2 class="t-display" id="home-title" data-home-label>4817 Mueller Blvd</h2>
-          <p class="t-desc">Austin, TX 78723 &middot; 2 HVAC systems &middot; PreFix Protect since March 2023</p>
-        </div>
-        <div class="home__links">
-          <a class="link" href="#">Latest snapshot<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
-          <a class="btn btn--secondary" href="#"><svg class="i"><use href="#ri-heart-pulse-line"/></svg>Home Health Report</a>
-        </div>
-      </div>
-
-      <hr class="divider">
-
-      <div class="home__grid">
-        <div class="home__health">
-          <p class="group-label">Condition at your Spring visit</p>
-          <p class="t-meta">Tue, Apr 14 &middot; 30 checks by Priya Shah</p>
-          <div class="stats">
-            <div class="stat">
-              <p class="t-display t-num stat__n stat__n--red">1</p>
-              <p class="t-label stat__label"><svg class="i i--16"><use href="#ri-error-warning-fill"/></svg>Critical</p>
-            </div>
-            <div class="stat">
-              <p class="t-display t-num stat__n">3</p>
-              <p class="t-label stat__label"><svg class="i i--16"><use href="#ri-alert-line"/></svg>Cause for concern</p>
-            </div>
-            <div class="stat">
-              <p class="t-display t-num stat__n stat__n--blue">26</p>
-              <p class="t-label stat__label"><svg class="i i--16"><use href="#ri-checkbox-circle-fill"/></svg>No concern</p>
-            </div>
-          </div>
-          <div class="stat-bar" aria-hidden="true"><span class="stat-bar__red" style="width:3.33%"></span><span class="stat-bar__ink" style="width:10%"></span><span class="stat-bar__blue"></span></div>
-          <p class="t-meta home__recs"><span class="t-red"><span data-rec-open-count>4</span> recommendations</span> need your decision. You&rsquo;ll find each one with its system below.</p>
-        </div>
-
-        <div class="home__pm">
-          <p class="group-label">Preventive maintenance</p>
-          <ul class="features">
-            <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Spring visit<span class="feature__sub">Done Tue, Apr 14</span></span></li>
-            <li class="feature when-actions"><span class="i-box"><svg class="i"><use href="#ri-door-closed-line"/></svg></span><span class="feature__text">Fall visit<span class="feature__sub">Ready to schedule</span></span></li>
-            <li class="feature when-caught-up"><span class="i-box"><svg class="i"><use href="#ri-calendar-line"/></svg></span><span class="feature__text">Fall visit<span class="feature__sub">Tue, Oct 13 &middot; 9:00&ndash;11:00 AM</span></span></li>
-          </ul>
-          <p class="t-meta home__pm-note">Both visits are included in your membership.</p>
-        </div>
-
-        <div class="home__team">
-          <p class="group-label">Your team</p>
-          <ul class="people people--compact">
-            <li class="person">
-              <span class="avatar">MR</span>
-              <div class="person__main">
-                <p class="t-strong">Marcus Reyes</p>
-                <p class="t-meta">Home Manager &middot; repairs</p>
-              </div>
-            </li>
-            <li class="person">
-              <span class="avatar">PS</span>
-              <div class="person__main">
-                <p class="t-strong">Priya Shah</p>
-                <p class="t-meta">PM technician</p>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
     <div class="layout">
       <div class="main">
-        <div class="systems__head">
-          <h2 class="t-title">Your home&rsquo;s systems</h2>
-          <p class="t-desc">What needs attention comes first. Each system shows its last check, open recommendations and recent work.</p>
-        </div>
 
-        <div class="systems">
-
-          <!-- Water heater: critical -->
-          <article class="card tile" id="sys-water-heater" aria-labelledby="sys-wh">
-            <div class="tile__head">
-              <div class="tile-icon"><svg class="i"><use href="#ri-fire-line"/></svg></div>
-              <div class="tile__name">
-                <span class="badge badge--critical">Critical</span>
-                <h3 class="t-strong" id="sys-wh">Water heater</h3>
-                <p class="t-meta">Checked Apr 14 &middot; <a class="link" href="#">Snapshot</a></p>
+        <!-- 1. Needs you: pinned above the timeline -->
+        <section class="card needs" id="needs" aria-labelledby="needs-title">
+          <div class="card__head">
+            <div class="card__heading">
+              <div class="card__title-row">
+                <svg class="i needs__pin"><use href="#ri-pushpin-line"/></svg>
+                <h2 class="t-title" id="needs-title">Needs you</h2>
               </div>
+              <p class="t-desc">Pinned until you act. Everything else is in your timeline below.</p>
             </div>
-            <div class="tile__rec">
+          </div>
+
+          <ul class="needs__list">
+            <li class="needs__item needs__item--pm when-actions">
+              <div class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-door-closed-line"/></svg></div>
+              <div class="needs__main">
+                <p class="t-strong">Schedule your Fall preventive maintenance</p>
+                <p class="t-meta">Included in your membership &middot; 30-point check &middot; earliest opening Tue, Oct 13</p>
+              </div>
+              <a class="btn btn--primary" href="#">Schedule visit</a>
+            </li>
+            <li class="needs__item when-actions">
+              <div class="tile-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></div>
+              <div class="needs__main">
+                <p class="t-strong">Schedule: kitchen faucet leak and garbage disposal jam</p>
+                <p class="t-meta">Service visit &middot; 2 tasks &middot; about 1.5 hours &middot; requested Sep 22</p>
+              </div>
+              <a class="btn btn--secondary" href="#">Schedule visit</a>
+            </li>
+            <li class="needs__item when-actions">
+              <div class="tile-icon"><svg class="i"><use href="#ri-drop-line"/></svg></div>
+              <div class="needs__main">
+                <p class="t-strong">Schedule: HVAC condensate line flush</p>
+                <p class="t-meta">Service visit &middot; 1 task &middot; from a recommendation you approved</p>
+              </div>
+              <a class="btn btn--secondary" href="#">Schedule visit</a>
+            </li>
+            <li class="needs__item needs__item--quiet when-caught-up">
+              <div class="tile-icon tile-icon--blue"><svg class="i"><use href="#ri-checkbox-circle-line"/></svg></div>
+              <div class="needs__main">
+                <p class="t-strong">Nothing to schedule</p>
+                <p class="t-meta">Your next visit is Mon, Sep 28.</p>
+              </div>
+            </li>
+          </ul>
+
+          <div class="needs__recs">
+            <div class="needs__recs-head">
+              <p class="t-strong">Recommendations to decide on</p>
+              <span class="count count--red" data-rec-open-count>4</span>
+            </div>
+            <div class="recs">
             <article class="rec rec--critical" data-priority="critical" data-state="open" data-title="Water heater relief valve">
               <div class="rec__open">
                 <label class="check" aria-label="Select water heater relief valve"><input type="checkbox" data-rec-select><span class="check__box"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
@@ -912,100 +833,7 @@ body.is-multi .when-single { display: none !important; }
                 <button class="link" data-rec-undo>Undo</button>
               </div>
             </article>
-            </div>
-            <ul class="features tile__facts">
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Sediment flushed at your Spring visit</span></li>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Drain pan dry, no tank leaks</span></li>
-            </ul>
-            <div class="tile__foot">
-              <button class="link" data-toggle="hist-wh" aria-expanded="false" aria-controls="hist-wh" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-              <a class="link" href="#">Request service</a>
-            </div>
-            <ul class="features tile__history" id="hist-wh" hidden>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Sediment flushed<span class="feature__sub">Spring visit, Apr 14</span></span></li>
-              <li class="feature feature--cross"><span class="i-box"><svg class="i"><use href="#ri-close-line"/></svg></span><span class="feature__text">Relief valve inspected, leak found<span class="feature__sub">Spring visit, Apr 14</span></span></li>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Drain pan checked for leaks<span class="feature__sub">Fall visit, Oct 20, 2025</span></span></li>
-            </ul>
-          </article>
-
-          <!-- HVAC: cause for concern, with the seasonal tip -->
-          <article class="card tile" id="sys-hvac" aria-labelledby="sys-hv">
-            <div class="tile__head">
-              <div class="tile-icon"><svg class="i"><use href="#ri-windy-line"/></svg></div>
-              <div class="tile__name">
-                <span class="badge badge--high">Cause for concern</span>
-                <h3 class="t-strong" id="sys-hv">Heating and cooling</h3>
-                <p class="t-meta">2 systems &middot; checked Apr 14 &middot; <a class="link" href="#">Snapshot</a></p>
-              </div>
-            </div>
-            <div class="tile__rec">
-            <article class="rec" data-priority="high" data-state="open" data-title="Upstairs AC diagnostic">
-              <div class="rec__open">
-                <label class="check" aria-label="Select upstairs AC diagnostic"><input type="checkbox" data-rec-select><span class="check__box"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <div class="rec__main">
-                  <div class="rec__tags"><span class="badge badge--high">High</span><span class="t-meta t-ink">Upstairs AC</span></div>
-                  <h3 class="t-strong">System turns on and off too often</h3>
-                  <p class="t-meta">Short cycling wears out the compressor faster. A specialist should find the cause.</p>
-                  <ul class="rec__meta">
-                    <li><svg class="i i--16"><use href="#ri-tools-line"/></svg>Specialty HVAC &middot; diagnostic visit</li>
-                    <li><svg class="i i--16"><use href="#ri-camera-line"/></svg>1 photo</li>
-                  </ul>
-                  <div class="rec__actions">
-                    <button class="btn btn--secondary" data-rec-submit>Send to PreFix</button>
-                    <button class="link" data-rec-decline>Decline</button>
-                  </div>
-                </div>
-              </div>
-              <div class="rec__reasons">
-                <p class="t-strong">Why are you declining &ldquo;System turns on and off too often&rdquo;?</p>
-                <div class="chips">
-                  <button class="chip" data-reason="already taken care of">Already taken care of</button>
-                  <button class="chip" data-reason="not a priority right now">Not a priority right now</button>
-                  <button class="chip" data-reason="cost">Cost</button>
-                  <button class="chip" data-reason="I&rsquo;ll handle it myself">I&rsquo;ll handle it myself</button>
-                </div>
-                <button class="link" data-rec-cancel-decline>Keep it open</button>
-              </div>
-              <div class="rec__done">
-                <svg class="i rec__done-icon"><use href="#ri-checkbox-circle-line"/></svg>
-                <p class="t-meta t-ink" data-rec-note></p>
-                <button class="link" data-rec-undo>Undo</button>
-              </div>
-            </article>
-            </div>
-            <ul class="features tile__facts">
-              <li class="feature"><span class="i-box"><svg class="i"><use href="#ri-drop-line"/></svg></span><span class="feature__text">Condensate line flush approved<span class="feature__sub when-actions">Ready to schedule</span><span class="feature__sub when-caught-up">Scheduled with your Fall visit</span></span></li>
-            </ul>
-            <div class="tip">
-              <svg class="i tip__icon"><use href="#ri-temp-cold-line"/></svg>
-              <div class="tip__text">
-                <p class="t-label">Heating season is coming</p>
-                <p class="t-meta">Your Fall visit includes a heating check. Your <span class="t-blue">$50 HVAC credit</span> covers part of a tune-up.</p>
-                <a class="link" href="#">Book a heating tune-up</a>
-              </div>
-            </div>
-            <div class="tile__foot">
-              <button class="link" data-toggle="hist-hv" aria-expanded="false" aria-controls="hist-hv" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-              <a class="link" href="#">Request service</a>
-            </div>
-            <ul class="features tile__history" id="hist-hv" hidden>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Filters changed, filters included<span class="feature__sub">Spring visit, Apr 14</span></span></li>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Supply and return temperatures recorded<span class="feature__sub">Spring visit, Apr 14</span></span></li>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Condenser coils cleaned<span class="feature__sub">Fall visit, Oct 20, 2025</span></span></li>
-            </ul>
-          </article>
-
-          <!-- Appliances: cause for concern, with appliance list and Sibi offer -->
-          <article class="card tile" id="sys-appliances" aria-labelledby="sys-ap">
-            <div class="tile__head">
-              <div class="tile-icon"><svg class="i"><use href="#ri-fridge-line"/></svg></div>
-              <div class="tile__name">
-                <span class="badge badge--high">Cause for concern</span>
-                <h3 class="t-strong" id="sys-ap">Appliances</h3>
-                <p class="t-meta">4 on file &middot; checked Apr 14 &middot; <a class="link" href="#">Snapshot</a></p>
-              </div>
-            </div>
-            <div class="tile__rec">
+              <div id="needs-more-recs" hidden>
             <article class="rec" data-priority="high" data-state="open" data-title="Dryer vent cleaning">
               <div class="rec__open">
                 <label class="check" aria-label="Select dryer vent cleaning"><input type="checkbox" data-rec-select><span class="check__box"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
@@ -1039,45 +867,39 @@ body.is-multi .when-single { display: none !important; }
                 <button class="link" data-rec-undo>Undo</button>
               </div>
             </article>
-            </div>
-            <button class="link tile__toggle" data-toggle="appliance-list" aria-expanded="false" aria-controls="appliance-list" data-open="Hide appliances" data-closed="See your 4 appliances"><span data-label>See your 4 appliances</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-            <dl class="appliances" id="appliance-list" hidden>
-              <div class="appliances__row"><dt>Refrigerator</dt><dd>Whirlpool &middot; 6 years</dd></div>
-              <div class="appliances__row"><dt>Washer</dt><dd>LG &middot; 4 years</dd></div>
-              <div class="appliances__row"><dt>Dryer</dt><dd>LG &middot; 4 years</dd></div>
-              <div class="appliances__row"><dt>Dishwasher</dt><dd>Bosch &middot; 9 years</dd></div>
-              <p class="t-meta appliances__note">From your enrollment visit. Tell us if something has changed.</p>
-            </dl>
-            <div class="tip tip--neutral">
-              <svg class="i tip__icon"><use href="#ri-shopping-bag-3-line"/></svg>
-              <div class="tip__text">
-                <p class="t-label">Replacing an appliance?</p>
-                <p class="t-meta">Member pricing through our partner Sibi. Your Home Manager can handle the install.</p>
-                <a class="link" href="#">Shop appliances<svg class="i"><use href="#ri-arrow-right-up-line"/></svg></a>
+            <article class="rec" data-priority="high" data-state="open" data-title="Upstairs AC diagnostic">
+              <div class="rec__open">
+                <label class="check" aria-label="Select upstairs AC diagnostic"><input type="checkbox" data-rec-select><span class="check__box"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
+                <div class="rec__main">
+                  <div class="rec__tags"><span class="badge badge--high">High</span><span class="t-meta t-ink">Upstairs AC</span></div>
+                  <h3 class="t-strong">System turns on and off too often</h3>
+                  <p class="t-meta">Short cycling wears out the compressor faster. A specialist should find the cause.</p>
+                  <ul class="rec__meta">
+                    <li><svg class="i i--16"><use href="#ri-tools-line"/></svg>Specialty HVAC &middot; diagnostic visit</li>
+                    <li><svg class="i i--16"><use href="#ri-camera-line"/></svg>1 photo</li>
+                  </ul>
+                  <div class="rec__actions">
+                    <button class="btn btn--secondary" data-rec-submit>Send to PreFix</button>
+                    <button class="link" data-rec-decline>Decline</button>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="tile__foot">
-              <button class="link" data-toggle="hist-ap" aria-expanded="false" aria-controls="hist-ap" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-              <a class="link" href="#">Request service</a>
-            </div>
-            <ul class="features tile__history" id="hist-ap" hidden>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Refrigerator condenser coils cleaned<span class="feature__sub">Spring visit, Apr 14</span></span></li>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Washer and dishwasher sanitized<span class="feature__sub">Spring visit, Apr 14</span></span></li>
-              <li class="feature feature--cross"><span class="i-box"><svg class="i"><use href="#ri-close-line"/></svg></span><span class="feature__text">Dryer vent lint buildup found<span class="feature__sub">Spring visit, Apr 14</span></span></li>
-            </ul>
-          </article>
-
-          <!-- Structure and exterior: cause for concern -->
-          <article class="card tile" id="sys-structure" aria-labelledby="sys-st">
-            <div class="tile__head">
-              <div class="tile-icon"><svg class="i"><use href="#ri-home-gear-line"/></svg></div>
-              <div class="tile__name">
-                <span class="badge badge--high">Cause for concern</span>
-                <h3 class="t-strong" id="sys-st">Structure and exterior</h3>
-                <p class="t-meta">Roof, walls, windows, doors &middot; <a class="link" href="#">Snapshot</a></p>
+              <div class="rec__reasons">
+                <p class="t-strong">Why are you declining &ldquo;System turns on and off too often&rdquo;?</p>
+                <div class="chips">
+                  <button class="chip" data-reason="already taken care of">Already taken care of</button>
+                  <button class="chip" data-reason="not a priority right now">Not a priority right now</button>
+                  <button class="chip" data-reason="cost">Cost</button>
+                  <button class="chip" data-reason="I&rsquo;ll handle it myself">I&rsquo;ll handle it myself</button>
+                </div>
+                <button class="link" data-rec-cancel-decline>Keep it open</button>
               </div>
-            </div>
-            <div class="tile__rec">
+              <div class="rec__done">
+                <svg class="i rec__done-icon"><use href="#ri-checkbox-circle-line"/></svg>
+                <p class="t-meta t-ink" data-rec-note></p>
+                <button class="link" data-rec-undo>Undo</button>
+              </div>
+            </article>
               <article class="rec" data-priority="normal" data-state="open" data-title="Kitchen window caulking">
                 <div class="rec__open">
                   <label class="check" aria-label="Select kitchen window caulking"><input type="checkbox" data-rec-select><span class="check__box"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
@@ -1110,155 +932,294 @@ body.is-multi .when-single { display: none !important; }
                   <button class="link" data-rec-undo>Undo</button>
                 </div>
               </article>
+              </div>
             </div>
-            <ul class="features tile__facts">
-              <li class="feature"><span class="i-box"><svg class="i"><use href="#ri-calendar-line"/></svg></span><span class="feature__text">2 visits booked<span class="feature__sub">Back door and hinges, Mon, Sep 28 &middot; Ceiling stain, Wed, Oct 21</span></span></li>
-            </ul>
-            <div class="tile__foot">
-              <button class="link" data-toggle="hist-st" aria-expanded="false" aria-controls="hist-st" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-              <a class="link" href="#">Request service</a>
+            <div class="card__foot">
+              <button class="link" data-toggle="needs-more-recs" aria-expanded="false" aria-controls="needs-more-recs" data-open="Show fewer" data-closed="Show 3 more recommendations"><span data-label>Show 3 more recommendations</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+              <button class="btn btn--primary" data-rec-submit-selected disabled><span data-label>Submit selected</span></button>
             </div>
-            <ul class="features tile__history" id="hist-st" hidden>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Roof leak repaired by a licensed roofer<span class="feature__sub">Managed by PreFix, Feb 11</span></span></li>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Garage door functional check<span class="feature__sub">Spring visit, Apr 14</span></span></li>
-            </ul>
-          </article>
+          </div>
 
-          <!-- Plumbing: no concern -->
-          <article class="card tile" id="sys-plumbing" aria-labelledby="sys-pl">
-            <div class="tile__head">
-              <div class="tile-icon"><svg class="i"><use href="#ri-drop-line"/></svg></div>
-              <div class="tile__name">
-                <span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>No concern</span>
-                <h3 class="t-strong" id="sys-pl">Plumbing and drains</h3>
-                <p class="t-meta">Checked Apr 14 &middot; <a class="link" href="#">Snapshot</a></p>
-              </div>
-            </div>
-            <ul class="features tile__facts">
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Exposed plumbing checked for leaks</span></li>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">All drains checked for flow</span></li>
-              <li class="feature when-actions"><span class="i-box"><svg class="i"><use href="#ri-hammer-line"/></svg></span><span class="feature__text">Kitchen faucet and disposal visit<span class="feature__sub">Ready to schedule</span></span></li>
-            </ul>
-            <div class="tile__foot">
-              <button class="link" data-toggle="hist-pl" aria-expanded="false" aria-controls="hist-pl" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-              <a class="link" href="#">Request service</a>
-            </div>
-            <ul class="features tile__history" id="hist-pl" hidden>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Toilet fill valve replaced<span class="feature__sub">Marcus Reyes, Mar 3</span></span></li>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Bathroom exhaust fan replaced<span class="feature__sub">Marcus Reyes, Jun 9</span></span></li>
-            </ul>
-          </article>
+          <div class="card__foot card__foot--split when-multi">
+            <p class="t-meta"><svg class="i i--16 inline-icon"><use href="#ri-home-4-line"/></svg>1206 Elm Ridge Dr has <strong class="t-ink">1 visit</strong> to schedule.</p>
+            <button class="link" data-switch-home="elm">Switch home<svg class="i"><use href="#ri-arrow-right-line"/></svg></button>
+          </div>
+        </section>
 
-          <!-- Safety: no concern -->
-          <article class="card tile" id="sys-safety" aria-labelledby="sys-sa">
-            <div class="tile__head">
-              <div class="tile-icon"><svg class="i"><use href="#ri-alarm-warning-line"/></svg></div>
-              <div class="tile__name">
-                <span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>No concern</span>
-                <h3 class="t-strong" id="sys-sa">Safety</h3>
-                <p class="t-meta">Smoke and CO detectors &middot; <a class="link" href="#">Snapshot</a></p>
-              </div>
+        <!-- 2. Timeline: upcoming above today, history below -->
+        <section class="card timeline" id="timeline" aria-labelledby="tl-title">
+          <div class="card__head timeline__head">
+            <div class="card__heading">
+              <h2 class="t-title" id="tl-title">Your timeline</h2>
+              <p class="t-desc">Everything at <span data-home-label>4817 Mueller Blvd</span>, newest first. Canceled and expired items are hidden.</p>
             </div>
-            <ul class="features tile__facts">
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">6 detectors tested, batteries changed</span></li>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Water and gas shutoffs located</span></li>
-            </ul>
-            <div class="tip tip--neutral">
-              <svg class="i tip__icon"><use href="#ri-lightbulb-line"/></svg>
-              <div class="tip__text">
-                <p class="t-meta">Press each detector&rsquo;s test button once a month. We&rsquo;ll change the batteries again at your Fall visit.</p>
-              </div>
+          </div>
+
+          <div class="filters" role="group" aria-label="Filter the timeline" data-filter-group>
+            <button class="filter" aria-pressed="true" data-filter="all">All</button>
+            <button class="filter" aria-pressed="false" data-filter="visit">Visits</button>
+            <button class="filter" aria-pressed="false" data-filter="rec">Recommendations</button>
+            <button class="filter" aria-pressed="false" data-filter="billing">Billing and credits</button>
+          </div>
+
+          <!-- Coming up -->
+          <div class="tl-section" data-tl-section>
+            <p class="section-head">Coming up</p>
+            <div class="rule"></div>
+            <ol class="tl">
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Feb</span><span class="t-meta">2027</span></div>
+                <span class="tl__icon tl__icon--future"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">February 2027</p>
+                  <div class="tl__top"><p class="t-strong">Spring preventive maintenance</p><span class="badge badge--included">Included</span></div>
+                  <p class="t-meta">Opens for scheduling in February. We&rsquo;ll email you a link.</p>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Oct 21</span><span class="t-meta">Wed</span></div>
+                <span class="tl__icon tl__icon--future"><svg class="i"><use href="#ri-calendar-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Wed, Oct 21</p>
+                  <div class="tl__top"><p class="t-strong">Ceiling water stain repair</p><span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>Confirmed</span></div>
+                  <p class="t-meta">Arrives 1:00&ndash;3:00 PM &middot; Dana Whitfield, specialty painting and drywall</p>
+                  <div class="tl__links"><a class="link" href="#">Reschedule</a><a class="link" href="#">Cancel visit</a></div>
+                </div>
+              </li>
+              <li class="tl__item when-caught-up" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Oct 13</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--pm"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Oct 13</p>
+                  <div class="tl__top"><p class="t-strong">Fall preventive maintenance</p><span class="badge badge--included">Included</span></div>
+                  <p class="t-meta">Arrives 9:00&ndash;11:00 AM &middot; Priya Shah, PM technician</p>
+                  <div class="tl__links"><a class="link" href="#">Reschedule</a><a class="link" href="#">Cancel visit</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="billing">
+                <div class="tl__date"><span class="t-label">Oct 1</span><span class="t-meta">Thu</span></div>
+                <span class="tl__icon tl__icon--future"><svg class="i"><use href="#ri-bank-card-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Thu, Oct 1</p>
+                  <div class="tl__top"><p class="t-strong">Membership payment</p><p class="t-strong t-num tl__amount">$69</p></div>
+                  <p class="t-meta">PreFix Protect, 2 HVAC systems &middot; card ending 4242</p>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Sep 28</span><span class="t-meta">Mon</span></div>
+                <span class="tl__icon tl__icon--future"><svg class="i"><use href="#ri-calendar-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Mon, Sep 28</p>
+                  <div class="tl__top"><p class="t-strong">Back door and cabinet hinges</p><span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>Confirmed</span></div>
+                  <p class="t-meta">Arrives 8:00&ndash;10:00 AM &middot; Marcus Reyes, Home Manager</p>
+                  <p class="visit__note"><svg class="i i--16"><use href="#ri-information-line"/></svg><span>Less than 72 hours away. To change it, call <a href="#">(512) 555-0142</a>.</span></p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Today -->
+          <div class="today" aria-label="Today">
+            <span class="today__pill">Today &middot; Fri, Sep 25</span>
+          </div>
+          <div class="tl-season">
+            <div class="tile-icon tile-icon--blue"><svg class="i"><use href="#ri-temp-cold-line"/></svg></div>
+            <div class="tl-season__text">
+              <p class="t-strong">This month: heating season is coming</p>
+              <p class="t-meta">Your Fall visit includes a heating check. Test smoke and CO detectors, and use your <span class="t-blue">$50 HVAC credit</span> on a tune-up.</p>
+              <a class="link" href="#">Book a heating tune-up</a>
             </div>
-            <div class="tile__foot">
-              <button class="link" data-toggle="hist-sa" aria-expanded="false" aria-controls="hist-sa" data-open="Hide history" data-closed="History"><span data-label>History</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-              <a class="link" href="#">Request service</a>
+          </div>
+
+          <!-- 2026 -->
+          <div class="tl-section" data-tl-section>
+            <div class="tl-year">
+              <p class="section-head">2026</p>
+              <p class="t-meta">4 visits &middot; <strong class="t-ink">$1,240 saved</strong></p>
             </div>
-            <ul class="features tile__history" id="hist-sa" hidden>
-              <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Detectors tested, batteries changed<span class="feature__sub">Fall visit, Oct 20, 2025</span></span></li>
-            </ul>
-          </article>
-        </div>
+            <div class="rule"></div>
+            <ol class="tl">
+              <li class="tl__item" data-kind="rec">
+                <div class="tl__date"><span class="t-label">Sep 20</span><span class="t-meta">Sun</span></div>
+                <span class="tl__icon"><svg class="i"><use href="#ri-thumb-up-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Sun, Sep 20</p>
+                  <p class="t-strong">You approved: HVAC condensate line flush</p>
+                  <p class="t-meta">From your Spring visit. It&rsquo;s ready to schedule.</p>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="billing">
+                <div class="tl__date"><span class="t-label">Sep 1</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon"><svg class="i"><use href="#ri-bank-card-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Sep 1</p>
+                  <div class="tl__top"><p class="t-strong">Membership payment</p><p class="t-strong t-num tl__amount">$69</p></div>
+                  <div class="tl__links"><a class="link" href="#">Receipt</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Jun 9</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--done"><svg class="i"><use href="#ri-check-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Jun 9</p>
+                  <div class="tl__top"><p class="t-strong">Bathroom exhaust fan replaced</p><p class="t-strong t-num tl__amount">$110</p></div>
+                  <p class="t-meta">Marcus Reyes, Home Manager &middot; 1 task completed &middot; market rate $382</p>
+                  <div class="tl__links"><a class="link" href="#">Visit summary</a><button class="link" data-toggle="prob-jun9" aria-expanded="false" aria-controls="prob-jun9">I have a problem with this</button></div>
+                  <div class="problem" id="prob-jun9" hidden>
+                    <div class="problem__ask">
+                      <p class="t-label">What&rsquo;s wrong with this visit?</p>
+                      <div class="chips">
+                        <button class="chip" data-problem>Something isn&rsquo;t fixed</button>
+                        <button class="chip" data-problem>The invoice looks wrong</button>
+                        <button class="chip" data-problem>I have a question</button>
+                      </div>
+                    </div>
+                    <p class="problem__done" hidden><svg class="i"><use href="#ri-checkbox-circle-line"/></svg><span class="t-meta t-ink" data-problem-note></span></p>
+                  </div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="billing">
+                <div class="tl__date"><span class="t-label">May 12</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon"><svg class="i"><use href="#ri-coupon-3-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, May 12</p>
+                  <div class="tl__top"><p class="t-strong">Referral credit added</p><p class="t-strong t-num tl__amount tl__amount--blue">+$25</p></div>
+                  <p class="t-meta">Jamie L. joined PreFix with your referral code. Use it on any service.</p>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="rec">
+                <div class="tl__date"><span class="t-label">Apr 16</span><span class="t-meta">Thu</span></div>
+                <span class="tl__icon tl__icon--report"><svg class="i"><use href="#ri-heart-pulse-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Thu, Apr 16</p>
+                  <p class="t-strong">Home Health Snapshot ready</p>
+                  <p class="t-meta">1 critical, 3 cause for concern, 26 no concern &middot; 4 recommendations</p>
+                  <div class="tl__links"><a class="link" href="#">Home Health Snapshot</a><a class="link" href="#needs">Review recommendations</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Apr 14</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--pm"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Apr 14</p>
+                  <div class="tl__top"><p class="t-strong">Spring preventive maintenance</p><span class="badge badge--included">Included</span></div>
+                  <p class="t-meta">Priya Shah, PM technician &middot; 30 checks &middot; market rate $650</p>
+                  <div class="tl__links"><a class="link" href="#">Visit summary</a><button class="link" data-toggle="prob-apr14" aria-expanded="false" aria-controls="prob-apr14">I have a problem with this</button></div>
+                  <div class="problem" id="prob-apr14" hidden>
+                    <div class="problem__ask">
+                      <p class="t-label">What&rsquo;s wrong with this visit?</p>
+                      <div class="chips">
+                        <button class="chip" data-problem>Something was missed</button>
+                        <button class="chip" data-problem>The snapshot looks wrong</button>
+                        <button class="chip" data-problem>I have a question</button>
+                      </div>
+                    </div>
+                    <p class="problem__done" hidden><svg class="i"><use href="#ri-checkbox-circle-line"/></svg><span class="t-meta t-ink" data-problem-note></span></p>
+                  </div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Mar 3</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--done"><svg class="i"><use href="#ri-check-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Mar 3</p>
+                  <div class="tl__top"><p class="t-strong">Toilet fill valve replaced</p><p class="t-strong t-num tl__amount">$80</p></div>
+                  <p class="t-meta">Marcus Reyes, Home Manager &middot; market rate $240</p>
+                  <div class="tl__links"><a class="link" href="#">Visit summary</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Feb 11</span><span class="t-meta">Wed</span></div>
+                <span class="tl__icon tl__icon--done"><svg class="i"><use href="#ri-check-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Wed, Feb 11</p>
+                  <div class="tl__top"><p class="t-strong">Roof leak repaired by a licensed roofer</p><p class="t-strong t-num tl__amount">$222</p></div>
+                  <p class="t-meta">Contractor managed by PreFix at no charge &middot; market rate $380</p>
+                  <div class="tl__links"><a class="link" href="#">Invoice</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="billing">
+                <div class="tl__date"><span class="t-label">Jan 2</span><span class="t-meta">Fri</span></div>
+                <span class="tl__icon"><svg class="i"><use href="#ri-coupon-3-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Fri, Jan 2</p>
+                  <div class="tl__top"><p class="t-strong">HVAC credit from PreFix</p><p class="t-strong t-num tl__amount tl__amount--blue">+$50</p></div>
+                  <p class="t-meta">For Specialty HVAC work &middot; expires Dec 31, 2026</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <!-- 2025, collapsed -->
+          <div class="tl-section" data-tl-section>
+            <div class="tl-year">
+              <p class="section-head">2025</p>
+              <p class="t-meta">3 visits &middot; <strong class="t-ink">$1,570 saved</strong></p>
+            </div>
+            <div class="rule"></div>
+            <ol class="tl" id="tl-2025" hidden>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Oct 20</span><span class="t-meta">Mon</span></div>
+                <span class="tl__icon tl__icon--pm"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Mon, Oct 20, 2025</p>
+                  <div class="tl__top"><p class="t-strong">Fall preventive maintenance</p><span class="badge badge--included">Included</span></div>
+                  <p class="t-meta">Priya Shah &middot; 30 checks &middot; 2 recommendations</p>
+                  <div class="tl__links"><a class="link" href="#">Home Health Snapshot</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Jul 8</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--done"><svg class="i"><use href="#ri-check-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Jul 8, 2025</p>
+                  <div class="tl__top"><p class="t-strong">Kitchen cabinet door rebuilt</p><p class="t-strong t-num tl__amount">$250</p></div>
+                  <p class="t-meta">Specialty carpentry &middot; market rate $520</p>
+                  <div class="tl__links"><a class="link" href="#">Visit summary</a></div>
+                </div>
+              </li>
+              <li class="tl__item" data-kind="visit">
+                <div class="tl__date"><span class="t-label">Apr 22</span><span class="t-meta">Tue</span></div>
+                <span class="tl__icon tl__icon--pm"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="tl__body">
+                  <p class="t-meta tl__date-inline">Tue, Apr 22, 2025</p>
+                  <div class="tl__top"><p class="t-strong">Spring preventive maintenance</p><span class="badge badge--included">Included</span></div>
+                  <p class="t-meta">Priya Shah &middot; 30 checks</p>
+                  <div class="tl__links"><a class="link" href="#">Home Health Snapshot</a></div>
+                </div>
+              </li>
+            </ol>
+            <div class="tl-more">
+              <button class="link" data-toggle="tl-2025" aria-expanded="false" aria-controls="tl-2025" data-open="Hide 2025" data-closed="Show 2025"><span data-label>Show 2025</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+              <a class="link" href="#">Full history since 2023<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
+            </div>
+          </div>
+        </section>
       </div>
 
-      <aside class="rail" aria-label="Visits and membership">
-
-        <!-- Upcoming visits -->
-        <section class="card" id="upcoming" aria-labelledby="upcoming-title">
-          <div class="card__head">
-            <div class="card__heading">
-              <h2 class="t-title" id="upcoming-title">Upcoming visits</h2>
-            </div>
-            <a class="link card__head-link" href="#">All visits<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
-          </div>
-          <div class="card__body visits">
-            <article class="visit">
-              <div class="date-tile"><span class="date-tile__m">Sep</span><span class="date-tile__d">28</span></div>
-              <div class="visit__main">
-                <div class="visit__top">
-                  <h3 class="t-strong">Back door and cabinet hinges</h3>
-                  <span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>Confirmed</span>
-                </div>
-                <ul class="visit__meta">
-                  <li><svg class="i i--16"><use href="#ri-calendar-line"/></svg><span><strong class="t-ink">Mon, Sep 28</strong> &middot; arrives 8:00&ndash;10:00 AM</span></li>
-                  <li><svg class="i i--16"><use href="#ri-user-line"/></svg><span>Marcus Reyes, Home Manager &middot; service visit</span></li>
-                </ul>
-                <p class="visit__note"><svg class="i i--16"><use href="#ri-information-line"/></svg><span>This visit is less than 72 hours away. To change it, call <a href="#">(512) 555-0142</a>.</span></p>
-                <div class="visit__actions">
-                  <button class="link" data-toggle="visit-1" aria-expanded="false" aria-controls="visit-1" data-open="Hide details" data-closed="Visit details"><span data-label>Visit details</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-                </div>
-                <div class="visit__details" id="visit-1" hidden>
-                  <p class="group-label">2 tasks</p>
-                  <ul class="features">
-                    <li class="feature"><span class="i-box"><svg class="i"><use href="#ri-hammer-line"/></svg></span><span class="feature__text">Back door sticks when closing<span class="feature__sub">Plane and adjust the door, check the strike plate</span></span></li>
-                    <li class="feature"><span class="i-box"><svg class="i"><use href="#ri-hammer-line"/></svg></span><span class="feature__text">Kitchen cabinet hinges are loose<span class="feature__sub">Tighten or replace 4 hinges</span></span></li>
-                  </ul>
-                </div>
+      <aside class="rail" aria-label="Your team and membership">
+        <section class="card" id="team" aria-labelledby="team-title">
+          <h2 class="t-title" id="team-title">Your PreFix team</h2>
+          <p class="t-desc team__sub">The people who look after <span data-home-label>4817 Mueller Blvd</span></p>
+          <ul class="people">
+            <li class="person">
+              <span class="avatar avatar--lg">MR</span>
+              <div class="person__main">
+                <p class="t-strong">Marcus Reyes</p>
+                <p class="t-meta">Home Manager &middot; repairs and service</p>
+                <p class="t-meta t-ink person__next"><svg class="i i--16"><use href="#ri-calendar-line"/></svg>Next visit Mon, Sep 28</p>
               </div>
-            </article>
-
-            <article class="visit visit--pm when-caught-up">
-              <div class="date-tile date-tile--pm"><span class="date-tile__m">Oct</span><span class="date-tile__d">13</span></div>
-              <div class="visit__main">
-                <div class="visit__top">
-                  <h3 class="t-strong">Fall preventive maintenance</h3>
-                  <span class="badge badge--included">Included in your membership</span>
-                </div>
-                <ul class="visit__meta">
-                  <li><svg class="i i--16"><use href="#ri-calendar-line"/></svg><span><strong class="t-ink">Tue, Oct 13</strong> &middot; arrives 9:00&ndash;11:00 AM</span></li>
-                  <li><svg class="i i--16"><use href="#ri-user-line"/></svg><span>Priya Shah, PM technician &middot; about 2 hours</span></li>
-                </ul>
-                <div class="visit__actions">
-                  <a class="link" href="#">Reschedule</a>
-                  <a class="link" href="#">Cancel visit</a>
-                </div>
+            </li>
+            <li class="person">
+              <span class="avatar avatar--lg">PS</span>
+              <div class="person__main">
+                <p class="t-strong">Priya Shah</p>
+                <p class="t-meta">PM technician &middot; spring and fall visits</p>
+                <p class="t-meta t-ink person__next when-actions"><svg class="i i--16"><use href="#ri-door-closed-line"/></svg>Fall visit not booked yet</p>
+                <p class="t-meta t-ink person__next when-caught-up"><svg class="i i--16"><use href="#ri-calendar-line"/></svg>Next visit Tue, Oct 13</p>
               </div>
-            </article>
-
-            <article class="visit">
-              <div class="date-tile"><span class="date-tile__m">Oct</span><span class="date-tile__d">21</span></div>
-              <div class="visit__main">
-                <div class="visit__top">
-                  <h3 class="t-strong">Ceiling water stain repair</h3>
-                  <span class="badge badge--status"><svg class="i"><use href="#ri-check-line"/></svg>Confirmed</span>
-                </div>
-                <ul class="visit__meta">
-                  <li><svg class="i i--16"><use href="#ri-calendar-line"/></svg><span><strong class="t-ink">Wed, Oct 21</strong> &middot; arrives 1:00&ndash;3:00 PM</span></li>
-                  <li><svg class="i i--16"><use href="#ri-user-line"/></svg><span>Dana Whitfield &middot; specialty painting and drywall</span></li>
-                </ul>
-                <div class="visit__actions">
-                  <button class="link" data-toggle="visit-2" aria-expanded="false" aria-controls="visit-2" data-open="Hide details" data-closed="Visit details"><span data-label>Visit details</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-                  <a class="link" href="#">Reschedule</a>
-                  <a class="link" href="#">Cancel visit</a>
-                </div>
-                <div class="visit__details" id="visit-2" hidden>
-                  <p class="group-label">1 task</p>
-                  <ul class="features">
-                    <li class="feature"><span class="i-box"><svg class="i"><use href="#ri-paint-brush-line"/></svg></span><span class="feature__text">Repair and repaint water-stained ceiling in the upstairs hallway<span class="feature__sub">Quoted at $125/hour specialty rate, about 3 hours</span></span></li>
-                  </ul>
-                </div>
-              </div>
-            </article>
-          </div>
+            </li>
+          </ul>
         </section>
 
         <!-- 7. Savings and credits -->
@@ -1363,7 +1324,33 @@ body.is-multi .when-single { display: none !important; }
             </ul>
           </div>
 
+
+          <hr class="divider">
+
+          <a class="report-link" href="#">
+            <span class="tile-icon tile-icon--blue"><svg class="i"><use href="#ri-heart-pulse-line"/></svg></span>
+            <span class="report-link__text">
+              <span class="t-strong">Home Health Report</span>
+              <span class="t-meta">Updated after your Spring visit</span>
+            </span>
+            <svg class="i report-link__arrow"><use href="#ri-arrow-right-s-line"/></svg>
+          </a>
         </section>
+
+          <!-- 6. Evergreen promotion -->
+          <section class="card" id="promo" aria-labelledby="promo-title">
+            <div class="promo__top">
+              <div class="tile-icon"><svg class="i"><use href="#ri-shopping-bag-3-line"/></svg></div>
+              <span class="badge badge--normal">Partner offer</span>
+            </div>
+            <h2 class="t-title duo__title" id="promo-title">Member pricing on appliances</h2>
+            <p class="t-desc">Shop new appliances through our partner Sibi. Your Home Manager can handle the install.</p>
+            <ul class="features duo__list">
+              <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Refrigerators, washers, dryers and more</span></li>
+              <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Delivered to your door</span></li>
+            </ul>
+            <a class="btn btn--secondary btn--block" href="#">Shop appliances<svg class="i"><use href="#ri-arrow-right-up-line"/></svg></a>
+          </section>
       </aside>
     </div>
   </main>

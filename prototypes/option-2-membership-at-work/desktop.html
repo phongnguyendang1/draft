@@ -85,7 +85,7 @@ h1, h2, h3, h4, p, ul, ol, figure { margin: 0; }
 ul, ol { padding: 0; list-style: none; }
 button { font: inherit; color: inherit; letter-spacing: inherit; }
 a { color: inherit; }
-[hidden] { display: none !important; }
+[hidden], .is-filtered { display: none !important; }
 
 :focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; }
 
@@ -149,7 +149,7 @@ a { color: inherit; }
 [aria-expanded="true"] > .icon-when-closed, [aria-expanded="false"] > .icon-when-open { display: none; }
 
 /* Cards (ref: white, 1px #ccd7dc, radius 24, padding 20) */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: var(--s-20); }
+.card { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: var(--s-20); }
 .card--tint { background: var(--blue-tint); border-color: var(--blue-tint); }
 .card--selected { background: var(--blue-tint); border: 2px solid var(--blue); }
 .card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-16); }
@@ -627,7 +627,7 @@ body.is-multi .when-single { display: none !important; }
   .plancard .credits__list { margin-left: 0; }
   .svc__grid { grid-auto-flow: row; grid-template-columns: 1fr; grid-template-rows: none; }
 
-  .layout { display: flex; flex-direction: column; gap: var(--s-16); }
+  .layout { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
   .main, .rail { display: contents; }
   #recs { order: 1; }
   #upcoming { order: 2; }
@@ -1519,6 +1519,30 @@ body.is-multi .when-single { display: none !important; }
         setRecState(r, "submitted", "Sent to PreFix. We’ll contact you to schedule “" + r.getAttribute("data-title") + "”.");
       });
       toast(picked.length + (picked.length === 1 ? " recommendation" : " recommendations") + " sent to PreFix");
+      return;
+    }
+
+    var filter = target.closest("[data-filter]");
+    if (filter) {
+      var group = filter.closest("[data-filter-group]");
+      var kind = filter.getAttribute("data-filter");
+      $all("[data-filter]", group).forEach(function (b) { b.setAttribute("aria-pressed", String(b === filter)); });
+      $all("[data-kind]").forEach(function (item) {
+        item.classList.toggle("is-filtered", kind !== "all" && item.getAttribute("data-kind") !== kind);
+      });
+      $all("[data-tl-section]").forEach(function (section) {
+        var any = $all("[data-kind]", section).some(function (item) { return !item.classList.contains("is-filtered"); });
+        section.classList.toggle("is-filtered", !any);
+      });
+      return;
+    }
+
+    var problem = target.closest("[data-problem]");
+    if (problem) {
+      var box = problem.closest(".problem");
+      $(".problem__ask", box).hidden = true;
+      $("[data-problem-note]", box).textContent = "Thanks. We\u2019ve told the team \u201c" + problem.textContent.trim() + "\u201d and will get back to you within 2 business hours.";
+      $(".problem__done", box).hidden = false;
       return;
     }
 

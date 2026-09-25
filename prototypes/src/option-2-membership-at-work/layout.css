@@ -88,7 +88,7 @@
   .plancard .credits__list { margin-left: 0; }
   .svc__grid { grid-auto-flow: row; grid-template-columns: 1fr; grid-template-rows: none; }
 
-  .layout { display: flex; flex-direction: column; gap: var(--s-16); }
+  .layout { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
   .main, .rail { display: contents; }
   #recs { order: 1; }
   #upcoming { order: 2; }
