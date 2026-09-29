@@ -1,22 +1,16 @@
-            <article class="rec" data-priority="high" data-state="open" data-title="Dryer vent cleaning">
+            <article class="rec rec--row" data-priority="high" data-state="open" data-title="Dryer vent cleaning" data-home="mueller">
               <div class="rec__open">
-                <label class="check" aria-label="Select dryer vent cleaning"><input type="checkbox" data-rec-select><span class="check__box"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
                 <div class="rec__main">
-                  <div class="rec__tags"><span class="badge badge--high">High</span><span class="t-meta t-ink">Dryer vent</span></div>
-                  <h3 class="t-strong">Lint buildup is blocking airflow</h3>
-                  <p class="t-meta">A blocked vent makes drying slower and raises the risk of a dryer fire.</p>
-                  <ul class="rec__meta">
-                    <li><svg class="i i--16"><use href="#ri-user-line"/></svg>Home Manager &middot; about 1 hour</li>
-                    <li><svg class="i i--16"><use href="#ri-camera-line"/></svg>1 photo</li>
-                  </ul>
-                  <div class="rec__actions">
-                    <button class="btn btn--secondary" data-rec-submit>Send to PreFix</button>
-                    <button class="link" data-rec-decline>Decline</button>
-                  </div>
+                  <p class="rec__line"><span class="badge badge--high">High</span><span class="t-strong">Dryer vent is blocked with lint</span></p>
+                  <p class="rec__meta">Home Manager &middot; about 1 hour &middot; found Apr 14<span class="home-tag">Mueller</span></p>
+                </div>
+                <div class="rec__actions">
+                  <button class="btn btn--secondary" data-rec-submit>Send</button>
+                  <button class="link" data-rec-decline>Decline</button>
                 </div>
               </div>
               <div class="rec__reasons">
-                <p class="t-strong">Why are you declining &ldquo;Lint buildup is blocking airflow&rdquo;?</p>
+                <p class="t-label">Why are you declining &ldquo;Dryer vent is blocked with lint&rdquo;?</p>
                 <div class="chips">
                   <button class="chip" data-reason="already taken care of">Already taken care of</button>
                   <button class="chip" data-reason="not a priority right now">Not a priority right now</button>

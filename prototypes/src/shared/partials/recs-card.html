@@ -1,0 +1,21 @@
+        <!-- Recommendations, led by the Home Health Report summary -->
+        <section class="card" id="recs" aria-labelledby="recs-title">
+          <div class="card__title-row">
+            <h2 class="t-title" id="recs-title">Recommendations</h2>
+            <span class="count count--red" data-rec-open-count>4</span>
+          </div>
+          <p class="t-desc recs__desc">What your Home Manager found on recent visits. Send the ones you want fixed.</p>
+          <div class="recs-health">
+            <!-- @include health-summary -->
+          </div>
+          <div class="recs">
+            <!-- @include rec-water-heater -->
+            <!-- @include rec-dryer-vent -->
+            <!-- @include rec-upstairs-ac -->
+            <!-- @include rec-kitchen-window -->
+            <p class="t-meta recs__empty" data-home="elm">No open recommendations for 1206 Elm Ridge Dr.</p>
+          </div>
+          <div class="recs__foot">
+            <a class="link" href="#">All recommendations<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
+          </div>
+        </section>

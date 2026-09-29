@@ -5,7 +5,7 @@ Each option has one template (src/<option>/dashboard.html) and one layout styles
 The build inlines the DM Sans font, shared CSS, the option CSS, the Remix icons the
 template references, and the shared script, then writes desktop.html and mobile.html.
 
-Usage: python3 prototypes/build.py
+Usage: python3 prototypes/build.py [option-slug ...]
 """
 
 import base64
@@ -149,10 +149,13 @@ def build_index():
 
 
 def main():
+    only = set(sys.argv[1:])
     index = ROOT / "index.html"
     index.write_text(build_index())
     print(f"wrote {index.relative_to(ROOT.parent)}")
     for option in OPTIONS:
+        if only and option["slug"] not in only:
+            continue
         out_dir = ROOT / option["slug"]
         out_dir.mkdir(exist_ok=True)
         for frame_key in FRAMES:

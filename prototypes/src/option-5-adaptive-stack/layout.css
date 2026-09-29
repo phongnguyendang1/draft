@@ -1,7 +1,6 @@
-/* Option 5 · Adaptive Stack
-   One stream of cards. Every card is always present; their order comes from rules
-   (member stage, urgency, season). The first card spans the full width.
-   Desktop: two-column stream. Mobile: one column in the same order. */
+/* Option 5 · Adaptive Stack (round 2)
+   Five cards plus one stage lead. Rules decide the order; the first card, Recommendations and
+   PreFix Protect span the full width, the rest pair up. Mobile: one column, same order. */
 
 .why { display: flex; align-items: flex-start; gap: var(--s-8); margin-bottom: var(--s-16); font-size: 14px; line-height: 20px; color: var(--text-2); }
 .why .i { color: var(--blue-text); flex: none; }
@@ -12,30 +11,8 @@ body:not(.stage-payment) .only-stage-payment,
 body:not(.stage-renewal) .only-stage-renewal,
 body.stage-payment .not-stage-payment { display: none !important; }
 
-.stream { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-24); align-items: stretch; }
-.stream > .card { display: flex; flex-direction: column; }
-.stream > .card > .card__heading, .stream > .card > .card__title-row { margin-bottom: var(--s-8); }
-.stream .card__head { align-items: center; }
-.stream .card__body { margin-top: var(--s-16); }
-.stream .card__foot { margin-top: auto; padding-top: var(--s-24); }
-.stream > .card > .t-desc { margin-bottom: var(--s-4); }
-
-/* Visits to schedule */
-.acts { display: grid; grid-template-columns: 1fr; gap: var(--s-12); margin-top: var(--s-16); }
-.act { display: flex; flex-direction: column; gap: var(--s-4); padding: var(--s-16); border-radius: var(--r-inner); background: var(--page); }
-.act--pm { background: var(--blue-tint); }
-.act__top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: var(--s-8); }
-.act .tile-icon { width: 40px; height: 40px; background: var(--surface); }
-.act__btn { margin-top: var(--s-12); align-self: flex-start; }
-.acts__other { margin-top: var(--s-16); display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
-.acts__other .inline-icon { margin-right: 0; }
-[data-card="actions"] .empty { margin-top: var(--s-16); }
-.stage-active:not(.is-caught-up) [data-card="actions"] .acts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.stage-active:not(.is-caught-up) [data-card="actions"] .act__btn { margin-top: auto; align-self: stretch; }
-.stage-active:not(.is-caught-up) [data-card="actions"] .act .t-meta { margin-bottom: var(--s-12); }
-
-/* Recommendations */
-[data-card="recs"] .recs { margin-top: var(--s-20); }
+.stream { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-24); align-items: start; }
+.stream > .card { min-width: 0; }
 
 /* Getting started */
 .start__progress { display: flex; flex-direction: column; gap: var(--s-8); margin: var(--s-16) 0 var(--s-8); max-width: 360px; }
@@ -62,26 +39,6 @@ body.stage-payment .not-stage-payment { display: none !important; }
 .review__next strong { font-weight: 600; }
 .review__cta { display: flex; align-items: center; gap: var(--s-20); margin-top: var(--s-20); }
 
-/* PM card */
-.pm__list { margin: var(--s-16) 0; }
-.pm__checks { margin-top: var(--s-16); }
-
-/* Home Health Report card */
-.hhr__stats { display: flex; gap: var(--s-40); margin: var(--s-16) 0 var(--s-24); }
-.t-red-num { color: var(--red); }
-.t-blue-num { color: var(--blue-text); }
-.hhr__links { display: flex; align-items: center; gap: var(--s-20); margin-top: auto; }
-
-/* Credits card */
-.credits__big { display: flex; align-items: flex-end; gap: var(--s-16); margin: var(--s-8) 0 var(--s-16); }
-.credits__refer { margin-top: var(--s-16); }
-
-/* Services card */
-.svc__bar { margin: var(--s-12) 0 var(--s-16); }
-.svc__grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-8) var(--s-24); margin-bottom: var(--s-12); }
-.svc__todo .i-box { color: var(--slate); }
-#svc-rest { margin-top: var(--s-12); }
-
 /* Prototype stage picker (not part of the design) */
 .proto__stages { display: flex; flex-direction: column; gap: 2px; }
 .proto__stage { display: flex; align-items: center; gap: var(--s-8); padding: 6px 0; font-size: 14px; line-height: 20px; cursor: pointer; }
@@ -89,82 +46,37 @@ body.stage-payment .not-stage-payment { display: none !important; }
 .proto__title--gap { margin-top: var(--s-16); }
 
 /* Stage order */
-/* active */
-.stage-active [data-card="actions"] { order: 1; grid-column: 1 / -1; }
-.stage-active [data-card="recs"] { order: 2; }
-.stage-active [data-card="upcoming"] { order: 3; }
-.stage-active [data-card="savings"] { order: 4; }
-.stage-active [data-card="pm"] { order: 5; }
-.stage-active [data-card="team"] { order: 6; }
-.stage-active [data-card="recent"] { order: 7; }
-.stage-active [data-card="hhr"] { order: 8; }
-.stage-active [data-card="plan"] { order: 9; }
-.stage-active [data-card="credits"] { order: 10; }
-.stage-active [data-card="services"] { order: 11; }
-.stage-active [data-card="seasonal"] { order: 12; }
-.stage-active #promo { order: 13; }
-/* new */
-.stage-new [data-card="start"] { order: 1; grid-column: 1 / -1; }
-.stage-new [data-card="actions"] { order: 2; }
-.stage-new [data-card="team"] { order: 3; }
-.stage-new [data-card="pm"] { order: 4; }
-.stage-new [data-card="services"] { order: 5; }
-.stage-new [data-card="upcoming"] { order: 6; }
-.stage-new [data-card="plan"] { order: 7; }
-.stage-new [data-card="credits"] { order: 8; }
-.stage-new [data-card="seasonal"] { order: 9; }
-.stage-new [data-card="recs"] { order: 10; }
-.stage-new [data-card="hhr"] { order: 11; }
-.stage-new [data-card="recent"] { order: 12; }
-.stage-new [data-card="savings"] { order: 13; }
-.stage-new #promo { order: 14; }
-/* payment */
-.stage-payment [data-card="payment"] { order: 1; grid-column: 1 / -1; }
-.stage-payment [data-card="plan"] { order: 2; }
-.stage-payment [data-card="upcoming"] { order: 3; }
-.stage-payment [data-card="actions"] { order: 4; }
-.stage-payment [data-card="recs"] { order: 5; }
-.stage-payment [data-card="credits"] { order: 6; }
-.stage-payment [data-card="team"] { order: 7; }
-.stage-payment [data-card="pm"] { order: 8; }
-.stage-payment [data-card="recent"] { order: 9; }
-.stage-payment [data-card="hhr"] { order: 10; }
-.stage-payment [data-card="savings"] { order: 11; }
-.stage-payment [data-card="services"] { order: 12; }
-.stage-payment [data-card="seasonal"] { order: 13; }
-.stage-payment #promo { order: 14; }
-/* renewal */
-.stage-renewal [data-card="review"] { order: 1; grid-column: 1 / -1; }
-.stage-renewal [data-card="plan"] { order: 2; }
-.stage-renewal [data-card="services"] { order: 3; }
-.stage-renewal [data-card="recs"] { order: 4; }
-.stage-renewal [data-card="actions"] { order: 5; }
-.stage-renewal [data-card="upcoming"] { order: 6; }
-.stage-renewal [data-card="pm"] { order: 7; }
-.stage-renewal [data-card="credits"] { order: 8; }
-.stage-renewal [data-card="team"] { order: 9; }
-.stage-renewal [data-card="recent"] { order: 10; }
-.stage-renewal [data-card="hhr"] { order: 11; }
-.stage-renewal [data-card="savings"] { order: 12; }
-.stage-renewal [data-card="seasonal"] { order: 13; }
-.stage-renewal #promo { order: 14; }
-/* active, nothing to schedule: recommendations lead */
-.stage-active.is-caught-up [data-card="recs"] { order: 1; grid-column: 1 / -1; }
-.stage-active.is-caught-up [data-card="actions"] { order: 3; grid-column: auto; }
-.stage-active.is-caught-up [data-card="upcoming"] { order: 2; }
+.stage-active #actions { order: 1; grid-column: 1 / -1; }
+.stage-active #recs { order: 2; grid-column: 1 / -1; }
+.stage-active #upcoming { order: 3; }
+.stage-active #savings { order: 4; }
+.stage-active #plan { order: 5; grid-column: 1 / -1; }
+.stage-new #start { order: 1; grid-column: 1 / -1; }
+.stage-new #actions { order: 2; }
+.stage-new #upcoming { order: 3; }
+.stage-new #savings { order: 4; }
+.stage-new #plan { order: 5; grid-column: 1 / -1; }
+.stage-new #recs { order: 6; grid-column: 1 / -1; }
+.stage-payment #payment { order: 1; grid-column: 1 / -1; }
+.stage-payment #plan { order: 2; grid-column: 1 / -1; }
+.stage-payment #upcoming { order: 3; }
+.stage-payment #actions { order: 4; }
+.stage-payment #recs { order: 5; grid-column: 1 / -1; }
+.stage-payment #savings { order: 6; }
+.stage-renewal #review { order: 1; grid-column: 1 / -1; }
+.stage-renewal #plan { order: 2; grid-column: 1 / -1; }
+.stage-renewal #savings { order: 3; }
+.stage-renewal #upcoming { order: 4; }
+.stage-renewal #recs { order: 5; grid-column: 1 / -1; }
+.stage-renewal #actions { order: 6; }
+.stage-active.is-caught-up #recs { order: 1; }
+.stage-active.is-caught-up #actions { order: 3; grid-column: auto; }
+.stage-active.is-caught-up #upcoming { order: 2; }
 
 @container app (max-width: 767px) {
   .stream { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
-  .stage-active:not(.is-caught-up) [data-card="actions"] .acts { grid-template-columns: 1fr; }
-  .stage-active:not(.is-caught-up) [data-card="actions"] .act .t-meta { margin-bottom: 0; }
-  .act__btn { align-self: stretch; }
   .start__steps { grid-template-columns: 1fr; }
   .start__step .btn { margin-left: 0; width: 100%; }
   .review { grid-template-columns: 1fr; gap: var(--s-24); }
   .pay__cta .btn { width: 100%; }
-  .hhr__stats { gap: var(--s-24); }
-  .svc__grid { grid-template-columns: 1fr; }
-  [data-card="recs"] .card__foot { flex-direction: column-reverse; align-items: stretch; }
-  [data-card="recs"] .card__foot .btn { width: 100%; }
-  [data-card="recs"] .card__foot .link { align-self: center; }
 }

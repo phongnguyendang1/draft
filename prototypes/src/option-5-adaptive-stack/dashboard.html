@@ -15,44 +15,14 @@
 
   <main class="page">
 
-    <section class="intro">
-      <div class="intro__text">
-        <h1 class="t-display">Good morning, Sarah</h1>
-        <p class="t-desc">Friday, September 25</p>
-      </div>
+    <!-- @include intro -->
 
-      <div class="menu-wrap when-multi">
-        <button class="switcher" data-menu="home-menu" aria-expanded="false" aria-haspopup="true">
-          <svg class="i"><use href="#ri-home-4-line"/></svg>
-          <span class="switcher__label" data-home-label>4817 Mueller Blvd</span>
-          <svg class="i i--16"><use href="#ri-arrow-down-s-line"/></svg>
-        </button>
-        <div class="menu menu--homes" id="home-menu" role="menu" hidden>
-          <p class="menu__label">Your homes</p>
-          <button class="menu__item" role="menuitemradio" aria-checked="true" data-home="mueller" data-address="4817 Mueller Blvd">
-            <span>
-              <span class="t-label t-ink">4817 Mueller Blvd</span>
-              <span class="t-meta menu__sub">Austin, TX 78723 &middot; 3 visits to schedule</span>
-            </span>
-            <svg class="i i--check"><use href="#ri-check-line"/></svg>
-          </button>
-          <button class="menu__item" role="menuitemradio" aria-checked="false" data-home="elm" data-address="1206 Elm Ridge Dr">
-            <span>
-              <span class="t-label t-ink">1206 Elm Ridge Dr</span>
-              <span class="t-meta menu__sub">Round Rock, TX 78664 &middot; 1 visit to schedule</span>
-            </span>
-            <svg class="i i--check"><use href="#ri-check-line"/></svg>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- @include welcome -->
+    <!-- @include message -->
 
     <!-- Why the stream is in this order -->
     <p class="why" aria-live="polite">
       <svg class="i"><use href="#ri-sparkling-line"/></svg>
-      <span class="why__text only-stage-active when-actions">3 visits are ready to schedule, so they&rsquo;re first. Your dashboard reorders itself as things change.</span>
+      <span class="why__text only-stage-active when-actions">Visits are ready to schedule, so they&rsquo;re first. Your dashboard reorders itself as things change.</span>
       <span class="why__text only-stage-active when-caught-up">Nothing needs scheduling, so your critical recommendation is first.</span>
       <span class="why__text only-stage-new">You&rsquo;re new to PreFix, so getting set up comes first.</span>
       <span class="why__text only-stage-payment">Your last payment didn&rsquo;t go through, so fixing it comes first.</span>
@@ -62,7 +32,7 @@
     <div class="stream">
 
       <!-- Stage lead: getting started -->
-      <section class="card card--selected stream__card only-stage-new" data-card="start" aria-labelledby="start-title">
+      <section class="card card--selected only-stage-new" id="start" aria-labelledby="start-title">
         <div class="card__heading">
           <h2 class="t-title" id="start-title">Welcome to PreFix, Sarah</h2>
           <p class="t-desc">Four steps to get the most from your membership.</p>
@@ -93,7 +63,7 @@
       </section>
 
       <!-- Stage lead: payment problem -->
-      <section class="card stream__card pay only-stage-payment" data-card="payment" aria-labelledby="pay-title">
+      <section class="card pay only-stage-payment" id="payment" aria-labelledby="pay-title">
         <div class="pay__head">
           <div class="tile-icon tile-icon--white"><svg class="i"><use href="#ri-error-warning-line"/></svg></div>
           <div class="card__heading">
@@ -113,7 +83,7 @@
       </section>
 
       <!-- Stage lead: year in review -->
-      <section class="card card--selected stream__card only-stage-renewal" data-card="review" aria-labelledby="review-title">
+      <section class="card card--selected only-stage-renewal" id="review" aria-labelledby="review-title">
         <div class="review">
           <div class="review__summary">
             <h2 class="t-title" id="review-title">Your year with PreFix</h2>
@@ -138,229 +108,21 @@
       </section>
 
       <!-- Visits to schedule -->
-      <section class="card stream__card" data-card="actions" aria-labelledby="actions-title">
+      <section class="card" id="actions" aria-labelledby="actions-title">
         <div class="card__title-row">
           <h2 class="t-title" id="actions-title">Ready to schedule</h2>
-          <span class="count when-actions">3</span>
+          <span class="count when-actions" data-count-visible=".ready .ready__item">4</span>
         </div>
-        <ul class="acts when-actions">
-          <li class="act act--pm">
-            <div class="act__top"><div class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-door-closed-line"/></svg></div><span class="badge badge--on-tint">Included</span></div>
-            <p class="t-strong">Fall preventive maintenance</p>
-            <p class="t-meta">30-point home check &middot; earliest Tue, Oct 13</p>
-            <a class="btn btn--primary act__btn" href="#">Schedule visit</a>
-          </li>
-          <li class="act">
-            <div class="act__top"><div class="tile-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></div></div>
-            <p class="t-strong">Kitchen faucet leak and garbage disposal jam</p>
-            <p class="t-meta">Service visit &middot; 2 tasks &middot; requested Sep 22</p>
-            <a class="btn btn--secondary act__btn" href="#">Schedule visit</a>
-          </li>
-          <li class="act">
-            <div class="act__top"><div class="tile-icon"><svg class="i"><use href="#ri-drop-line"/></svg></div></div>
-            <p class="t-strong">HVAC condensate line flush</p>
-            <p class="t-meta">Service visit &middot; from a recommendation you approved</p>
-            <a class="btn btn--secondary act__btn" href="#">Schedule visit</a>
-          </li>
-        </ul>
-        <div class="empty when-caught-up">
-          <div class="tile-icon tile-icon--white"><svg class="i"><use href="#ri-checkbox-circle-line"/></svg></div>
-          <div class="empty__text"><p class="t-strong">Nothing to schedule</p><p class="t-meta">Your next visit is Mon, Sep 28.</p></div>
-        </div>
-        <p class="t-meta acts__other when-multi"><svg class="i i--16 inline-icon"><use href="#ri-home-4-line"/></svg>1206 Elm Ridge Dr has <strong class="t-ink">1 visit</strong> to schedule. <button class="link" data-switch-home="elm">Switch home</button></p>
+        <!-- @include ready-items -->
       </section>
 
-      <!-- Recommendations -->
-      <section class="card stream__card" data-card="recs" aria-labelledby="recs-title">
-        <div class="card__title-row">
-          <h2 class="t-title" id="recs-title">Recommendations</h2>
-          <span class="count count--red" data-rec-open-count>4</span>
-        </div>
-        <div class="rec-summary">
-          <span class="badge badge--critical" data-rec-sum="critical" data-word="Critical">1 Critical</span>
-          <span class="badge badge--high" data-rec-sum="high" data-word="High">2 High</span>
-          <span class="badge badge--normal" data-rec-sum="normal" data-word="Normal">1 Normal</span>
-        </div>
-        <div class="recs">
-          <!-- @include rec-water-heater -->
-          <div id="stream-more-recs" hidden>
-            <!-- @include rec-dryer-vent -->
-            <!-- @include rec-upstairs-ac -->
-            <!-- @include rec-kitchen-window -->
-          </div>
-        </div>
-        <div class="card__foot">
-          <button class="link" data-toggle="stream-more-recs" aria-expanded="false" aria-controls="stream-more-recs" data-open="Show fewer" data-closed="Show 3 more"><span data-label>Show 3 more</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-          <button class="btn btn--primary" data-rec-submit-selected disabled><span data-label>Submit selected</span></button>
-        </div>
-      </section>
+      <!-- @include recs-card -->
 
-      <!-- Upcoming visits -->
-      <section class="card stream__card" data-card="upcoming" aria-labelledby="upcoming-title">
-        <div class="card__head">
-          <h2 class="t-title" id="upcoming-title">Upcoming visits</h2>
-          <a class="link card__head-link" href="#">All visits<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
-        </div>
-        <div class="card__body visits">
-          <!-- @include visits -->
-        </div>
-      </section>
+      <!-- @include upcoming-card -->
 
-      <!-- Savings -->
-      <section class="card stream__card" data-card="savings" aria-labelledby="sv-title">
-        <h2 class="t-title" id="sv-title">Your savings</h2>
-        <p class="t-desc savings__sub">This year vs. Austin market rates</p>
-        <p class="t-hero t-num savings__num">$1,240</p>
-        <button class="link" data-toggle="sv-math" aria-expanded="false" aria-controls="sv-math" data-open="Hide the math" data-closed="How we calculate"><span data-label>How we calculate</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-        <div class="savings__math" id="sv-math" hidden>
-          <dl class="ledger">
-            <div class="ledger__row"><dt>Market rate for the same work</dt><dd class="t-num">$1,652</dd></div>
-            <div class="ledger__row"><dt>What you paid PreFix</dt><dd class="t-num">&minus;$412</dd></div>
-            <div class="ledger__row ledger__row--total"><dt>You saved</dt><dd class="t-num">$1,240</dd></div>
-          </dl>
-          <p class="t-meta">Covers your 4 visits in 2026. Your membership fee is not included.</p>
-        </div>
-      </section>
+      <!-- @include savings -->
 
-      <!-- Preventive maintenance -->
-      <section class="card stream__card" data-card="pm" aria-labelledby="pm-title">
-        <div class="card__title-row"><h2 class="t-title" id="pm-title">Preventive maintenance</h2></div>
-        <p class="t-desc">Two 30-point visits a year, <span class="t-blue">included</span> in your membership.</p>
-        <ul class="features pm__list">
-          <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Spring visit<span class="feature__sub">Done Tue, Apr 14 &middot; <a class="link" href="#">Home Health Snapshot</a></span></span></li>
-          <li class="feature when-actions"><span class="i-box"><svg class="i"><use href="#ri-door-closed-line"/></svg></span><span class="feature__text">Fall visit<span class="feature__sub">Ready to schedule &middot; earliest Tue, Oct 13</span></span></li>
-          <li class="feature when-caught-up"><span class="i-box"><svg class="i"><use href="#ri-calendar-line"/></svg></span><span class="feature__text">Fall visit<span class="feature__sub">Tue, Oct 13 &middot; 9:00&ndash;11:00 AM</span></span></li>
-          <li class="feature"><span class="i-box"><svg class="i"><use href="#ri-door-closed-line"/></svg></span><span class="feature__text">Next spring visit<span class="feature__sub">Opens for scheduling in February</span></span></li>
-        </ul>
-        <button class="link" data-toggle="pm-checks" aria-expanded="false" aria-controls="pm-checks" data-open="Hide checks" data-closed="What we check"><span data-label>What we check</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-        <ul class="features pm__checks" id="pm-checks" hidden>
-          <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">HVAC filters changed (filters included)</span></li>
-          <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Smoke and CO detectors tested</span></li>
-          <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Water heater flushed and inspected</span></li>
-          <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Dryer vent debris extraction</span></li>
-          <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Plumbing and drains checked</span></li>
-        </ul>
-      </section>
-
-      <!-- Team -->
-      <section class="card stream__card" data-card="team" aria-labelledby="team-title">
-        <h2 class="t-title" id="team-title">Your PreFix team</h2>
-        <p class="t-desc team__sub">The people who look after <span data-home-label>4817 Mueller Blvd</span></p>
-        <!-- @include team-people -->
-      </section>
-
-      <!-- Recent visits -->
-      <section class="card stream__card" data-card="recent" aria-labelledby="recent-title">
-        <div class="card__head">
-          <h2 class="t-title" id="recent-title">Recent visits</h2>
-          <a class="link card__head-link" href="#">Visit history<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
-        </div>
-        <div class="card__body">
-          <ul class="history">
-            <li class="history__row">
-              <span class="history__icon"><svg class="i"><use href="#ri-check-line"/></svg></span>
-              <div class="history__main"><p class="t-strong">Bathroom exhaust fan replaced</p><p class="t-meta">Tue, Jun 9 &middot; Marcus Reyes</p></div>
-              <a class="link" href="#">Visit summary</a>
-            </li>
-            <li class="history__row">
-              <span class="history__icon"><svg class="i"><use href="#ri-check-line"/></svg></span>
-              <div class="history__main"><p class="t-strong">Spring preventive maintenance</p><p class="t-meta">Tue, Apr 14 &middot; Priya Shah</p></div>
-              <a class="link" href="#">Snapshot</a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <!-- Home Health Report -->
-      <section class="card stream__card" data-card="hhr" aria-labelledby="hhr-title">
-        <div class="card__title-row"><h2 class="t-title" id="hhr-title">Home Health Report</h2></div>
-        <p class="t-desc">From your Spring visit, Tue, Apr 14</p>
-        <div class="hhr__stats">
-          <div><p class="t-display t-num t-red-num">1</p><p class="t-meta">Critical</p></div>
-          <div><p class="t-display t-num">3</p><p class="t-meta">Cause for concern</p></div>
-          <div><p class="t-display t-num t-blue-num">26</p><p class="t-meta">No concern</p></div>
-        </div>
-        <div class="hhr__links">
-          <a class="btn btn--secondary" href="#"><svg class="i"><use href="#ri-heart-pulse-line"/></svg>Open report</a>
-          <a class="link" href="#">Latest snapshot</a>
-        </div>
-      </section>
-
-      <!-- Plan and billing -->
-      <section class="card stream__card" data-card="plan" aria-labelledby="plan-title">
-        <h2 class="t-title" id="plan-title">PreFix Protect</h2>
-        <p class="t-desc plan__sub">Member since March 2023</p>
-        <div class="plan__price">
-          <p class="t-display t-num">$69</p>
-          <p class="t-meta">per month, 2 HVAC systems<br><span class="only-stage-payment t-red">Sep 1 payment failed</span><span class="not-stage-payment">next bill Thu, Oct 1</span></p>
-        </div>
-        <a class="link" href="#">Manage billing<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
-        <hr class="divider">
-        <ul class="features">
-          <li class="feature"><span class="feature__lead"><span class="feature__qty">1/2</span><span class="i-box"><svg class="i"><use href="#ri-door-closed-line"/></svg></span></span><span class="feature__text">Preventive maintenance visits this year</span></li>
-          <li class="feature"><span class="feature__lead"><span class="feature__qty">2</span><span class="i-box"><svg class="i"><use href="#ri-hammer-line"/></svg></span></span><span class="feature__text">Home Manager repairs at $55/hour</span></li>
-          <li class="feature"><span class="feature__lead"><span class="feature__qty">1</span><span class="i-box"><svg class="i"><use href="#ri-team-line"/></svg></span></span><span class="feature__text">Contractor job managed for free</span></li>
-        </ul>
-      </section>
-
-      <!-- Credits -->
-      <section class="card stream__card" data-card="credits" aria-labelledby="credits-title">
-        <div class="card__title-row"><h2 class="t-title" id="credits-title">Credits</h2></div>
-        <div class="credits__big">
-          <p class="t-hero t-num">$75</p>
-          <p class="t-meta">available for your next visits<br>$50 expires Dec 31</p>
-        </div>
-        <ul class="credits__list">
-          <li class="credit">
-            <div class="credit__top"><p class="t-strong">$50 HVAC credit</p><span class="badge badge--included">HVAC only</span></div>
-            <p class="t-meta">From PreFix &middot; expires Dec 31, 2026</p>
-          </li>
-          <li class="credit">
-            <div class="credit__top"><p class="t-strong">$25 credit</p><span class="badge badge--neutral">Any service</span></div>
-            <p class="t-meta">Referral: Jamie L. joined in May &middot; no expiry</p>
-          </li>
-        </ul>
-        <a class="link credits__refer" href="#"><svg class="i"><use href="#ri-gift-line"/></svg>Refer a friend to earn more credit</a>
-      </section>
-
-      <!-- Services used -->
-      <section class="card stream__card" data-card="services" aria-labelledby="svc-title">
-        <div class="card__title-row"><h2 class="t-title" id="svc-title">4 of 10 services used</h2></div>
-        <p class="t-desc">There&rsquo;s more your membership can do.</p>
-        <div class="progress svc__bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="4" aria-label="Services used"><div class="progress__bar" style="width:40%"></div></div>
-        <ul class="svc__grid">
-          <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Preventive maintenance</span></li>
-          <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Home Manager repairs</span></li>
-          <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Contractor management</span></li>
-          <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Specialty carpentry</span></li>
-        </ul>
-        <button class="link" data-toggle="svc-rest" aria-expanded="false" aria-controls="svc-rest" data-open="Hide" data-closed="See 6 more services"><span data-label>See 6 more services</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
-        <ul class="svc__grid" id="svc-rest" hidden>
-          <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Specialty painting and drywall<span class="feature__sub">Booked for Wed, Oct 21</span></span></li>
-          <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Specialty HVAC</span></li>
-          <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Garage doors</span></li>
-          <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Attic insulation</span></li>
-          <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Duct assessment</span></li>
-          <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Irrigation</span></li>
-        </ul>
-      </section>
-
-      <!-- Seasonal -->
-      <section class="card stream__card" data-card="seasonal" id="seasonal" aria-labelledby="seasonal-title">
-        <div class="promo__top">
-          <div class="tile-icon tile-icon--blue"><svg class="i"><use href="#ri-temp-cold-line"/></svg></div>
-        </div>
-        <h2 class="t-title duo__title" id="seasonal-title">Heating season is coming</h2>
-        <p class="t-desc">A few things to take care of before the first cold front.</p>
-        <ul class="features duo__list">
-          <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Your Fall visit includes a heating check</span></li>
-          <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Test smoke and CO detectors monthly</span></li>
-          <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Use your <span class="t-blue">$50 HVAC credit</span> on a tune-up</span></li>
-        </ul>
-        <a class="btn btn--secondary btn--block" href="#">Book a heating tune-up</a>
-      </section>
-
-      <!-- @include promo -->
+      <!-- @include plan-services -->
     </div>
   </main>
 
@@ -381,7 +143,7 @@
     </div>
     <p class="proto__title proto__title--gap">Prototype states</p>
     <label class="proto__opt">Payment issue banner<span class="switch"><input type="checkbox" data-state-switch="payment"><span class="switch__track"></span></span></label>
-    <label class="proto__opt">Welcome card<span class="switch"><input type="checkbox" data-state-switch="welcome" checked><span class="switch__track"></span></span></label>
+    <label class="proto__opt">Top message<span class="switch"><input type="checkbox" data-state-switch="welcome" checked><span class="switch__track"></span></span></label>
     <label class="proto__opt">Nothing to schedule<span class="switch"><input type="checkbox" data-state-switch="caught-up"><span class="switch__track"></span></span></label>
     <label class="proto__opt">Member has 2 homes<span class="switch"><input type="checkbox" data-state-switch="multi" checked><span class="switch__track"></span></span></label>
   </div>

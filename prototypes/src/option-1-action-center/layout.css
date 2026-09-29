@@ -1,37 +1,17 @@
-/* Option 1 · Action Center
-   Desktop: two-up hero (Ready to schedule | Recommendations), then main column + 360px rail.
-   Mobile: one column ordered by priority. */
+/* Option 1 · Action Center (round 2)
+   Desktop: one main column (Ready to schedule, Recommendations with the Home Health Report,
+   PreFix Protect) beside a narrower rail (Your savings with the team, Upcoming visits).
+   Mobile: one column in priority order. */
 
-.layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; grid-template-areas: "hero hero" "main rail"; gap: var(--s-24); }
-.hero { grid-area: hero; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-24); align-items: stretch; }
-.main { grid-area: main; display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
-.rail { grid-area: rail; display: flex; flex-direction: column; gap: var(--s-24); }
-.duo { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-24); }
-
-#actions, #recs { display: flex; flex-direction: column; }
-#actions .card__foot, #recs .card__foot { margin-top: auto; }
-#actions .card__body + .card__foot, #recs .recs + .card__foot { margin-top: auto; }
-#actions .card__foot { padding-top: var(--s-20); }
-#actions .request-prompt { margin-bottom: var(--s-24); }
-#recs .card__foot { padding-top: var(--s-24); }
-
-.duo .btn { margin-top: auto; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s-24); align-items: start; }
+.main, .rail { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
 
 @container app (max-width: 767px) {
-  .layout { display: flex; flex-direction: column; gap: var(--s-16); }
-  .hero, .main, .rail, .duo { display: contents; }
+  .layout { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
+  .main, .rail { display: contents; }
   #actions { order: 1; }
   #recs { order: 2; }
   #upcoming { order: 3; }
   #savings { order: 4; }
   #plan { order: 5; }
-  #team { order: 6; }
-  #recent { order: 7; }
-  #seasonal { order: 8; }
-  #promo { order: 9; }
-
-  #recs .card__foot { flex-direction: column-reverse; align-items: stretch; }
-  #recs .card__foot .btn { width: 100%; }
-  #recs .card__foot .link { align-self: center; }
 }
-body:not(.is-multi) #actions .request-prompt { margin-bottom: 0; }

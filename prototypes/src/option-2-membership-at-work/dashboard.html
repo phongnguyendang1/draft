@@ -15,355 +15,166 @@
 
   <main class="page">
 
-    <section class="intro">
-      <div class="intro__text">
-        <h1 class="t-display">Good morning, Sarah</h1>
-        <p class="t-desc">Friday, September 25</p>
-      </div>
+    <!-- @include intro -->
 
-      <div class="menu-wrap when-multi">
-        <button class="switcher" data-menu="home-menu" aria-expanded="false" aria-haspopup="true">
-          <svg class="i"><use href="#ri-home-4-line"/></svg>
-          <span class="switcher__label" data-home-label>4817 Mueller Blvd</span>
-          <svg class="i i--16"><use href="#ri-arrow-down-s-line"/></svg>
-        </button>
-        <div class="menu menu--homes" id="home-menu" role="menu" hidden>
-          <p class="menu__label">Your homes</p>
-          <button class="menu__item" role="menuitemradio" aria-checked="true" data-home="mueller" data-address="4817 Mueller Blvd">
-            <span>
-              <span class="t-label t-ink">4817 Mueller Blvd</span>
-              <span class="t-meta menu__sub">Austin, TX 78723 &middot; 4 items need you</span>
-            </span>
-            <svg class="i i--check"><use href="#ri-check-line"/></svg>
-          </button>
-          <button class="menu__item" role="menuitemradio" aria-checked="false" data-home="elm" data-address="1206 Elm Ridge Dr">
-            <span>
-              <span class="t-label t-ink">1206 Elm Ridge Dr</span>
-              <span class="t-meta menu__sub">Round Rock, TX 78664 &middot; 1 item needs you</span>
-            </span>
-            <svg class="i i--check"><use href="#ri-check-line"/></svg>
-          </button>
-        </div>
-      </div>
-    </section>
+    <!-- @include message -->
 
-    <!-- @include welcome -->
-
-    <!-- 1. Needs your attention: visits to schedule and critical recommendations -->
+    <!-- 1. Needs your attention -->
     <section class="attn" id="attention" aria-labelledby="attn-title" data-carousel>
-      <div class="attn__head">
-        <div class="card__title-row">
-          <h2 class="t-title" id="attn-title">Needs your attention</h2>
-          <span class="count" data-count-visible=".attn-card[data-countable]">4</span>
-        </div>
-        <p class="t-meta attn__other when-multi"><svg class="i i--16 inline-icon"><use href="#ri-home-4-line"/></svg>1206 Elm Ridge Dr has <strong class="t-ink">1 visit</strong> to schedule. <button class="link" data-switch-home="elm">Switch home</button></p>
+      <div class="card__title-row attn__head">
+        <h2 class="t-title" id="attn-title">Needs your attention</h2>
+        <span class="count" data-count-visible=".attn-card[data-countable]">5</span>
       </div>
 
       <div class="attn__track" data-carousel-track>
-        <article class="attn-card attn-card--pm when-actions" data-countable>
+        <article class="attn-card attn-card--pm when-actions" data-countable data-home="mueller">
           <div class="attn-card__top">
             <div class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-door-closed-line"/></svg></div>
             <span class="badge badge--on-tint">Included</span>
           </div>
           <h3 class="t-strong">Fall preventive maintenance</h3>
-          <p class="t-meta t-ink">30-point home check &middot; about 2 hours</p>
-          <p class="t-meta">Earliest opening Tue, Oct 13</p>
+          <p class="t-meta">Earliest opening Tue, Oct 13<span class="home-tag">Mueller</span></p>
           <div class="attn-card__cta"><a class="btn btn--primary btn--block" href="#">Schedule visit</a></div>
         </article>
 
-        <article class="attn-card when-actions" data-countable>
+        <article class="attn-card attn-card--pm when-actions" data-countable data-home="elm">
           <div class="attn-card__top">
-            <div class="tile-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></div>
-            <span class="badge badge--neutral">Service visit</span>
+            <div class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-door-closed-line"/></svg></div>
+            <span class="badge badge--on-tint">Included</span>
           </div>
-          <h3 class="t-strong">Kitchen faucet leak and garbage disposal jam</h3>
-          <p class="t-meta t-ink">2 tasks &middot; about 1.5 hours</p>
-          <p class="t-meta">You requested this on Sep 22</p>
+          <h3 class="t-strong">Fall preventive maintenance</h3>
+          <p class="t-meta">Earliest opening Thu, Oct 15<span class="home-tag">Elm Ridge</span></p>
           <div class="attn-card__cta"><a class="btn btn--secondary btn--block" href="#">Schedule visit</a></div>
         </article>
 
-        <article class="attn-card when-actions" data-countable>
-          <div class="attn-card__top">
-            <div class="tile-icon"><svg class="i"><use href="#ri-drop-line"/></svg></div>
-            <span class="badge badge--neutral">Service visit</span>
-          </div>
+        <article class="attn-card when-actions" data-countable data-home="mueller">
+          <div class="attn-card__top"><div class="tile-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></div></div>
+          <h3 class="t-strong">Kitchen faucet and garbage disposal</h3>
+          <p class="t-meta">Service visit &middot; 2 tasks<span class="home-tag">Mueller</span></p>
+          <div class="attn-card__cta"><a class="btn btn--secondary btn--block" href="#">Schedule visit</a></div>
+        </article>
+
+        <article class="attn-card when-actions" data-countable data-home="mueller">
+          <div class="attn-card__top"><div class="tile-icon"><svg class="i"><use href="#ri-drop-line"/></svg></div></div>
           <h3 class="t-strong">HVAC condensate line flush</h3>
-          <p class="t-meta t-ink">1 task &middot; about 1 hour</p>
-          <p class="t-meta">From a recommendation you approved</p>
+          <p class="t-meta">Service visit &middot; 1 task<span class="home-tag">Mueller</span></p>
           <div class="attn-card__cta"><a class="btn btn--secondary btn--block" href="#">Schedule visit</a></div>
         </article>
 
         <article class="attn-card attn-card--done when-caught-up">
-          <div class="attn-card__top">
-            <div class="tile-icon tile-icon--white"><svg class="i"><use href="#ri-checkbox-circle-line"/></svg></div>
-          </div>
+          <div class="attn-card__top"><div class="tile-icon tile-icon--white"><svg class="i"><use href="#ri-checkbox-circle-line"/></svg></div></div>
           <h3 class="t-strong">Nothing to schedule</h3>
-          <p class="t-meta">Your next visit is Mon, Sep 28. Your Spring visit opens for scheduling in February.</p>
+          <p class="t-meta">Your next visit is Mon, Sep 28.</p>
           <div class="attn-card__cta"><a class="btn btn--secondary btn--block" href="#">Request service</a></div>
         </article>
 
-        <article class="attn-card attn-card--critical" data-countable data-rec-mirror="Water heater relief valve">
+        <article class="attn-card attn-card--critical" data-countable data-rec-mirror="Water heater relief valve" data-home="mueller">
           <div class="attn-card__top">
             <div class="tile-icon tile-icon--white"><svg class="i"><use href="#ri-error-warning-line"/></svg></div>
             <span class="badge badge--critical">Critical</span>
           </div>
           <h3 class="t-strong">Water heater relief valve is leaking</h3>
-          <p class="t-meta t-ink">Can damage the floor and drywall</p>
-          <p class="t-meta">Found at your Spring visit</p>
-          <div class="attn-card__cta"><a class="btn btn--secondary btn--block" href="#recs">Review recommendation</a></div>
+          <p class="t-meta">Found Apr 14<span class="home-tag">Mueller</span></p>
+          <div class="attn-card__cta"><a class="btn btn--secondary btn--block" href="#recs">Review</a></div>
         </article>
       </div>
 
       <div class="attn__pager">
         <div class="dots" data-carousel-dots aria-hidden="true"></div>
-        <p class="t-meta" data-carousel-caption>1 of 4</p>
+        <p class="t-meta" data-carousel-caption>1 of 5</p>
       </div>
     </section>
 
-    <!-- 2. Membership scorecard: the member's plan card beside the value table -->
+    <!-- 2. Coming up: dates only -->
+    <section class="card soon" id="upcoming" aria-labelledby="soon-title">
+      <div class="soon__head">
+        <h2 class="t-strong" id="soon-title">Coming up</h2>
+        <a class="link" href="#">Appointments<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
+      </div>
+      <ul class="soon__list">
+        <li class="soon__item" data-home="mueller">
+          <div class="date-tile"><span class="date-tile__m">Sep</span><span class="date-tile__d">28</span></div>
+          <div><p class="t-label">Back door and cabinet hinges</p><p class="t-meta">Mon &middot; 8:00&ndash;10:00 AM<span class="home-tag">Mueller</span></p></div>
+        </li>
+        <li class="soon__item when-caught-up" data-home="mueller">
+          <div class="date-tile date-tile--pm"><span class="date-tile__m">Oct</span><span class="date-tile__d">13</span></div>
+          <div><p class="t-label">Fall preventive maintenance</p><p class="t-meta">Tue &middot; 9:00&ndash;11:00 AM<span class="home-tag">Mueller</span></p></div>
+        </li>
+        <li class="soon__item" data-home="mueller">
+          <div class="date-tile"><span class="date-tile__m">Oct</span><span class="date-tile__d">21</span></div>
+          <div><p class="t-label">Ceiling water stain repair</p><p class="t-meta">Wed &middot; 1:00&ndash;3:00 PM<span class="home-tag">Mueller</span></p></div>
+        </li>
+        <li class="soon__item" data-home="elm">
+          <div class="date-tile"><span class="date-tile__m">Nov</span><span class="date-tile__d">4</span></div>
+          <div><p class="t-label">Garage door opener check</p><p class="t-meta">Wed &middot; 10:00 AM&ndash;12:00 PM<span class="home-tag">Elm Ridge</span></p></div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 3. Membership scorecard: the member's plan card beside what it covered -->
     <section class="score" aria-label="Your membership at work">
 
       <div class="plancard" id="plan">
         <p class="plancard__ribbon">Your plan</p>
         <div class="plancard__body">
           <h2 class="t-title">PreFix Protect</h2>
-          <p class="t-desc plancard__desc">Your membership at <span data-home-label>4817 Mueller Blvd</span></p>
           <p class="t-hero t-num plancard__num">$1,240</p>
-          <p class="t-meta">saved in 2026<br>compared with Austin market rates</p>
-          <a class="btn btn--secondary btn--block plancard__cta" href="#">See your year in review</a>
+          <p class="t-meta">saved this year vs. Austin market rates</p>
 
           <hr class="divider">
-
-          <ul class="features">
-            <li class="feature">
-              <span class="feature__lead"><span class="feature__qty">1/2</span><span class="i-box"><svg class="i"><use href="#ri-door-closed-line"/></svg></span></span>
-              <span class="feature__text">Preventive maintenance visits
-                <span class="feature__sub when-actions">Spring done Apr 14 &middot; Fall ready to schedule</span>
-                <span class="feature__sub when-caught-up">Spring done Apr 14 &middot; Fall on Tue, Oct 13</span>
-              </span>
-            </li>
-            <li class="feature">
-              <span class="feature__lead"><span class="feature__qty">2</span><span class="i-box"><svg class="i"><use href="#ri-hammer-line"/></svg></span></span>
-              <span class="feature__text">Home Manager repairs at $55/hour</span>
-            </li>
-            <li class="feature">
-              <span class="feature__lead"><span class="feature__qty">1</span><span class="i-box"><svg class="i"><use href="#ri-team-line"/></svg></span></span>
-              <span class="feature__text">Contractor job managed for free</span>
-            </li>
-            <li class="feature">
-              <span class="feature__lead"><span class="feature__qty feature__qty--blue">$75</span><span class="i-box"><svg class="i"><use href="#ri-coupon-3-line"/></svg></span></span>
-              <span class="feature__text">Credits available
-                <button class="link plancard__credits" data-toggle="credits-list" aria-expanded="false" aria-controls="credits-list" data-open="Hide credits" data-closed="See your credits">
-                  <span data-label>See your credits</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg>
-                </button>
-              </span>
-            </li>
-          </ul>
-          <ul class="credits__list" id="credits-list" hidden>
-            <li class="credit credit--on-tint">
-              <div class="credit__top"><p class="t-strong">$50 HVAC credit</p><span class="badge badge--included">HVAC only</span></div>
-              <p class="t-meta">From PreFix &middot; expires Dec 31, 2026</p>
-            </li>
-            <li class="credit credit--on-tint">
-              <div class="credit__top"><p class="t-strong">$25 credit</p><span class="badge badge--neutral">Any service</span></div>
-              <p class="t-meta">Referral: Jamie L. joined in May &middot; no expiry</p>
-            </li>
-            <li class="credit credit--refer">
-              <svg class="i"><use href="#ri-gift-line"/></svg>
-              <a class="link" href="#">Refer a friend to earn more credit</a>
-            </li>
-          </ul>
-
+          <!-- @include credits -->
           <hr class="divider">
+          <!-- @include team-people -->
 
-          <p class="group-label">Also in your plan:</p>
-          <ul class="features">
-            <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Specialty HVAC, carpentry and painting from $125/hour</span></li>
-            <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">A Home Health Snapshot after every visit</span></li>
-            <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">The PreFix No Hassle Promise</span></li>
-          </ul>
-
-          <hr class="divider">
-
-          <div class="plancard__price">
-            <p class="t-display t-num">$69</p>
-            <p class="t-meta">per month, 2 HVAC systems<br>next bill Thu, Oct 1</p>
+          <div class="plancard__prices">
+            <p class="t-meta" data-home="mueller"><strong class="t-ink">$69/month</strong> &middot; 2 HVAC systems<span class="home-tag">Mueller</span></p>
+            <p class="t-meta" data-home="elm"><strong class="t-ink">$49/month</strong> &middot; 1 HVAC system<span class="home-tag">Elm Ridge</span></p>
+            <p class="t-meta">Next bill Thu, Oct 1</p>
           </div>
-          <div class="plancard__links">
-            <a class="link" href="#">Manage billing<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
-            <a class="link" href="#">Home Health Report<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
-          </div>
+          <a class="link plancard__link" href="#">Membership and billing<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
         </div>
       </div>
 
       <div class="card value" id="value">
-        <div class="card__head">
-          <div class="card__heading">
-            <h2 class="t-title">What your membership covered</h2>
-            <p class="t-desc">Every visit this year, next to what the same work costs elsewhere in Austin.</p>
-          </div>
-          <a class="link card__head-link" href="#">Visit history<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
-        </div>
+        <h2 class="t-title">What your membership covered</h2>
+        <p class="t-desc value__desc">This year, next to what the same work costs elsewhere in Austin.</p>
 
-        <div class="vt" role="table" aria-label="Visits in 2026 with market rate and what you paid">
+        <div class="vt" role="table" aria-label="Services this year with market rate and what you paid">
           <div class="vt__row vt__row--head" role="row">
-            <div class="vt__label" role="columnheader"><span class="t-strong">2026 visits</span></div>
+            <div class="vt__label" role="columnheader"><span class="t-strong">2026</span></div>
             <div class="vt__cell" role="columnheader">Market rate</div>
             <div class="vt__cell vt__cell--you" role="columnheader">You paid</div>
           </div>
           <div class="vt__rule" aria-hidden="true"></div>
-
           <div class="vt__row" role="row">
-            <div class="vt__label" role="cell">
-              <p class="t-body">Bathroom exhaust fan replaced</p>
-              <p class="t-meta">Tue, Jun 9 &middot; <a class="link" href="#">Visit summary</a></p>
-            </div>
-            <div class="vt__cell t-num" role="cell">$382</div>
-            <div class="vt__cell vt__cell--you t-num" role="cell">$110</div>
-          </div>
-          <div class="vt__row" role="row">
-            <div class="vt__label" role="cell">
-              <p class="t-body">Spring preventive maintenance</p>
-              <p class="t-meta">Tue, Apr 14 &middot; <a class="link" href="#">Home Health Snapshot</a></p>
-            </div>
+            <div class="vt__label" role="cell"><p class="t-body">Preventive maintenance</p><p class="t-meta">1 visit</p></div>
             <div class="vt__cell t-num" role="cell">$650</div>
             <div class="vt__cell vt__cell--you" role="cell"><span class="vt__included"><svg class="i i--16"><use href="#ri-check-line"/></svg>Included</span></div>
           </div>
           <div class="vt__row" role="row">
-            <div class="vt__label" role="cell">
-              <p class="t-body">Toilet fill valve replaced</p>
-              <p class="t-meta">Tue, Mar 3 &middot; <a class="link" href="#">Visit summary</a></p>
-            </div>
-            <div class="vt__cell t-num" role="cell">$240</div>
-            <div class="vt__cell vt__cell--you t-num" role="cell">$80</div>
+            <div class="vt__label" role="cell"><p class="t-body">Home Manager repairs</p><p class="t-meta">2 visits at $55/hour</p></div>
+            <div class="vt__cell t-num" role="cell">$622</div>
+            <div class="vt__cell vt__cell--you t-num" role="cell">$190</div>
           </div>
           <div class="vt__row" role="row">
-            <div class="vt__label" role="cell">
-              <p class="t-body">Roof leak repaired by a licensed roofer</p>
-              <p class="t-meta">Wed, Feb 11 &middot; managed free &middot; <a class="link" href="#">Invoice</a></p>
-            </div>
+            <div class="vt__label" role="cell"><p class="t-body">Contractor management</p><p class="t-meta">1 job, managed free</p></div>
             <div class="vt__cell t-num" role="cell">$380</div>
             <div class="vt__cell vt__cell--you t-num" role="cell">$222</div>
           </div>
-
           <div class="vt__row vt__row--total" role="row">
-            <div class="vt__label" role="cell"><p class="t-strong">4 visits</p></div>
+            <div class="vt__label" role="cell"><p class="t-strong">Total</p></div>
             <div class="vt__cell t-num" role="cell">$1,652</div>
             <div class="vt__cell vt__cell--you t-num" role="cell">$412</div>
           </div>
         </div>
+        <p class="t-meta value__note">Market rate is the typical Austin price for the same work, including trip fees. Your membership fee isn&rsquo;t counted.</p>
 
-        <div class="value__note">
-          <button class="link" data-toggle="vt-how" aria-expanded="false" aria-controls="vt-how" data-open="Hide details" data-closed="How we compare prices">
-            <span data-label>How we compare prices</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg>
-          </button>
-          <ul class="features value__how" id="vt-how" hidden>
-            <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Market rate is the typical Austin price for the same work, including the trip fee.</span></li>
-            <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">You paid is your invoice total: labor, parts and any contractor bill.</span></li>
-            <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Your $69 monthly membership fee isn&rsquo;t counted in either column.</span></li>
-          </ul>
-        </div>
-
-        <hr class="divider">
-
-        <div class="svc">
-          <div class="svc__head">
-            <h3 class="t-strong">4 of 10 services used</h3>
-            <p class="t-meta">Your membership covers more than repairs</p>
-          </div>
-          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="4" aria-label="Services used"><div class="progress__bar" style="width:40%"></div></div>
-          <ul class="svc__grid">
-            <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Preventive maintenance</span></li>
-            <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Home Manager repairs</span></li>
-            <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Contractor management</span></li>
-            <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Specialty carpentry</span></li>
-            <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Specialty painting and drywall<span class="feature__sub">Booked for Wed, Oct 21</span></span></li>
-            <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Specialty HVAC</span></li>
-            <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Garage doors</span></li>
-            <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Attic insulation</span></li>
-            <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Duct assessment</span></li>
-            <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Irrigation</span></li>
-          </ul>
-        </div>
+        <!-- @include services-used -->
       </div>
     </section>
 
-    <div class="layout">
-      <div class="main">
-
-        <!-- 3. Recommendations: the full open list -->
-        <section class="card" id="recs" aria-labelledby="recs-title">
-          <div class="card__head">
-            <div class="card__heading">
-              <div class="card__title-row">
-                <h2 class="t-title" id="recs-title">Recommendations</h2>
-                <span class="count count--red" data-rec-open-count>4</span>
-              </div>
-              <p class="t-desc">Your Home Manager found these at your Spring visit. Send the ones you want fixed and we&rsquo;ll set them up.</p>
-            </div>
-          </div>
-
-          <div class="rec-summary">
-            <span class="badge badge--critical" data-rec-sum="critical" data-word="Critical">1 Critical</span>
-            <span class="badge badge--high" data-rec-sum="high" data-word="High">2 High</span>
-            <span class="badge badge--normal" data-rec-sum="normal" data-word="Normal">1 Normal</span>
-          </div>
-
-          <div class="recs">
-            <!-- @include rec-water-heater -->
-            <!-- @include rec-dryer-vent -->
-            <!-- @include rec-upstairs-ac -->
-            <!-- @include rec-kitchen-window -->
-          </div>
-
-          <div class="card__foot">
-            <a class="link" href="#">All recommendations<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
-            <button class="btn btn--primary" data-rec-submit-selected disabled><span data-label>Submit selected</span></button>
-          </div>
-        </section>
-
-        <!-- 4. Upcoming visits -->
-        <section class="card" id="upcoming" aria-labelledby="upcoming-title">
-          <div class="card__head">
-            <div class="card__heading">
-              <h2 class="t-title" id="upcoming-title">Upcoming visits</h2>
-            </div>
-            <a class="link card__head-link" href="#">All visits<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
-          </div>
-          <div class="card__body visits">
-            <!-- @include visits -->
-          </div>
-        </section>
-      </div>
-
-      <aside class="rail" aria-label="Your team and offers">
-
-        <!-- 5. Your PreFix team -->
-        <section class="card" id="team" aria-labelledby="team-title">
-          <h2 class="t-title" id="team-title">Your PreFix team</h2>
-          <p class="t-desc team__sub">The people who look after <span data-home-label>4817 Mueller Blvd</span></p>
-          <!-- @include team-people -->
-        </section>
-
-        <!-- 6. Seasonal card, tied to a service the member hasn't used -->
-        <section class="card" id="seasonal" aria-labelledby="seasonal-title">
-          <div class="promo__top">
-            <div class="tile-icon tile-icon--blue"><svg class="i"><use href="#ri-temp-cold-line"/></svg></div>
-            <span class="badge badge--normal">Not used yet</span>
-          </div>
-          <h2 class="t-title duo__title" id="seasonal-title">Try Specialty HVAC before winter</h2>
-          <p class="t-desc">A heating tune-up keeps your heat pump efficient through the cold months.</p>
-          <ul class="features duo__list">
-            <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Your <span class="t-blue">$50 HVAC credit</span> applies</span></li>
-            <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">In-house HVAC specialists at $125/hour</span></li>
-            <li class="feature feature--check"><span class="i-box"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="feature__text">Pairs well with your Fall visit</span></li>
-          </ul>
-          <a class="btn btn--secondary btn--block" href="#">Book a heating tune-up</a>
-        </section>
-
-        <!-- @include promo -->
-      </aside>
-    </div>
+    <!-- 4. Recommendations with the Home Health Report -->
+    <!-- @include recs-card -->
   </main>
 
   <!-- @include footer -->

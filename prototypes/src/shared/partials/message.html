@@ -1,0 +1,14 @@
+    <!-- Top message: one at a time. Welcome first, then the seasonal message. -->
+    <div class="messages">
+      <div class="message when-welcome" role="status">
+        <span class="message__icon"><svg class="i"><use href="#ri-sparkling-line"/></svg></span>
+        <p class="message__text"><strong>Welcome to the new HomeHub.</strong> Anything that needs you is now at the top.</p>
+        <button class="link message__action" data-dismiss="welcome" data-then="season">Got it</button>
+      </div>
+      <div class="message when-season" role="status">
+        <span class="message__icon"><svg class="i"><use href="#ri-temp-cold-line"/></svg></span>
+        <p class="message__text"><strong>Heating season is coming.</strong> Your Fall visit includes a heating check.</p>
+        <a class="link message__action" href="#">Book a tune-up</a>
+        <button class="icon-btn icon-btn--bare message__close" data-dismiss="season" aria-label="Dismiss"><svg class="i"><use href="#ri-close-line"/></svg></button>
+      </div>
+    </div>

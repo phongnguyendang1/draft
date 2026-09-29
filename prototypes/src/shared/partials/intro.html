@@ -1,0 +1,34 @@
+    <!-- Page title: the home's address, or "Your homes" with a filter when the member has more than one -->
+    <section class="intro">
+      <div class="intro__text when-single">
+        <h1 class="t-display">4817 Mueller Blvd</h1>
+        <p class="t-desc">Austin, TX 78723</p>
+      </div>
+      <div class="intro__text when-multi">
+        <h1 class="t-display" data-home-title>Your homes</h1>
+        <p class="t-desc" data-home-sub>2 homes, shown together</p>
+      </div>
+
+      <div class="menu-wrap when-multi">
+        <button class="switcher" data-menu="home-menu" aria-expanded="false" aria-haspopup="true">
+          <svg class="i"><use href="#ri-home-4-line"/></svg>
+          <span class="switcher__label" data-home-label>All homes</span>
+          <svg class="i i--16"><use href="#ri-arrow-down-s-line"/></svg>
+        </button>
+        <div class="menu menu--homes" id="home-menu" role="menu" hidden>
+          <button class="menu__item" role="menuitemradio" aria-checked="true" data-home-pick="all" data-label="All homes" data-title="Your homes" data-sub="2 homes, shown together">
+            <span><span class="t-label t-ink">All homes</span><span class="t-meta menu__sub">4817 Mueller Blvd and 1206 Elm Ridge Dr</span></span>
+            <svg class="i i--check"><use href="#ri-check-line"/></svg>
+          </button>
+          <div class="menu__sep"></div>
+          <button class="menu__item" role="menuitemradio" aria-checked="false" data-home-pick="mueller" data-label="4817 Mueller Blvd" data-title="4817 Mueller Blvd" data-sub="Austin, TX 78723">
+            <span><span class="t-label t-ink">4817 Mueller Blvd</span><span class="t-meta menu__sub">Austin, TX 78723</span></span>
+            <svg class="i i--check"><use href="#ri-check-line"/></svg>
+          </button>
+          <button class="menu__item" role="menuitemradio" aria-checked="false" data-home-pick="elm" data-label="1206 Elm Ridge Dr" data-title="1206 Elm Ridge Dr" data-sub="Round Rock, TX 78664">
+            <span><span class="t-label t-ink">1206 Elm Ridge Dr</span><span class="t-meta menu__sub">Round Rock, TX 78664</span></span>
+            <svg class="i i--check"><use href="#ri-check-line"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>

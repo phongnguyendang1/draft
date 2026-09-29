@@ -38,15 +38,20 @@
     });
   }
 
-  /* Home switcher */
-  function selectHome(id) {
-    var item = $('[data-home="' + id + '"]');
+  /* Home filter: "All homes" shows everything; picking a home hides the other home's items */
+  function pickHome(id) {
+    var item = $('[data-home-pick="' + id + '"]');
     if (!item) return;
-    $all("[data-home]").forEach(function (el) { el.setAttribute("aria-checked", String(el === item)); });
-    var address = item.getAttribute("data-address");
-    $all("[data-home-label]").forEach(function (el) { el.textContent = address; });
+    $all("[data-home-pick]").forEach(function (el) { el.setAttribute("aria-checked", String(el === item)); });
+    $all("[data-home-label]").forEach(function (el) { el.textContent = item.getAttribute("data-label"); });
+    $all("[data-home-title]").forEach(function (el) { el.textContent = item.getAttribute("data-title"); });
+    $all("[data-home-sub]").forEach(function (el) { el.textContent = item.getAttribute("data-sub"); });
+    body.classList.toggle("is-home-filtered", id !== "all");
+    $all("[data-home]").forEach(function (el) {
+      el.classList.toggle("is-other-home", id !== "all" && el.getAttribute("data-home") !== id);
+    });
     closeMenus();
-    if (id !== "mueller") toast("Prototype: sample data is the same for every home");
+    updateRecCounts();
   }
 
   function isShown(el) { return el.getClientRects().length > 0; }
@@ -92,14 +97,15 @@
   function refreshAll() { updateVisibleCounts(); refreshCarousels(); }
 
   /* Recommendations */
+  function isOpen(r) { var st = r.getAttribute("data-state"); return st === "open" || st === "declining"; }
   function updateRecCounts() {
-    var open = $all(".rec").filter(function (r) { return r.getAttribute("data-state") === "open" || r.getAttribute("data-state") === "declining"; }).length;
-    $all("[data-rec-open-count]").forEach(function (el) { el.textContent = open; });
+    var open = $all(".rec").filter(isOpen).length;
+    var here = $all(".rec").filter(function (r) { return isOpen(r) && !r.classList.contains("is-other-home"); }).length;
+    $all("[data-rec-open-count]").forEach(function (el) { el.textContent = here; el.hidden = here === 0; });
     $all("[data-rec-sum]").forEach(function (el) {
       var p = el.getAttribute("data-rec-sum");
       var n = $all('.rec[data-priority="' + p + '"]').filter(function (r) {
-        var st = r.getAttribute("data-state");
-        return st === "open" || st === "declining";
+        return isOpen(r) && !r.classList.contains("is-other-home");
       }).length;
       el.textContent = n + " " + el.getAttribute("data-word");
       el.hidden = n === 0;
@@ -135,6 +141,7 @@
   function applyState(name, on) {
     body.classList.toggle("is-" + name, on);
     $all('[data-state-switch="' + name + '"]').forEach(function (input) { input.checked = on; });
+    if (name === "multi" && !on) pickHome("all");
     refreshAll();
   }
 
@@ -160,14 +167,25 @@
       return;
     }
 
-    var home = target.closest("[data-home]");
-    if (home) { selectHome(home.getAttribute("data-home")); return; }
-
-    var switchHome = target.closest("[data-switch-home]");
-    if (switchHome) { selectHome(switchHome.getAttribute("data-switch-home")); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+    var pick = target.closest("[data-home-pick]");
+    if (pick) { pickHome(pick.getAttribute("data-home-pick")); return; }
 
     var dismiss = target.closest("[data-dismiss]");
-    if (dismiss) { applyState(dismiss.getAttribute("data-dismiss"), false); return; }
+    if (dismiss) {
+      applyState(dismiss.getAttribute("data-dismiss"), false);
+      if (dismiss.hasAttribute("data-then")) applyState(dismiss.getAttribute("data-then"), true);
+      return;
+    }
+
+    var copy = target.closest("[data-copy]");
+    if (copy) {
+      var text = copy.getAttribute("data-copy");
+      try { navigator.clipboard.writeText(text).catch(function () {}); } catch (err) { /* file:// may block the clipboard */ }
+      copy.textContent = "Copied";
+      setTimeout(function () { copy.textContent = "Copy"; }, 1600);
+      toast("Referral code " + text + " copied");
+      return;
+    }
 
     var rec = target.closest(".rec");
     if (rec) {

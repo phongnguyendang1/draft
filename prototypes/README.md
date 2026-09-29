@@ -10,16 +10,18 @@ HTML/CSS prototypes for the Member Portal (HomeHub) dashboard redesign. Each opt
 | 4 · Timeline | [desktop.html](option-4-timeline/desktop.html) | [mobile.html](option-4-timeline/mobile.html) |
 | 5 · Adaptive Stack | [desktop.html](option-5-adaptive-stack/desktop.html) | [mobile.html](option-5-adaptive-stack/mobile.html) |
 
-Links to other pages are inert. Interactions on the page work: expand/collapse panels, the home switcher, the account and mobile menus, sending, declining (with a reason) or undoing recommendations, and swiping the mobile carousel in Option 2.
+Links to other pages are inert. Interactions on the page work: the home filter (All homes or one home), the account and mobile menus, expand/collapse panels, sending, declining (with a reason) or undoing recommendations, copying the referral code, the top message (welcome, then the seasonal message), and swiping the mobile carousel in Option 2.
+
+Round 2 (Sep 29) applies stakeholder feedback to every option: a five-item nav, the address or "Your homes" as the page title, one top message, no recent visits, compact recommendations with the Home Health Report summary, one-line team members inside savings, and date-only upcoming visits. See [`feedback-round-2.md`](feedback-round-2.md).
 
 ## Prototype states
 
 The dark **Prototype states** button in the bottom-right corner is not part of the design. It turns conditional elements on and off:
 
 - Payment issue banner
-- Welcome card
-- Nothing to schedule (the action center's empty state)
-- Member has 2 homes (home switcher and the other-home nudge)
+- Top message (the welcome message; dismissing it shows the seasonal message)
+- Nothing to schedule (the empty state for visits to schedule)
+- Member has 2 homes ("Your homes" with the All homes filter, or a single address)
 
 In Option 5 the panel also has a **Member stage** picker (Active member, Getting started, Payment issue, Prepaid year ending). Picking a stage reorders the cards and swaps the lead card, which is the point of that option.
 
@@ -46,13 +48,14 @@ Source lives in `src/`:
 - `src/shared/prototype.js`: in-page interactions
 - `src/shared/icons/`: Remix Icon SVGs (Apache 2.0) used by the templates
 - `src/shared/fonts/`: DM Sans variable font (SIL OFL)
-- `src/shared/partials/`: markup shared by every option (header, welcome, recommendations, visits, team, promotion, footer), pulled in with `<!-- @include name -->`
+- `src/shared/partials/`: markup shared by every option (header, page title, top message, ready to schedule, recommendations, Home Health Report, visits, savings, team, plan, footer), pulled in with `<!-- @include name -->`
 - `src/<option>/dashboard.html` and `layout.css`: one template per option; the desktop and mobile screens share the markup, and the layout switches on the frame width with container queries
 
 After editing, rebuild the pages:
 
 ```bash
-python3 prototypes/build.py
+python3 prototypes/build.py                          # every option
+python3 prototypes/build.py option-1-action-center   # one option
 ```
 
 To use a new icon, copy its SVG from the [Remix Icon](https://remixicon.com) set into `src/shared/icons/` and reference it as `<svg class="i"><use href="#ri-name"/></svg>`.
