@@ -1,6 +1,6 @@
-Photos for promo cards, inlined by build.py.
+Photos for the Option 1 promo cards, inlined by build.py. Supplied by Phong on Sep 30 and cropped to 2:1.
 
-- hvac-tune-up.jpg: Specialty HVAC offer (a technician at an outdoor heat pump)
-- sibi-appliances.jpg: Sibi appliance offer (a kitchen with new stainless appliances)
+- hvac-tune-up.jpg: Specialty HVAC offer (an outdoor heat pump unit on a rooftop), 800 x 400
+- sibi-appliances.jpg: Sibi appliance offer (a stainless gas range in a kitchen), 571 x 286
 
-Use at least 760 x 380 (2:1; the card crops to fill). Only add photos PreFix has the rights to use.
+The card crops to fill, so use at least 760 x 380 for new photos. Only ship photos PreFix has the rights to use.
