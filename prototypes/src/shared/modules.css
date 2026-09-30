@@ -366,3 +366,16 @@ body:not(.is-home-filtered) .recs__empty { display: none !important; }
   .hstat__label { align-items: flex-start; white-space: normal; }
   .hstat__label .i { margin-top: 2px; }
 }
+
+.plan__prices { display: flex; flex-direction: column; gap: 2px; margin-top: var(--s-4); }
+
+/* Promo cards: a photo across the top, one offer, one action. Hidden when dismissed. */
+body:not(.is-promo-hvac) .when-promo-hvac, body:not(.is-promo-sibi) .when-promo-sibi { display: none !important; }
+.promo { padding: 0; overflow: hidden; }
+.promo__media { position: relative; aspect-ratio: 2 / 1; display: grid; place-items: center; background: var(--blue-tint); color: var(--blue); }
+.promo__ph { width: 48px; height: 48px; }
+.promo__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.promo__close { position: absolute; top: var(--s-12); right: var(--s-12); width: 36px; height: 36px; border-color: transparent; }
+.promo__close .i { width: 20px; height: 20px; }
+.promo__body { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-8); padding: var(--s-20); }
+.promo__body .btn { margin-top: var(--s-8); }

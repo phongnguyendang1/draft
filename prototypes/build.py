@@ -5,6 +5,9 @@ Each option has one template (src/<option>/dashboard.html) and one layout styles
 The build inlines the DM Sans font, shared CSS, the option CSS, the Remix icons the
 template references, and the shared script, then writes desktop.html and mobile.html.
 
+Photos for promo cards live in src/shared/photos/<name>.jpg (or .webp, .png) and are
+referenced as src="{{PHOTO:name}}". A missing photo leaves the card's tinted placeholder.
+
 Usage: python3 prototypes/build.py [option-slug ...]
 """
 
@@ -69,8 +72,28 @@ def resolve_includes(html, depth=0):
     return INCLUDE.sub(sub, html)
 
 
+PHOTO_TYPES = {".jpg": "image/jpeg", ".webp": "image/webp", ".png": "image/png"}
+PHOTO_IMG = re.compile(r'[ ]*<img [^>]*src="\{\{PHOTO:([a-z0-9-]+)\}\}"[^>]*>\n?')
+
+
+def inline_photos(html):
+    """Inline src="{{PHOTO:name}}" as a data URI, or drop the <img> if the photo is missing."""
+
+    def sub(match):
+        name = match.group(1)
+        for ext, mime in PHOTO_TYPES.items():
+            path = SHARED / "photos" / f"{name}{ext}"
+            if path.exists():
+                data = base64.b64encode(path.read_bytes()).decode()
+                return match.group(0).replace(f"{{{{PHOTO:{name}}}}}", f"data:{mime};base64,{data}")
+        print(f"  no photo for {name}, using the placeholder")
+        return ""
+
+    return PHOTO_IMG.sub(sub, html)
+
+
 def build_page(option, frame_key):
-    template = resolve_includes((SRC / option["slug"] / "dashboard.html").read_text())
+    template = inline_photos(resolve_includes((SRC / option["slug"] / "dashboard.html").read_text()))
 
     names = sorted(set(re.findall(r'href="#ri-([a-z0-9-]+)"', template)))
     missing = [n for n in names if not (SHARED / "icons" / f"{n}.svg").exists()]

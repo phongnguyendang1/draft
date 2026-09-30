@@ -6,7 +6,7 @@
 <title>{{TITLE}}</title>
 {{STYLES}}
 </head>
-<body class="{{FRAME}} is-welcome is-multi">
+<body class="{{FRAME}} is-welcome is-multi is-promo-hvac is-promo-sibi">
 {{ICONS}}
 
 <div class="app">
@@ -35,16 +35,21 @@
         <!-- 2. Recommendations with the Home Health Report -->
         <!-- @include recs-card -->
 
-        <!-- 3. Plan and services -->
-        <!-- @include plan-services -->
       </div>
 
-      <aside class="rail" aria-label="Savings and visits">
+      <aside class="rail" aria-label="Savings, visits, plan and offers">
         <!-- 4. Savings, credits, referral, team -->
         <!-- @include savings -->
 
         <!-- 5. Upcoming visits -->
         <!-- @include upcoming-card -->
+
+        <!-- 6. Plan and services -->
+        <!-- @include plan-services -->
+
+        <!-- 7. Offers with photos, each dismissible -->
+        <!-- @include promo-hvac -->
+        <!-- @include promo-sibi -->
       </aside>
     </div>
   </main>

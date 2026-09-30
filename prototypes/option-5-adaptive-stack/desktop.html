@@ -670,6 +670,19 @@ body:not(.is-home-filtered) .recs__empty { display: none !important; }
   .hstat__label .i { margin-top: 2px; }
 }
 
+.plan__prices { display: flex; flex-direction: column; gap: 2px; margin-top: var(--s-4); }
+
+/* Promo cards: a photo across the top, one offer, one action. Hidden when dismissed. */
+body:not(.is-promo-hvac) .when-promo-hvac, body:not(.is-promo-sibi) .when-promo-sibi { display: none !important; }
+.promo { padding: 0; overflow: hidden; }
+.promo__media { position: relative; aspect-ratio: 2 / 1; display: grid; place-items: center; background: var(--blue-tint); color: var(--blue); }
+.promo__ph { width: 48px; height: 48px; }
+.promo__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.promo__close { position: absolute; top: var(--s-12); right: var(--s-12); width: 36px; height: 36px; border-color: transparent; }
+.promo__close .i { width: 20px; height: 20px; }
+.promo__body { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-8); padding: var(--s-20); }
+.promo__body .btn { margin-top: var(--s-8); }
+
 /* Option 5 · Adaptive Stack (round 2)
    Five cards plus one stage lead. Rules decide the order; the first card, Recommendations and
    PreFix Protect span the full width, the rest pair up. Mobile: one column, same order. */
@@ -1256,8 +1269,11 @@ body.stage-payment .not-stage-payment { display: none !important; }
           <div class="card__head">
             <div class="card__heading">
               <h2 class="t-title" id="plan-title">PreFix Protect</h2>
-              <p class="t-desc" data-home="mueller">$69/month for 2 HVAC systems &middot; next bill Thu, Oct 1<span class="home-tag">Mueller</span></p>
-              <p class="t-desc" data-home="elm">$49/month for 1 HVAC system &middot; next bill Thu, Oct 1<span class="home-tag">Elm Ridge</span></p>
+              <div class="plan__prices">
+                <p class="t-body" data-home="mueller"><strong class="t-strong">$69/month</strong> &middot; 2 HVAC systems<span class="home-tag">Mueller</span></p>
+                <p class="t-body" data-home="elm"><strong class="t-strong">$49/month</strong> &middot; 1 HVAC system<span class="home-tag">Elm Ridge</span></p>
+                <p class="t-meta">Next bill Thu, Oct 1</p>
+              </div>
             </div>
             <a class="link card__head-link" href="#">Membership and billing<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
           </div>
