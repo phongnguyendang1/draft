@@ -22,7 +22,7 @@ Sources: Phong's notes, the call with Mark (Sep 28) and the call with James (Sep
 
 ## Per option
 
-- **Option 1:** left column is Ready to schedule, then Recommendations with the Home Health Report. The narrower right column holds Your savings (credits, referral, team), Upcoming visits, PreFix Protect with services used and not used shown in full, then two promo cards with photos: Specialty HVAC and the Sibi appliance offer. Each promo can be hidden with its close button.
+- **Option 1:** left column is Ready to schedule, Recommendations with the Home Health Report, then PreFix Protect with services used and not used shown in full. The narrower right column holds Your savings (credits, referral, team), Upcoming visits, then two promo cards with photos: Specialty HVAC and the Sibi appliance offer. Each promo can be hidden with its close button.
 - **Option 2:** Needs your attention, a one-row Coming up (moved near the top), the plan card with savings, credits and team beside what the membership covered (by service, not by visit) and services used, then Recommendations.
 - **Option 3:** Ready to schedule, a Home health card (report summary and preventive maintenance), compact system tiles with one recommendation each, then visits and savings.
 - **Option 4:** Needs you, then Coming up down to a Today marker. The past is on the Timeline page.

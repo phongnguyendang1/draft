@@ -1,17 +1,11 @@
 /* Option 1 · Action Center (round 2)
-   Desktop: one main column (Ready to schedule, Recommendations with the Home Health Report)
-   beside a narrower rail (Your savings with the team, Upcoming visits, PreFix Protect, then
+   Desktop: one main column (Ready to schedule, Recommendations with the Home Health Report,
+   PreFix Protect) beside a narrower rail (Your savings with the team, Upcoming visits, then
    the Specialty HVAC and Sibi offers).
    Mobile: one column in priority order. */
 
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s-24); align-items: start; }
 .main, .rail { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
-
-/* PreFix Protect in the rail: title above the link, services stacked */
-.rail #plan .card__head { flex-direction: column; gap: var(--s-8); }
-.rail #plan .card__head-link { margin-top: 0; }
-.rail #plan .svc__head { flex-direction: column; gap: 2px; }
-.rail #plan .svc__cols { grid-template-columns: 1fr; gap: var(--s-16); }
 
 @container app (max-width: 767px) {
   .layout { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }

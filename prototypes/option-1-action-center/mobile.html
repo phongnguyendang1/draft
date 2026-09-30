@@ -684,19 +684,13 @@ body:not(.is-promo-hvac) .when-promo-hvac, body:not(.is-promo-sibi) .when-promo-
 .promo__body .btn { margin-top: var(--s-8); }
 
 /* Option 1 · Action Center (round 2)
-   Desktop: one main column (Ready to schedule, Recommendations with the Home Health Report)
-   beside a narrower rail (Your savings with the team, Upcoming visits, PreFix Protect, then
+   Desktop: one main column (Ready to schedule, Recommendations with the Home Health Report,
+   PreFix Protect) beside a narrower rail (Your savings with the team, Upcoming visits, then
    the Specialty HVAC and Sibi offers).
    Mobile: one column in priority order. */
 
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s-24); align-items: start; }
 .main, .rail { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
-
-/* PreFix Protect in the rail: title above the link, services stacked */
-.rail #plan .card__head { flex-direction: column; gap: var(--s-8); }
-.rail #plan .card__head-link { margin-top: 0; }
-.rail #plan .svc__head { flex-direction: column; gap: 2px; }
-.rail #plan .svc__cols { grid-template-columns: 1fr; gap: var(--s-16); }
 
 @container app (max-width: 767px) {
   .layout { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
@@ -1030,9 +1024,55 @@ body:not(.is-promo-hvac) .when-promo-hvac, body:not(.is-promo-sibi) .when-promo-
           </div>
         </section>
 
+        <!-- 3. PreFix Protect: plan and services used -->
+        <!-- Plan and the services it covers, used and not yet used -->
+        <section class="card" id="plan" aria-labelledby="plan-title">
+          <div class="card__head">
+            <div class="card__heading">
+              <h2 class="t-title" id="plan-title">PreFix Protect</h2>
+              <div class="plan__prices">
+                <p class="t-body" data-home="mueller"><strong class="t-strong">$69/month</strong> &middot; 2 HVAC systems<span class="home-tag">Mueller</span></p>
+                <p class="t-body" data-home="elm"><strong class="t-strong">$49/month</strong> &middot; 1 HVAC system<span class="home-tag">Elm Ridge</span></p>
+                <p class="t-meta">Next bill Thu, Oct 1</p>
+              </div>
+            </div>
+            <a class="link card__head-link" href="#">Membership and billing<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
+          </div>
+
+          <div class="svc">
+            <div class="svc__head">
+              <p class="t-strong">4 of 10 services used</p>
+              <p class="t-meta">Your membership covers more than repairs</p>
+            </div>
+            <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="4" aria-label="Services used"><div class="progress__bar" style="width:40%"></div></div>
+            <div class="svc__cols">
+              <div>
+                <p class="svc__label">Used</p>
+                <ul class="svc__list">
+                  <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Preventive maintenance</span></li>
+                  <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Home Manager repairs</span></li>
+                  <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Contractor management</span></li>
+                  <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Specialty carpentry</span></li>
+                </ul>
+              </div>
+              <div>
+                <p class="svc__label">Not used yet</p>
+                <ul class="svc__list">
+                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Specialty painting and drywall<span class="feature__sub">Booked for Wed, Oct 21</span></span></li>
+                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Specialty HVAC</span></li>
+                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Garage doors</span></li>
+                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Attic insulation</span></li>
+                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Duct assessment</span></li>
+                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Irrigation</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </div>
 
-      <aside class="rail" aria-label="Savings, visits, plan and offers">
+      <aside class="rail" aria-label="Savings, visits and offers">
         <!-- 4. Savings, credits, referral, team -->
         <!-- Savings, credits, referral and the team behind them -->
         <section class="card" id="savings" aria-labelledby="savings-title">
@@ -1130,53 +1170,7 @@ body:not(.is-promo-hvac) .when-promo-hvac, body:not(.is-promo-sibi) .when-promo-
             </ul>
         </section>
 
-        <!-- 6. Plan and services -->
-        <!-- Plan and the services it covers, used and not yet used -->
-        <section class="card" id="plan" aria-labelledby="plan-title">
-          <div class="card__head">
-            <div class="card__heading">
-              <h2 class="t-title" id="plan-title">PreFix Protect</h2>
-              <div class="plan__prices">
-                <p class="t-body" data-home="mueller"><strong class="t-strong">$69/month</strong> &middot; 2 HVAC systems<span class="home-tag">Mueller</span></p>
-                <p class="t-body" data-home="elm"><strong class="t-strong">$49/month</strong> &middot; 1 HVAC system<span class="home-tag">Elm Ridge</span></p>
-                <p class="t-meta">Next bill Thu, Oct 1</p>
-              </div>
-            </div>
-            <a class="link card__head-link" href="#">Membership and billing<svg class="i"><use href="#ri-arrow-right-line"/></svg></a>
-          </div>
-
-          <div class="svc">
-            <div class="svc__head">
-              <p class="t-strong">4 of 10 services used</p>
-              <p class="t-meta">Your membership covers more than repairs</p>
-            </div>
-            <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="4" aria-label="Services used"><div class="progress__bar" style="width:40%"></div></div>
-            <div class="svc__cols">
-              <div>
-                <p class="svc__label">Used</p>
-                <ul class="svc__list">
-                  <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Preventive maintenance</span></li>
-                  <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Home Manager repairs</span></li>
-                  <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Contractor management</span></li>
-                  <li class="feature feature--check is-done"><span class="i-box"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg></span><span class="feature__text">Specialty carpentry</span></li>
-                </ul>
-              </div>
-              <div>
-                <p class="svc__label">Not used yet</p>
-                <ul class="svc__list">
-                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Specialty painting and drywall<span class="feature__sub">Booked for Wed, Oct 21</span></span></li>
-                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Specialty HVAC</span></li>
-                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Garage doors</span></li>
-                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Attic insulation</span></li>
-                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Duct assessment</span></li>
-                  <li class="feature feature--check svc__todo"><span class="i-box"><svg class="i"><use href="#ri-checkbox-blank-circle-line"/></svg></span><span class="feature__text">Irrigation</span></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 7. Offers with photos, each dismissible -->
+        <!-- 6. Offers with photos, each dismissible -->
         <!-- Promo: Specialty HVAC. Dismissing hides it for this visit. -->
         <section class="card promo when-promo-hvac" id="promo-hvac" aria-labelledby="promo-hvac-title">
           <div class="promo__media">
