@@ -301,6 +301,9 @@ body:not(.is-caught-up) .when-caught-up { display: none !important; }
 body:not(.is-multi) .when-multi { display: none !important; }
 body.is-multi .when-single { display: none !important; }
 
+/* Visually hidden, still read by screen readers */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
 /* HomeHub modules shared by every dashboard option: page chrome, visit, recommendation, credits, team. */
 
 :root { --container: 1184px; }
@@ -672,16 +675,16 @@ body:not(.is-home-filtered) .recs__empty { display: none !important; }
 
 .plan__prices { display: flex; flex-direction: column; gap: 2px; margin-top: var(--s-4); }
 
-/* Promo cards: a photo across the top, one offer, one action. Hidden when dismissed. */
+/* Promo tiles: a photo, a title, one line and a link. Hidden when dismissed. */
 body:not(.is-promo-hvac) .when-promo-hvac, body:not(.is-promo-sibi) .when-promo-sibi { display: none !important; }
-.promo { padding: 0; overflow: hidden; }
+.promo { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
 .promo__media { position: relative; aspect-ratio: 2 / 1; display: grid; place-items: center; background: var(--blue-tint); color: var(--blue); }
-.promo__ph { width: 48px; height: 48px; }
+.promo__ph { width: 40px; height: 40px; }
 .promo__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.promo__close { position: absolute; top: var(--s-12); right: var(--s-12); width: 36px; height: 36px; border-color: transparent; }
-.promo__close .i { width: 20px; height: 20px; }
-.promo__body { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-8); padding: var(--s-20); }
-.promo__body .btn { margin-top: var(--s-8); }
+.promo__close { position: absolute; top: var(--s-8); right: var(--s-8); width: 32px; height: 32px; border-color: transparent; }
+.promo__close .i { width: 18px; height: 18px; }
+.promo__body { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: var(--s-16); }
+.promo__cta { margin-top: var(--s-8); }
 
 /* Option 4 · Timeline (round 2)
    Desktop: "Needs you" pinned above the future half of the timeline, which runs down to a Today
@@ -764,7 +767,7 @@ body:not(.is-promo-hvac) .when-promo-hvac, body:not(.is-promo-sibi) .when-promo-
       </nav>
 
       <div class="topbar__actions">
-        <a class="btn btn--secondary" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Request service</a>
+        <a class="btn btn--secondary topbar__cta" href="#" data-ask-focus><svg class="i"><use href="#ri-add-line"/></svg>Request service</a>
         <div class="menu-wrap">
           <button class="avatar-btn" data-menu="account-menu" aria-expanded="false" aria-label="Account menu">SM</button>
           <div class="menu" id="account-menu" hidden>
@@ -782,7 +785,7 @@ body:not(.is-promo-hvac) .when-promo-hvac, body:not(.is-promo-sibi) .when-promo-
       </div>
 
       <div class="topbar__mobile">
-        <a class="btn btn--secondary btn--compact" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Request</a>
+        <a class="btn btn--secondary btn--compact topbar__cta" href="#" data-ask-focus><svg class="i"><use href="#ri-add-line"/></svg>Request</a>
         <button class="icon-btn" data-toggle="mobile-nav" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu">
           <svg class="i icon-when-closed"><use href="#ri-menu-line"/></svg>
           <svg class="i icon-when-open"><use href="#ri-close-line"/></svg>
@@ -1472,6 +1475,28 @@ body:not(.is-promo-hvac) .when-promo-hvac, body:not(.is-promo-sibi) .when-promo-
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeMenus();
+  });
+
+  /* Request service: when the in-page request bar scrolls away, dock the button (top bar or bottom bar) */
+  var hero = $("[data-cta-hero]");
+  if (hero && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      body.classList.toggle("is-cta-docked", !entries[0].isIntersecting);
+    }).observe(hero);
+  }
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest("[data-ask-focus]") || !hero) return;
+    hero.scrollIntoView({ behavior: "smooth", block: "center" });
+    var input = $("[data-ask-input]", hero);
+    if (input) input.focus({ preventScroll: true });
+  });
+  document.addEventListener("submit", function (e) {
+    var form = e.target.closest("[data-ask]");
+    if (!form) return;
+    e.preventDefault();
+    var input = $("[data-ask-input]", form);
+    var text = input && input.value.trim();
+    toast(text ? "Starting a request: \u201c" + text + "\u201d" : "Starting a service request");
   });
 
   updateRecCounts();

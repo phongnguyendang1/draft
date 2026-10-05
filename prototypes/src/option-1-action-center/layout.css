@@ -1,20 +1,194 @@
-/* Option 1 · Action Center (round 2)
-   Desktop: one main column (Ready to schedule, Recommendations with the Home Health Report,
-   PreFix Protect) beside a narrower rail (Your savings with the team, Upcoming visits, then
-   the Specialty HVAC and Sibi offers).
+/* Option 1 · Action Center (round 3)
+   Request service leads the page as a request bar, then docks to the top bar (desktop) or a
+   bottom bar (mobile) once it scrolls away; it is the only yellow button on the page.
+   Below it, two equal columns of compact cards: rows are a title, one line of meta and one
+   action, and the whole row opens the detail page.
+   Left: Ready to schedule, Recommendations, Home health, PreFix Protect.
+   Right: Saved this year, Upcoming visits, Your PreFix team, offers.
    Mobile: one column in priority order. */
 
-.layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s-24); align-items: start; }
-.main, .rail { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
+/* ---------- Request service ---------- */
+.topbar { position: sticky; top: 0; }
+.topbar__cta { background: var(--yellow); border-color: var(--yellow); color: var(--on-yellow); transition: opacity .15s ease, visibility .15s; }
+.topbar__cta:hover { background: var(--yellow-hover); border-color: var(--yellow-hover); }
+body:not(.is-cta-docked) .topbar__actions .topbar__cta { visibility: hidden; opacity: 0; }
+.topbar__mobile .topbar__cta { display: none; }
 
+.ask {
+  display: flex; align-items: center; gap: var(--s-12);
+  height: 64px; margin-bottom: var(--s-24); padding: 0 var(--s-8) 0 var(--s-24);
+  background: var(--surface); border: 2px solid var(--blue); border-radius: var(--r-pill);
+}
+.ask:focus-within { outline: 4px solid var(--blue-tint); }
+.ask__field { flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; gap: var(--s-12); cursor: text; }
+.ask__icon { width: 24px; height: 24px; flex: none; color: var(--blue-text); }
+.ask__input {
+  flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; outline: 0; background: none;
+  font: inherit; font-size: 16px; line-height: 24px; letter-spacing: var(--track); color: var(--ink);
+}
+.ask__input::placeholder { color: var(--text-2); }
+.ask__btn { height: 48px; padding: 0 var(--s-24); font-size: 16px; line-height: 24px; }
+.ask__btn .i { width: 20px; height: 20px; }
+
+.dock { display: none; }
+
+/* ---------- Grid ---------- */
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-24); align-items: start; }
+.col { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
+
+/* ---------- Card header: title, count, one link ---------- */
+.d-head { display: flex; align-items: center; gap: var(--s-8); margin-bottom: var(--s-8); }
+.d-head__link {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 2px; flex: none; white-space: nowrap;
+  padding: 0; border: 0; background: none; cursor: pointer; text-decoration: none;
+  color: var(--slate); font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: 0;
+}
+.d-head__link:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.d-head__link .i { width: 20px; height: 20px; }
+.d-head__link .i--turn { width: 16px; height: 16px; margin-left: 2px; transition: transform .15s ease; }
+.d-head__link[aria-expanded="true"] .i--turn { transform: rotate(45deg); }
+
+/* ---------- Rows: icon, title + one meta line, one action. The whole row opens the detail. ---------- */
+/* Every row has a top rule; the list clips the first visible one, so hidden rows never leave a stray line */
+.d-list { display: flex; flex-direction: column; margin-top: -1px; clip-path: inset(1px -24px 0 -24px); }
+.dash .d-list > li { border-top: 1px solid var(--border); }
+.d-row { position: relative; display: flex; align-items: center; gap: var(--s-12); min-height: 64px; padding: var(--s-12) 0; }
+.d-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.d-title {
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  color: var(--ink); text-decoration: none; font-size: 16px; line-height: 24px; font-weight: 600;
+}
+.d-title::after { content: ""; position: absolute; inset: 0; }
+.d-row:hover .d-title { color: var(--blue-text); }
+.d-title:focus-visible { outline: none; }
+.d-row:has(.d-title:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; border-radius: 12px; }
+.d-row .btn, .d-row .link, .d-row .icon-btn { position: relative; z-index: 1; }
+.d-meta { font-size: 14px; line-height: 20px; color: var(--text-2); }
+.btn--sm { height: 36px; padding: 0 var(--s-16); }
+
+.d-icon, .d-sev {
+  width: 40px; height: 40px; flex: none; display: grid; place-items: center;
+  border-radius: 12px; background: var(--page); color: var(--ink);
+}
+.d-icon .i, .d-sev .i { width: 20px; height: 20px; }
+.d-icon--tint { background: var(--blue-tint); color: var(--blue-text); }
+.d-sev { color: var(--text-2); }
+.d-sev--critical { background: var(--red); color: #fff; }
+.d-sev--high { background: var(--surface); color: var(--red); box-shadow: inset 0 0 0 1px var(--red); }
+.d-chev { width: 20px; height: 20px; flex: none; color: var(--text-2); }
+
+.d-empty { display: flex; align-items: center; gap: var(--s-8); padding: var(--s-8) 0 var(--s-4); font-size: 14px; line-height: 20px; color: var(--text-2); }
+.d-empty .i { width: 20px; height: 20px; color: var(--blue); }
+body:not(.is-home-filtered) .d-empty[data-home] { display: none; }
+
+/* Home names only matter when both homes are shown */
+body:not(.is-multi) .d-home, body.is-home-filtered .d-home,
+body:not(.is-multi) .d-home-label, body.is-home-filtered .d-home-label { display: none !important; }
+.d-home--tag {
+  display: inline-flex; align-items: center; height: 20px; padding: 0 var(--s-8); border-radius: 10px;
+  background: var(--page); color: var(--text-2); font-size: 12px; line-height: 16px; font-weight: 600;
+}
+
+/* ---------- Recommendations ---------- */
+.dash .rec { padding: 0; border-top: 0; }
+.d-rec--critical .rec__open { margin: var(--s-4) calc(-1 * var(--s-12)); padding: var(--s-12); border-radius: var(--r-inner); background: var(--red-tint); }
+.dash .d-list > .d-rec--critical + li { border-top: 0; }
+.dash .rec__done { display: none; }
+.dash .rec[data-state="submitted"] .rec__done,
+.dash .rec[data-state="declined"] .rec__done { display: flex; align-items: center; }
+.d-done { width: 24px; height: 24px; flex: none; color: var(--blue-text); }
+
+/* ---------- Home health ---------- */
+.d-healths { margin-top: -1px; clip-path: inset(1px 0 0 0); }
+.d-health { padding: var(--s-12) 0 var(--s-4); border-top: 1px solid var(--border); }
+.d-health + .d-health { margin-top: var(--s-8); }
+.d-health__row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s-4) var(--s-16); }
+.d-health__home { font-size: 14px; line-height: 20px; font-weight: 600; }
+.d-stats { display: flex; flex-wrap: wrap; gap: var(--s-4) var(--s-20); }
+.d-stat { display: flex; align-items: baseline; gap: 6px; }
+.d-stat__n { font-size: 24px; line-height: 32px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.d-stat__n--blue { color: var(--blue-text); }
+.d-stat__l { font-size: 14px; line-height: 20px; color: var(--text-2); }
+.d-health .hbar { margin-top: var(--s-8); }
+
+/* ---------- PreFix Protect ---------- */
+.d-svc { display: flex; flex-direction: column; gap: var(--s-8); margin: var(--s-8) 0 var(--s-16); }
+.d-chips { display: flex; flex-wrap: wrap; gap: var(--s-8); }
+.d-chip {
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 var(--s-12);
+  border: 1px solid var(--border); border-radius: var(--r-pill); background: var(--surface);
+  color: var(--ink); text-decoration: none; font-size: 14px; line-height: 20px; white-space: nowrap;
+}
+.d-chip .i { width: 16px; height: 16px; color: var(--text-2); }
+a.d-chip:hover { border-color: var(--blue); color: var(--blue-text); }
+a.d-chip:hover .i { color: var(--blue-text); }
+.d-chip--used { border-color: var(--blue-tint); background: var(--blue-tint); }
+.d-chip--used .i { color: var(--blue-text); }
+
+/* ---------- Upcoming visits ---------- */
+.d-date {
+  width: 40px; height: 44px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 12px; background: var(--page);
+}
+.d-date__m { font-size: 12px; line-height: 16px; color: var(--text-2); }
+.d-date__d { font-size: 16px; line-height: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.d-date--pm { background: var(--blue-tint); }
+.d-date--pm .d-date__m { color: var(--blue-text); }
+
+/* ---------- Saved this year ---------- */
+.d-savings { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--s-4) var(--s-12); }
+.dash .savings__math { margin-top: var(--s-8); }
+.d-perks { display: flex; flex-wrap: wrap; gap: var(--s-12) var(--s-32); margin-top: var(--s-16); padding-top: var(--s-16); border-top: 1px solid var(--border); }
+.d-perk { display: flex; align-items: center; gap: var(--s-8); }
+.d-perk .i { width: 20px; height: 20px; color: var(--blue-text); }
+
+/* ---------- Your PreFix team ---------- */
+.pro {
+  position: relative; width: 40px; height: 40px; flex: none; display: grid; place-items: center;
+  border-radius: 50%; background: var(--ink); color: #fff; font-size: 14px; line-height: 20px; font-weight: 600;
+}
+.pro__badge {
+  position: absolute; right: -6px; bottom: -4px; width: 18px; height: 18px; display: grid; place-items: center;
+  border: 2px solid var(--surface); border-radius: 50%; background: var(--blue); color: #fff;
+}
+.pro__badge .i { width: 10px; height: 10px; }
+.d-role { font-size: 16px; line-height: 24px; font-weight: 600; }
+.d-role .d-home--tag { margin-left: var(--s-8); vertical-align: 2px; }
+.d-msg { width: 40px; height: 40px; }
+.d-msg .i { width: 20px; height: 20px; }
+
+/* ---------- Offers ---------- */
+.d-promos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--s-24); }
+
+/* ---------- Mobile ---------- */
 @container app (max-width: 767px) {
-  .layout { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
-  .main, .rail { display: contents; }
+  .ask { height: 56px; margin-bottom: var(--s-16); padding: 0 var(--s-4) 0 var(--s-16); }
+  .ask__btn { height: 44px; padding: 0 var(--s-16); font-size: 14px; line-height: 20px; }
+  .ask__btn .i { display: none; }
+
+  .dock {
+    display: block; position: sticky; bottom: 0; z-index: 30;
+    padding: var(--s-12) var(--s-16); background: var(--surface); border-top: 1px solid var(--border);
+    transform: translateY(100%); transition: transform .2s ease;
+  }
+  body.is-cta-docked .dock { transform: none; }
+
+  .grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-16); }
+  .d-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
+  .col { display: contents; }
   #actions { order: 1; }
   #recs { order: 2; }
   #upcoming { order: 3; }
-  #savings { order: 4; }
-  #plan { order: 5; }
-  #promo-hvac { order: 6; }
-  #promo-sibi { order: 7; }
+  #health { order: 4; }
+  #savings { order: 5; }
+  #team { order: 6; }
+  #plan { order: 7; }
+  .d-promos { order: 8; grid-template-columns: minmax(0, 1fr); gap: var(--s-16); }
+
+
+  /* Offers become a photo-left row so they don't take a screen each */
+  .promo { flex-direction: row; }
+  .promo__media { width: 128px; flex: none; aspect-ratio: auto; }
+  .promo__body { flex: 1; min-width: 0; padding: var(--s-12) var(--s-16); }
 }
+.frame-mobile .proto { bottom: 84px; }

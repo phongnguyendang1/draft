@@ -271,5 +271,27 @@
     if (e.key === "Escape") closeMenus();
   });
 
+  /* Request service: when the in-page request bar scrolls away, dock the button (top bar or bottom bar) */
+  var hero = $("[data-cta-hero]");
+  if (hero && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      body.classList.toggle("is-cta-docked", !entries[0].isIntersecting);
+    }).observe(hero);
+  }
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest("[data-ask-focus]") || !hero) return;
+    hero.scrollIntoView({ behavior: "smooth", block: "center" });
+    var input = $("[data-ask-input]", hero);
+    if (input) input.focus({ preventScroll: true });
+  });
+  document.addEventListener("submit", function (e) {
+    var form = e.target.closest("[data-ask]");
+    if (!form) return;
+    e.preventDefault();
+    var input = $("[data-ask-input]", form);
+    var text = input && input.value.trim();
+    toast(text ? "Starting a request: \u201c" + text + "\u201d" : "Starting a service request");
+  });
+
   updateRecCounts();
 })();

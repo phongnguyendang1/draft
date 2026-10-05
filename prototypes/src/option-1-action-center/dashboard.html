@@ -13,48 +13,307 @@
 
   <!-- @include top -->
 
-  <main class="page">
+  <main class="page dash">
 
     <!-- @include intro -->
 
+    <!-- Request service: the main way into PreFix, so it leads the page -->
+    <form class="ask" data-ask data-cta-hero aria-label="Request service">
+      <label class="ask__field">
+        <svg class="i ask__icon"><use href="#ri-tools-line"/></svg>
+        <span class="sr-only">What needs fixing?</span>
+        <input class="ask__input" type="text" placeholder="What needs fixing?" autocomplete="off" data-ask-input>
+      </label>
+      <button class="btn btn--primary ask__btn" type="submit"><svg class="i"><use href="#ri-add-line"/></svg>Request service</button>
+    </form>
+
     <!-- @include message -->
 
-    <div class="layout">
-      <div class="main">
+    <div class="grid">
+      <div class="col">
 
-        <!-- 1. Ready to schedule -->
-        <section class="card" id="actions" aria-labelledby="actions-title">
-          <div class="card__title-row">
+        <!-- Ready to schedule -->
+        <section class="card d-card" id="actions" aria-labelledby="actions-title">
+          <div class="d-head">
             <h2 class="t-title" id="actions-title">Ready to schedule</h2>
-            <span class="count when-actions" data-count-visible=".ready .ready__item">4</span>
+            <span class="count when-actions" data-count-visible=".d-ready > li">4</span>
           </div>
-          <p class="t-desc when-actions">Pick a time for these visits. Preventive maintenance is included in your membership.</p>
-          <!-- @include ready-items -->
+          <ul class="d-list d-ready when-actions">
+            <li class="d-row" data-home="mueller">
+              <span class="d-icon d-icon--tint"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+              <div class="d-main">
+                <a class="d-title" href="#">Fall preventive maintenance</a>
+                <p class="d-meta"><span class="t-blue">Included</span><span class="d-home"> &middot; Mueller</span></p>
+              </div>
+              <a class="btn btn--secondary btn--sm" href="#">Schedule</a>
+            </li>
+            <li class="d-row" data-home="elm">
+              <span class="d-icon d-icon--tint"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+              <div class="d-main">
+                <a class="d-title" href="#">Fall preventive maintenance</a>
+                <p class="d-meta"><span class="t-blue">Included</span><span class="d-home"> &middot; Elm Ridge</span></p>
+              </div>
+              <a class="btn btn--secondary btn--sm" href="#">Schedule</a>
+            </li>
+            <li class="d-row" data-home="mueller">
+              <span class="d-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></span>
+              <div class="d-main">
+                <a class="d-title" href="#">Kitchen faucet and disposal</a>
+                <p class="d-meta">Service visit<span class="d-home"> &middot; Mueller</span></p>
+              </div>
+              <a class="btn btn--secondary btn--sm" href="#">Schedule</a>
+            </li>
+            <li class="d-row" data-home="mueller">
+              <span class="d-icon"><svg class="i"><use href="#ri-drop-line"/></svg></span>
+              <div class="d-main">
+                <a class="d-title" href="#">HVAC condensate line flush</a>
+                <p class="d-meta">Service visit<span class="d-home"> &middot; Mueller</span></p>
+              </div>
+              <a class="btn btn--secondary btn--sm" href="#">Schedule</a>
+            </li>
+          </ul>
+          <p class="d-empty when-caught-up"><svg class="i"><use href="#ri-checkbox-circle-line"/></svg>You&rsquo;re all caught up.</p>
         </section>
 
-        <!-- 2. Recommendations with the Home Health Report -->
-        <!-- @include recs-card -->
+        <!-- Recommendations: severity, title, one action. Details on the Recommendations page. -->
+        <section class="card d-card" id="recs" aria-labelledby="recs-title">
+          <div class="d-head">
+            <h2 class="t-title" id="recs-title">Recommendations</h2>
+            <span class="count count--red" data-rec-open-count>4</span>
+            <a class="d-head__link" href="#">See all<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></a>
+          </div>
+          <ul class="d-list">
+            <li class="rec d-rec d-rec--critical" data-priority="critical" data-state="open" data-title="Water heater relief valve" data-home="mueller">
+              <div class="rec__open d-row">
+                <span class="d-sev d-sev--critical" title="Critical"><svg class="i"><use href="#ri-error-warning-fill"/></svg></span>
+                <div class="d-main">
+                  <a class="d-title" href="#">Water heater valve leaking</a>
+                  <p class="d-meta"><span class="t-red">Critical</span><span class="d-home"> &middot; Mueller</span></p>
+                </div>
+                <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
+              </div>
+              <div class="rec__done d-row">
+                <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
+                <p class="d-main d-meta t-ink" data-rec-note></p>
+                <button class="link" data-rec-undo>Undo</button>
+              </div>
+            </li>
+            <li class="rec d-rec" data-priority="high" data-state="open" data-title="Dryer vent cleaning" data-home="mueller">
+              <div class="rec__open d-row">
+                <span class="d-sev d-sev--high" title="High"><svg class="i"><use href="#ri-alert-line"/></svg></span>
+                <div class="d-main">
+                  <a class="d-title" href="#">Dryer vent blocked with lint</a>
+                  <p class="d-meta">High<span class="d-home"> &middot; Mueller</span></p>
+                </div>
+                <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
+              </div>
+              <div class="rec__done d-row">
+                <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
+                <p class="d-main d-meta t-ink" data-rec-note></p>
+                <button class="link" data-rec-undo>Undo</button>
+              </div>
+            </li>
+            <li class="rec d-rec" data-priority="high" data-state="open" data-title="Upstairs AC short cycling" data-home="mueller">
+              <div class="rec__open d-row">
+                <span class="d-sev d-sev--high" title="High"><svg class="i"><use href="#ri-alert-line"/></svg></span>
+                <div class="d-main">
+                  <a class="d-title" href="#">Upstairs AC short cycling</a>
+                  <p class="d-meta">High<span class="d-home"> &middot; Mueller</span></p>
+                </div>
+                <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
+              </div>
+              <div class="rec__done d-row">
+                <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
+                <p class="d-main d-meta t-ink" data-rec-note></p>
+                <button class="link" data-rec-undo>Undo</button>
+              </div>
+            </li>
+            <li class="rec d-rec" data-priority="normal" data-state="open" data-title="Kitchen window caulk" data-home="mueller">
+              <div class="rec__open d-row">
+                <span class="d-sev" title="Normal"><svg class="i"><use href="#ri-information-line"/></svg></span>
+                <div class="d-main">
+                  <a class="d-title" href="#">Kitchen window caulk cracked</a>
+                  <p class="d-meta">Normal<span class="d-home"> &middot; Mueller</span></p>
+                </div>
+                <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
+              </div>
+              <div class="rec__done d-row">
+                <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
+                <p class="d-main d-meta t-ink" data-rec-note></p>
+                <button class="link" data-rec-undo>Undo</button>
+              </div>
+            </li>
+          </ul>
+          <p class="d-empty" data-home="elm"><svg class="i"><use href="#ri-checkbox-circle-line"/></svg>No open recommendations at Elm Ridge.</p>
+        </section>
 
-        <!-- 3. PreFix Protect: plan and services used -->
-        <!-- @include plan-services -->
+        <!-- Home Health Report: counts and bar from the latest visit -->
+        <section class="card d-card" id="health" aria-labelledby="health-title">
+          <div class="d-head">
+            <h2 class="t-title" id="health-title">Home health</h2>
+            <a class="d-head__link" href="#">Open report<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></a>
+          </div>
+          <div class="d-healths">
+          <div class="d-health" data-home="mueller">
+            <div class="d-health__row">
+              <p class="d-health__home d-home-label">4817 Mueller Blvd</p>
+              <div class="d-stats">
+                <p class="d-stat"><span class="d-stat__n t-red">1</span><span class="d-stat__l">Critical</span></p>
+                <p class="d-stat"><span class="d-stat__n">3</span><span class="d-stat__l">Concern</span></p>
+                <p class="d-stat"><span class="d-stat__n d-stat__n--blue">26</span><span class="d-stat__l">No concern</span></p>
+              </div>
+            </div>
+            <div class="hbar" aria-hidden="true"><span class="hbar__red" style="width:3.33%"></span><span class="hbar__ink" style="width:10%"></span><span class="hbar__blue"></span></div>
+          </div>
+          <div class="d-health d-health--ok" data-home="elm">
+            <div class="d-health__row">
+              <p class="d-health__home d-home-label">1206 Elm Ridge Dr</p>
+              <div class="d-stats">
+                <p class="d-stat"><span class="d-stat__n d-stat__n--blue">30</span><span class="d-stat__l">No concern</span></p>
+              </div>
+            </div>
+            <div class="hbar" aria-hidden="true"><span class="hbar__blue"></span></div>
+          </div>
+          </div>
+        </section>
 
+        <!-- PreFix Protect: services used and still available -->
+        <section class="card d-card" id="plan" aria-labelledby="plan-title">
+          <div class="d-head">
+            <h2 class="t-title" id="plan-title">PreFix Protect</h2>
+            <a class="d-head__link" href="#">Membership<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></a>
+          </div>
+          <div class="d-svc">
+            <p class="t-strong">4 of 10 services used</p>
+            <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="4" aria-label="Services used"><div class="progress__bar" style="width:40%"></div></div>
+          </div>
+          <ul class="d-chips" aria-label="Services">
+            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Maintenance visits</li>
+            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Repairs</li>
+            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Contractor jobs</li>
+            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Carpentry</li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Painting</a></li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Specialty HVAC</a></li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Garage doors</a></li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Insulation</a></li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Duct check</a></li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Irrigation</a></li>
+          </ul>
+        </section>
       </div>
 
-      <aside class="rail" aria-label="Savings, visits and offers">
-        <!-- 4. Savings, credits, referral, team -->
-        <!-- @include savings -->
+      <div class="col">
 
-        <!-- 5. Upcoming visits -->
-        <!-- @include upcoming-card -->
+        <!-- Savings: the number, then credits and referral on one line -->
+        <section class="card d-card" id="savings" aria-labelledby="savings-title">
+          <div class="d-head">
+            <h2 class="t-title" id="savings-title">Saved this year</h2>
+            <button class="d-head__link" data-toggle="savings-math" aria-expanded="false" aria-controls="savings-math" data-open="Hide" data-closed="How?"><span data-label>How?</span><svg class="i i--turn"><use href="#ri-add-circle-line"/></svg></button>
+          </div>
+          <p class="d-savings"><span class="t-hero t-num">$1,240</span><span class="d-meta">vs. Austin market rates</span></p>
+          <div class="savings__math" id="savings-math" hidden>
+            <dl class="ledger">
+              <div class="ledger__row"><dt>Market rate for the same work</dt><dd class="t-num">$1,652</dd></div>
+              <div class="ledger__row"><dt>What you paid PreFix</dt><dd class="t-num">&minus;$412</dd></div>
+              <div class="ledger__row ledger__row--total"><dt>You saved</dt><dd class="t-num">$1,240</dd></div>
+            </dl>
+          </div>
+          <div class="d-perks">
+            <p class="d-perk"><svg class="i"><use href="#ri-coupon-3-line"/></svg><span class="d-meta">Credits</span><strong class="t-strong t-num">$75</strong></p>
+            <p class="d-perk"><svg class="i"><use href="#ri-gift-line"/></svg><span class="d-meta">Refer</span><code class="refer__code">SARAH-4817</code><button class="link" data-copy="SARAH-4817">Copy</button></p>
+          </div>
+        </section>
 
-        <!-- 6. Offers with photos, each dismissible -->
-        <!-- @include promo-hvac -->
-        <!-- @include promo-sibi -->
-      </aside>
+        <!-- Upcoming visits: date and title. Details and changes in Appointments. -->
+        <section class="card d-card" id="upcoming" aria-labelledby="upcoming-title">
+          <div class="d-head">
+            <h2 class="t-title" id="upcoming-title">Upcoming visits</h2>
+            <a class="d-head__link" href="#">Appointments<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></a>
+          </div>
+          <ul class="d-list">
+            <li class="d-row d-row--link" data-home="mueller">
+              <span class="d-date"><span class="d-date__m">Sep</span><span class="d-date__d">28</span></span>
+              <div class="d-main">
+                <a class="d-title" href="#">Back door and cabinet hinges</a>
+                <p class="d-meta">Mon, 8&ndash;10 AM<span class="d-home"> &middot; Mueller</span></p>
+              </div>
+              <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
+            </li>
+            <li class="d-row d-row--link when-caught-up" data-home="mueller">
+              <span class="d-date d-date--pm"><span class="d-date__m">Oct</span><span class="d-date__d">13</span></span>
+              <div class="d-main">
+                <a class="d-title" href="#">Fall preventive maintenance</a>
+                <p class="d-meta">Tue, 9&ndash;11 AM<span class="d-home"> &middot; Mueller</span></p>
+              </div>
+              <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
+            </li>
+            <li class="d-row d-row--link" data-home="mueller">
+              <span class="d-date"><span class="d-date__m">Oct</span><span class="d-date__d">21</span></span>
+              <div class="d-main">
+                <a class="d-title" href="#">Ceiling water stain repair</a>
+                <p class="d-meta">Wed, 1&ndash;3 PM<span class="d-home"> &middot; Mueller</span></p>
+              </div>
+              <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
+            </li>
+            <li class="d-row d-row--link" data-home="elm">
+              <span class="d-date"><span class="d-date__m">Nov</span><span class="d-date__d">4</span></span>
+              <div class="d-main">
+                <a class="d-title" href="#">Garage door opener check</a>
+                <p class="d-meta">Wed, 10 AM&ndash;12 PM<span class="d-home"> &middot; Elm Ridge</span></p>
+              </div>
+              <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Your PreFix team: role first, so it's clear these are PreFix pros, not people on the account -->
+        <section class="card d-card" id="team" aria-labelledby="team-title">
+          <div class="d-head">
+            <h2 class="t-title" id="team-title">Your PreFix team</h2>
+          </div>
+          <ul class="d-list">
+            <li class="d-row" data-home="mueller">
+              <span class="pro" aria-hidden="true">MR<span class="pro__badge"><svg class="i"><use href="#ri-home-4-fill"/></svg></span></span>
+              <div class="d-main">
+                <p class="d-role">Home Manager<span class="d-home d-home--tag">Mueller</span></p>
+                <p class="d-meta">Marcus Reyes &middot; repairs and visits</p>
+              </div>
+              <a class="icon-btn d-msg" href="#" aria-label="Message Marcus Reyes, your Home Manager"><svg class="i"><use href="#ri-message-3-line"/></svg></a>
+            </li>
+            <li class="d-row" data-home="mueller">
+              <span class="pro" aria-hidden="true">PS<span class="pro__badge"><svg class="i"><use href="#ri-home-4-fill"/></svg></span></span>
+              <div class="d-main">
+                <p class="d-role">Maintenance technician<span class="d-home d-home--tag">Mueller</span></p>
+                <p class="d-meta">Priya Shah &middot; spring and fall checks</p>
+              </div>
+              <a class="icon-btn d-msg" href="#" aria-label="Message Priya Shah, your maintenance technician"><svg class="i"><use href="#ri-message-3-line"/></svg></a>
+            </li>
+            <li class="d-row" data-home="elm">
+              <span class="pro" aria-hidden="true">TA<span class="pro__badge"><svg class="i"><use href="#ri-home-4-fill"/></svg></span></span>
+              <div class="d-main">
+                <p class="d-role">Home Manager<span class="d-home d-home--tag">Elm Ridge</span></p>
+                <p class="d-meta">Tom Alvarez &middot; repairs and visits</p>
+              </div>
+              <a class="icon-btn d-msg" href="#" aria-label="Message Tom Alvarez, your Home Manager"><svg class="i"><use href="#ri-message-3-line"/></svg></a>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Offers: two small photo tiles, each dismissible -->
+        <div class="d-promos">
+          <!-- @include promo-hvac -->
+          <!-- @include promo-sibi -->
+        </div>
+      </div>
     </div>
   </main>
 
   <!-- @include footer -->
+
+  <!-- Mobile: Request service stays in reach once the request bar scrolls away -->
+  <div class="dock">
+    <a class="btn btn--primary btn--block dock__btn" href="#" data-ask-focus><svg class="i"><use href="#ri-add-line"/></svg>Request service</a>
+  </div>
 </div>
 
 <!-- @include overlays -->

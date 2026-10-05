@@ -10,9 +10,9 @@ HTML/CSS prototypes for the Member Portal (HomeHub) dashboard redesign. Each opt
 | 4 · Timeline | [desktop.html](option-4-timeline/desktop.html) | [mobile.html](option-4-timeline/mobile.html) |
 | 5 · Adaptive Stack | [desktop.html](option-5-adaptive-stack/desktop.html) | [mobile.html](option-5-adaptive-stack/mobile.html) |
 
-Links to other pages are inert. Interactions on the page work: the home filter (All homes or one home), the account and mobile menus, expand/collapse panels, sending, declining (with a reason) or undoing recommendations, copying the referral code, the top message (welcome, then the seasonal message), hiding a promo card in Option 1, and swiping the mobile carousel in Option 2.
+Links to other pages are inert. Interactions on the page work: the home filter (All homes or one home), the account and mobile menus, expand/collapse panels, sending, declining (with a reason) or undoing recommendations, copying the referral code, the top message (welcome, then the seasonal message), hiding a promo card and the docking Request service button in Option 1, and swiping the mobile carousel in Option 2.
 
-Round 2 (Sep 29) applies stakeholder feedback to every option: a five-item nav, the address or "Your homes" as the page title, one top message, no recent visits, compact recommendations with the Home Health Report summary, one-line team members inside savings, and date-only upcoming visits. See [`feedback-round-2.md`](feedback-round-2.md).
+Round 3 (Oct 5) rebuilds Option 1 as compact cards with Request service leading the page; see the round 3 section of [`feedback-round-2.md`](feedback-round-2.md). Round 2 (Sep 29) applies stakeholder feedback to every option: a five-item nav, the address or "Your homes" as the page title, one top message, no recent visits, compact recommendations with the Home Health Report summary, one-line team members inside savings, and date-only upcoming visits. See [`feedback-round-2.md`](feedback-round-2.md).
 
 ## Prototype states
 

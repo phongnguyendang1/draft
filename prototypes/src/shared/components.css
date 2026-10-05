@@ -237,3 +237,6 @@ body.is-caught-up .when-actions { display: none !important; }
 body:not(.is-caught-up) .when-caught-up { display: none !important; }
 body:not(.is-multi) .when-multi { display: none !important; }
 body.is-multi .when-single { display: none !important; }
+
+/* Visually hidden, still read by screen readers */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
