@@ -802,7 +802,7 @@ body.stage-payment .not-stage-payment { display: none !important; }
       </nav>
 
       <div class="topbar__actions">
-        <a class="btn btn--secondary topbar__cta" href="#" data-ask-focus><svg class="i"><use href="#ri-add-line"/></svg>Request service</a>
+        <a class="btn btn--secondary topbar__cta" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Request service</a>
         <div class="menu-wrap">
           <button class="avatar-btn" data-menu="account-menu" aria-expanded="false" aria-label="Account menu">SM</button>
           <div class="menu" id="account-menu" hidden>
@@ -820,7 +820,7 @@ body.stage-payment .not-stage-payment { display: none !important; }
       </div>
 
       <div class="topbar__mobile">
-        <a class="btn btn--secondary btn--compact topbar__cta" href="#" data-ask-focus><svg class="i"><use href="#ri-add-line"/></svg>Request</a>
+        <a class="btn btn--secondary btn--compact topbar__cta" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Request</a>
         <button class="icon-btn" data-toggle="mobile-nav" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu">
           <svg class="i icon-when-closed"><use href="#ri-menu-line"/></svg>
           <svg class="i icon-when-open"><use href="#ri-close-line"/></svg>
@@ -1621,27 +1621,13 @@ body.stage-payment .not-stage-payment { display: none !important; }
     if (e.key === "Escape") closeMenus();
   });
 
-  /* Request service: when the in-page request bar scrolls away, dock the button (top bar or bottom bar) */
+  /* Request service: when the page's Request service button scrolls away, dock it (top bar or bottom bar) */
   var hero = $("[data-cta-hero]");
   if (hero && "IntersectionObserver" in window) {
     new IntersectionObserver(function (entries) {
       body.classList.toggle("is-cta-docked", !entries[0].isIntersecting);
     }).observe(hero);
   }
-  document.addEventListener("click", function (e) {
-    if (!e.target.closest("[data-ask-focus]") || !hero) return;
-    hero.scrollIntoView({ behavior: "smooth", block: "center" });
-    var input = $("[data-ask-input]", hero);
-    if (input) input.focus({ preventScroll: true });
-  });
-  document.addEventListener("submit", function (e) {
-    var form = e.target.closest("[data-ask]");
-    if (!form) return;
-    e.preventDefault();
-    var input = $("[data-ask-input]", form);
-    var text = input && input.value.trim();
-    toast(text ? "Starting a request: \u201c" + text + "\u201d" : "Starting a service request");
-  });
 
   updateRecCounts();
 })();

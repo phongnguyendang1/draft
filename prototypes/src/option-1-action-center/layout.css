@@ -1,10 +1,12 @@
 /* Option 1 · Action Center (round 3)
-   Request service leads the page as a request bar, then docks to the top bar (desktop) or a
-   bottom bar (mobile) once it scrolls away; it is the only yellow button on the page.
+   Request service is a large button beside the page title that opens the request flow. Once it
+   scrolls away it docks to the top bar (desktop) or a bottom bar (mobile); it is the only yellow
+   button on the page.
    Desktop keeps the round 2 columns: a wide main column (Ready to schedule, Recommendations
    with the Home Health Report, PreFix Protect) beside a 380px rail (Saved this year, Upcoming
-   visits, Your PreFix team, offers). Inside the main column's cards, items sit in a 2-column
-   grid of small cards: a title, one line of meta and one action; the whole card opens the detail.
+   visits, Your PreFix team, offers). In Ready to schedule and Recommendations, items sit in a
+   2-column grid of small cards with one action each; the whole card opens the detail.
+   PreFix Protect lists services as pills.
    Mobile: one column in priority order. */
 
 /* ---------- Request service ---------- */
@@ -14,21 +16,9 @@
 body:not(.is-cta-docked) .topbar__actions .topbar__cta { visibility: hidden; opacity: 0; }
 .topbar__mobile .topbar__cta { display: none; }
 
-.ask {
-  display: flex; align-items: center; gap: var(--s-12);
-  height: 64px; margin-bottom: var(--s-24); padding: 0 var(--s-8) 0 var(--s-24);
-  background: var(--surface); border: 2px solid var(--blue); border-radius: var(--r-pill);
-}
-.ask:focus-within { outline: 4px solid var(--blue-tint); }
-.ask__field { flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; gap: var(--s-12); cursor: text; }
-.ask__icon { width: 24px; height: 24px; flex: none; color: var(--blue-text); }
-.ask__input {
-  flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; outline: 0; background: none;
-  font: inherit; font-size: 16px; line-height: 24px; letter-spacing: var(--track); color: var(--ink);
-}
-.ask__input::placeholder { color: var(--text-2); }
-.ask__btn { height: 48px; padding: 0 var(--s-24); font-size: 16px; line-height: 24px; }
-.ask__btn .i { width: 20px; height: 20px; }
+.d-intro__actions { display: flex; align-items: center; gap: var(--s-12); }
+.d-request { height: 52px; padding: 0 var(--s-32); font-size: 16px; line-height: 24px; }
+.d-request .i { width: 20px; height: 20px; }
 
 .dock { display: none; }
 
@@ -84,6 +74,7 @@ body:not(.is-cta-docked) .topbar__actions .topbar__cta { visibility: hidden; opa
 .d-icon--white { background: var(--surface); }
 .tile .d-sev:not(.d-sev--critical):not(.d-sev--high) { background: var(--surface); }
 .d-meta { font-size: 14px; line-height: 20px; color: var(--text-2); }
+.d-risk { margin: 2px 0; font-size: 14px; line-height: 20px; color: var(--ink); }
 .btn--sm { height: 36px; padding: 0 var(--s-16); }
 
 .d-icon, .d-sev {
@@ -138,15 +129,17 @@ body:not(.is-multi) .d-home-label, body.is-home-filtered .d-home-label { display
 
 /* ---------- PreFix Protect ---------- */
 .d-svc { display: flex; flex-direction: column; gap: var(--s-8); margin: var(--s-8) 0 var(--s-16); }
-.svc2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-12); }
-.svc2 > div { padding: var(--s-12) var(--s-16); border-radius: var(--r-inner); background: var(--page); }
-.svc2__label { margin-bottom: var(--s-4); font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
-.svc2__list { display: flex; flex-direction: column; }
-.svc2__item { display: flex; align-items: center; gap: var(--s-8); padding: 6px 0; color: var(--ink); text-decoration: none; font-size: 14px; line-height: 20px; }
-.svc2__item .i { width: 18px; height: 18px; flex: none; color: var(--text-2); }
-.svc2__item--used .i { color: var(--blue-text); }
-a.svc2__item:hover { color: var(--blue-text); }
-a.svc2__item:hover .i { color: var(--blue-text); }
+.d-chips { display: flex; flex-wrap: wrap; gap: var(--s-8); }
+.d-chip {
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 var(--s-12);
+  border: 1px solid var(--border); border-radius: var(--r-pill); background: var(--surface);
+  color: var(--ink); text-decoration: none; font-size: 14px; line-height: 20px; white-space: nowrap;
+}
+.d-chip .i { width: 16px; height: 16px; color: var(--text-2); }
+a.d-chip:hover { border-color: var(--blue); color: var(--blue-text); }
+a.d-chip:hover .i { color: var(--blue-text); }
+.d-chip--used { border-color: var(--blue-tint); background: var(--blue-tint); }
+.d-chip--used .i { color: var(--blue-text); }
 
 /* ---------- Upcoming visits ---------- */
 .d-date {
@@ -157,6 +150,14 @@ a.svc2__item:hover .i { color: var(--blue-text); }
 .d-date__d { font-size: 16px; line-height: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .d-date--pm { background: var(--blue-tint); }
 .d-date--pm .d-date__m { color: var(--blue-text); }
+
+/* Visit type: a small badge above the title */
+.vtype {
+  display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; height: 20px; margin-bottom: 2px; padding: 0 var(--s-8);
+  border-radius: 10px; background: var(--page); color: var(--ink); font-size: 12px; line-height: 16px; font-weight: 600;
+}
+.vtype .i { width: 14px; height: 14px; }
+.vtype--pm, .vtype--enrollment { background: var(--blue-tint); color: var(--blue-text); }
 
 /* ---------- Saved this year ---------- */
 .d-savings { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--s-4) var(--s-12); }
@@ -186,9 +187,9 @@ a.svc2__item:hover .i { color: var(--blue-text); }
 
 /* ---------- Mobile ---------- */
 @container app (max-width: 767px) {
-  .ask { height: 56px; margin-bottom: var(--s-16); padding: 0 var(--s-4) 0 var(--s-16); }
-  .ask__btn { height: 44px; padding: 0 var(--s-16); font-size: 14px; line-height: 20px; }
-  .ask__btn .i { display: none; }
+  .d-intro__actions { flex-direction: column; align-items: stretch; width: 100%; }
+  .d-intro__actions .menu-wrap, .d-intro__actions .switcher { width: 100%; }
+  .d-request { height: 48px; }
 
   .dock {
     display: block; position: sticky; bottom: 0; z-index: 30;
@@ -198,9 +199,12 @@ a.svc2__item:hover .i { color: var(--blue-text); }
   body.is-cta-docked .dock { transform: none; }
 
   .layout { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
-  .tiles, .svc2 { grid-template-columns: minmax(0, 1fr); }
+  .tiles { grid-template-columns: minmax(0, 1fr); }
   /* One item card per row: title on the left, action on the right */
-  .dash .tile, .dash .rec .rec__open.tile__body, .dash .rec .rec__done.tile__body { flex-direction: row; align-items: center; }
+  .dash .tile, .dash .rec .rec__done.tile__body { flex-direction: row; align-items: center; }
+  /* Recommendations carry more detail, so their action sits below the text */
+  .dash .rec.tile { flex-direction: column; align-items: stretch; }
+  .dash .rec .rec__open.tile__body .tile__btn { align-self: flex-start; }
   .tile__head { flex: 1; min-width: 0; align-items: center; }
   .tile__btn { margin: 0; align-self: center; padding: 0 var(--s-12); }
   .tile .d-icon, .tile .d-sev { display: none; }

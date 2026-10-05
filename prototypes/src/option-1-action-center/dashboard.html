@@ -15,17 +15,22 @@
 
   <main class="page dash">
 
-    <!-- @include intro -->
-
-    <!-- Request service: the main way into PreFix, so it leads the page -->
-    <form class="ask" data-ask data-cta-hero aria-label="Request service">
-      <label class="ask__field">
-        <svg class="i ask__icon"><use href="#ri-tools-line"/></svg>
-        <span class="sr-only">What needs fixing?</span>
-        <input class="ask__input" type="text" placeholder="What needs fixing?" autocomplete="off" data-ask-input>
-      </label>
-      <button class="btn btn--primary ask__btn" type="submit"><svg class="i"><use href="#ri-add-line"/></svg>Request service</button>
-    </form>
+    <!-- Page title, home filter and Request service, the page's main action.
+         The button opens the request flow (which home, what's wrong, photos, times). -->
+    <section class="intro d-intro">
+      <div class="intro__text when-single">
+        <h1 class="t-display">4817 Mueller Blvd</h1>
+        <p class="t-desc">Austin, TX 78723</p>
+      </div>
+      <div class="intro__text when-multi">
+        <h1 class="t-display" data-home-title>Your homes</h1>
+        <p class="t-desc" data-home-sub>2 homes, shown together</p>
+      </div>
+      <div class="d-intro__actions">
+        <!-- @include home-switcher -->
+        <a class="btn btn--primary d-request" href="#" data-cta-hero><svg class="i"><use href="#ri-add-line"/></svg>Request service</a>
+      </div>
+    </section>
 
     <!-- @include message -->
 
@@ -127,7 +132,9 @@
                   <span class="d-sev d-sev--critical"><svg class="i"><use href="#ri-error-warning-fill"/></svg></span>
                   <div class="d-main">
                     <a class="d-title" href="#">Water heater valve leaking</a>
-                    <p class="d-meta"><span class="t-red">Critical</span><span class="d-home"> &middot; Mueller</span></p>
+                    <p class="d-meta"><span class="t-red">Critical</span> &middot; Home Manager &middot; about 1 hr</p>
+                    <p class="d-risk">Dripping valve can damage the floor and drywall.</p>
+                    <p class="d-meta">Found Apr 14<span class="d-home"> &middot; Mueller</span></p>
                   </div>
                 </div>
                 <button class="btn btn--secondary btn--sm tile__btn" data-rec-submit>Send</button>
@@ -146,7 +153,8 @@
                   <span class="d-sev d-sev--high"><svg class="i"><use href="#ri-alert-line"/></svg></span>
                   <div class="d-main">
                     <a class="d-title" href="#">Dryer vent blocked with lint</a>
-                    <p class="d-meta">High<span class="d-home"> &middot; Mueller</span></p>
+                    <p class="d-meta">High &middot; Home Manager &middot; about 1 hr</p>
+                    <p class="d-meta">Found Apr 14<span class="d-home"> &middot; Mueller</span></p>
                   </div>
                 </div>
                 <button class="btn btn--secondary btn--sm tile__btn" data-rec-submit>Send</button>
@@ -165,7 +173,8 @@
                   <span class="d-sev d-sev--high"><svg class="i"><use href="#ri-alert-line"/></svg></span>
                   <div class="d-main">
                     <a class="d-title" href="#">Upstairs AC short cycling</a>
-                    <p class="d-meta">High<span class="d-home"> &middot; Mueller</span></p>
+                    <p class="d-meta">High &middot; Specialty HVAC &middot; diagnostic visit</p>
+                    <p class="d-meta">Found Apr 14<span class="d-home"> &middot; Mueller</span></p>
                   </div>
                 </div>
                 <button class="btn btn--secondary btn--sm tile__btn" data-rec-submit>Send</button>
@@ -184,7 +193,8 @@
                   <span class="d-sev"><svg class="i"><use href="#ri-information-line"/></svg></span>
                   <div class="d-main">
                     <a class="d-title" href="#">Kitchen window caulk cracked</a>
-                    <p class="d-meta">Normal<span class="d-home"> &middot; Mueller</span></p>
+                    <p class="d-meta">Normal &middot; Specialty carpentry &middot; about 1 hr</p>
+                    <p class="d-meta">Found Apr 14<span class="d-home"> &middot; Mueller</span></p>
                   </div>
                 </div>
                 <button class="btn btn--secondary btn--sm tile__btn" data-rec-submit>Send</button>
@@ -201,7 +211,7 @@
           <p class="d-empty" data-home="elm"><svg class="i"><use href="#ri-checkbox-circle-line"/></svg>No open recommendations at Elm Ridge.</p>
         </section>
 
-        <!-- PreFix Protect: services used and not used yet, side by side -->
+        <!-- PreFix Protect: services used (filled pills) and not used yet (outlined pills that link to booking) -->
         <section class="card d-card" id="plan" aria-labelledby="plan-title">
           <div class="d-head">
             <h2 class="t-title" id="plan-title">PreFix Protect</h2>
@@ -211,28 +221,18 @@
             <p class="t-strong">4 of 10 services used</p>
             <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="4" aria-label="Services used"><div class="progress__bar" style="width:40%"></div></div>
           </div>
-          <div class="svc2">
-            <div>
-              <p class="svc2__label">Used</p>
-              <ul class="svc2__list">
-                <li class="svc2__item svc2__item--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Preventive maintenance</li>
-                <li class="svc2__item svc2__item--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Home Manager repairs</li>
-                <li class="svc2__item svc2__item--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Contractor management</li>
-                <li class="svc2__item svc2__item--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Specialty carpentry</li>
-              </ul>
-            </div>
-            <div>
-              <p class="svc2__label">Not used yet</p>
-              <ul class="svc2__list">
-                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Specialty painting and drywall</a></li>
-                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Specialty HVAC</a></li>
-                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Garage doors</a></li>
-                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Attic insulation</a></li>
-                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Duct assessment</a></li>
-                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Irrigation</a></li>
-              </ul>
-            </div>
-          </div>
+          <ul class="d-chips" aria-label="Services">
+            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Maintenance visits</li>
+            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Repairs</li>
+            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Contractor jobs</li>
+            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Carpentry</li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Painting</a></li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Specialty HVAC</a></li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Garage doors</a></li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Insulation</a></li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Duct check</a></li>
+            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Irrigation</a></li>
+          </ul>
         </section>
       </div>
 
@@ -268,6 +268,7 @@
             <li class="d-row d-row--link" data-home="mueller">
               <span class="d-date"><span class="d-date__m">Sep</span><span class="d-date__d">28</span></span>
               <div class="d-main">
+                <p class="vtype vtype--service"><svg class="i"><use href="#ri-hammer-line"/></svg>Service visit</p>
                 <a class="d-title" href="#">Back door and cabinet hinges</a>
                 <p class="d-meta">Mon, 8&ndash;10 AM<span class="d-home"> &middot; Mueller</span></p>
               </div>
@@ -276,6 +277,7 @@
             <li class="d-row d-row--link when-caught-up" data-home="mueller">
               <span class="d-date d-date--pm"><span class="d-date__m">Oct</span><span class="d-date__d">13</span></span>
               <div class="d-main">
+                <p class="vtype vtype--pm"><svg class="i"><use href="#ri-home-gear-line"/></svg>Preventive maintenance</p>
                 <a class="d-title" href="#">Fall preventive maintenance</a>
                 <p class="d-meta">Tue, 9&ndash;11 AM<span class="d-home"> &middot; Mueller</span></p>
               </div>
@@ -284,6 +286,7 @@
             <li class="d-row d-row--link" data-home="mueller">
               <span class="d-date"><span class="d-date__m">Oct</span><span class="d-date__d">21</span></span>
               <div class="d-main">
+                <p class="vtype vtype--specialty"><svg class="i"><use href="#ri-paint-brush-line"/></svg>Specialty visit</p>
                 <a class="d-title" href="#">Ceiling water stain repair</a>
                 <p class="d-meta">Wed, 1&ndash;3 PM<span class="d-home"> &middot; Mueller</span></p>
               </div>
@@ -292,6 +295,7 @@
             <li class="d-row d-row--link" data-home="elm">
               <span class="d-date"><span class="d-date__m">Nov</span><span class="d-date__d">4</span></span>
               <div class="d-main">
+                <p class="vtype vtype--service"><svg class="i"><use href="#ri-hammer-line"/></svg>Service visit</p>
                 <a class="d-title" href="#">Garage door opener check</a>
                 <p class="d-meta">Wed, 10 AM&ndash;12 PM<span class="d-home"> &middot; Elm Ridge</span></p>
               </div>
@@ -346,7 +350,7 @@
 
   <!-- Mobile: Request service stays in reach once the request bar scrolls away -->
   <div class="dock">
-    <a class="btn btn--primary btn--block dock__btn" href="#" data-ask-focus><svg class="i"><use href="#ri-add-line"/></svg>Request service</a>
+    <a class="btn btn--primary btn--block dock__btn" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Request service</a>
   </div>
 </div>
 
