@@ -1,10 +1,10 @@
 /* Option 1 · Action Center (round 3)
    Request service leads the page as a request bar, then docks to the top bar (desktop) or a
    bottom bar (mobile) once it scrolls away; it is the only yellow button on the page.
-   Below it, two equal columns of compact cards: rows are a title, one line of meta and one
-   action, and the whole row opens the detail page.
-   Left: Ready to schedule, Recommendations, Home health, PreFix Protect.
-   Right: Saved this year, Upcoming visits, Your PreFix team, offers.
+   Desktop keeps the round 2 columns: a wide main column (Ready to schedule, Recommendations
+   with the Home Health Report, PreFix Protect) beside a 380px rail (Saved this year, Upcoming
+   visits, Your PreFix team, offers). Inside the main column's cards, items sit in a 2-column
+   grid of small cards: a title, one line of meta and one action; the whole card opens the detail.
    Mobile: one column in priority order. */
 
 /* ---------- Request service ---------- */
@@ -33,8 +33,8 @@ body:not(.is-cta-docked) .topbar__actions .topbar__cta { visibility: hidden; opa
 .dock { display: none; }
 
 /* ---------- Grid ---------- */
-.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-24); align-items: start; }
-.col { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s-24); align-items: start; }
+.main, .rail { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
 
 /* ---------- Card header: title, count, one link ---------- */
 .d-head { display: flex; align-items: center; gap: var(--s-8); margin-bottom: var(--s-8); }
@@ -63,6 +63,26 @@ body:not(.is-cta-docked) .topbar__actions .topbar__cta { visibility: hidden; opa
 .d-title:focus-visible { outline: none; }
 .d-row:has(.d-title:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; border-radius: 12px; }
 .d-row .btn, .d-row .link, .d-row .icon-btn { position: relative; z-index: 1; }
+
+/* ---------- Item cards: the 2-column grid inside the main column's modules ---------- */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-12); margin-top: var(--s-12); }
+.dash .tile {
+  position: relative; display: flex; flex-direction: column; gap: var(--s-12);
+  padding: var(--s-16); border: 0; border-radius: var(--r-inner); background: var(--page);
+}
+.dash .tile--pm { background: var(--blue-tint); }
+.dash .tile--critical { background: var(--red-tint); }
+.dash .tile--critical[data-state="submitted"] { background: var(--page); }
+.tile:hover { box-shadow: inset 0 0 0 1px var(--blue); }
+.tile:has(.d-title:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; }
+.tile__body { flex: 1; display: flex; flex-direction: column; gap: var(--s-12); }
+.dash .rec .rec__open.tile__body { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-12); }
+.tile__head { display: flex; align-items: flex-start; gap: var(--s-12); }
+.tile .d-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
+.tile:hover .d-title { color: var(--blue-text); }
+.tile__btn { position: relative; z-index: 1; align-self: flex-start; margin-top: auto; margin-left: 52px; }
+.d-icon--white { background: var(--surface); }
+.tile .d-sev:not(.d-sev--critical):not(.d-sev--high) { background: var(--surface); }
 .d-meta { font-size: 14px; line-height: 20px; color: var(--text-2); }
 .btn--sm { height: 36px; padding: 0 var(--s-16); }
 
@@ -91,14 +111,19 @@ body:not(.is-multi) .d-home-label, body.is-home-filtered .d-home-label { display
 
 /* ---------- Recommendations ---------- */
 .dash .rec { padding: 0; border-top: 0; }
+.dash .rec.tile { padding: var(--s-16); }
 .d-rec--critical .rec__open { margin: var(--s-4) calc(-1 * var(--s-12)); padding: var(--s-12); border-radius: var(--r-inner); background: var(--red-tint); }
 .dash .d-list > .d-rec--critical + li { border-top: 0; }
 .dash .rec__done { display: none; }
 .dash .rec[data-state="submitted"] .rec__done,
-.dash .rec[data-state="declined"] .rec__done { display: flex; align-items: center; }
+.dash .rec[data-state="declined"] .rec__done { display: flex; }
 .d-done { width: 24px; height: 24px; flex: none; color: var(--blue-text); }
 
-/* ---------- Home health ---------- */
+/* ---------- Home Health Report, at the top of Recommendations ---------- */
+.hh { margin-top: var(--s-8); padding: var(--s-12) var(--s-16) var(--s-16); border: 1px solid var(--border); border-radius: var(--r-inner); }
+.hh__head { display: flex; align-items: center; gap: var(--s-8); }
+.hh__title { display: inline-flex; align-items: center; gap: var(--s-8); font-size: 16px; line-height: 24px; font-weight: 600; }
+.hh__title .i { width: 20px; height: 20px; color: var(--blue-text); }
 .d-healths { margin-top: -1px; clip-path: inset(1px 0 0 0); }
 .d-health { padding: var(--s-12) 0 var(--s-4); border-top: 1px solid var(--border); }
 .d-health + .d-health { margin-top: var(--s-8); }
@@ -113,17 +138,15 @@ body:not(.is-multi) .d-home-label, body.is-home-filtered .d-home-label { display
 
 /* ---------- PreFix Protect ---------- */
 .d-svc { display: flex; flex-direction: column; gap: var(--s-8); margin: var(--s-8) 0 var(--s-16); }
-.d-chips { display: flex; flex-wrap: wrap; gap: var(--s-8); }
-.d-chip {
-  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 var(--s-12);
-  border: 1px solid var(--border); border-radius: var(--r-pill); background: var(--surface);
-  color: var(--ink); text-decoration: none; font-size: 14px; line-height: 20px; white-space: nowrap;
-}
-.d-chip .i { width: 16px; height: 16px; color: var(--text-2); }
-a.d-chip:hover { border-color: var(--blue); color: var(--blue-text); }
-a.d-chip:hover .i { color: var(--blue-text); }
-.d-chip--used { border-color: var(--blue-tint); background: var(--blue-tint); }
-.d-chip--used .i { color: var(--blue-text); }
+.svc2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-12); }
+.svc2 > div { padding: var(--s-12) var(--s-16); border-radius: var(--r-inner); background: var(--page); }
+.svc2__label { margin-bottom: var(--s-4); font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
+.svc2__list { display: flex; flex-direction: column; }
+.svc2__item { display: flex; align-items: center; gap: var(--s-8); padding: 6px 0; color: var(--ink); text-decoration: none; font-size: 14px; line-height: 20px; }
+.svc2__item .i { width: 18px; height: 18px; flex: none; color: var(--text-2); }
+.svc2__item--used .i { color: var(--blue-text); }
+a.svc2__item:hover { color: var(--blue-text); }
+a.svc2__item:hover .i { color: var(--blue-text); }
 
 /* ---------- Upcoming visits ---------- */
 .d-date {
@@ -159,6 +182,7 @@ a.d-chip:hover .i { color: var(--blue-text); }
 
 /* ---------- Offers ---------- */
 .d-promos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--s-24); }
+.rail .promo__media { aspect-ratio: 5 / 2; }
 
 /* ---------- Mobile ---------- */
 @container app (max-width: 767px) {
@@ -173,17 +197,23 @@ a.d-chip:hover .i { color: var(--blue-text); }
   }
   body.is-cta-docked .dock { transform: none; }
 
-  .grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-16); }
+  .layout { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
+  .tiles, .svc2 { grid-template-columns: minmax(0, 1fr); }
+  /* One item card per row: title on the left, action on the right */
+  .dash .tile, .dash .rec .rec__open.tile__body, .dash .rec .rec__done.tile__body { flex-direction: row; align-items: center; }
+  .tile__head { flex: 1; min-width: 0; align-items: center; }
+  .tile__btn { margin: 0; align-self: center; padding: 0 var(--s-12); }
+  .tile .d-icon, .tile .d-sev { display: none; }
+  .hh__title .i { display: none; }
   .d-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
-  .col { display: contents; }
+  .main, .rail { display: contents; }
   #actions { order: 1; }
   #recs { order: 2; }
   #upcoming { order: 3; }
-  #health { order: 4; }
-  #savings { order: 5; }
-  #team { order: 6; }
-  #plan { order: 7; }
-  .d-promos { order: 8; grid-template-columns: minmax(0, 1fr); gap: var(--s-16); }
+  #savings { order: 4; }
+  #team { order: 5; }
+  #plan { order: 6; }
+  .d-promos { order: 7; grid-template-columns: minmax(0, 1fr); gap: var(--s-16); }
 
 
   /* Offers become a photo-left row so they don't take a screen each */

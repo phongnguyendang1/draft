@@ -689,10 +689,10 @@ body:not(.is-promo-hvac) .when-promo-hvac, body:not(.is-promo-sibi) .when-promo-
 /* Option 1 · Action Center (round 3)
    Request service leads the page as a request bar, then docks to the top bar (desktop) or a
    bottom bar (mobile) once it scrolls away; it is the only yellow button on the page.
-   Below it, two equal columns of compact cards: rows are a title, one line of meta and one
-   action, and the whole row opens the detail page.
-   Left: Ready to schedule, Recommendations, Home health, PreFix Protect.
-   Right: Saved this year, Upcoming visits, Your PreFix team, offers.
+   Desktop keeps the round 2 columns: a wide main column (Ready to schedule, Recommendations
+   with the Home Health Report, PreFix Protect) beside a 380px rail (Saved this year, Upcoming
+   visits, Your PreFix team, offers). Inside the main column's cards, items sit in a 2-column
+   grid of small cards: a title, one line of meta and one action; the whole card opens the detail.
    Mobile: one column in priority order. */
 
 /* ---------- Request service ---------- */
@@ -721,8 +721,8 @@ body:not(.is-cta-docked) .topbar__actions .topbar__cta { visibility: hidden; opa
 .dock { display: none; }
 
 /* ---------- Grid ---------- */
-.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-24); align-items: start; }
-.col { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s-24); align-items: start; }
+.main, .rail { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
 
 /* ---------- Card header: title, count, one link ---------- */
 .d-head { display: flex; align-items: center; gap: var(--s-8); margin-bottom: var(--s-8); }
@@ -751,6 +751,26 @@ body:not(.is-cta-docked) .topbar__actions .topbar__cta { visibility: hidden; opa
 .d-title:focus-visible { outline: none; }
 .d-row:has(.d-title:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; border-radius: 12px; }
 .d-row .btn, .d-row .link, .d-row .icon-btn { position: relative; z-index: 1; }
+
+/* ---------- Item cards: the 2-column grid inside the main column's modules ---------- */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-12); margin-top: var(--s-12); }
+.dash .tile {
+  position: relative; display: flex; flex-direction: column; gap: var(--s-12);
+  padding: var(--s-16); border: 0; border-radius: var(--r-inner); background: var(--page);
+}
+.dash .tile--pm { background: var(--blue-tint); }
+.dash .tile--critical { background: var(--red-tint); }
+.dash .tile--critical[data-state="submitted"] { background: var(--page); }
+.tile:hover { box-shadow: inset 0 0 0 1px var(--blue); }
+.tile:has(.d-title:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; }
+.tile__body { flex: 1; display: flex; flex-direction: column; gap: var(--s-12); }
+.dash .rec .rec__open.tile__body { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-12); }
+.tile__head { display: flex; align-items: flex-start; gap: var(--s-12); }
+.tile .d-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
+.tile:hover .d-title { color: var(--blue-text); }
+.tile__btn { position: relative; z-index: 1; align-self: flex-start; margin-top: auto; margin-left: 52px; }
+.d-icon--white { background: var(--surface); }
+.tile .d-sev:not(.d-sev--critical):not(.d-sev--high) { background: var(--surface); }
 .d-meta { font-size: 14px; line-height: 20px; color: var(--text-2); }
 .btn--sm { height: 36px; padding: 0 var(--s-16); }
 
@@ -779,14 +799,19 @@ body:not(.is-multi) .d-home-label, body.is-home-filtered .d-home-label { display
 
 /* ---------- Recommendations ---------- */
 .dash .rec { padding: 0; border-top: 0; }
+.dash .rec.tile { padding: var(--s-16); }
 .d-rec--critical .rec__open { margin: var(--s-4) calc(-1 * var(--s-12)); padding: var(--s-12); border-radius: var(--r-inner); background: var(--red-tint); }
 .dash .d-list > .d-rec--critical + li { border-top: 0; }
 .dash .rec__done { display: none; }
 .dash .rec[data-state="submitted"] .rec__done,
-.dash .rec[data-state="declined"] .rec__done { display: flex; align-items: center; }
+.dash .rec[data-state="declined"] .rec__done { display: flex; }
 .d-done { width: 24px; height: 24px; flex: none; color: var(--blue-text); }
 
-/* ---------- Home health ---------- */
+/* ---------- Home Health Report, at the top of Recommendations ---------- */
+.hh { margin-top: var(--s-8); padding: var(--s-12) var(--s-16) var(--s-16); border: 1px solid var(--border); border-radius: var(--r-inner); }
+.hh__head { display: flex; align-items: center; gap: var(--s-8); }
+.hh__title { display: inline-flex; align-items: center; gap: var(--s-8); font-size: 16px; line-height: 24px; font-weight: 600; }
+.hh__title .i { width: 20px; height: 20px; color: var(--blue-text); }
 .d-healths { margin-top: -1px; clip-path: inset(1px 0 0 0); }
 .d-health { padding: var(--s-12) 0 var(--s-4); border-top: 1px solid var(--border); }
 .d-health + .d-health { margin-top: var(--s-8); }
@@ -801,17 +826,15 @@ body:not(.is-multi) .d-home-label, body.is-home-filtered .d-home-label { display
 
 /* ---------- PreFix Protect ---------- */
 .d-svc { display: flex; flex-direction: column; gap: var(--s-8); margin: var(--s-8) 0 var(--s-16); }
-.d-chips { display: flex; flex-wrap: wrap; gap: var(--s-8); }
-.d-chip {
-  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 var(--s-12);
-  border: 1px solid var(--border); border-radius: var(--r-pill); background: var(--surface);
-  color: var(--ink); text-decoration: none; font-size: 14px; line-height: 20px; white-space: nowrap;
-}
-.d-chip .i { width: 16px; height: 16px; color: var(--text-2); }
-a.d-chip:hover { border-color: var(--blue); color: var(--blue-text); }
-a.d-chip:hover .i { color: var(--blue-text); }
-.d-chip--used { border-color: var(--blue-tint); background: var(--blue-tint); }
-.d-chip--used .i { color: var(--blue-text); }
+.svc2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-12); }
+.svc2 > div { padding: var(--s-12) var(--s-16); border-radius: var(--r-inner); background: var(--page); }
+.svc2__label { margin-bottom: var(--s-4); font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
+.svc2__list { display: flex; flex-direction: column; }
+.svc2__item { display: flex; align-items: center; gap: var(--s-8); padding: 6px 0; color: var(--ink); text-decoration: none; font-size: 14px; line-height: 20px; }
+.svc2__item .i { width: 18px; height: 18px; flex: none; color: var(--text-2); }
+.svc2__item--used .i { color: var(--blue-text); }
+a.svc2__item:hover { color: var(--blue-text); }
+a.svc2__item:hover .i { color: var(--blue-text); }
 
 /* ---------- Upcoming visits ---------- */
 .d-date {
@@ -847,6 +870,7 @@ a.d-chip:hover .i { color: var(--blue-text); }
 
 /* ---------- Offers ---------- */
 .d-promos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--s-24); }
+.rail .promo__media { aspect-ratio: 5 / 2; }
 
 /* ---------- Mobile ---------- */
 @container app (max-width: 767px) {
@@ -861,17 +885,23 @@ a.d-chip:hover .i { color: var(--blue-text); }
   }
   body.is-cta-docked .dock { transform: none; }
 
-  .grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-16); }
+  .layout { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
+  .tiles, .svc2 { grid-template-columns: minmax(0, 1fr); }
+  /* One item card per row: title on the left, action on the right */
+  .dash .tile, .dash .rec .rec__open.tile__body, .dash .rec .rec__done.tile__body { flex-direction: row; align-items: center; }
+  .tile__head { flex: 1; min-width: 0; align-items: center; }
+  .tile__btn { margin: 0; align-self: center; padding: 0 var(--s-12); }
+  .tile .d-icon, .tile .d-sev { display: none; }
+  .hh__title .i { display: none; }
   .d-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
-  .col { display: contents; }
+  .main, .rail { display: contents; }
   #actions { order: 1; }
   #recs { order: 2; }
   #upcoming { order: 3; }
-  #health { order: 4; }
-  #savings { order: 5; }
-  #team { order: 6; }
-  #plan { order: 7; }
-  .d-promos { order: 8; grid-template-columns: minmax(0, 1fr); gap: var(--s-16); }
+  #savings { order: 4; }
+  #team { order: 5; }
+  #plan { order: 6; }
+  .d-promos { order: 7; grid-template-columns: minmax(0, 1fr); gap: var(--s-16); }
 
 
   /* Offers become a photo-left row so they don't take a screen each */
@@ -884,7 +914,7 @@ a.d-chip:hover .i { color: var(--blue-text); }
 </style>
 </head>
 <body class="frame-desktop is-welcome is-multi is-promo-hvac is-promo-sibi">
-<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="ri-add-circle-line" viewBox="0 0 24 24"><path d="M11 11V7H13V11H17V13H13V17H11V13H7V11H11ZM12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"/></symbol><symbol id="ri-add-line" viewBox="0 0 24 24"><path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z"/></symbol><symbol id="ri-alert-line" viewBox="0 0 24 24"><path d="M12.8659 3.00017L22.3922 19.5002C22.6684 19.9785 22.5045 20.5901 22.0262 20.8662C21.8742 20.954 21.7017 21.0002 21.5262 21.0002H2.47363C1.92135 21.0002 1.47363 20.5525 1.47363 20.0002C1.47363 19.8246 1.51984 19.6522 1.60761 19.5002L11.1339 3.00017C11.41 2.52187 12.0216 2.358 12.4999 2.63414C12.6519 2.72191 12.7782 2.84815 12.8659 3.00017ZM4.20568 19.0002H19.7941L11.9999 5.50017L4.20568 19.0002ZM10.9999 16.0002H12.9999V18.0002H10.9999V16.0002ZM10.9999 9.00017H12.9999V14.0002H10.9999V9.00017Z"/></symbol><symbol id="ri-arrow-down-s-line" viewBox="0 0 24 24"><path d="M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z"/></symbol><symbol id="ri-arrow-right-s-line" viewBox="0 0 24 24"><path d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z"/></symbol><symbol id="ri-arrow-right-up-line" viewBox="0 0 24 24"><path d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z"/></symbol><symbol id="ri-bank-card-line" viewBox="0 0 24 24"><path d="M3.00488 2.99979H21.0049C21.5572 2.99979 22.0049 3.4475 22.0049 3.99979V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979ZM20.0049 10.9998H4.00488V18.9998H20.0049V10.9998ZM20.0049 8.99979V4.99979H4.00488V8.99979H20.0049ZM14.0049 14.9998H18.0049V16.9998H14.0049V14.9998Z"/></symbol><symbol id="ri-check-line" viewBox="0 0 24 24"><path d="M9.9997 15.1709L19.1921 5.97852L20.6063 7.39273L9.9997 17.9993L3.63574 11.6354L5.04996 10.2212L9.9997 15.1709Z"/></symbol><symbol id="ri-checkbox-circle-fill" viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM17.4571 9.45711L11 15.9142L6.79289 11.7071L8.20711 10.2929L11 13.0858L16.0429 8.04289L17.4571 9.45711Z"/></symbol><symbol id="ri-checkbox-circle-line" viewBox="0 0 24 24"><path d="M4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12ZM12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM17.4571 9.45711L16.0429 8.04289L11 13.0858L8.20711 10.2929L6.79289 11.7071L11 15.9142L17.4571 9.45711Z"/></symbol><symbol id="ri-close-line" viewBox="0 0 24 24"><path d="M11.9997 10.5865L16.9495 5.63672L18.3637 7.05093L13.4139 12.0007L18.3637 16.9504L16.9495 18.3646L11.9997 13.4149L7.04996 18.3646L5.63574 16.9504L10.5855 12.0007L5.63574 7.05093L7.04996 5.63672L11.9997 10.5865Z"/></symbol><symbol id="ri-coupon-3-line" viewBox="0 0 24 24"><path d="M2.00488 3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979H21.0049C21.5572 2.99979 22.0049 3.4475 22.0049 3.99979V9.49979C20.6242 9.49979 19.5049 10.6191 19.5049 11.9998C19.5049 13.3805 20.6242 14.4998 22.0049 14.4998V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979ZM8.09024 18.9998C8.29615 18.4172 8.85177 17.9998 9.50488 17.9998C10.158 17.9998 10.7136 18.4172 10.9195 18.9998H20.0049V16.032C18.5232 15.2957 17.5049 13.7666 17.5049 11.9998C17.5049 10.2329 18.5232 8.7039 20.0049 7.96755V4.99979H10.9195C10.7136 5.58238 10.158 5.99979 9.50488 5.99979C8.85177 5.99979 8.29615 5.58238 8.09024 4.99979H4.00488V18.9998H8.09024ZM9.50488 10.9998C8.67646 10.9998 8.00488 10.3282 8.00488 9.49979C8.00488 8.67136 8.67646 7.99979 9.50488 7.99979C10.3333 7.99979 11.0049 8.67136 11.0049 9.49979C11.0049 10.3282 10.3333 10.9998 9.50488 10.9998ZM9.50488 15.9998C8.67646 15.9998 8.00488 15.3282 8.00488 14.4998C8.00488 13.6714 8.67646 12.9998 9.50488 12.9998C10.3333 12.9998 11.0049 13.6714 11.0049 14.4998C11.0049 15.3282 10.3333 15.9998 9.50488 15.9998Z"/></symbol><symbol id="ri-door-closed-line" viewBox="0 0 24 24"><path d="M2.99805 21V19H4.99805V4C4.99805 3.44772 5.44576 3 5.99805 3H17.998C18.5503 3 18.998 3.44772 18.998 4V19H20.998V21H2.99805ZM16.998 5H6.99805V19H16.998V5ZM14.998 11V13H12.998V11H14.998Z"/></symbol><symbol id="ri-drop-line" viewBox="0 0 24 24"><path d="M12 3.09723L7.05025 8.04697C4.31658 10.7806 4.31658 15.2128 7.05025 17.9465C9.78392 20.6801 14.2161 20.6801 16.9497 17.9465C19.6834 15.2128 19.6834 10.7806 16.9497 8.04697L12 3.09723ZM12 0.268799L18.364 6.63276C21.8787 10.1475 21.8787 15.846 18.364 19.3607C14.8492 22.8754 9.15076 22.8754 5.63604 19.3607C2.12132 15.846 2.12132 10.1475 5.63604 6.63276L12 0.268799Z"/></symbol><symbol id="ri-equalizer-line" viewBox="0 0 24 24"><path d="M6.17071 18C6.58254 16.8348 7.69378 16 9 16C10.3062 16 11.4175 16.8348 11.8293 18H22V20H11.8293C11.4175 21.1652 10.3062 22 9 22C7.69378 22 6.58254 21.1652 6.17071 20H2V18H6.17071ZM12.1707 11C12.5825 9.83481 13.6938 9 15 9C16.3062 9 17.4175 9.83481 17.8293 11H22V13H17.8293C17.4175 14.1652 16.3062 15 15 15C13.6938 15 12.5825 14.1652 12.1707 13H2V11H12.1707ZM6.17071 4C6.58254 2.83481 7.69378 2 9 2C10.3062 2 11.4175 2.83481 11.8293 4H22V6H11.8293C11.4175 7.16519 10.3062 8 9 8C7.69378 8 6.58254 7.16519 6.17071 6H2V4H6.17071ZM9 6C9.55228 6 10 5.55228 10 5C10 4.44772 9.55228 4 9 4C8.44772 4 8 4.44772 8 5C8 5.55228 8.44772 6 9 6ZM15 13C15.5523 13 16 12.5523 16 12C16 11.4477 15.5523 11 15 11C14.4477 11 14 11.4477 14 12C14 12.5523 14.4477 13 15 13ZM9 20C9.55228 20 10 19.5523 10 19C10 18.4477 9.55228 18 9 18C8.44772 18 8 18.4477 8 19C8 19.5523 8.44772 20 9 20Z"/></symbol><symbol id="ri-error-warning-fill" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 15V17H13V15H11ZM11 7V13H13V7H11Z"/></symbol><symbol id="ri-fridge-line" viewBox="0 0 24 24"><path d="M18.998 1C19.5503 1 19.998 1.44772 19.998 2V22C19.998 22.5523 19.5503 23 18.998 23H4.99805C4.44576 23 3.99805 22.5523 3.99805 22V2C3.99805 1.44772 4.44576 1 4.99805 1H18.998ZM17.998 12H5.99805V21H17.998V12ZM9.99805 14V18H7.99805V14H9.99805ZM17.998 3H5.99805V10H17.998V3ZM9.99805 5V8H7.99805V5H9.99805Z"/></symbol><symbol id="ri-gift-line" viewBox="0 0 24 24"><path d="M15.0049 2.00281C17.214 2.00281 19.0049 3.79367 19.0049 6.00281C19.0049 6.73184 18.8098 7.41532 18.4691 8.00392L23.0049 8.00281V10.0028H21.0049V20.0028C21.0049 20.5551 20.5572 21.0028 20.0049 21.0028H4.00488C3.4526 21.0028 3.00488 20.5551 3.00488 20.0028V10.0028H1.00488V8.00281L5.54065 8.00392C5.19992 7.41532 5.00488 6.73184 5.00488 6.00281C5.00488 3.79367 6.79574 2.00281 9.00488 2.00281C10.2001 2.00281 11.2729 2.52702 12.0058 3.35807C12.7369 2.52702 13.8097 2.00281 15.0049 2.00281ZM11.0049 10.0028H5.00488V19.0028H11.0049V10.0028ZM19.0049 10.0028H13.0049V19.0028H19.0049V10.0028ZM9.00488 4.00281C7.90031 4.00281 7.00488 4.89824 7.00488 6.00281C7.00488 7.05717 7.82076 7.92097 8.85562 7.99732L9.00488 8.00281H11.0049V6.00281C11.0049 5.00116 10.2686 4.1715 9.30766 4.02558L9.15415 4.00829L9.00488 4.00281ZM15.0049 4.00281C13.9505 4.00281 13.0867 4.81869 13.0104 5.85355L13.0049 6.00281V8.00281H15.0049C16.0592 8.00281 16.923 7.18693 16.9994 6.15207L17.0049 6.00281C17.0049 4.89824 16.1095 4.00281 15.0049 4.00281Z"/></symbol><symbol id="ri-hammer-line" viewBox="0 0 24 24"><path d="M20 2C20.5523 2 21 2.44772 21 3V8C21 8.55228 20.5523 9 20 9H15V22C15 22.5523 14.5523 23 14 23H10C9.44772 23 9 22.5523 9 22V9H3.5C2.94772 9 2.5 8.55228 2.5 8V5.61803C2.5 5.23926 2.714 4.893 3.05279 4.72361L8.5 2H20ZM15 4H8.97214L4.5 6.23607V7H11V21H13V7H15V4ZM19 4H17V7H19V4Z"/></symbol><symbol id="ri-home-4-fill" viewBox="0 0 24 24"><path d="M20 20C20 20.5523 19.5523 21 19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20ZM11 13V19H13V13H11Z"/></symbol><symbol id="ri-home-4-line" viewBox="0 0 24 24"><path d="M19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20C20 20.5523 19.5523 21 19 21ZM13 19H18V9.15745L12 3.7029L6 9.15745V19H11V13H13V19Z"/></symbol><symbol id="ri-information-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z"/></symbol><symbol id="ri-logout-box-r-line" viewBox="0 0 24 24"><path d="M5 22C4.44772 22 4 21.5523 4 21V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V6H18V4H6V20H18V18H20V21C20 21.5523 19.5523 22 19 22H5ZM18 16V13H11V11H18V8L23 12L18 16Z"/></symbol><symbol id="ri-menu-line" viewBox="0 0 24 24"><path d="M3 4H21V6H3V4ZM3 11H21V13H3V11ZM3 18H21V20H3V18Z"/></symbol><symbol id="ri-message-3-line" viewBox="0 0 24 24"><path d="M2 8.99374C2 5.68349 4.67654 3 8.00066 3H15.9993C19.3134 3 22 5.69478 22 8.99374V21H8.00066C4.68659 21 2 18.3052 2 15.0063V8.99374ZM20 19V8.99374C20 6.79539 18.2049 5 15.9993 5H8.00066C5.78458 5 4 6.78458 4 8.99374V15.0063C4 17.2046 5.79512 19 8.00066 19H20ZM14 11H16V13H14V11ZM8 11H10V13H8V11Z"/></symbol><symbol id="ri-question-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM13 13.3551V14H11V12.5C11 11.9477 11.4477 11.5 12 11.5C12.8284 11.5 13.5 10.8284 13.5 10C13.5 9.17157 12.8284 8.5 12 8.5C11.2723 8.5 10.6656 9.01823 10.5288 9.70577L8.56731 9.31346C8.88637 7.70919 10.302 6.5 12 6.5C13.933 6.5 15.5 8.067 15.5 10C15.5 11.5855 14.4457 12.9248 13 13.3551Z"/></symbol><symbol id="ri-sparkling-line" viewBox="0 0 24 24"><path d="M14 4.4375C15.3462 4.4375 16.4375 3.34619 16.4375 2H17.5625C17.5625 3.34619 18.6538 4.4375 20 4.4375V5.5625C18.6538 5.5625 17.5625 6.65381 17.5625 8H16.4375C16.4375 6.65381 15.3462 5.5625 14 5.5625V4.4375ZM1 11C4.31371 11 7 8.31371 7 5H9C9 8.31371 11.6863 11 15 11V13C11.6863 13 9 15.6863 9 19H7C7 15.6863 4.31371 13 1 13V11ZM4.87601 12C6.18717 12.7276 7.27243 13.8128 8 15.124 8.72757 13.8128 9.81283 12.7276 11.124 12 9.81283 11.2724 8.72757 10.1872 8 8.87601 7.27243 10.1872 6.18717 11.2724 4.87601 12ZM17.25 14C17.25 15.7949 15.7949 17.25 14 17.25V18.75C15.7949 18.75 17.25 20.2051 17.25 22H18.75C18.75 20.2051 20.2051 18.75 22 18.75V17.25C20.2051 17.25 18.75 15.7949 18.75 14H17.25Z"/></symbol><symbol id="ri-temp-cold-line" viewBox="0 0 24 24"><path d="M8 5C8 2.79086 9.79086 1 12 1C14.2091 1 16 2.79086 16 5V10.2547C17.8135 11.5196 19 13.6213 19 16C19 19.866 15.866 23 12 23C8.13401 23 5 19.866 5 16C5 13.6213 6.18652 11.5196 8 10.2547V5ZM9.1442 11.8951C7.80943 12.8261 7 14.3432 7 16C7 18.7614 9.23858 21 12 21C14.7614 21 17 18.7614 17 16C17 14.3432 16.1906 12.8261 14.8558 11.8951L14 11.2981V5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5V11.2981L9.1442 11.8951ZM8 16H16C16 18.2091 14.2091 20 12 20C9.79086 20 8 18.2091 8 16Z"/></symbol><symbol id="ri-tools-line" viewBox="0 0 24 24"><path d="M5.32943 3.27158C6.56252 2.8332 7.9923 3.10749 8.97927 4.09446C10.1002 5.21537 10.3019 6.90741 9.5843 8.23385L20.293 18.9437L18.8788 20.3579L8.16982 9.64875C6.84325 10.3669 5.15069 10.1654 4.02952 9.04421C3.04227 8.05696 2.7681 6.62665 3.20701 5.39332L5.44373 7.63C6.02952 8.21578 6.97927 8.21578 7.56505 7.63C8.15084 7.04421 8.15084 6.09446 7.56505 5.50868L5.32943 3.27158ZM15.6968 5.15512L18.8788 3.38736L20.293 4.80157L18.5252 7.98355L16.7574 8.3371L14.6361 10.4584L13.2219 9.04421L15.3432 6.92289L15.6968 5.15512ZM8.97927 13.2868L10.3935 14.7011L5.09018 20.0044C4.69966 20.3949 4.06649 20.3949 3.67597 20.0044C3.31334 19.6417 3.28744 19.0699 3.59826 18.6774L3.67597 18.5902L8.97927 13.2868Z"/></symbol><symbol id="ri-user-line" viewBox="0 0 24 24"><path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z"/></symbol></svg>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="ri-add-circle-line" viewBox="0 0 24 24"><path d="M11 11V7H13V11H17V13H13V17H11V13H7V11H11ZM12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20Z"/></symbol><symbol id="ri-add-line" viewBox="0 0 24 24"><path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z"/></symbol><symbol id="ri-alert-line" viewBox="0 0 24 24"><path d="M12.8659 3.00017L22.3922 19.5002C22.6684 19.9785 22.5045 20.5901 22.0262 20.8662C21.8742 20.954 21.7017 21.0002 21.5262 21.0002H2.47363C1.92135 21.0002 1.47363 20.5525 1.47363 20.0002C1.47363 19.8246 1.51984 19.6522 1.60761 19.5002L11.1339 3.00017C11.41 2.52187 12.0216 2.358 12.4999 2.63414C12.6519 2.72191 12.7782 2.84815 12.8659 3.00017ZM4.20568 19.0002H19.7941L11.9999 5.50017L4.20568 19.0002ZM10.9999 16.0002H12.9999V18.0002H10.9999V16.0002ZM10.9999 9.00017H12.9999V14.0002H10.9999V9.00017Z"/></symbol><symbol id="ri-arrow-down-s-line" viewBox="0 0 24 24"><path d="M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z"/></symbol><symbol id="ri-arrow-right-s-line" viewBox="0 0 24 24"><path d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z"/></symbol><symbol id="ri-arrow-right-up-line" viewBox="0 0 24 24"><path d="M16.0037 9.41421L7.39712 18.0208L5.98291 16.6066L14.5895 8H7.00373V6H18.0037V17H16.0037V9.41421Z"/></symbol><symbol id="ri-bank-card-line" viewBox="0 0 24 24"><path d="M3.00488 2.99979H21.0049C21.5572 2.99979 22.0049 3.4475 22.0049 3.99979V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979ZM20.0049 10.9998H4.00488V18.9998H20.0049V10.9998ZM20.0049 8.99979V4.99979H4.00488V8.99979H20.0049ZM14.0049 14.9998H18.0049V16.9998H14.0049V14.9998Z"/></symbol><symbol id="ri-check-line" viewBox="0 0 24 24"><path d="M9.9997 15.1709L19.1921 5.97852L20.6063 7.39273L9.9997 17.9993L3.63574 11.6354L5.04996 10.2212L9.9997 15.1709Z"/></symbol><symbol id="ri-checkbox-circle-fill" viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM17.4571 9.45711L11 15.9142L6.79289 11.7071L8.20711 10.2929L11 13.0858L16.0429 8.04289L17.4571 9.45711Z"/></symbol><symbol id="ri-checkbox-circle-line" viewBox="0 0 24 24"><path d="M4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12ZM12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM17.4571 9.45711L16.0429 8.04289L11 13.0858L8.20711 10.2929L6.79289 11.7071L11 15.9142L17.4571 9.45711Z"/></symbol><symbol id="ri-close-line" viewBox="0 0 24 24"><path d="M11.9997 10.5865L16.9495 5.63672L18.3637 7.05093L13.4139 12.0007L18.3637 16.9504L16.9495 18.3646L11.9997 13.4149L7.04996 18.3646L5.63574 16.9504L10.5855 12.0007L5.63574 7.05093L7.04996 5.63672L11.9997 10.5865Z"/></symbol><symbol id="ri-coupon-3-line" viewBox="0 0 24 24"><path d="M2.00488 3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979H21.0049C21.5572 2.99979 22.0049 3.4475 22.0049 3.99979V9.49979C20.6242 9.49979 19.5049 10.6191 19.5049 11.9998C19.5049 13.3805 20.6242 14.4998 22.0049 14.4998V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979ZM8.09024 18.9998C8.29615 18.4172 8.85177 17.9998 9.50488 17.9998C10.158 17.9998 10.7136 18.4172 10.9195 18.9998H20.0049V16.032C18.5232 15.2957 17.5049 13.7666 17.5049 11.9998C17.5049 10.2329 18.5232 8.7039 20.0049 7.96755V4.99979H10.9195C10.7136 5.58238 10.158 5.99979 9.50488 5.99979C8.85177 5.99979 8.29615 5.58238 8.09024 4.99979H4.00488V18.9998H8.09024ZM9.50488 10.9998C8.67646 10.9998 8.00488 10.3282 8.00488 9.49979C8.00488 8.67136 8.67646 7.99979 9.50488 7.99979C10.3333 7.99979 11.0049 8.67136 11.0049 9.49979C11.0049 10.3282 10.3333 10.9998 9.50488 10.9998ZM9.50488 15.9998C8.67646 15.9998 8.00488 15.3282 8.00488 14.4998C8.00488 13.6714 8.67646 12.9998 9.50488 12.9998C10.3333 12.9998 11.0049 13.6714 11.0049 14.4998C11.0049 15.3282 10.3333 15.9998 9.50488 15.9998Z"/></symbol><symbol id="ri-door-closed-line" viewBox="0 0 24 24"><path d="M2.99805 21V19H4.99805V4C4.99805 3.44772 5.44576 3 5.99805 3H17.998C18.5503 3 18.998 3.44772 18.998 4V19H20.998V21H2.99805ZM16.998 5H6.99805V19H16.998V5ZM14.998 11V13H12.998V11H14.998Z"/></symbol><symbol id="ri-drop-line" viewBox="0 0 24 24"><path d="M12 3.09723L7.05025 8.04697C4.31658 10.7806 4.31658 15.2128 7.05025 17.9465C9.78392 20.6801 14.2161 20.6801 16.9497 17.9465C19.6834 15.2128 19.6834 10.7806 16.9497 8.04697L12 3.09723ZM12 0.268799L18.364 6.63276C21.8787 10.1475 21.8787 15.846 18.364 19.3607C14.8492 22.8754 9.15076 22.8754 5.63604 19.3607C2.12132 15.846 2.12132 10.1475 5.63604 6.63276L12 0.268799Z"/></symbol><symbol id="ri-equalizer-line" viewBox="0 0 24 24"><path d="M6.17071 18C6.58254 16.8348 7.69378 16 9 16C10.3062 16 11.4175 16.8348 11.8293 18H22V20H11.8293C11.4175 21.1652 10.3062 22 9 22C7.69378 22 6.58254 21.1652 6.17071 20H2V18H6.17071ZM12.1707 11C12.5825 9.83481 13.6938 9 15 9C16.3062 9 17.4175 9.83481 17.8293 11H22V13H17.8293C17.4175 14.1652 16.3062 15 15 15C13.6938 15 12.5825 14.1652 12.1707 13H2V11H12.1707ZM6.17071 4C6.58254 2.83481 7.69378 2 9 2C10.3062 2 11.4175 2.83481 11.8293 4H22V6H11.8293C11.4175 7.16519 10.3062 8 9 8C7.69378 8 6.58254 7.16519 6.17071 6H2V4H6.17071ZM9 6C9.55228 6 10 5.55228 10 5C10 4.44772 9.55228 4 9 4C8.44772 4 8 4.44772 8 5C8 5.55228 8.44772 6 9 6ZM15 13C15.5523 13 16 12.5523 16 12C16 11.4477 15.5523 11 15 11C14.4477 11 14 11.4477 14 12C14 12.5523 14.4477 13 15 13ZM9 20C9.55228 20 10 19.5523 10 19C10 18.4477 9.55228 18 9 18C8.44772 18 8 18.4477 8 19C8 19.5523 8.44772 20 9 20Z"/></symbol><symbol id="ri-error-warning-fill" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 15V17H13V15H11ZM11 7V13H13V7H11Z"/></symbol><symbol id="ri-fridge-line" viewBox="0 0 24 24"><path d="M18.998 1C19.5503 1 19.998 1.44772 19.998 2V22C19.998 22.5523 19.5503 23 18.998 23H4.99805C4.44576 23 3.99805 22.5523 3.99805 22V2C3.99805 1.44772 4.44576 1 4.99805 1H18.998ZM17.998 12H5.99805V21H17.998V12ZM9.99805 14V18H7.99805V14H9.99805ZM17.998 3H5.99805V10H17.998V3ZM9.99805 5V8H7.99805V5H9.99805Z"/></symbol><symbol id="ri-gift-line" viewBox="0 0 24 24"><path d="M15.0049 2.00281C17.214 2.00281 19.0049 3.79367 19.0049 6.00281C19.0049 6.73184 18.8098 7.41532 18.4691 8.00392L23.0049 8.00281V10.0028H21.0049V20.0028C21.0049 20.5551 20.5572 21.0028 20.0049 21.0028H4.00488C3.4526 21.0028 3.00488 20.5551 3.00488 20.0028V10.0028H1.00488V8.00281L5.54065 8.00392C5.19992 7.41532 5.00488 6.73184 5.00488 6.00281C5.00488 3.79367 6.79574 2.00281 9.00488 2.00281C10.2001 2.00281 11.2729 2.52702 12.0058 3.35807C12.7369 2.52702 13.8097 2.00281 15.0049 2.00281ZM11.0049 10.0028H5.00488V19.0028H11.0049V10.0028ZM19.0049 10.0028H13.0049V19.0028H19.0049V10.0028ZM9.00488 4.00281C7.90031 4.00281 7.00488 4.89824 7.00488 6.00281C7.00488 7.05717 7.82076 7.92097 8.85562 7.99732L9.00488 8.00281H11.0049V6.00281C11.0049 5.00116 10.2686 4.1715 9.30766 4.02558L9.15415 4.00829L9.00488 4.00281ZM15.0049 4.00281C13.9505 4.00281 13.0867 4.81869 13.0104 5.85355L13.0049 6.00281V8.00281H15.0049C16.0592 8.00281 16.923 7.18693 16.9994 6.15207L17.0049 6.00281C17.0049 4.89824 16.1095 4.00281 15.0049 4.00281Z"/></symbol><symbol id="ri-hammer-line" viewBox="0 0 24 24"><path d="M20 2C20.5523 2 21 2.44772 21 3V8C21 8.55228 20.5523 9 20 9H15V22C15 22.5523 14.5523 23 14 23H10C9.44772 23 9 22.5523 9 22V9H3.5C2.94772 9 2.5 8.55228 2.5 8V5.61803C2.5 5.23926 2.714 4.893 3.05279 4.72361L8.5 2H20ZM15 4H8.97214L4.5 6.23607V7H11V21H13V7H15V4ZM19 4H17V7H19V4Z"/></symbol><symbol id="ri-heart-pulse-line" viewBox="0 0 24 24"><path d="M16.5 3C19.5376 3 22 5.5 22 9C22 16 14.5 20 12 21.5C10.0226 20.3135 4.91699 17.563 2.86894 13.001L1 13V11L2.21045 11.0009C2.07425 10.3633 2 9.69651 2 9C2 5.5 4.5 3 7.5 3C9.35997 3 11 4 12 5C13 4 14.64 3 16.5 3ZM16.5 5C15.4241 5 14.2593 5.56911 13.4142 6.41421L12 7.82843L10.5858 6.41421C9.74068 5.56911 8.5759 5 7.5 5C5.55906 5 4 6.6565 4 9C4 9.68542 4.09035 10.3516 4.26658 11.0004L6.43381 11L8.5 7.55635L11.5 12.5563L12.4338 11H17V13H13.5662L11.5 16.4437L8.5 11.4437L7.56619 13L5.10789 13.0006C5.89727 14.3737 7.09304 15.6681 8.64514 16.9029C9.39001 17.4955 10.1845 18.0485 11.0661 18.6038C11.3646 18.7919 11.6611 18.9729 12 19.1752C12.3389 18.9729 12.6354 18.7919 12.9339 18.6038C13.8155 18.0485 14.61 17.4955 15.3549 16.9029C18.3337 14.533 20 11.9435 20 9C20 6.64076 18.463 5 16.5 5Z"/></symbol><symbol id="ri-home-4-fill" viewBox="0 0 24 24"><path d="M20 20C20 20.5523 19.5523 21 19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20ZM11 13V19H13V13H11Z"/></symbol><symbol id="ri-home-4-line" viewBox="0 0 24 24"><path d="M19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20C20 20.5523 19.5523 21 19 21ZM13 19H18V9.15745L12 3.7029L6 9.15745V19H11V13H13V19Z"/></symbol><symbol id="ri-information-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z"/></symbol><symbol id="ri-logout-box-r-line" viewBox="0 0 24 24"><path d="M5 22C4.44772 22 4 21.5523 4 21V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V6H18V4H6V20H18V18H20V21C20 21.5523 19.5523 22 19 22H5ZM18 16V13H11V11H18V8L23 12L18 16Z"/></symbol><symbol id="ri-menu-line" viewBox="0 0 24 24"><path d="M3 4H21V6H3V4ZM3 11H21V13H3V11ZM3 18H21V20H3V18Z"/></symbol><symbol id="ri-message-3-line" viewBox="0 0 24 24"><path d="M2 8.99374C2 5.68349 4.67654 3 8.00066 3H15.9993C19.3134 3 22 5.69478 22 8.99374V21H8.00066C4.68659 21 2 18.3052 2 15.0063V8.99374ZM20 19V8.99374C20 6.79539 18.2049 5 15.9993 5H8.00066C5.78458 5 4 6.78458 4 8.99374V15.0063C4 17.2046 5.79512 19 8.00066 19H20ZM14 11H16V13H14V11ZM8 11H10V13H8V11Z"/></symbol><symbol id="ri-question-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM13 13.3551V14H11V12.5C11 11.9477 11.4477 11.5 12 11.5C12.8284 11.5 13.5 10.8284 13.5 10C13.5 9.17157 12.8284 8.5 12 8.5C11.2723 8.5 10.6656 9.01823 10.5288 9.70577L8.56731 9.31346C8.88637 7.70919 10.302 6.5 12 6.5C13.933 6.5 15.5 8.067 15.5 10C15.5 11.5855 14.4457 12.9248 13 13.3551Z"/></symbol><symbol id="ri-sparkling-line" viewBox="0 0 24 24"><path d="M14 4.4375C15.3462 4.4375 16.4375 3.34619 16.4375 2H17.5625C17.5625 3.34619 18.6538 4.4375 20 4.4375V5.5625C18.6538 5.5625 17.5625 6.65381 17.5625 8H16.4375C16.4375 6.65381 15.3462 5.5625 14 5.5625V4.4375ZM1 11C4.31371 11 7 8.31371 7 5H9C9 8.31371 11.6863 11 15 11V13C11.6863 13 9 15.6863 9 19H7C7 15.6863 4.31371 13 1 13V11ZM4.87601 12C6.18717 12.7276 7.27243 13.8128 8 15.124 8.72757 13.8128 9.81283 12.7276 11.124 12 9.81283 11.2724 8.72757 10.1872 8 8.87601 7.27243 10.1872 6.18717 11.2724 4.87601 12ZM17.25 14C17.25 15.7949 15.7949 17.25 14 17.25V18.75C15.7949 18.75 17.25 20.2051 17.25 22H18.75C18.75 20.2051 20.2051 18.75 22 18.75V17.25C20.2051 17.25 18.75 15.7949 18.75 14H17.25Z"/></symbol><symbol id="ri-temp-cold-line" viewBox="0 0 24 24"><path d="M8 5C8 2.79086 9.79086 1 12 1C14.2091 1 16 2.79086 16 5V10.2547C17.8135 11.5196 19 13.6213 19 16C19 19.866 15.866 23 12 23C8.13401 23 5 19.866 5 16C5 13.6213 6.18652 11.5196 8 10.2547V5ZM9.1442 11.8951C7.80943 12.8261 7 14.3432 7 16C7 18.7614 9.23858 21 12 21C14.7614 21 17 18.7614 17 16C17 14.3432 16.1906 12.8261 14.8558 11.8951L14 11.2981V5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5V11.2981L9.1442 11.8951ZM8 16H16C16 18.2091 14.2091 20 12 20C9.79086 20 8 18.2091 8 16Z"/></symbol><symbol id="ri-tools-line" viewBox="0 0 24 24"><path d="M5.32943 3.27158C6.56252 2.8332 7.9923 3.10749 8.97927 4.09446C10.1002 5.21537 10.3019 6.90741 9.5843 8.23385L20.293 18.9437L18.8788 20.3579L8.16982 9.64875C6.84325 10.3669 5.15069 10.1654 4.02952 9.04421C3.04227 8.05696 2.7681 6.62665 3.20701 5.39332L5.44373 7.63C6.02952 8.21578 6.97927 8.21578 7.56505 7.63C8.15084 7.04421 8.15084 6.09446 7.56505 5.50868L5.32943 3.27158ZM15.6968 5.15512L18.8788 3.38736L20.293 4.80157L18.5252 7.98355L16.7574 8.3371L14.6361 10.4584L13.2219 9.04421L15.3432 6.92289L15.6968 5.15512ZM8.97927 13.2868L10.3935 14.7011L5.09018 20.0044C4.69966 20.3949 4.06649 20.3949 3.67597 20.0044C3.31334 19.6417 3.28744 19.0699 3.59826 18.6774L3.67597 18.5902L8.97927 13.2868Z"/></symbol><symbol id="ri-user-line" viewBox="0 0 24 24"><path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z"/></symbol></svg>
 
 <div class="app">
 
@@ -1016,155 +1046,179 @@ a.d-chip:hover .i { color: var(--blue-text); }
       </div>
     </div>
 
-    <div class="grid">
-      <div class="col">
+    <div class="layout">
+      <div class="main">
 
-        <!-- Ready to schedule -->
+        <!-- Ready to schedule: items as a 2-column grid of small cards -->
         <section class="card d-card" id="actions" aria-labelledby="actions-title">
           <div class="d-head">
             <h2 class="t-title" id="actions-title">Ready to schedule</h2>
             <span class="count when-actions" data-count-visible=".d-ready > li">4</span>
           </div>
-          <ul class="d-list d-ready when-actions">
-            <li class="d-row" data-home="mueller">
-              <span class="d-icon d-icon--tint"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
-              <div class="d-main">
-                <a class="d-title" href="#">Fall preventive maintenance</a>
-                <p class="d-meta"><span class="t-blue">Included</span><span class="d-home"> &middot; Mueller</span></p>
+          <ul class="tiles d-ready when-actions">
+            <li class="tile tile--pm" data-home="mueller">
+              <div class="tile__head">
+                <span class="d-icon d-icon--white"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="d-main">
+                  <a class="d-title" href="#">Fall preventive maintenance</a>
+                  <p class="d-meta"><span class="t-blue">Included</span><span class="d-home"> &middot; Mueller</span></p>
+                </div>
               </div>
-              <a class="btn btn--secondary btn--sm" href="#">Schedule</a>
+              <a class="btn btn--secondary btn--sm tile__btn" href="#">Schedule</a>
             </li>
-            <li class="d-row" data-home="elm">
-              <span class="d-icon d-icon--tint"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
-              <div class="d-main">
-                <a class="d-title" href="#">Fall preventive maintenance</a>
-                <p class="d-meta"><span class="t-blue">Included</span><span class="d-home"> &middot; Elm Ridge</span></p>
+            <li class="tile tile--pm" data-home="elm">
+              <div class="tile__head">
+                <span class="d-icon d-icon--white"><svg class="i"><use href="#ri-door-closed-line"/></svg></span>
+                <div class="d-main">
+                  <a class="d-title" href="#">Fall preventive maintenance</a>
+                  <p class="d-meta"><span class="t-blue">Included</span><span class="d-home"> &middot; Elm Ridge</span></p>
+                </div>
               </div>
-              <a class="btn btn--secondary btn--sm" href="#">Schedule</a>
+              <a class="btn btn--secondary btn--sm tile__btn" href="#">Schedule</a>
             </li>
-            <li class="d-row" data-home="mueller">
-              <span class="d-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></span>
-              <div class="d-main">
-                <a class="d-title" href="#">Kitchen faucet and disposal</a>
-                <p class="d-meta">Service visit<span class="d-home"> &middot; Mueller</span></p>
+            <li class="tile" data-home="mueller">
+              <div class="tile__head">
+                <span class="d-icon d-icon--white"><svg class="i"><use href="#ri-hammer-line"/></svg></span>
+                <div class="d-main">
+                  <a class="d-title" href="#">Kitchen faucet and disposal</a>
+                  <p class="d-meta">Service visit<span class="d-home"> &middot; Mueller</span></p>
+                </div>
               </div>
-              <a class="btn btn--secondary btn--sm" href="#">Schedule</a>
+              <a class="btn btn--secondary btn--sm tile__btn" href="#">Schedule</a>
             </li>
-            <li class="d-row" data-home="mueller">
-              <span class="d-icon"><svg class="i"><use href="#ri-drop-line"/></svg></span>
-              <div class="d-main">
-                <a class="d-title" href="#">HVAC condensate line flush</a>
-                <p class="d-meta">Service visit<span class="d-home"> &middot; Mueller</span></p>
+            <li class="tile" data-home="mueller">
+              <div class="tile__head">
+                <span class="d-icon d-icon--white"><svg class="i"><use href="#ri-drop-line"/></svg></span>
+                <div class="d-main">
+                  <a class="d-title" href="#">HVAC condensate line flush</a>
+                  <p class="d-meta">Service visit<span class="d-home"> &middot; Mueller</span></p>
+                </div>
               </div>
-              <a class="btn btn--secondary btn--sm" href="#">Schedule</a>
+              <a class="btn btn--secondary btn--sm tile__btn" href="#">Schedule</a>
             </li>
           </ul>
           <p class="d-empty when-caught-up"><svg class="i"><use href="#ri-checkbox-circle-line"/></svg>You&rsquo;re all caught up.</p>
         </section>
 
-        <!-- Recommendations: severity, title, one action. Details on the Recommendations page. -->
+        <!-- Recommendations: the Home Health Report summary, then items as a 2-column grid -->
         <section class="card d-card" id="recs" aria-labelledby="recs-title">
           <div class="d-head">
             <h2 class="t-title" id="recs-title">Recommendations</h2>
             <span class="count count--red" data-rec-open-count>4</span>
             <a class="d-head__link" href="#">See all<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></a>
           </div>
-          <ul class="d-list">
-            <li class="rec d-rec d-rec--critical" data-priority="critical" data-state="open" data-title="Water heater relief valve" data-home="mueller">
-              <div class="rec__open d-row">
-                <span class="d-sev d-sev--critical" title="Critical"><svg class="i"><use href="#ri-error-warning-fill"/></svg></span>
-                <div class="d-main">
-                  <a class="d-title" href="#">Water heater valve leaking</a>
-                  <p class="d-meta"><span class="t-red">Critical</span><span class="d-home"> &middot; Mueller</span></p>
+
+          <div class="hh">
+            <div class="hh__head">
+              <p class="hh__title"><svg class="i"><use href="#ri-heart-pulse-line"/></svg>Home Health Report</p>
+              <a class="d-head__link" href="#">Open report<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></a>
+            </div>
+            <div class="d-healths">
+              <div class="d-health" data-home="mueller">
+                <div class="d-health__row">
+                  <p class="d-health__home d-home-label">4817 Mueller Blvd</p>
+                  <div class="d-stats">
+                    <p class="d-stat"><span class="d-stat__n t-red">1</span><span class="d-stat__l">Critical</span></p>
+                    <p class="d-stat"><span class="d-stat__n">3</span><span class="d-stat__l">Concern</span></p>
+                    <p class="d-stat"><span class="d-stat__n d-stat__n--blue">26</span><span class="d-stat__l">No concern</span></p>
+                  </div>
                 </div>
-                <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
+                <div class="hbar" aria-hidden="true"><span class="hbar__red" style="width:3.33%"></span><span class="hbar__ink" style="width:10%"></span><span class="hbar__blue"></span></div>
               </div>
-              <div class="rec__done d-row">
-                <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
-                <p class="d-main d-meta t-ink" data-rec-note></p>
-                <button class="link" data-rec-undo>Undo</button>
+              <div class="d-health" data-home="elm">
+                <div class="d-health__row">
+                  <p class="d-health__home d-home-label">1206 Elm Ridge Dr</p>
+                  <div class="d-stats">
+                    <p class="d-stat"><span class="d-stat__n d-stat__n--blue">30</span><span class="d-stat__l">No concern</span></p>
+                  </div>
+                </div>
+                <div class="hbar" aria-hidden="true"><span class="hbar__blue"></span></div>
+              </div>
+            </div>
+          </div>
+
+          <ul class="tiles">
+            <li class="rec tile tile--critical" data-priority="critical" data-state="open" data-title="Water heater relief valve" data-home="mueller">
+              <div class="rec__open tile__body">
+                <div class="tile__head">
+                  <span class="d-sev d-sev--critical"><svg class="i"><use href="#ri-error-warning-fill"/></svg></span>
+                  <div class="d-main">
+                    <a class="d-title" href="#">Water heater valve leaking</a>
+                    <p class="d-meta"><span class="t-red">Critical</span><span class="d-home"> &middot; Mueller</span></p>
+                  </div>
+                </div>
+                <button class="btn btn--secondary btn--sm tile__btn" data-rec-submit>Send</button>
+              </div>
+              <div class="rec__done tile__body">
+                <div class="tile__head">
+                  <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
+                  <p class="d-main d-meta t-ink" data-rec-note></p>
+                </div>
+                <button class="link tile__btn" data-rec-undo>Undo</button>
               </div>
             </li>
-            <li class="rec d-rec" data-priority="high" data-state="open" data-title="Dryer vent cleaning" data-home="mueller">
-              <div class="rec__open d-row">
-                <span class="d-sev d-sev--high" title="High"><svg class="i"><use href="#ri-alert-line"/></svg></span>
-                <div class="d-main">
-                  <a class="d-title" href="#">Dryer vent blocked with lint</a>
-                  <p class="d-meta">High<span class="d-home"> &middot; Mueller</span></p>
+            <li class="rec tile" data-priority="high" data-state="open" data-title="Dryer vent cleaning" data-home="mueller">
+              <div class="rec__open tile__body">
+                <div class="tile__head">
+                  <span class="d-sev d-sev--high"><svg class="i"><use href="#ri-alert-line"/></svg></span>
+                  <div class="d-main">
+                    <a class="d-title" href="#">Dryer vent blocked with lint</a>
+                    <p class="d-meta">High<span class="d-home"> &middot; Mueller</span></p>
+                  </div>
                 </div>
-                <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
+                <button class="btn btn--secondary btn--sm tile__btn" data-rec-submit>Send</button>
               </div>
-              <div class="rec__done d-row">
-                <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
-                <p class="d-main d-meta t-ink" data-rec-note></p>
-                <button class="link" data-rec-undo>Undo</button>
+              <div class="rec__done tile__body">
+                <div class="tile__head">
+                  <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
+                  <p class="d-main d-meta t-ink" data-rec-note></p>
+                </div>
+                <button class="link tile__btn" data-rec-undo>Undo</button>
               </div>
             </li>
-            <li class="rec d-rec" data-priority="high" data-state="open" data-title="Upstairs AC short cycling" data-home="mueller">
-              <div class="rec__open d-row">
-                <span class="d-sev d-sev--high" title="High"><svg class="i"><use href="#ri-alert-line"/></svg></span>
-                <div class="d-main">
-                  <a class="d-title" href="#">Upstairs AC short cycling</a>
-                  <p class="d-meta">High<span class="d-home"> &middot; Mueller</span></p>
+            <li class="rec tile" data-priority="high" data-state="open" data-title="Upstairs AC short cycling" data-home="mueller">
+              <div class="rec__open tile__body">
+                <div class="tile__head">
+                  <span class="d-sev d-sev--high"><svg class="i"><use href="#ri-alert-line"/></svg></span>
+                  <div class="d-main">
+                    <a class="d-title" href="#">Upstairs AC short cycling</a>
+                    <p class="d-meta">High<span class="d-home"> &middot; Mueller</span></p>
+                  </div>
                 </div>
-                <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
+                <button class="btn btn--secondary btn--sm tile__btn" data-rec-submit>Send</button>
               </div>
-              <div class="rec__done d-row">
-                <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
-                <p class="d-main d-meta t-ink" data-rec-note></p>
-                <button class="link" data-rec-undo>Undo</button>
+              <div class="rec__done tile__body">
+                <div class="tile__head">
+                  <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
+                  <p class="d-main d-meta t-ink" data-rec-note></p>
+                </div>
+                <button class="link tile__btn" data-rec-undo>Undo</button>
               </div>
             </li>
-            <li class="rec d-rec" data-priority="normal" data-state="open" data-title="Kitchen window caulk" data-home="mueller">
-              <div class="rec__open d-row">
-                <span class="d-sev" title="Normal"><svg class="i"><use href="#ri-information-line"/></svg></span>
-                <div class="d-main">
-                  <a class="d-title" href="#">Kitchen window caulk cracked</a>
-                  <p class="d-meta">Normal<span class="d-home"> &middot; Mueller</span></p>
+            <li class="rec tile" data-priority="normal" data-state="open" data-title="Kitchen window caulk" data-home="mueller">
+              <div class="rec__open tile__body">
+                <div class="tile__head">
+                  <span class="d-sev"><svg class="i"><use href="#ri-information-line"/></svg></span>
+                  <div class="d-main">
+                    <a class="d-title" href="#">Kitchen window caulk cracked</a>
+                    <p class="d-meta">Normal<span class="d-home"> &middot; Mueller</span></p>
+                  </div>
                 </div>
-                <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
+                <button class="btn btn--secondary btn--sm tile__btn" data-rec-submit>Send</button>
               </div>
-              <div class="rec__done d-row">
-                <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
-                <p class="d-main d-meta t-ink" data-rec-note></p>
-                <button class="link" data-rec-undo>Undo</button>
+              <div class="rec__done tile__body">
+                <div class="tile__head">
+                  <svg class="i d-done"><use href="#ri-checkbox-circle-fill"/></svg>
+                  <p class="d-main d-meta t-ink" data-rec-note></p>
+                </div>
+                <button class="link tile__btn" data-rec-undo>Undo</button>
               </div>
             </li>
           </ul>
           <p class="d-empty" data-home="elm"><svg class="i"><use href="#ri-checkbox-circle-line"/></svg>No open recommendations at Elm Ridge.</p>
         </section>
 
-        <!-- Home Health Report: counts and bar from the latest visit -->
-        <section class="card d-card" id="health" aria-labelledby="health-title">
-          <div class="d-head">
-            <h2 class="t-title" id="health-title">Home health</h2>
-            <a class="d-head__link" href="#">Open report<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></a>
-          </div>
-          <div class="d-healths">
-          <div class="d-health" data-home="mueller">
-            <div class="d-health__row">
-              <p class="d-health__home d-home-label">4817 Mueller Blvd</p>
-              <div class="d-stats">
-                <p class="d-stat"><span class="d-stat__n t-red">1</span><span class="d-stat__l">Critical</span></p>
-                <p class="d-stat"><span class="d-stat__n">3</span><span class="d-stat__l">Concern</span></p>
-                <p class="d-stat"><span class="d-stat__n d-stat__n--blue">26</span><span class="d-stat__l">No concern</span></p>
-              </div>
-            </div>
-            <div class="hbar" aria-hidden="true"><span class="hbar__red" style="width:3.33%"></span><span class="hbar__ink" style="width:10%"></span><span class="hbar__blue"></span></div>
-          </div>
-          <div class="d-health d-health--ok" data-home="elm">
-            <div class="d-health__row">
-              <p class="d-health__home d-home-label">1206 Elm Ridge Dr</p>
-              <div class="d-stats">
-                <p class="d-stat"><span class="d-stat__n d-stat__n--blue">30</span><span class="d-stat__l">No concern</span></p>
-              </div>
-            </div>
-            <div class="hbar" aria-hidden="true"><span class="hbar__blue"></span></div>
-          </div>
-          </div>
-        </section>
-
-        <!-- PreFix Protect: services used and still available -->
+        <!-- PreFix Protect: services used and not used yet, side by side -->
         <section class="card d-card" id="plan" aria-labelledby="plan-title">
           <div class="d-head">
             <h2 class="t-title" id="plan-title">PreFix Protect</h2>
@@ -1174,22 +1228,32 @@ a.d-chip:hover .i { color: var(--blue-text); }
             <p class="t-strong">4 of 10 services used</p>
             <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="4" aria-label="Services used"><div class="progress__bar" style="width:40%"></div></div>
           </div>
-          <ul class="d-chips" aria-label="Services">
-            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Maintenance visits</li>
-            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Repairs</li>
-            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Contractor jobs</li>
-            <li class="d-chip d-chip--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Carpentry</li>
-            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Painting</a></li>
-            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Specialty HVAC</a></li>
-            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Garage doors</a></li>
-            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Insulation</a></li>
-            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Duct check</a></li>
-            <li><a class="d-chip" href="#"><svg class="i"><use href="#ri-add-line"/></svg>Irrigation</a></li>
-          </ul>
+          <div class="svc2">
+            <div>
+              <p class="svc2__label">Used</p>
+              <ul class="svc2__list">
+                <li class="svc2__item svc2__item--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Preventive maintenance</li>
+                <li class="svc2__item svc2__item--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Home Manager repairs</li>
+                <li class="svc2__item svc2__item--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Contractor management</li>
+                <li class="svc2__item svc2__item--used"><svg class="i"><use href="#ri-checkbox-circle-fill"/></svg>Specialty carpentry</li>
+              </ul>
+            </div>
+            <div>
+              <p class="svc2__label">Not used yet</p>
+              <ul class="svc2__list">
+                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Specialty painting and drywall</a></li>
+                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Specialty HVAC</a></li>
+                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Garage doors</a></li>
+                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Attic insulation</a></li>
+                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Duct assessment</a></li>
+                <li><a class="svc2__item" href="#"><svg class="i"><use href="#ri-add-circle-line"/></svg>Irrigation</a></li>
+              </ul>
+            </div>
+          </div>
         </section>
       </div>
 
-      <div class="col">
+      <aside class="rail" aria-label="Savings, visits, team and offers">
 
         <!-- Savings: the number, then credits and referral on one line -->
         <section class="card d-card" id="savings" aria-labelledby="savings-title">
@@ -1262,31 +1326,31 @@ a.d-chip:hover .i { color: var(--blue-text); }
             <li class="d-row" data-home="mueller">
               <span class="pro" aria-hidden="true">MR<span class="pro__badge"><svg class="i"><use href="#ri-home-4-fill"/></svg></span></span>
               <div class="d-main">
-                <p class="d-role">Home Manager<span class="d-home d-home--tag">Mueller</span></p>
-                <p class="d-meta">Marcus Reyes &middot; repairs and visits</p>
+                <p class="d-role">Home Manager</p>
+                <p class="d-meta">Marcus Reyes<span class="d-home"> &middot; Mueller</span></p>
               </div>
               <a class="icon-btn d-msg" href="#" aria-label="Message Marcus Reyes, your Home Manager"><svg class="i"><use href="#ri-message-3-line"/></svg></a>
             </li>
             <li class="d-row" data-home="mueller">
               <span class="pro" aria-hidden="true">PS<span class="pro__badge"><svg class="i"><use href="#ri-home-4-fill"/></svg></span></span>
               <div class="d-main">
-                <p class="d-role">Maintenance technician<span class="d-home d-home--tag">Mueller</span></p>
-                <p class="d-meta">Priya Shah &middot; spring and fall checks</p>
+                <p class="d-role">Maintenance technician</p>
+                <p class="d-meta">Priya Shah<span class="d-home"> &middot; Mueller</span></p>
               </div>
               <a class="icon-btn d-msg" href="#" aria-label="Message Priya Shah, your maintenance technician"><svg class="i"><use href="#ri-message-3-line"/></svg></a>
             </li>
             <li class="d-row" data-home="elm">
               <span class="pro" aria-hidden="true">TA<span class="pro__badge"><svg class="i"><use href="#ri-home-4-fill"/></svg></span></span>
               <div class="d-main">
-                <p class="d-role">Home Manager<span class="d-home d-home--tag">Elm Ridge</span></p>
-                <p class="d-meta">Tom Alvarez &middot; repairs and visits</p>
+                <p class="d-role">Home Manager</p>
+                <p class="d-meta">Tom Alvarez<span class="d-home"> &middot; Elm Ridge</span></p>
               </div>
               <a class="icon-btn d-msg" href="#" aria-label="Message Tom Alvarez, your Home Manager"><svg class="i"><use href="#ri-message-3-line"/></svg></a>
             </li>
           </ul>
         </section>
 
-        <!-- Offers: two small photo tiles, each dismissible -->
+        <!-- Offers: photo tiles, each dismissible -->
         <div class="d-promos">
           <!-- Promo: Specialty HVAC. Dismissing hides it for this visit. -->
           <section class="card promo when-promo-hvac" id="promo-hvac" aria-labelledby="promo-hvac-title">
@@ -1315,7 +1379,7 @@ a.d-chip:hover .i { color: var(--blue-text); }
             </div>
           </section>
         </div>
-      </div>
+      </aside>
     </div>
   </main>
 

@@ -34,12 +34,10 @@ Leadership found the dashboard too busy. Option 1 is rebuilt as compact cards; O
 
 - **Request service leads the page.** A "What needs fixing?" bar with a yellow Request service button sits under the page title. It is the only yellow button on the page (Schedule and Send are outlined). When the bar scrolls away, the button docks: in the sticky top bar on desktop, in a bottom bar on mobile. The docked button brings the bar back into view.
 - **Your PreFix team is its own card**, with the role first ("Home Manager", "Maintenance technician"), the name second, a PreFix badge on each avatar and a Message button. It no longer sits inside savings, where the names read like people on the account.
-- **Two equal columns of compact cards.** Each row is a title, one line of meta and one action; the whole row opens the detail page. Descriptions, durations, booking notes and plan prices are gone from the dashboard and stay on their own pages.
-  - Left: Ready to schedule, Recommendations, Home health, PreFix Protect.
-  - Right: Saved this year (credits and referral on one line), Upcoming visits, Your PreFix team, the two offers as small photo tiles.
+- **Same columns as round 2, with items as small cards.** The wide left column (Ready to schedule, Recommendations, PreFix Protect) and the 380px right rail (Saved this year, Upcoming visits, Your PreFix team, the two offers) stay where they were. Inside the left column's cards, the items sit in a 2-column grid of small cards: a title, one line of meta and one action, and the whole card opens the detail page. Descriptions, durations, booking notes and plan prices are gone from the dashboard and stay on their own pages. On mobile each item card is one row.
 - **Recommendations show Send only.** Decline (with a reason) moves to the Recommendations page, so each row has one action.
-- **Home health** is one line per home: the counts and the bar.
-- **PreFix Protect** shows services used and not used as short chips; the unused ones link to booking.
+- **The Home Health Report** stays at the top of Recommendations, one line per home: the counts and the bar.
+- **PreFix Protect** shows services used and not used yet side by side; the unused ones link to booking.
 
 ## Not applied
 
