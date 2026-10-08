@@ -18,6 +18,10 @@
 .skip:focus { top: var(--s-12); }
 
 /* ---------- Page frame ---------- */
+.app { display: flex; flex-direction: column; min-height: 100vh; }
+.app > .page { flex: 1 0 auto; width: 100%; }
+.app > .footer { margin-top: auto; }
+.sum__list--plain li span:last-child { color: var(--ink); text-align: right; }
 .topbar__actions { margin-left: auto; }
 .page { padding-top: var(--s-32); }
 .back { margin-bottom: var(--s-24); }
@@ -46,7 +50,7 @@ h1[tabindex="-1"]:focus { outline: none; }
 .message--alert .btn { flex: none; }
 
 /* ---------- Request type cards ---------- */
-.types { display: flex; flex-direction: column; gap: var(--s-12); }
+.types { display: flex; flex-direction: column; gap: var(--s-16); }
 .type {
   display: flex; align-items: flex-start; gap: var(--s-16); width: 100%; padding: var(--s-20);
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card);
@@ -79,7 +83,7 @@ legend { padding: 0; }
 .textarea {
   width: 100%; min-height: 128px; padding: var(--s-12) var(--s-16); margin-top: var(--s-12);
   border: 1px solid var(--slate); border-radius: var(--r-inner); background: var(--surface); color: var(--ink);
-  font: inherit; font-size: 16px; line-height: 24px; letter-spacing: var(--track); resize: vertical;
+  font: inherit; font-size: 16px; line-height: 24px; letter-spacing: var(--track); resize: none;
   transition: border-color .15s ease;
 }
 .textarea::placeholder { color: var(--text-2); opacity: 1; }
@@ -102,6 +106,9 @@ legend { padding: 0; }
   transition: background-color .15s ease, box-shadow .15s ease;
 }
 .opt:hover { box-shadow: inset 0 0 0 1px var(--blue); }
+.opt:hover .opt__title, .type:hover .type__title { color: var(--blue-text); }
+.opt:has(input:checked):hover .opt__title { color: var(--ink); }
+#jobs .opt:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .opt:has(input:checked) { background: var(--blue-tint); box-shadow: inset 0 0 0 2px var(--blue); }
 .opt:has(input:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; }
 .opt input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
@@ -126,8 +133,8 @@ legend { padding: 0; }
 
 /* Duration tiles: stacked, centred, with a tick so selection is not colour alone */
 .opt--dur { flex-direction: column; justify-content: center; align-items: center; gap: 0; text-align: center; min-height: 80px; }
-.opt--dur .opt__tick { position: absolute; top: var(--s-8); right: var(--s-8); width: 16px; height: 16px; color: var(--blue-text); opacity: 0; }
-.opt--dur:has(input:checked) .opt__tick { opacity: 1; }
+.opt--dur .opt__tick { display: none; width: 16px; height: 16px; margin: 0 4px -3px 0; color: var(--blue-text); }
+.opt--dur:has(input:checked) .opt__tick { display: inline-block; }
 
 /* Inline note (the message pattern, compact): outcome hints are blue, never red */
 .note {
@@ -197,7 +204,7 @@ legend { padding: 0; }
 .sum__list { display: flex; flex-direction: column; gap: var(--s-8); margin: 0; }
 .sum__list li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-12); font-size: 14px; line-height: 20px; }
 .sum__list li span:last-child { flex: none; color: var(--text-2); font-variant-numeric: tabular-nums; }
-.sum__text { margin: var(--s-8) 0 0; padding: var(--s-8) var(--s-12); border-radius: 12px; background: var(--page); font-size: 14px; line-height: 20px; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.sum__text { font-weight: 400; margin: var(--s-8) 0 0; padding: var(--s-8) var(--s-12); border-radius: 12px; background: var(--page); font-size: 14px; line-height: 20px; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 #summary .ledger { margin-top: var(--s-16); padding-top: var(--s-8); border-top: 1px solid var(--border); }
 #summary .ledger[hidden] { display: none; }
 .sum__home { display: flex; align-items: flex-start; gap: var(--s-8); }
@@ -219,6 +226,7 @@ legend { padding: 0; }
 .next .d-icon { width: 32px; height: 32px; border-radius: 50%; font-size: 14px; line-height: 20px; font-weight: 600; background: var(--blue-tint); color: var(--blue-text); }
 
 /* Home Manager card (rail on the booked screen): the sample's team row */
+.hm .d-msg { width: 44px; height: 44px; }
 .hm { margin: var(--s-8) 0 0; }
 .hm__row { display: flex; align-items: center; gap: var(--s-12); min-height: 64px; padding: var(--s-12) 0; }
 .hm__main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -276,7 +284,10 @@ legend { padding: 0; }
   .opts--3 .opt { padding: var(--s-12) var(--s-8); }
 
   .book { grid-template-columns: minmax(0, 1fr); gap: var(--s-24); }
-  .cal__day { width: 40px; height: 40px; }
+  .cal__day { width: min(44px, 100%); border-radius: 22px; }
+  .back .link, .result__actions .link { min-height: 44px; }
+  .opts--stack { grid-template-columns: minmax(0, 1fr); }
+  .fdock .btn { height: 48px; }
 
   .factions { display: none; }
   .fdock {

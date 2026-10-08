@@ -104,7 +104,7 @@
           <div class="message message--alert" role="note">
             <span class="message__icon"><svg class="i"><use href="#ri-error-warning-fill"/></svg></span>
             <p class="message__text"><strong>Gas smell, gas leak or burning smell?</strong> Please call 911.</p>
-            <a class="btn btn--secondary btn--sm" href="tel:911"><svg class="i"><use href="#ri-phone-line"/></svg>Call 911</a>
+            <a class="btn btn--secondary" href="tel:911"><svg class="i"><use href="#ri-phone-line"/></svg>Call 911</a>
           </div>
 
           <ul class="types" aria-label="Request types">
@@ -123,7 +123,7 @@
                 <span class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-timer-flash-line"/></svg></span>
                 <span class="type__body">
                   <span class="type__title">Fast Fix <span class="badge badge--blue">New</span></span>
-                  <span class="type__desc">Small handyman jobs of 1 to 3 hours. You have the parts and want to book a time now.</span>
+                  <span class="type__desc">Handyman services for small jobs of 1 to 3 hours. You have the parts and want to book a time now.</span>
                 </span>
                 <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
               </a>
@@ -133,7 +133,7 @@
                 <span class="tile-icon"><svg class="i"><use href="#ri-tools-line"/></svg></span>
                 <span class="type__body">
                   <span class="type__title">Service request</span>
-                  <span class="type__desc">Bigger repairs and projects. Choose this for more involved work, several tasks, anything that may need troubleshooting or materials, or if you are not sure.</span>
+                  <span class="type__desc">Bigger repairs and projects. Choose this for anything more involved, or if you are not sure.</span>
                 </span>
                 <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
               </a>
@@ -155,30 +155,31 @@
         <section class="card" data-screen-id="job" aria-label="The job" hidden>
           <div class="fsec">
             <fieldset id="fs-jobs" aria-describedby="jobs-hint err-jobs">
-              <legend class="t-strong">Pick everything that applies <span class="req">(required)</span></legend>
+              <legend class="t-strong">Pick everything that applies</legend>
               <p class="t-meta" id="jobs-hint">Choose as many as you need. Times are estimates.</p>
               <div class="opts" id="jobs"></div>
-              <p class="error" id="err-jobs" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Pick at least one job.</span></p>
+              <p class="error" id="err-jobs" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Pick a job, or describe it below.</span></p>
+              <div class="note" id="note-over" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> Your jobs add up to about <span id="over-time"></span>, so we will send this to our team as a service request. You will not need to enter anything else.</span></div>
             </fieldset>
           </div>
 
           <div class="fsec">
             <div class="field" id="field-desc">
-              <label class="t-strong" for="desc">Tell us what you need done <span class="req">(required)</span></label>
+              <label class="t-strong" for="desc">Tell us what you need done</label>
               <p class="t-meta" id="desc-hint">Include what needs to be repaired or installed and how many items.</p>
               <textarea class="textarea" id="desc" rows="4" aria-describedby="desc-hint err-desc" placeholder="Example: Install 2 curtain rods and mount 1 TV."></textarea>
               <p class="error" id="err-desc" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Tell us a little about what you need done.</span></p>
             </div>
           </div>
 
-          <div class="fsec">
+          <div class="fsec" id="fsec-hours">
             <fieldset id="fs-hours" aria-describedby="hours-hint err-hours">
-              <legend class="t-strong">How long should we book? <span class="req">(required)</span></legend>
+              <legend class="t-strong">How long should we book?</legend>
               <p class="t-meta" id="hours-hint">Billed at $55 per hour. Your Home Manager will do what fits in the time you book.</p>
               <div class="opts opts--3" id="hours">
-                <label class="opt opt--dur"><input type="radio" name="hours" value="1"><span class="opt__title">1 hour</span><span class="opt__meta">$55</span><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg></label>
-                <label class="opt opt--dur"><input type="radio" name="hours" value="2"><span class="opt__title">2 hours</span><span class="opt__meta">$110</span><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg></label>
-                <label class="opt opt--dur"><input type="radio" name="hours" value="3"><span class="opt__title">3 hours</span><span class="opt__meta">$165</span><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg></label>
+                <label class="opt opt--dur"><input type="radio" name="hours" value="1"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>1 hour</span><span class="opt__meta">$55</span></label>
+                <label class="opt opt--dur"><input type="radio" name="hours" value="2"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>2 hours</span><span class="opt__meta">$110</span></label>
+                <label class="opt opt--dur"><input type="radio" name="hours" value="3"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>3 hours</span><span class="opt__meta">$165</span></label>
               </div>
               <p class="error" id="err-hours" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose how long to book.</span></p>
               <div class="note" id="note-hours" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span id="note-hours-text"></span></div>
@@ -195,27 +196,28 @@
         <section class="card" data-screen-id="check" aria-label="Quick check" hidden>
           <div class="fsec">
             <fieldset id="fs-parts" aria-describedby="parts-hint err-parts">
-              <legend class="t-strong">Do you already have all the parts or materials needed for the work? <span class="req">(required)</span></legend>
+              <legend class="t-strong">Do you already have all the parts or materials needed for the work?</legend>
               <p class="t-meta" id="parts-hint">Think of things like a new faucet, lock set or TV mount.</p>
-              <div class="opts" id="parts">
+              <div class="opts opts--3 opts--stack" id="parts">
                 <label class="opt"><input type="radio" name="parts" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__main"><span class="opt__title">Yes</span><span class="opt__meta">I have everything</span></span></label>
-                <label class="opt"><input type="radio" name="parts" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__main"><span class="opt__title">No or not sure</span><span class="opt__meta">I may need parts</span></span></label>
+                <label class="opt"><input type="radio" name="parts" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__main"><span class="opt__title">No</span><span class="opt__meta">I need to get parts</span></span></label>
+                <label class="opt"><input type="radio" name="parts" value="unsure"><span class="opt__radio" aria-hidden="true"></span><span class="opt__main"><span class="opt__title">Not sure</span><span class="opt__meta">I need to check</span></span></label>
               </div>
-              <p class="error" id="err-parts" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes, or no or not sure.</span></p>
+              <p class="error" id="err-parts" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes, no or not sure.</span></p>
               <div class="note" id="note-parts" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>No problem.</strong> We will send this to our team as a service request so they can plan the parts. You will not need to enter anything again.</span></div>
             </fieldset>
           </div>
 
           <div class="fsec">
             <fieldset id="fs-more" aria-describedby="more-hint err-more">
-              <legend class="t-strong">Is there anything that could make the job more involved? <span class="req">(required)</span></legend>
+              <legend class="t-strong">Is there anything that could make the job more involved?</legend>
               <p class="t-meta" id="more-hint">Select any that apply.</p>
               <div class="opts opts--1" id="more">
-                <label class="opt"><input type="checkbox" name="more" value="trade"><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="opt__title">Electrical or plumbing work</span></label>
-                <label class="opt"><input type="checkbox" name="more" value="height"><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="opt__title">Work above about 10 feet</span></label>
-                <label class="opt"><input type="checkbox" name="more" value="multi"><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="opt__title">Multiple rooms or several separate tasks</span></label>
-                <label class="opt"><input type="checkbox" name="more" value="diagnose"><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="opt__title">The repair may need diagnosing first</span></label>
-                <label class="opt"><input type="checkbox" name="more" value="none"><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span><span class="opt__title">None of these</span></label>
+                <label class="opt"><input type="checkbox" name="more" value="trade"><span class="opt__title">New electrical wiring or plumbing lines</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
+                <label class="opt"><input type="checkbox" name="more" value="height"><span class="opt__title">Work above about 10 feet</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
+                <label class="opt"><input type="checkbox" name="more" value="multi"><span class="opt__title">Work in more than one room</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
+                <label class="opt"><input type="checkbox" name="more" value="diagnose"><span class="opt__title">The repair may need diagnosing first</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
+                <label class="opt"><input type="checkbox" name="more" value="none"><span class="opt__title">None of these</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
               </div>
               <p class="error" id="err-more" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Select what applies, or None of these.</span></p>
               <div class="note" id="note-more" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> Jobs like this need a little more planning, so we will send it to our team as a service request. You will not need to enter anything again.</span></div>
@@ -230,6 +232,7 @@
 
         <!-- ============ 3. Pick a time ============ -->
         <section class="card" data-screen-id="time" aria-label="Pick a time" hidden>
+          <div class="message message--alert" id="err-time" role="alert" hidden><span class="message__icon"><svg class="i"><use href="#ri-error-warning-fill"/></svg></span><p class="message__text"><strong id="err-time-lead"></strong> <span id="err-time-text"></span></p></div>
           <div class="book" id="book">
             <div>
               <h2 class="t-strong" id="cal-title">Select the date</h2>
@@ -250,14 +253,9 @@
             </div>
           </div>
 
-          <div class="empty-state" id="noslots" hidden>
-            <div class="empty-state__row"><svg class="i"><use href="#ri-calendar-event-line"/></svg>
-              <div><p class="t-strong">No open times right now</p><p class="t-meta">We could not find an open time for this visit. Send it to our team and they will find you one. Everything you entered comes with it.</p></div>
-            </div>
-          </div>
+          <div class="note" id="noslots" role="status" hidden><svg class="i"><use href="#ri-calendar-event-line"/></svg><span><strong>No open times right now.</strong> Send this to our team and they will find you a time. Everything you entered comes with it.</span></div>
 
-          <p class="error" id="err-time" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span id="err-time-text">Pick a date and a time.</span></p>
-          <div class="note" role="note"><svg class="i"><use href="#ri-information-line"/></svg><span>Your Home Manager will do what fits in the time you book. Anything left over can be scheduled for another visit.</span></div>
+                    <div class="note" id="note-fits" role="note"><svg class="i"><use href="#ri-information-line"/></svg><span>Your Home Manager will do what fits in the time you book. Anything left over can be scheduled for another visit.</span></div>
 
           <div class="factions">
             <span class="factions__status" id="status-time" aria-live="polite"></span>
@@ -270,13 +268,11 @@
           <div class="d-head"><h2 class="t-title">Your visit</h2></div>
           <ul class="result__rows">
             <li class="result__row"><span class="d-icon"><svg class="i"><use href="#ri-calendar-event-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-date"></p><p class="d-meta" id="b-time"></p></div></li>
-            <li class="result__row"><span class="d-icon"><svg class="i"><use href="#ri-user-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-hm"></p><p class="d-meta">Your Home Manager</p></div></li>
             <li class="result__row"><span class="d-icon"><svg class="i"><use href="#ri-home-4-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-addr"></p><p class="d-meta" id="b-city"></p></div></li>
             <li class="result__row"><span class="d-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-jobs"></p><p class="d-meta" id="b-len"></p></div></li>
           </ul>
-          <div class="note"><svg class="i"><use href="#ri-information-line"/></svg><span>Your Home Manager will do what fits in the time you booked. Anything left over can be scheduled for another visit.</span></div>
           <div class="result__actions">
-            <a class="btn btn--secondary" href="#" data-handoff="Dashboard">Back to dashboard</a>
+            <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>
             <a class="link" href="#" data-toast="Added to your calendar">Add to calendar</a>
             <a class="link" href="#" data-toast="Opens Appointments">Reschedule or cancel</a>
           </div>
@@ -291,7 +287,7 @@
           </ol>
           <div class="note" role="note"><svg class="i"><use href="#ri-information-line"/></svg><span id="sent-why"></span></div>
           <div class="result__actions">
-            <a class="btn btn--secondary" href="#" data-handoff="Dashboard">Back to dashboard</a>
+            <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>
           </div>
         </section>
       </div>
@@ -302,12 +298,13 @@
           <dl class="sum">
             <div class="sum__row"><dt class="sum__label" id="s-home-label">Home</dt><dd class="sum__val sum__home"><svg class="i"><use href="#ri-home-4-line"/></svg><span><span id="s-addr">4817 Mueller Blvd</span><span class="sum__sub" id="s-city">Austin, TX 78723</span></span></dd></div>
             <div class="sum__row" id="s-jobs-row" hidden><dt class="sum__label">Jobs</dt><dd class="sum__val"><ul class="sum__list" id="s-jobs"></ul><p class="sum__text" id="s-text" hidden></p></dd></div>
+            <div class="sum__row" id="s-answers-row" hidden><dt class="sum__label">Your answers</dt><dd class="sum__val"><ul class="sum__list sum__list--plain" id="s-answers"></ul></dd></div>
             <div class="sum__row" id="s-when-row" hidden><dt class="sum__label">When</dt><dd class="sum__val"><span id="s-when"></span><span class="sum__sub" id="s-hm"></span></dd></div>
           </dl>
           <dl class="ledger" id="s-ledger" hidden>
             <div class="ledger__row"><dt>Time</dt><dd class="t-num" id="l-time"></dd></div>
             <div class="ledger__row"><dt>Rate</dt><dd class="t-num">$55 per hour</dd></div>
-            <div class="ledger__row ledger__row--total"><dt>Total</dt><dd class="t-num" id="l-total"></dd></div>
+            <div class="ledger__row ledger__row--total"><dt>Estimated total</dt><dd class="t-num" id="l-total"></dd></div>
           </dl>
         </section>
 
