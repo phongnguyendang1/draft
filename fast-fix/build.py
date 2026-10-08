@@ -36,7 +36,7 @@ def read(name):
 def used_icons():
     names = set()
     for n in ("body.html", "app.js", "flow.css"):
-        names |= set(re.findall(r"ri-([a-z0-9]+(?:-[a-z0-9]+)*)", read(n)))
+        names |= set(re.findall(r"""(?:#|["'])ri-([a-z0-9]+(?:-[a-z0-9]+)*)""", read(n)))
     return sorted(names)
 
 
@@ -61,7 +61,7 @@ def refresh_icons(icon_dir):
 
 def build():
     font = read("font-face.css")
-    css = "\n".join([font, read("base.css"), read("chrome.css"), read("flow.css")])
+    css = "\n".join([font, read("base.css"), read("chrome.css"), read("shared.css"), read("flow.css")])
     sprite = read("sprite.svg")
     body = read("body.html").replace("{{SPRITE}}", sprite)
     js = read("app.js")

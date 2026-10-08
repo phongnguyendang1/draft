@@ -1,0 +1,88 @@
+/* VERBATIM component rules reused from desktop_4.html (line ranges noted). Do not edit; override in flow.css. */
+/* --- verbatim desktop_4.html L345-354: page, intro, home switcher, menu labels --- */
+/* Intro and home switcher */
+.page { max-width: var(--container); margin: 0 auto; padding: var(--s-40) 0 var(--s-48); }
+.intro { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s-24); margin-bottom: var(--s-32); }
+.intro__text { display: flex; flex-direction: column; gap: var(--s-4); }
+.switcher { display: inline-flex; align-items: center; gap: var(--s-8); height: 44px; padding: 0 var(--s-16); border: 1px solid var(--border); border-radius: var(--r-pill); background: var(--surface); cursor: pointer; color: var(--ink); font-size: 14px; line-height: 20px; font-weight: 600; }
+.switcher:hover { border-color: var(--blue); }
+.switcher__label { white-space: nowrap; }
+.menu--homes { min-width: 344px; }
+.menu__label { padding: var(--s-8) var(--s-12) var(--s-4); font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
+.menu__sub { display: block; }
+
+/* --- verbatim desktop_4.html L436-441: ledger (key/value rows with ink total rule) --- */
+.ledger { margin: 0; }
+.ledger__row { display: flex; justify-content: space-between; gap: var(--s-16); padding: var(--s-8) 0; font-size: 14px; line-height: 20px; }
+.ledger__row dt { color: var(--text-2); }
+.ledger__row dd { margin: 0; font-weight: 600; }
+.ledger__row--total { margin-top: var(--s-4); padding-top: var(--s-12); border-top: 2px solid var(--ink); font-size: 16px; line-height: 24px; }
+.ledger__row--total dt { color: var(--ink); font-weight: 600; }
+
+/* --- verbatim desktop_4.html L484-486: footer --- */
+.footer { background: var(--surface); border-top: 1px solid var(--border); }
+.footer__inner { max-width: var(--container); margin: 0 auto; padding: var(--s-24) 0; display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); }
+.footer__links { display: flex; gap: var(--s-20); }
+
+/* --- verbatim desktop_4.html L560-565: message (slim tinted banner) --- */
+.message { display: flex; align-items: center; gap: var(--s-12); margin-bottom: var(--s-24); padding: var(--s-12) var(--s-12) var(--s-12) var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); }
+.message__icon { display: grid; color: var(--blue-text); }
+.message__text { flex: 1; font-size: 14px; line-height: 20px; }
+.message__text strong { font-weight: 600; }
+.message__action { flex: none; }
+.message__close { width: 32px; height: 32px; }
+
+/* --- verbatim desktop_4.html L701-701: sticky top bar --- */
+.topbar { position: sticky; top: 0; }
+
+/* --- verbatim desktop_4.html L711-715: dock (hidden on desktop), layout grid, main/rail columns --- */
+.dock { display: none; }
+
+/* ---------- Grid ---------- */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s-24); align-items: start; }
+.main, .rail { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
+
+/* --- verbatim desktop_4.html L717-727: card header: title, count, one link --- */
+/* ---------- Card header: title, count, one link ---------- */
+.d-head { display: flex; align-items: center; gap: var(--s-8); margin-bottom: var(--s-8); }
+.d-head__link {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 2px; flex: none; white-space: nowrap;
+  padding: 0; border: 0; background: none; cursor: pointer; text-decoration: none;
+  color: var(--slate); font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: 0;
+}
+.d-head__link:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.d-head__link .i { width: 20px; height: 20px; }
+.d-head__link .i--turn { width: 16px; height: 16px; margin-left: 2px; transition: transform .15s ease; }
+.d-head__link[aria-expanded="true"] .i--turn { transform: rotate(45deg); }
+
+/* --- verbatim desktop_4.html L764-777: meta text, small button, icon tiles, severity tiles, chevron --- */
+.d-meta { font-size: 14px; line-height: 20px; color: var(--text-2); }
+.d-risk { margin: 2px 0; font-size: 14px; line-height: 20px; color: var(--ink); }
+.btn--sm { height: 36px; padding: 0 var(--s-16); }
+
+.d-icon, .d-sev {
+  width: 40px; height: 40px; flex: none; display: grid; place-items: center;
+  border-radius: 12px; background: var(--page); color: var(--ink);
+}
+.d-icon .i, .d-sev .i { width: 20px; height: 20px; }
+.d-icon--tint { background: var(--blue-tint); color: var(--blue-text); }
+.d-sev { color: var(--text-2); }
+.d-sev--critical { background: var(--red); color: #fff; }
+.d-sev--high { background: var(--surface); color: var(--red); box-shadow: inset 0 0 0 1px var(--red); }
+.d-chev { width: 20px; height: 20px; flex: none; color: var(--text-2); }
+
+/* --- verbatim desktop_4.html L858-870: PreFix pro avatar, role, message button --- */
+.pro {
+  position: relative; width: 40px; height: 40px; flex: none; display: grid; place-items: center;
+  border-radius: 50%; background: var(--ink); color: #fff; font-size: 14px; line-height: 20px; font-weight: 600;
+}
+.pro__badge {
+  position: absolute; right: -6px; bottom: -4px; width: 18px; height: 18px; display: grid; place-items: center;
+  border: 2px solid var(--surface); border-radius: 50%; background: var(--blue); color: #fff;
+}
+.pro__badge .i { width: 10px; height: 10px; }
+.d-role { font-size: 16px; line-height: 24px; font-weight: 600; }
+.d-role .d-home--tag { margin-left: var(--s-8); vertical-align: 2px; }
+.d-msg { width: 40px; height: 40px; }
+.d-msg .i { width: 20px; height: 20px; }
+
