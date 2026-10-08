@@ -16,8 +16,9 @@ Request type (How can we help?)
  |- Fast Fix ............. 1 The job -> 2 Quick check -> 3 Pick a time -> Booked
  |                              |              |                |
  |                              |              |                '- no open times --.
- |                              |              '- parts: no / not sure -----------+
- |                              |              '- anything that makes it involved -+--> Sent to our team
+ |                              |              '- step ladder: No / Not sure ------+
+ |                              |              '- gas, wiring, water lines: Yes / Not sure --+--> Sent to our team
+ |                              |              '- part or fixture: Need one -------+
  |                              '- jobs add up to more than 3 hours ----------------'     (auto-submitted
  |- Service request ...... existing flow                                                   service request)
  '- Account ............. existing flow
@@ -31,20 +32,21 @@ Step 4 in the diagram (Home Manager completion, taxonomy, follow-on) is Home Man
 |---|---|---|
 | **Request type** | Chooses Emergency, Fast Fix, Service request or Account. | 911 notice for gas smell, gas leak or burning smell sits above the cards (from Mark's sketch). Fast Fix card is the tinted, recommended one; Service request copy says to choose it for anything bigger "or if you are not sure". Members with 2 homes get the home switcher from the dashboard. |
 | **1 The job** | Picks every job that applies (each shows an estimate), describes the work in free text, picks 1, 2 or 3 hours. | Matches the diagram's "top 10 list or free form": a described job with nothing ticked counts as "Something else". Free-text prompt and example are Mark's wording. Running estimate and an under-booking nudge, because Slack notes the system cannot suggest hours and there is a risk of booking too little. Over 3 hours: the length question disappears and the button becomes "Send to our team". |
-| **2 Quick check** | Answers: do you have all parts or materials (Yes / No / Not sure); is there anything that could make the job more involved (select any, or None of these). | Wording follows Mark's draft questions. The outcome is shown inline before the member continues, and the button changes from "Continue to times" to "Send to our team". Once the parts answer sends the request to the team, the second question becomes optional so nothing blocks the hand-off. |
+| **2 Quick check** | Answers Mark's three questions: (1) Can you reach it with a standard step ladder? Yes / No, it's higher / Not sure. (2) Does it involve gas, new wiring, or moving water lines? No / Yes / Not sure. (3) Do you already have the part or fixture, if one's needed? Have it / No part needed / Need one. | Wording, option order and routing are Mark's (the "good" answer sits in a different position on each question, so members have to read). The outcome is shown inline as soon as a routing answer is chosen, and the button changes from "Continue to times" to "Send to our team". Once an answer routes the request, the other questions show "Optional." so nothing blocks the hand-off. |
 | **3 Pick a time** | Picks a date (month calendar), then a time. Confirms. | Real open slots, confirmed on the spot. Start and end time shown, Central Time. Expectation note: the Home Manager does what fits, leftovers can be scheduled for another visit. |
 | **Booked** | Reads the confirmation. | Date, time, Home Manager, address, jobs, hours booked. Home Manager card with message button. |
 | **Sent to our team** | Reads what happens next. | The "no-go" path: nothing to re-enter. The "What you sent" card shows the jobs, description and the answers that triggered the hand-off (parts, what makes it involved, time asked for), so Ops gets the "why". Gentle one-line reason, no blame. |
 
-States covered: empty-form validation (inline errors with text and icon, focus moves to the first problem), under-booking nudge, over-3-hours, parts "No or not sure", complications, no open times, "that time was just taken", 1 vs 2 homes.
+States covered: empty-form validation (inline errors with text and icon, focus moves to the first problem), under-booking nudge, over-3-hours, each routing answer on step 2, no open times, "that time was just taken", 1 vs 2 homes.
 
 ## Outcome rules (member-facing)
 
 | Condition | Result |
 |---|---|
 | Jobs add up to more than 3 hours | Sent to our team, shown on step 1 before continuing |
-| Parts = "No" or "Not sure" | Sent to our team |
-| Any item other than "None of these" is selected | Sent to our team |
+| Step ladder = "No, it's higher" or "Not sure" ("Yes" is the good answer) | Sent to our team |
+| Gas, new wiring or moving water lines = "Yes" or "Not sure" ("No" is the good answer) | Sent to our team |
+| Part or fixture = "Need one" ("Have it" and "No part needed" pass) | Sent to our team |
 | No open times for the visit length | Sent to our team |
 | Chosen time was just taken | Stay on step 3, list refreshes, pick another |
 | Everything fine | Booked |
@@ -54,6 +56,7 @@ States covered: empty-form validation (inline errors with text and icon, focus m
 - **Name "Fast Fix".** Jira epic PFX-537 is titled "Fast Fix (formerly Quick Book)". Mark's Slack also says Quick Fix and the diagram says Book a Handyman.
 - **$55 per hour, billed per hour** is shown on step 1 and in the summary. Source: PreFix Service Pricing Guide (Jan 2026) co-pay rate. Slack does not mention price. Confirm it applies to Fast Fix, or remove the price rows.
 - **Slot picker pattern** (date, then time, start and end shown, times in the address timezone, refresh on "just taken") follows the shipped Member Calendar documentation, so engineering can reuse it.
+- **Member-facing hints under the questions.** Mark's notes on what each question catches were internal. The prototype turns two into short hints: "Think roofs, second-story outsides and vaulted ceilings." and "Swapping a fixture is fine. Adding or relocating one is not." Third hint ("For example a new faucet, lock set or TV mount.") is mine. Edit or drop freely.
 - **Job list, time estimates and wording are illustrative.** Mark: the top 10 to 20 list and the vetting questions will be worked out with Justin and James H. Estimates mostly default to 1 hour in the existing proof of concept.
 - **Home Manager name on the confirmation** comes from the member's assigned Home Manager.
 - **Placeholders to confirm with Ops:** the "Add to calendar" and "Reschedule or cancel" links on the confirmation, and the two-step "What happens next" on the sent screen. None of these are in Slack.
@@ -61,8 +64,8 @@ States covered: empty-form validation (inline errors with text and icon, focus m
 
 ## Open questions for the team
 
-1. **Overlap in the questions (refined here, needs Mark's sign-off).** Taken literally, "Electrical or plumbing work" would send anyone who picked "Running toilet" or "Garbage disposal issue" (Mark's own examples) to our team, and "Multiple rooms or several separate tasks" conflicts with picking several jobs. The prototype narrows them to "New electrical wiring or plumbing lines" and "Work in more than one room"; the total-time check covers volume. Slack's original wording is in `requirements.md`.
-2. **Height rule.** The question says about 10 feet, Mark's message says a 20 foot ladder, and an older ops document says 15 feet.
+1. **Gas in question 2 vs the 911 notice.** Question 2 is about gas *work* (adding or relocating), while the 911 notice on the first page covers a gas smell or leak. They are separate, but the word "gas" appears in both; confirm the wording does not confuse a member with a real leak.
+2. **Reaching "higher" jobs.** "Standard step ladder" replaces the earlier 10 / 15 / 20 foot numbers, so the height rule no longer needs a number in the UI. Ops may still want one in their internal guidance.
 3. **What does the Emergency card open?** Sources keep "call 911" (gas, burning) separate from urgent home problems (active leak, no power). Not defined for the new top-level card.
 4. **Price and billing rules** for a booked block: rate, partial hours, cancellation or reschedule.
 5. **3-hour visits.** Slack says 1 to 3 hours; the existing proof of concept only supports 1 and 2 hours until a 3-hour service type exists.
@@ -89,7 +92,7 @@ Tokens, type, radii, spacing, top bar and shared components are copied verbatim 
 Targets WCAG 2.1 AA. Verified on both frames:
 
 - **axe-core**: no A or AA violations on every screen and state (including validation errors, over 3 hours, time error).
-- **104 scripted checks** pass: happy path, every no-go route, "time just taken", no open times, home switch, back navigation, keyboard focus after navigation, and regression tests for the bugs found in review.
+- **140 scripted checks** pass: happy path, a routing matrix over every answer of every step-2 question, every no-go route, "time just taken", no open times, home switch, back navigation, keyboard focus after navigation, and regression tests for the bugs found in review.
 - **Reflow** at 320px with no horizontal scroll; every mobile tap target is at least 44px (apart from the sample's own logo link).
 - **Design-language audit**: no new text colors, backgrounds, type sizes or fonts versus the sample; no drop shadows. New-only values are existing tokens used in new places (slate for form-control borders, the kit's 6px checkbox radius, the 2px selected ring).
 

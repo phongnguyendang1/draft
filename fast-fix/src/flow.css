@@ -98,7 +98,7 @@ legend { padding: 0; }
 /* Selectable option tiles: checkbox (multi) and radio (single). Gray tile, blue-tint + 2px ring when chosen. */
 .opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-12); margin-top: var(--s-12); }
 .opts--1 { grid-template-columns: minmax(0, 1fr); }
-.opts--1 .opt { min-height: 56px; }
+.opts--1 .opt, .opts--stack .opt { min-height: 56px; }
 .opts--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .opt {
   position: relative; display: flex; align-items: center; gap: var(--s-12); min-height: 72px; padding: var(--s-16);

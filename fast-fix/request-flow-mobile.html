@@ -526,7 +526,7 @@ legend { padding: 0; }
 /* Selectable option tiles: checkbox (multi) and radio (single). Gray tile, blue-tint + 2px ring when chosen. */
 .opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-12); margin-top: var(--s-12); }
 .opts--1 { grid-template-columns: minmax(0, 1fr); }
-.opts--1 .opt { min-height: 56px; }
+.opts--1 .opt, .opts--stack .opt { min-height: 56px; }
 .opts--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .opt {
   position: relative; display: flex; align-items: center; gap: var(--s-12); min-height: 72px; padding: var(--s-16);
@@ -938,32 +938,44 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
         <!-- ============ 2. Quick check ============ -->
         <section class="card" data-screen-id="check" aria-label="Quick check" hidden>
           <div class="fsec">
-            <fieldset id="fs-parts" aria-describedby="parts-hint err-parts">
-              <legend class="t-strong">Do you already have all the parts or materials needed for the work?</legend>
-              <p class="t-meta" id="parts-hint">Think of things like a new faucet, lock set or TV mount.</p>
-              <div class="opts opts--3 opts--stack" id="parts">
-                <label class="opt"><input type="radio" name="parts" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__main"><span class="opt__title">Yes</span><span class="opt__meta">I have everything</span></span></label>
-                <label class="opt"><input type="radio" name="parts" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__main"><span class="opt__title">No</span><span class="opt__meta">I need to get parts</span></span></label>
-                <label class="opt"><input type="radio" name="parts" value="unsure"><span class="opt__radio" aria-hidden="true"></span><span class="opt__main"><span class="opt__title">Not sure</span><span class="opt__meta">I need to check</span></span></label>
+            <fieldset id="fs-ladder" aria-describedby="hint-ladder err-ladder">
+              <legend class="t-strong">Can you reach it with a standard step ladder?</legend>
+              <p class="t-meta" id="hint-ladder">Think roofs, second-story outsides and vaulted ceilings.</p>
+              <div class="opts opts--3 opts--stack" id="ladder-opts">
+                <label class="opt"><input type="radio" name="ladder" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Yes</span></label>
+                <label class="opt"><input type="radio" name="ladder" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No, it’s higher</span></label>
+                <label class="opt"><input type="radio" name="ladder" value="unsure"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Not sure</span></label>
               </div>
-              <p class="error" id="err-parts" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes, no or not sure.</span></p>
-              <div class="note" id="note-parts" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>No problem.</strong> We will send this to our team as a service request so they can plan the parts. You will not need to enter anything again.</span></div>
+              <p class="error" id="err-ladder" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes, no or not sure.</span></p>
+              <div class="note" id="note-ladder" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> Higher jobs need the right equipment, so we will send this to our team as a service request. You will not need to enter anything again.</span></div>
             </fieldset>
           </div>
 
           <div class="fsec">
-            <fieldset id="fs-more" aria-describedby="more-hint err-more">
-              <legend class="t-strong">Is there anything that could make the job more involved?</legend>
-              <p class="t-meta" id="more-hint">Select any that apply.</p>
-              <div class="opts opts--1" id="more">
-                <label class="opt"><input type="checkbox" name="more" value="trade"><span class="opt__title">New electrical wiring or plumbing lines</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <label class="opt"><input type="checkbox" name="more" value="height"><span class="opt__title">Work above about 10 feet</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <label class="opt"><input type="checkbox" name="more" value="multi"><span class="opt__title">Work in more than one room</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <label class="opt"><input type="checkbox" name="more" value="diagnose"><span class="opt__title">The repair may need diagnosing first</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <label class="opt"><input type="checkbox" name="more" value="none"><span class="opt__title">None of these</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
+            <fieldset id="fs-trade" aria-describedby="hint-trade err-trade">
+              <legend class="t-strong">Does it involve gas, new wiring, or moving water lines?</legend>
+              <p class="t-meta" id="hint-trade">Swapping a fixture is fine. Adding or relocating one is not.</p>
+              <div class="opts opts--3 opts--stack" id="trade-opts">
+                <label class="opt"><input type="radio" name="trade" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No</span></label>
+                <label class="opt"><input type="radio" name="trade" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Yes</span></label>
+                <label class="opt"><input type="radio" name="trade" value="unsure"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Not sure</span></label>
               </div>
-              <p class="error" id="err-more" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Select what applies, or None of these.</span></p>
-              <div class="note" id="note-more" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> Jobs like this need a little more planning, so we will send it to our team as a service request. You will not need to enter anything again.</span></div>
+              <p class="error" id="err-trade" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose no, yes or not sure.</span></p>
+              <div class="note" id="note-trade" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> Work like this can need a licensed trade, so we will send it to our team as a service request. You will not need to enter anything again.</span></div>
+            </fieldset>
+          </div>
+
+          <div class="fsec">
+            <fieldset id="fs-part" aria-describedby="hint-part err-part">
+              <legend class="t-strong">Do you already have the part or fixture, if one’s needed?</legend>
+              <p class="t-meta" id="hint-part">For example a new faucet, lock set or TV mount.</p>
+              <div class="opts opts--3 opts--stack" id="part-opts">
+                <label class="opt"><input type="radio" name="part" value="have"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Have it</span></label>
+                <label class="opt"><input type="radio" name="part" value="none"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No part needed</span></label>
+                <label class="opt"><input type="radio" name="part" value="need"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Need one</span></label>
+              </div>
+              <p class="error" id="err-part" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose have it, no part needed or need one.</span></p>
+              <div class="note" id="note-part" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>No problem.</strong> We will send this to our team as a service request so they can plan the part. You will not need to enter anything again.</span></div>
             </fieldset>
           </div>
 
@@ -1150,7 +1162,7 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
   var TITLES = {
     type: ["How can we help?", "Choose what fits best."],
     job: ["What do you need done?", "Fast Fix is for small handyman jobs. All fields are required."],
-    check: ["A quick check", "Two questions so we book the right visit. Both are required."],
+    check: ["A quick check", "Three quick questions so we book the right visit. All are required."],
     time: ["Pick a time", "Real open times with your Home Manager. Your booking is confirmed right away."],
     booked: ["You’re booked", "Confirmed. Nothing else to do."],
     sent: ["Request sent", "Our team will take it from here."]
@@ -1161,15 +1173,30 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
   };
   var BACK = { type: null, job: "type", check: "job", time: "check", booked: null, sent: null };
   var WHY = {
-    parts: "You do not have all the parts yet, so our team will help plan them.",
-    more: "Some of the details you shared need a little more planning.",
+    ladder: "This needs more than a standard step ladder, so our team will plan the right equipment.",
+    trade: "Work with gas, wiring or water lines can need a licensed trade, so our team will plan it.",
+    part: "You still need the part, so our team will help plan it.",
     time: "These jobs add up to more than 3 hours, so our team will plan the visit.",
     slots: "We could not find an open time, so our team will find one for you."
+  };
+  /* Step 2: the vetting questions (Mark's wording). Any answer listed in BAD sends the request to the team. */
+  var Q = ["ladder", "trade", "part"];
+  var BAD = { ladder: ["no", "unsure"], trade: ["yes", "unsure"], part: ["need"] };
+  var HINT = {
+    ladder: "Think roofs, second-story outsides and vaulted ceilings.",
+    trade: "Swapping a fixture is fine. Adding or relocating one is not.",
+    part: "For example a new faucet, lock set or TV mount."
+  };
+  var QNAME = { ladder: "Standard step ladder", trade: "Gas, wiring or water lines", part: "Part or fixture" };
+  var QLABEL = {
+    ladder: { yes: "Yes", no: "No, it’s higher", unsure: "Not sure" },
+    trade: { no: "No", yes: "Yes", unsure: "Not sure" },
+    part: { have: "Have it", none: "No part needed", need: "Need one" }
   };
 
   /* ---------- State ---------- */
   var state = {
-    screen: "type", home: "mueller", jobs: {}, desc: "", hours: 0, parts: "", more: {},
+    screen: "type", home: "mueller", jobs: {}, desc: "", hours: 0, ladder: "", trade: "", part: "",
     date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}
   };
 
@@ -1205,12 +1232,9 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
   }
   function overLimit() { return totalMin() > MAX_MIN; }
   function totalMin() { return selectedJobs().reduce(function (s, j) { return s + j.min; }, 0); }
-  function complications() { return Object.keys(state.more).filter(function (k) { return k !== "none" && state.more[k]; }); }
-  function checkOutcome() {
-    if (state.parts === "no" || state.parts === "unsure") return "parts";
-    if (complications().length) return "more";
-    return "";
-  }
+  function isBad(q) { return BAD[q].indexOf(state[q]) > -1; }
+  function routedBy() { return Q.filter(isBad); }
+  function checkOutcome() { var r = routedBy(); return r.length ? r[0] : ""; }
   function hours() { return state.hours || 2; }
 
   /* ---------- Availability (deterministic stand-in for the real calendar) ---------- */
@@ -1255,8 +1279,9 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
     $all('input[name="jobs"]').forEach(function (c) { c.checked = !!state.jobs[c.value]; });
     $("#desc").value = state.desc;
     $all('input[name="hours"]').forEach(function (r) { r.checked = +r.value === state.hours; });
-    $all('input[name="parts"]').forEach(function (r) { r.checked = r.value === state.parts; });
-    $all('input[name="more"]').forEach(function (c) { c.checked = !!state.more[c.value]; });
+    Q.forEach(function (q) {
+      $all('input[name="' + q + '"]').forEach(function (r) { r.checked = r.value === state[q]; });
+    });
   }
 
   /* ---------- Rendering: calendar and times ---------- */
@@ -1311,10 +1336,11 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
   }
 
   function updateChecksNotes() {
-    var routed = state.parts === "no" || state.parts === "unsure";
-    $("#note-parts").hidden = !routed;
-    $("#note-more").hidden = complications().length === 0;
-    $("#more-hint").textContent = routed ? "Optional. Select any that apply." : "Select any that apply.";
+    var routed = routedBy().length > 0;
+    Q.forEach(function (q) {
+      $("#note-" + q).hidden = !isBad(q);
+      $("#hint-" + q).textContent = (routed && !state[q] ? "Optional. " : "") + HINT[q];
+    });
   }
 
   function ctaFor(screen) {
@@ -1372,12 +1398,7 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
 
     var ans = [];
     if (s === "sent") {
-      if (state.parts) ans.push(["Parts", { yes: "Yes", no: "No", unsure: "Not sure" }[state.parts]]);
-      var comp = complications();
-      var answered = Object.keys(state.more).some(function (k) { return state.more[k]; });
-      if (state.parts && (answered || state.parts === "yes")) {
-        ans.push(["More involved", comp.length ? comp.map(function (k) { return { trade: "Wiring or plumbing", height: "Above 10 feet", multi: "More than one room", diagnose: "Needs diagnosing" }[k]; }).join(", ") : "None of these"]);
-      }
+      Q.forEach(function (q) { if (state[q]) ans.push([QNAME[q], QLABEL[q][state[q]]]); });
       if (state.hours && !overLimit()) ans.push(["Time asked for", state.hours + (state.hours === 1 ? " hour" : " hours")]);
     }
     $("#s-answers-row").hidden = ans.length === 0;
@@ -1414,8 +1435,8 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
       state.desc = "The toilet in the hall bath keeps running after I flush, and the front door lock sticks.";
       state.hours = 2;
     }
-    if (screen === "time" || screen === "booked") { state.parts = state.parts || "yes"; if (!Object.keys(state.more).length) state.more = { none: true }; }
-    if (screen === "sent" && !state.reason) { state.reason = "parts"; state.parts = "no"; state.more = { diagnose: true }; }
+    if (screen === "time" || screen === "booked") { state.ladder = state.ladder || "yes"; state.trade = state.trade || "no"; state.part = state.part || "have"; }
+    if (screen === "sent" && !state.reason) { state.reason = "ladder"; state.ladder = "no"; }
     if (screen === "booked" && (!state.date || state.time === null)) {
       state.date = firstOpenDay();
       var s = slotsFor(state.date);
@@ -1489,7 +1510,7 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
       renderTimes();
     }
     if (screen === "booked") fillBooked();
-    if (screen === "sent") $("#sent-why").textContent = WHY[state.reason] || WHY.parts;
+    if (screen === "sent") $("#sent-why").textContent = WHY[state.reason] || WHY.ladder;
 
     refresh();
     if (!firstRender) { window.scrollTo(0, 0); $("#h1").focus({ preventScroll: true }); }
@@ -1537,11 +1558,10 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
     }
     if (s === "check") {
       var bad2 = [];
-      if (!state.parts) bad2.push("parts");
-      var routed = state.parts === "no" || state.parts === "unsure";
-      if (!routed && !Object.keys(state.more).some(function (k) { return state.more[k]; })) bad2.push("more");
-      ["parts", "more"].forEach(function (id) { setError(id, bad2.indexOf(id) > -1); });
-      if (bad2.length) { focusFirst({ parts: '#parts input', more: '#more input' }[bad2[0]]); return; }
+      /* Once an answer sends the request to the team, the other questions stop blocking */
+      if (routedBy().length === 0) Q.forEach(function (q) { if (!state[q]) bad2.push(q); });
+      Q.forEach(function (q) { setError(q, bad2.indexOf(q) > -1); });
+      if (bad2.length) { focusFirst("#" + bad2[0] + "-opts input"); return; }
       var out = checkOutcome();
       if (out) { state.reason = out; navigate("sent"); return; }
       navigate("time");
@@ -1672,13 +1692,7 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
     var el = e.target;
     if (el.name === "jobs") { state.jobs[el.value] = el.checked; setError("jobs", false); }
     else if (el.name === "hours") { state.hours = +el.value; state.date = null; state.time = null; setError("hours", false); }
-    else if (el.name === "parts") { state.parts = el.value; setError("parts", false); }
-    else if (el.name === "more") {
-      if (el.value === "none" && el.checked) { state.more = { none: true }; }
-      else { state.more[el.value] = el.checked; if (el.checked) state.more.none = false; }
-      $all('input[name="more"]').forEach(function (c) { c.checked = !!state.more[c.value]; });
-      setError("more", false);
-    }
+    else if (Q.indexOf(el.name) > -1) { state[el.name] = el.value; setError(el.name, false); }
     else if (el.name === "slot") { state.time = +el.value; setError("time", false); }
     else if (el.hasAttribute("data-state-switch")) {
       var name = el.getAttribute("data-state-switch");

@@ -195,32 +195,44 @@
         <!-- ============ 2. Quick check ============ -->
         <section class="card" data-screen-id="check" aria-label="Quick check" hidden>
           <div class="fsec">
-            <fieldset id="fs-parts" aria-describedby="parts-hint err-parts">
-              <legend class="t-strong">Do you already have all the parts or materials needed for the work?</legend>
-              <p class="t-meta" id="parts-hint">Think of things like a new faucet, lock set or TV mount.</p>
-              <div class="opts opts--3 opts--stack" id="parts">
-                <label class="opt"><input type="radio" name="parts" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__main"><span class="opt__title">Yes</span><span class="opt__meta">I have everything</span></span></label>
-                <label class="opt"><input type="radio" name="parts" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__main"><span class="opt__title">No</span><span class="opt__meta">I need to get parts</span></span></label>
-                <label class="opt"><input type="radio" name="parts" value="unsure"><span class="opt__radio" aria-hidden="true"></span><span class="opt__main"><span class="opt__title">Not sure</span><span class="opt__meta">I need to check</span></span></label>
+            <fieldset id="fs-ladder" aria-describedby="hint-ladder err-ladder">
+              <legend class="t-strong">Can you reach it with a standard step ladder?</legend>
+              <p class="t-meta" id="hint-ladder">Think roofs, second-story outsides and vaulted ceilings.</p>
+              <div class="opts opts--3 opts--stack" id="ladder-opts">
+                <label class="opt"><input type="radio" name="ladder" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Yes</span></label>
+                <label class="opt"><input type="radio" name="ladder" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No, it’s higher</span></label>
+                <label class="opt"><input type="radio" name="ladder" value="unsure"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Not sure</span></label>
               </div>
-              <p class="error" id="err-parts" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes, no or not sure.</span></p>
-              <div class="note" id="note-parts" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>No problem.</strong> We will send this to our team as a service request so they can plan the parts. You will not need to enter anything again.</span></div>
+              <p class="error" id="err-ladder" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes, no or not sure.</span></p>
+              <div class="note" id="note-ladder" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> Higher jobs need the right equipment, so we will send this to our team as a service request. You will not need to enter anything again.</span></div>
             </fieldset>
           </div>
 
           <div class="fsec">
-            <fieldset id="fs-more" aria-describedby="more-hint err-more">
-              <legend class="t-strong">Is there anything that could make the job more involved?</legend>
-              <p class="t-meta" id="more-hint">Select any that apply.</p>
-              <div class="opts opts--1" id="more">
-                <label class="opt"><input type="checkbox" name="more" value="trade"><span class="opt__title">New electrical wiring or plumbing lines</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <label class="opt"><input type="checkbox" name="more" value="height"><span class="opt__title">Work above about 10 feet</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <label class="opt"><input type="checkbox" name="more" value="multi"><span class="opt__title">Work in more than one room</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <label class="opt"><input type="checkbox" name="more" value="diagnose"><span class="opt__title">The repair may need diagnosing first</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
-                <label class="opt"><input type="checkbox" name="more" value="none"><span class="opt__title">None of these</span><span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>
+            <fieldset id="fs-trade" aria-describedby="hint-trade err-trade">
+              <legend class="t-strong">Does it involve gas, new wiring, or moving water lines?</legend>
+              <p class="t-meta" id="hint-trade">Swapping a fixture is fine. Adding or relocating one is not.</p>
+              <div class="opts opts--3 opts--stack" id="trade-opts">
+                <label class="opt"><input type="radio" name="trade" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No</span></label>
+                <label class="opt"><input type="radio" name="trade" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Yes</span></label>
+                <label class="opt"><input type="radio" name="trade" value="unsure"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Not sure</span></label>
               </div>
-              <p class="error" id="err-more" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Select what applies, or None of these.</span></p>
-              <div class="note" id="note-more" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> Jobs like this need a little more planning, so we will send it to our team as a service request. You will not need to enter anything again.</span></div>
+              <p class="error" id="err-trade" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose no, yes or not sure.</span></p>
+              <div class="note" id="note-trade" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> Work like this can need a licensed trade, so we will send it to our team as a service request. You will not need to enter anything again.</span></div>
+            </fieldset>
+          </div>
+
+          <div class="fsec">
+            <fieldset id="fs-part" aria-describedby="hint-part err-part">
+              <legend class="t-strong">Do you already have the part or fixture, if one’s needed?</legend>
+              <p class="t-meta" id="hint-part">For example a new faucet, lock set or TV mount.</p>
+              <div class="opts opts--3 opts--stack" id="part-opts">
+                <label class="opt"><input type="radio" name="part" value="have"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Have it</span></label>
+                <label class="opt"><input type="radio" name="part" value="none"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No part needed</span></label>
+                <label class="opt"><input type="radio" name="part" value="need"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Need one</span></label>
+              </div>
+              <p class="error" id="err-part" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose have it, no part needed or need one.</span></p>
+              <div class="note" id="note-part" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>No problem.</strong> We will send this to our team as a service request so they can plan the part. You will not need to enter anything again.</span></div>
             </fieldset>
           </div>
 

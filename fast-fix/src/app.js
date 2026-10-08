@@ -39,7 +39,7 @@
   var TITLES = {
     type: ["How can we help?", "Choose what fits best."],
     job: ["What do you need done?", "Fast Fix is for small handyman jobs. All fields are required."],
-    check: ["A quick check", "Two questions so we book the right visit. Both are required."],
+    check: ["A quick check", "Three quick questions so we book the right visit. All are required."],
     time: ["Pick a time", "Real open times with your Home Manager. Your booking is confirmed right away."],
     booked: ["You’re booked", "Confirmed. Nothing else to do."],
     sent: ["Request sent", "Our team will take it from here."]
@@ -50,15 +50,30 @@
   };
   var BACK = { type: null, job: "type", check: "job", time: "check", booked: null, sent: null };
   var WHY = {
-    parts: "You do not have all the parts yet, so our team will help plan them.",
-    more: "Some of the details you shared need a little more planning.",
+    ladder: "This needs more than a standard step ladder, so our team will plan the right equipment.",
+    trade: "Work with gas, wiring or water lines can need a licensed trade, so our team will plan it.",
+    part: "You still need the part, so our team will help plan it.",
     time: "These jobs add up to more than 3 hours, so our team will plan the visit.",
     slots: "We could not find an open time, so our team will find one for you."
+  };
+  /* Step 2: the vetting questions (Mark's wording). Any answer listed in BAD sends the request to the team. */
+  var Q = ["ladder", "trade", "part"];
+  var BAD = { ladder: ["no", "unsure"], trade: ["yes", "unsure"], part: ["need"] };
+  var HINT = {
+    ladder: "Think roofs, second-story outsides and vaulted ceilings.",
+    trade: "Swapping a fixture is fine. Adding or relocating one is not.",
+    part: "For example a new faucet, lock set or TV mount."
+  };
+  var QNAME = { ladder: "Standard step ladder", trade: "Gas, wiring or water lines", part: "Part or fixture" };
+  var QLABEL = {
+    ladder: { yes: "Yes", no: "No, it’s higher", unsure: "Not sure" },
+    trade: { no: "No", yes: "Yes", unsure: "Not sure" },
+    part: { have: "Have it", none: "No part needed", need: "Need one" }
   };
 
   /* ---------- State ---------- */
   var state = {
-    screen: "type", home: "mueller", jobs: {}, desc: "", hours: 0, parts: "", more: {},
+    screen: "type", home: "mueller", jobs: {}, desc: "", hours: 0, ladder: "", trade: "", part: "",
     date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}
   };
 
@@ -94,12 +109,9 @@
   }
   function overLimit() { return totalMin() > MAX_MIN; }
   function totalMin() { return selectedJobs().reduce(function (s, j) { return s + j.min; }, 0); }
-  function complications() { return Object.keys(state.more).filter(function (k) { return k !== "none" && state.more[k]; }); }
-  function checkOutcome() {
-    if (state.parts === "no" || state.parts === "unsure") return "parts";
-    if (complications().length) return "more";
-    return "";
-  }
+  function isBad(q) { return BAD[q].indexOf(state[q]) > -1; }
+  function routedBy() { return Q.filter(isBad); }
+  function checkOutcome() { var r = routedBy(); return r.length ? r[0] : ""; }
   function hours() { return state.hours || 2; }
 
   /* ---------- Availability (deterministic stand-in for the real calendar) ---------- */
@@ -144,8 +156,9 @@
     $all('input[name="jobs"]').forEach(function (c) { c.checked = !!state.jobs[c.value]; });
     $("#desc").value = state.desc;
     $all('input[name="hours"]').forEach(function (r) { r.checked = +r.value === state.hours; });
-    $all('input[name="parts"]').forEach(function (r) { r.checked = r.value === state.parts; });
-    $all('input[name="more"]').forEach(function (c) { c.checked = !!state.more[c.value]; });
+    Q.forEach(function (q) {
+      $all('input[name="' + q + '"]').forEach(function (r) { r.checked = r.value === state[q]; });
+    });
   }
 
   /* ---------- Rendering: calendar and times ---------- */
@@ -200,10 +213,11 @@
   }
 
   function updateChecksNotes() {
-    var routed = state.parts === "no" || state.parts === "unsure";
-    $("#note-parts").hidden = !routed;
-    $("#note-more").hidden = complications().length === 0;
-    $("#more-hint").textContent = routed ? "Optional. Select any that apply." : "Select any that apply.";
+    var routed = routedBy().length > 0;
+    Q.forEach(function (q) {
+      $("#note-" + q).hidden = !isBad(q);
+      $("#hint-" + q).textContent = (routed && !state[q] ? "Optional. " : "") + HINT[q];
+    });
   }
 
   function ctaFor(screen) {
@@ -261,12 +275,7 @@
 
     var ans = [];
     if (s === "sent") {
-      if (state.parts) ans.push(["Parts", { yes: "Yes", no: "No", unsure: "Not sure" }[state.parts]]);
-      var comp = complications();
-      var answered = Object.keys(state.more).some(function (k) { return state.more[k]; });
-      if (state.parts && (answered || state.parts === "yes")) {
-        ans.push(["More involved", comp.length ? comp.map(function (k) { return { trade: "Wiring or plumbing", height: "Above 10 feet", multi: "More than one room", diagnose: "Needs diagnosing" }[k]; }).join(", ") : "None of these"]);
-      }
+      Q.forEach(function (q) { if (state[q]) ans.push([QNAME[q], QLABEL[q][state[q]]]); });
       if (state.hours && !overLimit()) ans.push(["Time asked for", state.hours + (state.hours === 1 ? " hour" : " hours")]);
     }
     $("#s-answers-row").hidden = ans.length === 0;
@@ -303,8 +312,8 @@
       state.desc = "The toilet in the hall bath keeps running after I flush, and the front door lock sticks.";
       state.hours = 2;
     }
-    if (screen === "time" || screen === "booked") { state.parts = state.parts || "yes"; if (!Object.keys(state.more).length) state.more = { none: true }; }
-    if (screen === "sent" && !state.reason) { state.reason = "parts"; state.parts = "no"; state.more = { diagnose: true }; }
+    if (screen === "time" || screen === "booked") { state.ladder = state.ladder || "yes"; state.trade = state.trade || "no"; state.part = state.part || "have"; }
+    if (screen === "sent" && !state.reason) { state.reason = "ladder"; state.ladder = "no"; }
     if (screen === "booked" && (!state.date || state.time === null)) {
       state.date = firstOpenDay();
       var s = slotsFor(state.date);
@@ -378,7 +387,7 @@
       renderTimes();
     }
     if (screen === "booked") fillBooked();
-    if (screen === "sent") $("#sent-why").textContent = WHY[state.reason] || WHY.parts;
+    if (screen === "sent") $("#sent-why").textContent = WHY[state.reason] || WHY.ladder;
 
     refresh();
     if (!firstRender) { window.scrollTo(0, 0); $("#h1").focus({ preventScroll: true }); }
@@ -426,11 +435,10 @@
     }
     if (s === "check") {
       var bad2 = [];
-      if (!state.parts) bad2.push("parts");
-      var routed = state.parts === "no" || state.parts === "unsure";
-      if (!routed && !Object.keys(state.more).some(function (k) { return state.more[k]; })) bad2.push("more");
-      ["parts", "more"].forEach(function (id) { setError(id, bad2.indexOf(id) > -1); });
-      if (bad2.length) { focusFirst({ parts: '#parts input', more: '#more input' }[bad2[0]]); return; }
+      /* Once an answer sends the request to the team, the other questions stop blocking */
+      if (routedBy().length === 0) Q.forEach(function (q) { if (!state[q]) bad2.push(q); });
+      Q.forEach(function (q) { setError(q, bad2.indexOf(q) > -1); });
+      if (bad2.length) { focusFirst("#" + bad2[0] + "-opts input"); return; }
       var out = checkOutcome();
       if (out) { state.reason = out; navigate("sent"); return; }
       navigate("time");
@@ -561,13 +569,7 @@
     var el = e.target;
     if (el.name === "jobs") { state.jobs[el.value] = el.checked; setError("jobs", false); }
     else if (el.name === "hours") { state.hours = +el.value; state.date = null; state.time = null; setError("hours", false); }
-    else if (el.name === "parts") { state.parts = el.value; setError("parts", false); }
-    else if (el.name === "more") {
-      if (el.value === "none" && el.checked) { state.more = { none: true }; }
-      else { state.more[el.value] = el.checked; if (el.checked) state.more.none = false; }
-      $all('input[name="more"]').forEach(function (c) { c.checked = !!state.more[c.value]; });
-      setError("more", false);
-    }
+    else if (Q.indexOf(el.name) > -1) { state[el.name] = el.value; setError(el.name, false); }
     else if (el.name === "slot") { state.time = +el.value; setError("time", false); }
     else if (el.hasAttribute("data-state-switch")) {
       var name = el.getAttribute("data-state-switch");
