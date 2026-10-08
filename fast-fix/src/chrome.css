@@ -1,0 +1,38 @@
+/* VERBATIM from desktop_4.html (page chrome: frames, payment banner, top bar, nav). */
+/* HomeHub modules shared by every dashboard option: page chrome, visit, recommendation, credits, team. */
+
+:root { --container: 1184px; }
+
+/* Frames: desktop renders at 1280, mobile at 390. Layout reacts to the frame, not the viewport. */
+.app { container-type: inline-size; container-name: app; }
+.frame-desktop .app { min-width: 1280px; }
+.frame-mobile { background: #e4e8ea; }
+.frame-mobile .app { max-width: 390px; min-height: 100vh; margin: 0 auto; background: var(--page); border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+@media (max-width: 430px) { .frame-mobile { background: var(--page); } .frame-mobile .app { border: 0; } }
+
+/* Payment banner */
+.paybar { background: var(--red-tint); }
+.paybar__inner { max-width: var(--container); margin: 0 auto; min-height: 64px; padding: 10px 0; display: flex; align-items: center; gap: var(--s-12); }
+.paybar__icon { color: var(--red); }
+.paybar__text { flex: 1; font-size: 14px; line-height: 20px; }
+.paybar__text strong { font-weight: 600; }
+
+/* Top bar */
+.topbar { position: relative; z-index: 20; background: var(--surface); border-bottom: 1px solid var(--border); }
+.topbar__inner { max-width: var(--container); height: 72px; margin: 0 auto; display: flex; align-items: center; gap: var(--s-32); }
+.brand { display: inline-flex; align-items: center; gap: var(--s-8); flex: none; text-decoration: none; }
+.brand__mark { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: #fff; }
+.brand__mark .i { width: 18px; height: 18px; }
+.brand__name { font-size: 24px; line-height: 32px; font-weight: 600; }
+.brand__product { padding-left: var(--s-8); border-left: 1px solid var(--border); font-size: 16px; line-height: 24px; color: var(--text-2); }
+.nav { flex: 1; align-self: stretch; display: flex; gap: var(--s-24); }
+.nav__link { position: relative; display: inline-flex; align-items: center; gap: var(--s-8); white-space: nowrap; text-decoration: none; color: var(--text-2); font-size: 16px; line-height: 24px; }
+.nav__link:hover { color: var(--ink); }
+.nav__link.is-active { color: var(--ink); font-weight: 600; }
+.nav__link.is-active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--ink); }
+.topbar__actions { display: flex; align-items: center; gap: var(--s-12); flex: none; }
+.avatar-btn { width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--blue-tint); color: var(--blue-text); font-size: 14px; line-height: 20px; font-weight: 600; cursor: pointer; }
+.avatar-btn:hover { background: #d9ebfc; }
+.menu__who { padding: var(--s-8) var(--s-12); }
+.topbar__mobile { display: none; }
+.mnav { display: none; }
