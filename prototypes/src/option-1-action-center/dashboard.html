@@ -37,19 +37,19 @@
     <div class="layout">
       <div class="main">
 
-        <!-- Home Health Snapshot: results of the checks on the latest preventive maintenance visit.
-             Its own module, above everything else: the status of the home. -->
+        <!-- Home Health Report: the latest report's results and date, per home.
+             Its own module at the top, apart from Recommendations: the status of the home. -->
         <section class="card d-card" id="health" aria-labelledby="health-title">
           <div class="d-head">
-            <h2 class="t-title" id="health-title">Home Health Snapshot</h2>
-            <a class="d-head__link" href="#">Open snapshot<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></a>
+            <h2 class="t-title" id="health-title">Home Health Report</h2>
+            <a class="d-head__link" href="#">Open report<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></a>
           </div>
           <div class="d-healths">
             <div class="d-health" data-home="mueller">
               <div class="d-health__row">
                 <div class="d-health__src">
                   <p class="d-health__home d-home-label">4817 Mueller Blvd</p>
-                  <p class="d-meta">Preventive maintenance, Apr 14 &middot; 30 checks</p>
+                  <p class="d-meta">Latest report, Apr 14</p>
                 </div>
                 <div class="d-stats">
                   <p class="d-stat"><span class="d-stat__n t-red">1</span><span class="d-stat__l">Critical</span></p>
@@ -63,7 +63,7 @@
               <div class="d-health__row">
                 <div class="d-health__src">
                   <p class="d-health__home d-home-label">1206 Elm Ridge Dr</p>
-                  <p class="d-meta">Preventive maintenance, Apr 21 &middot; 30 checks</p>
+                  <p class="d-meta">Latest report, Apr 21</p>
                 </div>
                 <div class="d-stats">
                   <p class="d-stat"><span class="d-stat__n d-stat__n--blue">30</span><span class="d-stat__l">No concern</span></p>
@@ -166,7 +166,6 @@
                 </div>
                 <div class="tile__actions">
                   <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
-                  <span class="tile__more" aria-hidden="true">Details<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></span>
                 </div>
               </div>
               <div class="rec__done tile__body">
@@ -189,7 +188,6 @@
                 </div>
                 <div class="tile__actions">
                   <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
-                  <span class="tile__more" aria-hidden="true">Details<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></span>
                 </div>
               </div>
               <div class="rec__done tile__body">
@@ -212,7 +210,6 @@
                 </div>
                 <div class="tile__actions">
                   <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
-                  <span class="tile__more" aria-hidden="true">Details<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></span>
                 </div>
               </div>
               <div class="rec__done tile__body">
@@ -235,7 +232,6 @@
                 </div>
                 <div class="tile__actions">
                   <button class="btn btn--secondary btn--sm" data-rec-submit>Send</button>
-                  <span class="tile__more" aria-hidden="true">Details<svg class="i"><use href="#ri-arrow-right-s-line"/></svg></span>
                 </div>
               </div>
               <div class="rec__done tile__body">

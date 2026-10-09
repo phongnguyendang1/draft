@@ -2,10 +2,11 @@
    Request service is a large button beside the page title that opens the request flow. Once it
    scrolls away it docks to the top bar (desktop) or a bottom bar (mobile); it is the only yellow
    button on the page.
-   Desktop: a wide main column (Home Health Snapshot, Ready to schedule, Recommendations,
+   Desktop: a wide main column (Home Health Report, Ready to schedule, Recommendations,
    PreFix Protect) beside a 380px rail (Saved this year, Upcoming visits, Your PreFix team,
    offers). In Ready to schedule and Recommendations, items sit in a 2-column grid of small
-   cards with one action and a Details cue; the whole card opens the detail.
+   cards with one action; the whole card opens the detail, and Ready to schedule cards show a
+   Details cue.
    PreFix Protect lists services as pills.
    Mobile: one column in priority order. */
 
@@ -122,7 +123,7 @@ body:not(.is-multi) .d-home-label, body.is-home-filtered .d-home-label { display
 .dash .rec[data-state="declined"] .rec__done { display: flex; }
 .d-done { width: 24px; height: 24px; flex: none; color: var(--blue-text); }
 
-/* ---------- Home Health Snapshot ---------- */
+/* ---------- Home Health Report ---------- */
 .d-healths { margin-top: -1px; clip-path: inset(1px 0 0 0); }
 .d-health { padding: var(--s-12) 0 var(--s-4); border-top: 1px solid var(--border); }
 .d-health + .d-health { margin-top: var(--s-8); }

@@ -47,13 +47,12 @@ Source: the design review in sprint planning with Mark, JC (Juan Carlos), Velisl
 | Change | Source |
 | --- | --- |
 | The Home Health Report moves out of Recommendations into its own module at the top of the left column, so its counts aren't read as recommendation counts. | JC, Mark, Phong |
-| It is called the Home Health Snapshot (the PM snapshot). "Home Health Report" is the existing service-history page. | Mark, JC |
-| Each home shows the visit and date the snapshot came from ("Preventive maintenance, Apr 14 · 30 checks"), so the counts read as results of that visit's checks. | Mark, Alex |
+| Each home shows the date of its latest report ("Latest report, Apr 14"). | Mark |
 | Ready to schedule: service visits are titled "Service visit", with their tasks below, comma-separated and cut off with "…". | JC, Phong |
 | Ready to schedule: each card shows how long the visit takes. | Mark |
 | Ready to schedule: a "Schedule all" button at the top. | Mark, Phong |
 | Ready to schedule shows at most 4 cards; "See all" in the header opens the rest in Appointments (no load-more button). | Alex, Phong |
-| Item cards show a "Details" cue, so it's clear they open. Applied to recommendation cards too (same card). | Velislav |
+| Ready to schedule cards show a "Details" cue, so it's clear they open. | Velislav, Phong |
 | Upcoming visits are titled by visit type ("Service visit", "Specialty visit", "Preventive maintenance"), with the tasks below. | JC, Phong |
 | Saved this year compares with "market rates", not "Austin market rates": homes can be in different markets, and the number sums all homes. | JC, Phong |
 | Your PreFix team: no message buttons. Members can't message a Home Manager directly. | Velislav, Mark, Phong |
@@ -61,6 +60,8 @@ Source: the design review in sprint planning with Mark, JC (Juan Carlos), Velisl
 
 Not changed, or still open:
 
+- **The Home Health Report's name.** JC hears "Home Health Report" as today's service-history page; Mark calls this the PM report or the home health snapshot. No rename was agreed, so it keeps its name.
+- **A Details cue on recommendation cards.** Only the Ready to schedule cards were discussed, so the recommendation cards don't have one yet.
 - **Top message.** Phong hid it while presenting. Alex wants a reserved, full-width place for banners (welcome, card expiring, payment) so closing one doesn't shift only one column; the slot is already full width and shows one message at a time. A fuller "message center" is still to design.
 - **Credits and referral code.** Shown once for all homes. Today each subscription has its own code and credits; the team leans toward moving both to the user level (Mark, Velislav, JC), which is a backend decision.
 - **The savings number.** Mark wants to rethink it; not changed yet.
