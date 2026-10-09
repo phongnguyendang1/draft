@@ -40,6 +40,36 @@ Leadership found the dashboard too busy. Option 1 is rebuilt as compact cards; O
 - **The Home Health Report** stays at the top of Recommendations, one line per home: the counts and the bar.
 - **PreFix Protect** shows services as pills: filled for used, outlined for not used yet (these link to booking).
 
+## Round 4: Option 1, team review (Oct 9)
+
+Source: the design review in sprint planning with Mark, JC (Juan Carlos), Velislav and Alex. Only changes the meeting clearly settled are applied.
+
+| Change | Source |
+| --- | --- |
+| The Home Health Report moves out of Recommendations into its own module at the top of the left column, so its counts aren't read as recommendation counts. | JC, Mark, Phong |
+| It is called the Home Health Snapshot (the PM snapshot). "Home Health Report" is the existing service-history page. | Mark, JC |
+| Each home shows the visit and date the snapshot came from ("Preventive maintenance, Apr 14 · 30 checks"), so the counts read as results of that visit's checks. | Mark, Alex |
+| Ready to schedule: service visits are titled "Service visit", with their tasks below, comma-separated and cut off with "…". | JC, Phong |
+| Ready to schedule: each card shows how long the visit takes. | Mark |
+| Ready to schedule: a "Schedule all" button at the top. | Mark, Phong |
+| Ready to schedule shows at most 4 cards; "See all" in the header opens the rest in Appointments (no load-more button). | Alex, Phong |
+| Item cards show a "Details" cue, so it's clear they open. Applied to recommendation cards too (same card). | Velislav |
+| Upcoming visits are titled by visit type ("Service visit", "Specialty visit", "Preventive maintenance"), with the tasks below. | JC, Phong |
+| Saved this year compares with "market rates", not "Austin market rates": homes can be in different markets, and the number sums all homes. | JC, Phong |
+| Your PreFix team: no message buttons. Members can't message a Home Manager directly. | Velislav, Mark, Phong |
+| Promotions have no close (X) button. Promotions can't be closed; they always show. | Velislav, Phong |
+
+Not changed, or still open:
+
+- **Top message.** Phong hid it while presenting. Alex wants a reserved, full-width place for banners (welcome, card expiring, payment) so closing one doesn't shift only one column; the slot is already full width and shows one message at a time. A fuller "message center" is still to design.
+- **Credits and referral code.** Shown once for all homes. Today each subscription has its own code and credits; the team leans toward moving both to the user level (Mark, Velislav, JC), which is a backend decision.
+- **The savings number.** Mark wants to rethink it; not changed yet.
+- **Promotions format.** The promotions backend doesn't support an hourly rate, a credit or styled text yet, and promotions can only link to a URL (Velislav, JC). JC: promotions should be text and links, not an image, for WCAG; the prototype already is.
+- **PreFix Protect.** Unchanged. Mark liked an earlier presentation; it isn't clear which. A service pill should open Request service with that service filled in (Mark), which needs the request flow.
+- **Multiple homes.** How each module presents several homes still needs work (Mark, JC).
+- **PFR-101.** Members will get a primary or secondary Home Manager, whoever is available; the team card is fine for now (Velislav).
+- **One-sentence role of the dashboard.** Homework for everyone (Mark).
+
 ## Not applied
 
 - **A blocking pop-up for critical recommendations before the dashboard.** Critical items can't be declined, so the pop-up would trap members; it also stacks with the onboarding modal and works against "land and go". Critical items lead Recommendations instead.

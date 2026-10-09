@@ -1,11 +1,11 @@
-/* Option 1 · Action Center (round 3)
+/* Option 1 · Action Center (round 4)
    Request service is a large button beside the page title that opens the request flow. Once it
    scrolls away it docks to the top bar (desktop) or a bottom bar (mobile); it is the only yellow
    button on the page.
-   Desktop keeps the round 2 columns: a wide main column (Ready to schedule, Recommendations
-   with the Home Health Report, PreFix Protect) beside a 380px rail (Saved this year, Upcoming
-   visits, Your PreFix team, offers). In Ready to schedule and Recommendations, items sit in a
-   2-column grid of small cards with one action each; the whole card opens the detail.
+   Desktop: a wide main column (Home Health Snapshot, Ready to schedule, Recommendations,
+   PreFix Protect) beside a 380px rail (Saved this year, Upcoming visits, Your PreFix team,
+   offers). In Ready to schedule and Recommendations, items sit in a 2-column grid of small
+   cards with one action and a Details cue; the whole card opens the detail.
    PreFix Protect lists services as pills.
    Mobile: one column in priority order. */
 
@@ -28,6 +28,8 @@ body:not(.is-cta-docked) .topbar__actions .topbar__cta { visibility: hidden; opa
 
 /* ---------- Card header: title, count, one link ---------- */
 .d-head { display: flex; align-items: center; gap: var(--s-8); margin-bottom: var(--s-8); }
+.d-head__actions { margin-left: auto; display: flex; align-items: center; gap: var(--s-16); }
+.d-head__actions .d-head__link { margin-left: 0; }
 .d-head__link {
   margin-left: auto; display: inline-flex; align-items: center; gap: 2px; flex: none; white-space: nowrap;
   padding: 0; border: 0; background: none; cursor: pointer; text-decoration: none;
@@ -67,10 +69,20 @@ body:not(.is-cta-docked) .topbar__actions .topbar__cta { visibility: hidden; opa
 .tile:has(.d-title:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; }
 .tile__body { flex: 1; display: flex; flex-direction: column; gap: var(--s-12); }
 .dash .rec .rec__open.tile__body { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-12); }
+.dash .rec:not([data-state="open"]) .rec__open.tile__body { display: none; }
 .tile__head { display: flex; align-items: flex-start; gap: var(--s-12); }
 .tile .d-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
 .tile:hover .d-title { color: var(--blue-text); }
-.tile__btn { position: relative; z-index: 1; align-self: flex-start; margin-top: auto; margin-left: 52px; }
+.tile__actions {
+  position: relative; z-index: 1; display: flex; align-items: center; gap: var(--s-16);
+  margin-top: auto; margin-left: 52px; pointer-events: none;
+}
+.tile__actions .btn { pointer-events: auto; }
+.tile__undo { align-self: flex-start; margin-left: 36px; }
+.tile__more { display: inline-flex; align-items: center; gap: 2px; color: var(--slate); font-size: 14px; line-height: 20px; font-weight: 600; }
+.tile__more .i { width: 18px; height: 18px; }
+.tile:hover .tile__more { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.d-tasks { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ink); font-size: 14px; line-height: 20px; }
 .d-icon--white { background: var(--surface); }
 .tile .d-sev:not(.d-sev--critical):not(.d-sev--high) { background: var(--surface); }
 .d-meta { font-size: 14px; line-height: 20px; color: var(--text-2); }
@@ -110,15 +122,12 @@ body:not(.is-multi) .d-home-label, body.is-home-filtered .d-home-label { display
 .dash .rec[data-state="declined"] .rec__done { display: flex; }
 .d-done { width: 24px; height: 24px; flex: none; color: var(--blue-text); }
 
-/* ---------- Home Health Report, at the top of Recommendations ---------- */
-.hh { margin-top: var(--s-8); padding: var(--s-12) var(--s-16) var(--s-16); border: 1px solid var(--border); border-radius: var(--r-inner); }
-.hh__head { display: flex; align-items: center; gap: var(--s-8); }
-.hh__title { display: inline-flex; align-items: center; gap: var(--s-8); font-size: 16px; line-height: 24px; font-weight: 600; }
-.hh__title .i { width: 20px; height: 20px; color: var(--blue-text); }
+/* ---------- Home Health Snapshot ---------- */
 .d-healths { margin-top: -1px; clip-path: inset(1px 0 0 0); }
 .d-health { padding: var(--s-12) 0 var(--s-4); border-top: 1px solid var(--border); }
 .d-health + .d-health { margin-top: var(--s-8); }
 .d-health__row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s-4) var(--s-16); }
+.d-health__src { display: flex; flex-direction: column; }
 .d-health__home { font-size: 14px; line-height: 20px; font-weight: 600; }
 .d-stats { display: flex; flex-wrap: wrap; gap: var(--s-4) var(--s-20); }
 .d-stat { display: flex; align-items: baseline; gap: 6px; }
@@ -151,13 +160,6 @@ a.d-chip:hover .i { color: var(--blue-text); }
 .d-date--pm { background: var(--blue-tint); }
 .d-date--pm .d-date__m { color: var(--blue-text); }
 
-/* Visit type: a small badge above the title */
-.vtype {
-  display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; height: 20px; margin-bottom: 2px; padding: 0 var(--s-8);
-  border-radius: 10px; background: var(--page); color: var(--ink); font-size: 12px; line-height: 16px; font-weight: 600;
-}
-.vtype .i { width: 14px; height: 14px; }
-.vtype--pm, .vtype--enrollment { background: var(--blue-tint); color: var(--blue-text); }
 
 /* ---------- Saved this year ---------- */
 .d-savings { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--s-4) var(--s-12); }
@@ -178,8 +180,6 @@ a.d-chip:hover .i { color: var(--blue-text); }
 .pro__badge .i { width: 10px; height: 10px; }
 .d-role { font-size: 16px; line-height: 24px; font-weight: 600; }
 .d-role .d-home--tag { margin-left: var(--s-8); vertical-align: 2px; }
-.d-msg { width: 40px; height: 40px; }
-.d-msg .i { width: 20px; height: 20px; }
 
 /* ---------- Offers ---------- */
 .d-promos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--s-24); }
@@ -200,24 +200,21 @@ a.d-chip:hover .i { color: var(--blue-text); }
 
   .layout { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
   .tiles { grid-template-columns: minmax(0, 1fr); }
-  /* One item card per row: title on the left, action on the right */
-  .dash .tile, .dash .rec .rec__done.tile__body { flex-direction: row; align-items: center; }
-  /* Recommendations carry more detail, so their action sits below the text */
-  .dash .rec.tile { flex-direction: column; align-items: stretch; }
-  .dash .rec .rec__open.tile__body .tile__btn { align-self: flex-start; }
-  .tile__head { flex: 1; min-width: 0; align-items: center; }
-  .tile__btn { margin: 0; align-self: center; padding: 0 var(--s-12); }
+  /* One card per row; the icon drops so the text has room, and the actions sit below it */
   .tile .d-icon, .tile .d-sev { display: none; }
-  .hh__title .i { display: none; }
+  .tile__actions { margin-left: 0; }
+  .dash .rec .rec__done.tile__body { flex-direction: row; align-items: center; }
   .d-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; }
   .main, .rail { display: contents; }
-  #actions { order: 1; }
-  #recs { order: 2; }
-  #upcoming { order: 3; }
-  #savings { order: 4; }
-  #team { order: 5; }
-  #plan { order: 6; }
-  .d-promos { order: 7; grid-template-columns: minmax(0, 1fr); gap: var(--s-16); }
+  #health { order: 1; }
+  #actions { order: 2; }
+  #recs { order: 3; }
+  #upcoming { order: 4; }
+  #savings { order: 5; }
+  #team { order: 6; }
+  #plan { order: 7; }
+  .d-promos { order: 8; grid-template-columns: minmax(0, 1fr); gap: var(--s-16); }
+  .d-head { flex-wrap: wrap; }
 
 
   /* Offers become a photo-left row so they don't take a screen each */
