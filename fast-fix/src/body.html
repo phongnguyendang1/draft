@@ -109,21 +109,11 @@
 
           <ul class="types" aria-label="Request types">
             <li>
-              <a class="type type--urgent" href="#" data-handoff="Emergency">
-                <span class="tile-icon tile-icon--red"><svg class="i"><use href="#ri-error-warning-fill"/></svg></span>
-                <span class="type__body">
-                  <span class="type__title">Emergency</span>
-                  <span class="type__desc">Active leak, no power or a safety risk.</span>
-                </span>
-                <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
-              </a>
-            </li>
-            <li>
               <a class="type type--fast" href="#/job" data-go="job">
                 <span class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-timer-flash-line"/></svg></span>
                 <span class="type__body">
                   <span class="type__title">Fast Fix <span class="badge badge--blue">New</span></span>
-                  <span class="type__desc">Handyman services for small jobs of 1 to 3 hours. You have the parts and want to book a time now.</span>
+                  <span class="type__desc">Small jobs that take 1 to 3 hours. You have the parts and want to book a time now.</span>
                 </span>
                 <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
               </a>
@@ -156,34 +146,22 @@
           <div class="fsec">
             <fieldset id="fs-jobs" aria-describedby="jobs-hint err-jobs">
               <legend class="t-strong">Pick everything that applies</legend>
-              <p class="t-meta" id="jobs-hint">Choose as many as you need. Times are estimates.</p>
+              <p class="t-meta" id="jobs-hint">Choose as many as you need. Don&rsquo;t see yours? Show all and pick Something else.</p>
               <div class="opts" id="jobs"></div>
-              <p class="error" id="err-jobs" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Pick a job, or describe it below.</span></p>
-              <div class="note" id="note-over" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> Your jobs add up to about <span id="over-time"></span>, so we will send this to our team as a service request. You will not need to enter anything else.</span></div>
-            </fieldset>
-          </div>
-
-          <div class="fsec">
-            <div class="field" id="field-desc">
-              <label class="t-strong" for="desc">Tell us what you need done</label>
-              <p class="t-meta" id="desc-hint">Include what needs to be repaired or installed and how many items.</p>
-              <textarea class="textarea" id="desc" rows="4" aria-describedby="desc-hint err-desc" placeholder="Example: Install 2 curtain rods and mount 1 TV."></textarea>
-              <p class="error" id="err-desc" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Tell us a little about what you need done.</span></p>
-            </div>
-          </div>
-
-          <div class="fsec" id="fsec-hours">
-            <fieldset id="fs-hours" aria-describedby="hours-hint err-hours">
-              <legend class="t-strong">How long should we book?</legend>
-              <p class="t-meta" id="hours-hint">Billed at $55 per hour. Your Home Manager will do what fits in the time you book.</p>
-              <div class="opts opts--3" id="hours">
-                <label class="opt opt--dur"><input type="radio" name="hours" value="1"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>1 hour</span><span class="opt__meta">$55</span></label>
-                <label class="opt opt--dur"><input type="radio" name="hours" value="2"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>2 hours</span><span class="opt__meta">$110</span></label>
-                <label class="opt opt--dur"><input type="radio" name="hours" value="3"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>3 hours</span><span class="opt__meta">$165</span></label>
+              <div class="jobs__more">
+                <button class="link" type="button" id="jobs-toggle" aria-expanded="false" aria-controls="jobs"><span data-label>Show all 25 jobs</span><svg class="i"><use href="#ri-arrow-down-s-line"/></svg></button>
+                <span class="sr-only" id="jobs-count" aria-live="polite"></span>
               </div>
-              <p class="error" id="err-hours" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose how long to book.</span></p>
-              <div class="note" id="note-hours" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span id="note-hours-text"></span></div>
+              <p class="error" id="err-jobs" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Pick at least one job.</span></p>
+              <div class="note" id="note-over" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.</span></div>
             </fieldset>
+          </div>
+
+          <div class="fsec" role="group" aria-labelledby="details-title">
+            <h2 class="t-strong" id="details-title">Tell us what you need done</h2>
+            <p class="t-meta" id="details-hint">Include what needs to be repaired or installed and how many items.</p>
+            <div class="details" id="details"></div>
+            <p class="t-meta details__empty" id="details-empty">Pick a job above and a box for it will appear here.</p>
           </div>
 
           <div class="factions">
@@ -245,6 +223,23 @@
         <!-- ============ 3. Pick a time ============ -->
         <section class="card" data-screen-id="time" aria-label="Pick a time" hidden>
           <div class="message message--alert" id="err-time" role="alert" hidden><span class="message__icon"><svg class="i"><use href="#ri-error-warning-fill"/></svg></span><p class="message__text"><strong id="err-time-lead"></strong> <span id="err-time-text"></span></p></div>
+          <div class="rec" id="rec">
+            <div class="rec__head">
+              <div class="rec__text">
+                <p class="rec__label">Recommended time</p>
+                <p class="rec__value" id="rec-value">2 hours</p>
+                <p class="t-meta" id="rec-meta"></p>
+              </div>
+              <button class="link" type="button" id="rec-change" aria-expanded="false" aria-controls="rec-options"><span data-label>Change</span></button>
+            </div>
+            <div class="opts opts--3" id="rec-options" role="radiogroup" aria-label="How long to book" hidden>
+              <label class="opt opt--dur"><input type="radio" name="hours" value="1"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>1 hour</span><span class="opt__meta">$55</span><span class="opt__rec" data-rec-for="1" hidden>Recommended</span></label>
+              <label class="opt opt--dur"><input type="radio" name="hours" value="2"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>2 hours</span><span class="opt__meta">$110</span><span class="opt__rec" data-rec-for="2" hidden>Recommended</span></label>
+              <label class="opt opt--dur"><input type="radio" name="hours" value="3"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>3 hours</span><span class="opt__meta">$165</span><span class="opt__rec" data-rec-for="3" hidden>Recommended</span></label>
+            </div>
+            <div class="note" id="note-hours" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span id="note-hours-text"></span></div>
+          </div>
+
           <div class="book" id="book">
             <div>
               <h2 class="t-strong" id="cal-title">Select the date</h2>
@@ -309,7 +304,7 @@
           <div class="d-head"><h2 class="t-title" id="summary-title">Your request</h2></div>
           <dl class="sum">
             <div class="sum__row"><dt class="sum__label" id="s-home-label">Home</dt><dd class="sum__val sum__home"><svg class="i"><use href="#ri-home-4-line"/></svg><span><span id="s-addr">4817 Mueller Blvd</span><span class="sum__sub" id="s-city">Austin, TX 78723</span></span></dd></div>
-            <div class="sum__row" id="s-jobs-row" hidden><dt class="sum__label">Jobs</dt><dd class="sum__val"><ul class="sum__list" id="s-jobs"></ul><p class="sum__text" id="s-text" hidden></p></dd></div>
+            <div class="sum__row" id="s-jobs-row" hidden><dt class="sum__label">Jobs</dt><dd class="sum__val"><ul class="sum__jobs" id="s-jobs"></ul></dd></div>
             <div class="sum__row" id="s-answers-row" hidden><dt class="sum__label">Your answers</dt><dd class="sum__val"><ul class="sum__list sum__list--plain" id="s-answers"></ul></dd></div>
             <div class="sum__row" id="s-when-row" hidden><dt class="sum__label">When</dt><dd class="sum__val"><span id="s-when"></span><span class="sum__sub" id="s-hm"></span></dd></div>
           </dl>

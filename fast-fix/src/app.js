@@ -13,23 +13,42 @@
     mueller: { addr: "4817 Mueller Blvd", city: "Austin, TX 78723", hm: "Marcus Reyes", ini: "MR" },
     elm: { addr: "1206 Elm Ridge Dr", city: "Round Rock, TX 78664", hm: "Tom Alvarez", ini: "TA" }
   };
+  /* 25 jobs (illustrative; the real list is curated with Ops). `min` is an internal estimate used only to
+     recommend a booking length. It is never shown to the member. `ex` is the placeholder example. */
   var JOBS = [
-    { id: "toilet-run", title: "Running toilet", icon: "ri-drop-line", min: 60 },
-    { id: "toilet-clog", title: "Clogged toilet", icon: "ri-water-flash-line", min: 60 },
-    { id: "lock", title: "Door lock issue", icon: "ri-door-lock-line", min: 60 },
-    { id: "door", title: "Sticking or loose door", icon: "ri-door-closed-line", min: 30 },
-    { id: "disposal", title: "Garbage disposal issue", icon: "ri-recycle-line", min: 60 },
-    { id: "appliance", title: "Appliance diagnostic", icon: "ri-fridge-line", min: 60 },
-    { id: "tv", title: "Mount a TV", icon: "ri-tv-line", min: 60 },
-    { id: "hang", title: "Hang shelves, curtain rods or art", icon: "ri-ruler-line", min: 60 },
-    { id: "assemble", title: "Assemble furniture", icon: "ri-sofa-line", min: 60 },
-    { id: "caulk", title: "Caulk or seal", icon: "ri-paint-brush-line", min: 60 },
-    { id: "other", title: "Something else", icon: "ri-add-line", min: 60 }
+    { id: "toilet-run", title: "Running toilet", icon: "ri-drop-line", min: 60, ex: "Example: The hall bath toilet keeps running after I flush." },
+    { id: "toilet-clog", title: "Clogged toilet", icon: "ri-water-flash-line", min: 60, ex: "Example: The guest bath toilet clogs every few days." },
+    { id: "lock", title: "Door lock issue", icon: "ri-door-lock-line", min: 60, ex: "Example: The front door lock sticks and is hard to turn." },
+    { id: "door", title: "Sticking or loose door", icon: "ri-door-closed-line", min: 30, ex: "Example: The bedroom door rubs the frame and will not latch." },
+    { id: "disposal", title: "Garbage disposal issue", icon: "ri-recycle-line", min: 60, ex: "Example: The kitchen disposal hums but does not spin." },
+    { id: "appliance", title: "Appliance diagnostic", icon: "ri-fridge-line", min: 60, ex: "Example: The dishwasher stopped draining." },
+    { id: "tv", title: "Mount a TV", icon: "ri-tv-line", min: 60, ex: "Example: Mount one 55 inch TV on the living room wall." },
+    { id: "hang", title: "Hang shelves, curtain rods or art", icon: "ri-ruler-line", min: 60, ex: "Example: Hang 2 curtain rods and 3 framed pictures." },
+    { id: "assemble", title: "Assemble furniture", icon: "ri-sofa-line", min: 60, ex: "Example: Assemble 1 dresser and 2 bookshelves." },
+    { id: "caulk", title: "Caulk or seal", icon: "ri-paint-brush-line", min: 60, ex: "Example: Re-caulk around the kitchen sink." },
+    { id: "faucet-leak", title: "Leaky faucet", icon: "ri-contrast-drop-line", min: 60, ex: "Example: The bathroom faucet drips when it is off." },
+    { id: "faucet-swap", title: "Replace a faucet or showerhead", icon: "ri-showers-line", min: 60, ex: "Example: Replace the kitchen faucet. I have the new one." },
+    { id: "light", title: "Replace a light fixture", icon: "ri-lightbulb-line", min: 60, ex: "Example: Replace 2 light fixtures in the hallway." },
+    { id: "outlet", title: "Replace an outlet or switch", icon: "ri-plug-line", min: 60, ex: "Example: Replace 3 outlets and 1 switch with new ones." },
+    { id: "smart", title: "Install a doorbell or thermostat", icon: "ri-router-line", min: 60, ex: "Example: Install a video doorbell at the front door." },
+    { id: "knob", title: "Replace a door knob or handle", icon: "ri-key-2-line", min: 30, ex: "Example: Replace 4 interior door knobs." },
+    { id: "cab-door", title: "Fix a cabinet door or hinge", icon: "ri-archive-drawer-line", min: 30, ex: "Example: A kitchen cabinet door hangs crooked." },
+    { id: "cab-hw", title: "Install cabinet handles", icon: "ri-hammer-line", min: 60, ex: "Example: Install handles on 12 kitchen cabinets." },
+    { id: "drywall", title: "Patch a small drywall hole", icon: "ri-brush-line", min: 60, ex: "Example: Patch a small hole in the hallway wall." },
+    { id: "blinds", title: "Install blinds or curtains", icon: "ri-window-line", min: 60, ex: "Example: Install blinds on 3 windows." },
+    { id: "weather", title: "Add weatherstripping or a door sweep", icon: "ri-home-gear-line", min: 30, ex: "Example: Add a door sweep to the back door." },
+    { id: "smoke", title: "Replace smoke detector batteries", icon: "ri-alarm-warning-line", min: 30, ex: "Example: Replace batteries in 4 smoke detectors." },
+    { id: "towel", title: "Install a towel bar or bath accessory", icon: "ri-ruler-2-line", min: 30, ex: "Example: Install a towel bar and a toilet paper holder." },
+    { id: "childproof", title: "Install safety latches or gates", icon: "ri-lock-line", min: 60, ex: "Example: Install safety latches on 6 lower cabinets." },
+    { id: "other", title: "Something else", icon: "ri-add-line", min: 60, ex: "Example: Tell us what you need and how many items." }
   ];
+  var JOB = {};
+  JOBS.forEach(function (j) { JOB[j.id] = j; });
+  var TOP = 10;
   var RATE = 55;
   var MAX_MIN = 180;
-  var TODAY = new Date(2026, 9, 8);
-  var FIRST_DAY = new Date(2026, 9, 12);
+  var TODAY = new Date(2026, 9, 13);
+  var FIRST_DAY = new Date(2026, 9, 14);
   var LAST_MONTH = { y: 2027, m: 1 };
   var FIRST_MONTH = { y: 2026, m: 9 };
   var STARTS = [480, 570, 660, 780, 870, 960];
@@ -38,7 +57,7 @@
   var SCREENS = ["type", "job", "check", "time", "booked", "sent"];
   var TITLES = {
     type: ["How can we help?", "Choose what fits best."],
-    job: ["What do you need done?", "Fast Fix is for small handyman jobs. All fields are required."],
+    job: ["What do you need done?", "Fast Fix is for small jobs. All fields are required."],
     check: ["A quick check", "Three quick questions so we book the right visit. All are required."],
     time: ["Pick a time", "Real open times with your Home Manager. Your booking is confirmed right away."],
     booked: ["You’re booked", "Confirmed. Nothing else to do."],
@@ -53,7 +72,7 @@
     ladder: "This needs more than a standard step ladder, so our team will plan the right equipment.",
     trade: "Work with gas, wiring or water lines can need a licensed trade, so our team will plan it.",
     part: "You still need the part, so our team will help plan it.",
-    time: "These jobs add up to more than 3 hours, so our team will plan the visit.",
+    time: "These jobs add up to more than a Fast Fix covers, so our team will plan the visit.",
     slots: "We could not find an open time, so our team will find one for you."
   };
   /* Step 2: the vetting questions (Mark's wording). Any answer listed in BAD sends the request to the team. */
@@ -73,7 +92,7 @@
 
   /* ---------- State ---------- */
   var state = {
-    screen: "type", home: "mueller", jobs: {}, desc: "", hours: 0, ladder: "", trade: "", part: "",
+    screen: "type", home: "mueller", jobs: {}, order: [], notes: {}, showAll: false, hours: 0, ladder: "", trade: "", part: "",
     date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}
   };
 
@@ -100,19 +119,18 @@
   function money(n) { return "$" + n; }
 
   /* ---------- Derived ---------- */
-  function pickedJobs() { return JOBS.filter(function (j) { return state.jobs[j.id]; }); }
-  /* "Top 10 list or free form": a described job with nothing ticked counts as "Something else" */
   function selectedJobs() {
-    var p = pickedJobs();
-    if (!p.length && state.desc.trim()) return [JOBS[JOBS.length - 1]];
-    return p;
+    return state.order.filter(function (id) { return state.jobs[id]; }).map(function (id) { return JOB[id]; });
   }
-  function overLimit() { return totalMin() > MAX_MIN; }
   function totalMin() { return selectedJobs().reduce(function (s, j) { return s + j.min; }, 0); }
+  function overLimit() { return totalMin() > MAX_MIN; }
+  /* Recommended booking length: what the picked jobs add up to, rounded up to a whole hour, 1 to 3 */
+  function recommendedHours() { return Math.min(3, Math.max(1, Math.ceil(totalMin() / 60))); }
   function isBad(q) { return BAD[q].indexOf(state[q]) > -1; }
   function routedBy() { return Q.filter(isBad); }
   function checkOutcome() { var r = routedBy(); return r.length ? r[0] : ""; }
-  function hours() { return state.hours || 2; }
+  function hours() { return state.hours || recommendedHours(); }
+  function hoursText(h) { return h + (h === 1 ? " hour" : " hours"); }
 
   /* ---------- Availability (deterministic stand-in for the real calendar) ---------- */
   var BLOCKED = { "2026-10-19": 1, "2026-10-27": 1, "2026-11-11": 1, "2026-11-26": 1, "2026-11-27": 1, "2026-12-25": 1 };
@@ -141,21 +159,56 @@
   }
 
   /* ---------- Rendering: jobs ---------- */
+  /* 10 jobs plus "Show all"; anything already picked stays visible when the list is collapsed */
   function renderJobs() {
-    $("#jobs").innerHTML = JOBS.map(function (j) {
-      var meta = j.id === "other" ? "Describe it below" : "About " + fmtMin(j.min);
-      return '<label class="opt"><input type="checkbox" name="jobs" value="' + j.id + '">' +
+    var shown = JOBS.filter(function (j, i) { return state.showAll || i < TOP || state.jobs[j.id]; });
+    $("#jobs").innerHTML = shown.map(function (j) {
+      return '<label class="opt"><input type="checkbox" name="jobs" value="' + j.id + '"' + (state.jobs[j.id] ? " checked" : "") + '>' +
         '<span class="d-icon" aria-hidden="true"><svg class="i"><use href="#' + j.icon + '"/></svg></span>' +
-        '<span class="opt__main"><span class="opt__title">' + j.title + '</span><span class="opt__meta">' + meta + '</span></span>' +
+        '<span class="opt__main"><span class="opt__title">' + j.title + '</span></span>' +
         '<span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>';
     }).join("");
+    var t = $("#jobs-toggle");
+    t.setAttribute("aria-expanded", String(state.showAll));
+    $("[data-label]", t).textContent = state.showAll ? "Show fewer jobs" : "Show all " + JOBS.length + " jobs";
+    $("use", t).setAttribute("href", state.showAll ? "#ri-arrow-up-s-line" : "#ri-arrow-down-s-line");
+    $("#jobs-count").textContent = "Showing " + shown.length + " of " + JOBS.length + " jobs";
+  }
+
+  /* One labelled text box per picked job, in the order picked. Built with the DOM (member text is never HTML). */
+  function renderDetails() {
+    var box = $("#details"), jobs = selectedJobs();
+    $("#details-empty").hidden = jobs.length > 0;
+    box.innerHTML = "";
+    jobs.forEach(function (j) {
+      var wrap = document.createElement("div");
+      wrap.className = "field detail";
+      wrap.id = "field-note-" + j.id;
+      var label = document.createElement("label");
+      label.setAttribute("for", "note-" + j.id);
+      label.textContent = j.title;
+      var ta = document.createElement("textarea");
+      ta.className = "textarea";
+      ta.id = "note-" + j.id;
+      ta.rows = 3;
+      ta.placeholder = j.ex;
+      ta.value = state.notes[j.id] || "";
+      ta.setAttribute("data-note", j.id);
+      ta.setAttribute("aria-describedby", "details-hint err-note-" + j.id);
+      var err = document.createElement("p");
+      err.className = "error";
+      err.id = "err-note-" + j.id;
+      err.hidden = true;
+      err.setAttribute("role", "alert");
+      err.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span></span>';
+      err.lastChild.textContent = "Add a few details about " + j.title.toLowerCase() + ".";
+      wrap.appendChild(label); wrap.appendChild(ta); wrap.appendChild(err);
+      box.appendChild(wrap);
+    });
   }
 
   /* Push state into the form controls (used when jumping straight to a screen) */
   function syncInputs() {
-    $all('input[name="jobs"]').forEach(function (c) { c.checked = !!state.jobs[c.value]; });
-    $("#desc").value = state.desc;
-    $all('input[name="hours"]').forEach(function (r) { r.checked = +r.value === state.hours; });
     Q.forEach(function (q) {
       $all('input[name="' + q + '"]').forEach(function (r) { r.checked = r.value === state[q]; });
     });
@@ -197,19 +250,18 @@
   }
 
   /* ---------- Rendering: notes, status, CTA, summary ---------- */
-  function updateHoursNote() {
-    var t = totalMin(), over = overLimit(), note = $("#note-hours"), txt = "";
-    $("#note-over").hidden = !over;
-    $("#over-time").textContent = fmtMin(t);
-    $("#fsec-hours").hidden = over;
-    if (t > 0 && !over) {
-      txt = "Your jobs add up to about " + fmtMin(t) + ".";
-      if (state.hours && state.hours * 60 < t) {
-        txt += " Booking " + state.hours + (state.hours === 1 ? " hour" : " hours") + " may not be enough, so your Home Manager might not finish everything.";
-      }
-    }
-    note.hidden = !txt;
-    $("#note-hours-text").textContent = txt;
+  function updateOver() { $("#note-over").hidden = !overLimit(); }
+
+  /* Step 3: the recommended length, with a way to change it */
+  function updateRec() {
+    var rec = recommendedHours(), h = hours();
+    $("#rec-value").textContent = hoursText(h);
+    $("#rec-meta").textContent = (h === rec ? "Recommended for the jobs you picked. " : "You changed this from the recommended " + hoursText(rec) + ". ") + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
+    $all('input[name="hours"]').forEach(function (r) { r.checked = +r.value === h; });
+    $all("[data-rec-for]").forEach(function (el) { el.hidden = +el.getAttribute("data-rec-for") !== rec; });
+    var note = $("#note-hours");
+    note.hidden = h >= rec;
+    $("#note-hours-text").textContent = h >= rec ? "" : "We recommend " + hoursText(rec) + " for these jobs. Booking " + hoursText(h) + " may not be enough, so your Home Manager might not finish everything.";
   }
 
   function updateChecksNotes() {
@@ -221,17 +273,17 @@
   }
 
   function ctaFor(screen) {
-    var n = selectedJobs().length, t = totalMin(), h = state.hours;
+    var n = selectedJobs().length;
     if (screen === "job") {
       return {
         label: overLimit() ? "Send to our team" : "Continue",
-        status: n ? n + (n === 1 ? " job" : " jobs") + " · about " + fmtMin(t) : "Nothing picked yet"
+        status: n ? n + (n === 1 ? " job" : " jobs") + " picked" : "Nothing picked yet"
       };
     }
     if (screen === "check") {
       return {
         label: checkOutcome() ? "Send to our team" : "Continue to times",
-        status: n + (n === 1 ? " job" : " jobs") + " · " + (h ? h + (h === 1 ? " hour" : " hours") : "")
+        status: n + (n === 1 ? " job" : " jobs")
       };
     }
     if (screen === "time") {
@@ -259,12 +311,23 @@
 
     var jobs = selectedJobs(), showJobs = s !== "type" && jobs.length > 0;
     $("#s-jobs-row").hidden = !showJobs;
-    $("#s-jobs").innerHTML = jobs.map(function (j) {
-      return "<li><span>" + j.title + "</span><span>" + fmtMin(j.min) + "</span></li>";
-    }).join("");
-    var txt = state.desc.trim();
-    $("#s-text").hidden = !(showJobs && txt);
-    $("#s-text").textContent = txt;
+    var list = $("#s-jobs");
+    list.innerHTML = "";
+    jobs.forEach(function (j) {
+      var li = document.createElement("li");
+      var t = document.createElement("span");
+      t.className = "sum__jobname";
+      t.textContent = j.title;
+      li.appendChild(t);
+      var note = (state.notes[j.id] || "").trim();
+      if (note) {
+        var n = document.createElement("span");
+        n.className = "sum__jobnote";
+        n.textContent = note;
+        li.appendChild(n);
+      }
+      list.appendChild(li);
+    });
 
     var showWhen = (s === "time") && state.date && state.time !== null;
     $("#s-when-row").hidden = !showWhen;
@@ -276,22 +339,22 @@
     var ans = [];
     if (s === "sent") {
       Q.forEach(function (q) { if (state[q]) ans.push([QNAME[q], QLABEL[q][state[q]]]); });
-      if (state.hours && !overLimit()) ans.push(["Time asked for", state.hours + (state.hours === 1 ? " hour" : " hours")]);
     }
     $("#s-answers-row").hidden = ans.length === 0;
     $("#s-answers").innerHTML = ans.map(function (r) { return "<li><span>" + r[0] + "</span><span>" + r[1] + "</span></li>"; }).join("");
 
-    var showLedger = state.hours && !overLimit() && (s === "job" || s === "check" || s === "time");
+    var showLedger = s === "time" && !body.classList.contains("is-noslots");
     $("#s-ledger").hidden = !showLedger;
     if (showLedger) {
-      $("#l-time").textContent = state.hours + (state.hours === 1 ? " hour" : " hours");
-      $("#l-total").textContent = money(state.hours * RATE);
+      $("#l-time").textContent = hoursText(hours());
+      $("#l-total").textContent = money(hours() * RATE);
     }
   }
 
   function refresh() {
-    updateHoursNote();
+    updateOver();
     updateChecksNotes();
+    if (state.screen === "time") updateRec();
     updateCta();
     updateSummary();
   }
@@ -300,8 +363,8 @@
   function setError(id, on) {
     var el = $("#err-" + id);
     if (el) el.hidden = !on;
-    var field = { desc: "#field-desc" }[id];
-    if (field) $(field).classList.toggle("is-invalid", on);
+    var field = $("#field-" + id);
+    if (field) field.classList.toggle("is-invalid", on);
   }
   function clearErrors(ids) { ids.forEach(function (id) { setError(id, false); }); }
 
@@ -309,8 +372,9 @@
   function seedDemo(screen) {
     if (!selectedJobs().length) {
       state.jobs = { "toilet-run": true, lock: true };
-      state.desc = "The toilet in the hall bath keeps running after I flush, and the front door lock sticks.";
-      state.hours = 2;
+      state.order = ["toilet-run", "lock"];
+      state.notes = { "toilet-run": "The toilet in the hall bath keeps running after I flush.", lock: "The front door lock sticks and is hard to turn." };
+      state.hours = 0;
     }
     if (screen === "time" || screen === "booked") { state.ladder = state.ladder || "yes"; state.trade = state.trade || "no"; state.part = state.part || "have"; }
     if (screen === "sent" && !state.reason) { state.reason = "ladder"; state.ladder = "no"; }
@@ -372,8 +436,10 @@
     /* dock */
     $("#fdock").hidden = !/^(job|check|time)$/.test(screen);
 
+    if (screen === "job") { renderJobs(); renderDetails(); }
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
+      $("#rec").hidden = noSlots;
       $("#book").hidden = noSlots;
       $("#noslots").hidden = !noSlots;
       $("#note-fits").hidden = noSlots;
@@ -402,7 +468,7 @@
     $("#b-addr").textContent = h.addr;
     $("#b-city").textContent = h.city;
     $("#b-jobs").textContent = selectedJobs().map(function (j) { return j.title; }).join(", ");
-    $("#b-len").textContent = hours() + (hours() === 1 ? " hour" : " hours") + " booked";
+    $("#b-len").textContent = hoursText(hours()) + " booked";
     $("#hm-initials").textContent = h.ini;
     $("#hm-role").textContent = h.hm;
     $("#hm-meta").textContent = "Home Manager";
@@ -420,15 +486,12 @@
   function next() {
     var s = state.screen;
     if (s === "job") {
-      var bad = [];
-      if (!selectedJobs().length) bad.push("jobs");
-      if (!state.desc.trim()) bad.push("desc");
-      if (!state.hours && !overLimit()) bad.push("hours");
-      ["jobs", "desc", "hours"].forEach(function (id) { setError(id, bad.indexOf(id) > -1); });
-      if (bad.length) {
-        focusFirst({ jobs: '#jobs input', desc: "#desc", hours: '#hours input' }[bad[0]]);
-        return;
-      }
+      var jobs = selectedJobs(), bad = [];
+      if (!jobs.length) bad.push("jobs");
+      jobs.forEach(function (j) { if (!(state.notes[j.id] || "").trim()) bad.push("note-" + j.id); });
+      setError("jobs", bad.indexOf("jobs") > -1);
+      jobs.forEach(function (j) { setError("note-" + j.id, bad.indexOf("note-" + j.id) > -1); });
+      if (bad.length) { focusFirst(bad[0] === "jobs" ? "#jobs input" : "#" + bad[0]); return; }
       if (overLimit()) { state.reason = "time"; navigate("sent"); return; }
       navigate("check");
       return;
@@ -521,6 +584,15 @@
     var pick = t.closest("[data-home-pick]");
     if (pick) { pickHome(pick.getAttribute("data-home-pick")); return; }
 
+    if (t.closest("#jobs-toggle")) { state.showAll = !state.showAll; renderJobs(); return; }
+    if (t.closest("#rec-change")) {
+      var rc = $("#rec-change"), openRec = rc.getAttribute("aria-expanded") !== "true";
+      rc.setAttribute("aria-expanded", String(openRec));
+      $("[data-label]", rc).textContent = openRec ? "Done" : "Change";
+      $("#rec-options").hidden = !openRec;
+      return;
+    }
+
     var go = t.closest("[data-go]");
     if (go) { e.preventDefault(); navigate(go.getAttribute("data-go")); return; }
     var hand = t.closest("[data-handoff]");
@@ -567,8 +639,22 @@
 
   document.addEventListener("change", function (e) {
     var el = e.target;
-    if (el.name === "jobs") { state.jobs[el.value] = el.checked; setError("jobs", false); }
-    else if (el.name === "hours") { state.hours = +el.value; state.date = null; state.time = null; setError("hours", false); }
+    if (el.name === "jobs") {
+      state.jobs[el.value] = el.checked;
+      var at = state.order.indexOf(el.value);
+      if (el.checked && at < 0) state.order.push(el.value);
+      if (!el.checked && at > -1) state.order.splice(at, 1);
+      /* a different set of jobs means a different recommendation: drop any chosen length and time */
+      state.hours = 0; state.date = null; state.time = null;
+      setError("jobs", false);
+      renderDetails();
+    }
+    else if (el.name === "hours") {
+      state.hours = +el.value === recommendedHours() ? 0 : +el.value;
+      state.time = null; state.date = firstOpenDay();
+      if (state.date) { var hd = parse(state.date); state.month = { y: hd.getFullYear(), m: hd.getMonth() }; }
+      renderCal(); renderTimes();
+    }
     else if (Q.indexOf(el.name) > -1) { state[el.name] = el.value; setError(el.name, false); }
     else if (el.name === "slot") { state.time = +el.value; setError("time", false); }
     else if (el.hasAttribute("data-state-switch")) {
@@ -580,7 +666,8 @@
   });
 
   document.addEventListener("input", function (e) {
-    if (e.target.id === "desc") { state.desc = e.target.value; if (state.desc.trim()) setError("desc", false); refresh(); }
+    var id = e.target.getAttribute && e.target.getAttribute("data-note");
+    if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); refresh(); }
   });
 
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenus(); });
