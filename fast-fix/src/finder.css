@@ -1,100 +1,69 @@
 /* =====================================================================
-   Describe-first variant: a plain "describe what you need" input at the start of step 1.
-   Same language as the rest of the flow: flat, tokens only, no shadows. It is just a form:
-   a labelled input, matched jobs shown as cards, and a few inline choices when a phrase is
-   ambiguous. Blue-tint surfaces are the sample's "recommended / info" surface.
+   Describe-first variant: ONE surface. An optional "describe what you need" input sits directly above
+   the job list. Typing selects matching jobs in that same list; ticking a job yourself always wins.
+   Same language as the rest of the flow: flat, tokens only, no shadows. Blue-tint = the selected surface.
    ===================================================================== */
 
 /* Variant switches */
 body:not(.variant-finder) .finder-only { display: none !important; }
 body.variant-finder .classic-only { display: none !important; }
+body:not(.variant-finder) .jobs-sec { margin-top: 0; padding-top: 0; border-top: 0; }
 
 /* ---------- Describe ---------- */
-.finder { display: flex; flex-direction: column; gap: var(--s-20); }
-.finder__panel { display: flex; flex-direction: column; gap: var(--s-20); }
-.finder__panel[hidden] { display: none; }
 .finder__input { margin-top: var(--s-8); min-height: 112px; }
+.finder__status {
+  display: flex; align-items: center; gap: 6px; min-height: 20px; margin: var(--s-8) 0 0;
+  font-size: 14px; line-height: 20px; color: var(--text-2);
+}
+.finder__status:focus { outline: none; }
+.finder__status-icon { display: inline-flex; flex: none; color: var(--blue-text); }
+.finder__status-icon .i { width: 16px; height: 16px; }
+.finder + .jobs-sec { margin-top: var(--s-12); padding-top: 0; border-top: 0; }
+
 .finder__chips { display: flex; flex-wrap: wrap; gap: var(--s-8); }
-.finder__chips-label { display: block; margin: 0 0 var(--s-8); font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
-.finder__row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); flex-wrap: wrap; }
 .chip { font-family: inherit; letter-spacing: var(--track); }
 .chip:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; }
-.finder__chips .chip, .finder-q .chip { min-height: 44px; }
+.finder-q .chip { min-height: 44px; }
 
-/* The member's own description, with the matched phrases highlighted (underline + tint, never colour alone) */
-.finder__you { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-12); padding: var(--s-12) var(--s-16); border-radius: var(--r-inner); background: var(--page); }
-.finder__you-body { min-width: 0; }
-.finder__you-label { margin: 0 0 2px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
-.finder__you-text { margin: 0; overflow-wrap: anywhere; }
-.finder__you mark { padding: 0 2px; border-radius: 4px; background: var(--blue-tint); color: inherit; box-shadow: inset 0 -2px 0 var(--blue); }
-.finder__maybe { text-decoration: underline dotted; text-decoration-thickness: 2px; text-underline-offset: 3px; }
-.finder__you .link { flex: none; min-height: 44px; margin: -12px -8px 0 0; padding: 0 var(--s-8); }
-.finder__summary { margin: 0; color: var(--text-2); }
-
-/* Loading */
-.skel { height: 64px; border-radius: var(--r-inner); background: var(--page); animation: finder-pulse 1.2s ease-in-out infinite; }
-.skel:nth-child(4) { animation-delay: .15s; }
-
-/* Inline choices when a phrase could mean more than one job, or matched none */
+/* One-tap questions: ambiguous phrase, or a phrase that matched no job */
 .finder-qs { display: flex; flex-direction: column; gap: var(--s-12); }
 .finder-qs:empty { display: none; }
-.finder-q { padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); animation: finder-in .2s ease both; }
-.finder-q__text { margin: 0 0 var(--s-12); font-weight: 600; }
+.finder-qs:not(:empty) { margin-top: var(--s-12); }
+.finder-q { padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); }
+.finder-q__text { margin: 0 0 var(--s-12); font-weight: 600; overflow-wrap: anywhere; }
 .finder-q .chip { background: var(--surface); }
 .finder-q .chip:hover { border-color: var(--blue); }
 
-/* ---------- Matched jobs ---------- */
-.picks__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-12); }
-.picks__head h2 { margin: 0; }
-.picks__head h2:focus { outline: none; }
-.picks { display: flex; flex-direction: column; gap: var(--s-12); margin: 0; }
-.pick { padding: var(--s-16); border-radius: var(--r-inner); background: var(--page); animation: finder-in .2s ease both; }
-.pick__top { display: flex; align-items: flex-start; gap: var(--s-12); }
-.pick .d-icon { background: var(--surface); }
-.pick__main { flex: 1; min-width: 0; padding-top: 8px; }
-.pick__title { margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; }
-.pick__quote { margin: 0; font-size: 14px; line-height: 20px; color: var(--text-2); overflow-wrap: anywhere; }
-.pick__remove { flex: none; margin: -2px -6px 0 0; }
-.pick__more { margin-top: var(--s-4); padding-left: 52px; }
-.pick__more .link { min-height: 44px; }
-.pick__box { margin-top: var(--s-4); }
-.pick__box[hidden] { display: none; }
-.pick__box label { display: block; font-size: 14px; line-height: 20px; font-weight: 600; }
-.pick__box label span { font-weight: 400; color: var(--text-2); }
-.pick__box .textarea { margin-top: var(--s-8); min-height: 80px; }
-.picks__empty { margin: 0; padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-faint); }
+/* ---------- The list (one place to select) ---------- */
+body.variant-finder #jobs { grid-template-columns: minmax(0, 1fr); gap: var(--s-8); }
 
-/* Add another + browse */
-.finder__add { display: flex; gap: var(--s-8); }
-.input {
-  flex: 1; min-width: 0; height: 48px; padding: 0 var(--s-16); border: 1px solid var(--slate); border-radius: var(--r-pill);
-  background: var(--surface); color: var(--ink); font: inherit; font-size: 16px; line-height: 24px; letter-spacing: var(--track);
-}
-.input::placeholder { color: var(--text-2); opacity: 1; }
-.input:hover { border-color: var(--blue); }
-.input:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; border-color: var(--blue-text); }
-.finder__browse-toggle { align-self: flex-start; min-height: 44px; }
+.job { display: flex; flex-direction: column; border-radius: var(--r-inner); background: var(--page); transition: background-color .15s ease, box-shadow .15s ease; }
+.job[hidden] { display: none; }
+.job:not(.is-on):hover { box-shadow: inset 0 0 0 1px var(--blue); }
+.job.is-on { background: var(--blue-tint); box-shadow: inset 0 0 0 2px var(--blue); }
+.job .opt, .job .opt:hover, .job .opt:has(input:checked), .job .opt:has(input:checked):hover { background: none; box-shadow: none; }
+.job.is-on .d-icon { color: var(--blue-text); }
+.job.is-on .opt__title { color: var(--ink); }
+.opt__quote { font-size: 14px; line-height: 20px; font-weight: 400; color: var(--text-2); overflow-wrap: anywhere; }
+.opt__quote[hidden] { display: none; }
 
-/* The full list, available under "Browse all jobs" */
-body.variant-finder .finder-browse:not(.is-open) { display: none; }
-.finder + .finder-browse { margin-top: var(--s-24); padding-top: var(--s-24); border-top: 1px solid var(--border); }
-
-/* ---------- Motion (subtle; off for people who ask for less) ---------- */
-@keyframes finder-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@keyframes finder-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-@media (prefers-reduced-motion: reduce) {
-  .finder-q, .pick, .skel { animation: none; }
-}
-
-/* ---------- Visibility by phase ---------- */
-body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .factions { display: none; }
+/* Optional details, right under the job they belong to. Always empty until the member writes. */
+.job__more { padding: 0 var(--s-16) var(--s-4) calc(var(--s-16) + 40px + var(--s-12)); }
+.job__more[hidden] { display: none; }
+.job__more > .link { min-height: 44px; }
+.job__box { padding-bottom: var(--s-12); }
+.job__box[hidden] { display: none; }
+.job__box label { display: block; font-size: 14px; line-height: 20px; font-weight: 600; }
+.job__box label span { font-weight: 400; color: var(--text-2); }
+.job__box .textarea { margin-top: var(--s-8); min-height: 80px; }
 
 /* ---------- Mobile ---------- */
 @container app (max-width: 767px) {
-  .finder__row { flex-direction: column-reverse; align-items: stretch; gap: var(--s-8); }
-  .finder__row .btn { width: 100%; }
-  .finder__row .link { align-self: center; min-height: 44px; }
-  .pick__more { padding-left: 0; }
-  .pick__main { padding-top: 0; align-self: center; }
-  .finder__add .btn { padding: 0 var(--s-16); }
+  .job__more { padding-left: var(--s-16); }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .job { transition: none; }
+}
+
+.fdock__status:empty { display: none; }

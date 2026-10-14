@@ -143,64 +143,19 @@
 
         <!-- ============ 1. The job ============ -->
         <section class="card" data-screen-id="job" aria-label="The job" hidden>
-          <div class="finder finder-only" id="finder" data-phase="ask">
 
-            <!-- Describe -->
-            <div class="finder__panel" id="finder-ask">
-              <div class="field" id="field-finder">
-                <label class="t-strong" for="finder-input">Describe what you need</label>
-                <p class="t-meta" id="finder-hint">Mention as many things as you like.</p>
-                <textarea class="textarea finder__input" id="finder-input" rows="3" maxlength="600" aria-describedby="finder-hint err-finder" placeholder="For example: the toilet keeps running, my front door lock sticks, and I need a TV mounted."></textarea>
-                <p class="error" id="err-finder" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Describe a few things first, or pick from the list.</span></p>
-              </div>
-              <div>
-                <p class="finder__chips-label">Or start with an example</p>
-                <div class="finder__chips" role="group" aria-label="Examples">
-                  <button class="chip" type="button" data-finder-example="The toilet keeps running and the bedroom door sticks">Running toilet and a sticking door</button>
-                  <button class="chip" type="button" data-finder-example="Mount a TV and hang some shelves">Mount a TV and hang shelves</button>
-                  <button class="chip" type="button" data-finder-example="Replace the kitchen faucet and a light fixture in the hallway">Replace a faucet and a light</button>
-                </div>
-              </div>
-              <div class="finder__row">
-                <button class="link" type="button" data-finder-browse>Pick from the list instead</button>
-                <button class="btn btn--primary btn--lg" type="button" data-finder-send><svg class="i"><use href="#ri-search-line"/></svg>Find jobs</button>
-              </div>
+          <!-- Describe-first variant: one optional input above the same list. Typing selects jobs in the list below. -->
+          <div class="fsec finder-only finder" id="finder">
+            <div class="field" id="field-finder">
+              <label class="t-strong" for="finder-input">Describe what you need</label>
+              <p class="t-meta" id="finder-hint">Write it your way, one job or several. Matching jobs are selected below.</p>
+              <textarea class="textarea finder__input" id="finder-input" rows="3" maxlength="600" aria-describedby="finder-hint" placeholder="For example: the toilet keeps running, my front door lock sticks, and I need a TV mounted."></textarea>
             </div>
-
-            <!-- Loading -->
-            <div class="finder__panel" id="finder-thinking" hidden aria-busy="true">
-              <div class="finder__you"><div class="finder__you-body"><p class="finder__you-label">Your description</p><p class="finder__you-text" id="finder-said"></p></div></div>
-              <p class="t-meta" role="status">Finding jobs&hellip;</p>
-              <div class="skel" aria-hidden="true"></div>
-              <div class="skel" aria-hidden="true"></div>
-            </div>
-
-            <!-- Matches -->
-            <div class="finder__panel" id="finder-picks" hidden>
-              <div class="finder__you" id="finder-you">
-                <div class="finder__you-body"><p class="finder__you-label">Your description</p><p class="finder__you-text" id="finder-you-text"></p></div>
-                <button class="link" type="button" id="finder-edit">Edit</button>
-              </div>
-              <p class="finder__summary" id="finder-summary"></p>
-              <div class="finder-qs" id="finder-questions"></div>
-              <div class="picks__head"><h2 class="t-strong" id="picks-title" tabindex="-1">Selected jobs</h2><span class="t-meta" id="picks-count"></span></div>
-              <ul class="picks" id="picks"></ul>
-              <p class="picks__empty t-meta" id="picks-empty" hidden>Nothing picked yet. Describe another job below, or browse the full list.</p>
-              <p class="error" id="err-picks" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Add at least one job, or browse the list.</span></p>
-              <div class="note" id="note-over-finder" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> We can send it to our team as a service request, or you can remove a job or two.</span></div>
-              <div id="finder-add-wrap">
-                <label class="finder__chips-label" for="finder-more">Add another job</label>
-                <div class="finder__add">
-                  <input class="input" type="text" id="finder-more" maxlength="300" placeholder="Describe another job">
-                  <button class="btn btn--secondary" type="button" id="finder-add">Add</button>
-                </div>
-              </div>
-              <button class="link finder__browse-toggle" type="button" id="finder-browse-toggle" aria-expanded="false" aria-controls="finder-browse"><span data-label>Browse all 25 jobs</span><svg class="i"><use href="#ri-arrow-down-s-line"/></svg></button>
-            </div>
-            <span class="sr-only" id="finder-live" aria-live="polite"></span>
+            <p class="finder__status" id="finder-status" role="status"></p>
+            <div class="finder-qs" id="finder-questions"></div>
           </div>
 
-          <div class="fsec finder-browse" id="finder-browse">
+          <div class="fsec jobs-sec">
             <fieldset id="fs-jobs" aria-describedby="jobs-hint err-jobs">
               <legend class="t-strong">Pick everything that applies</legend>
               <p class="t-meta" id="jobs-hint">Choose as many as you need. Don&rsquo;t see yours? Show all and pick Something else.</p>
@@ -213,6 +168,7 @@
               <div class="note" id="note-over" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.</span></div>
             </fieldset>
           </div>
+          <span class="sr-only" id="finder-live" aria-live="polite"></span>
 
           <div class="fsec classic-only" role="group" aria-labelledby="details-title">
             <h2 class="t-strong" id="details-title">Tell us what you need done</h2>
@@ -418,11 +374,17 @@
     <label class="proto__opt">No open times<span class="switch"><input type="checkbox" data-state-switch="noslots"><span class="switch__track"></span></span></label>
     <label class="proto__opt">Chosen time just taken<span class="switch"><input type="checkbox" data-state-switch="taken"><span class="switch__track"></span></span></label>
     <label class="proto__opt finder-only">Matching is unavailable<span class="switch"><input type="checkbox" data-state-switch="finderdown"><span class="switch__track"></span></span></label>
+    <div class="proto__go finder-only" role="group" aria-label="Try a description">
+      <p class="proto__title">Try a description</p>
+      <button class="proto__link" type="button" data-finder-example="The toilet keeps running, my front door lock sticks, and I need a TV mounted">Three clear jobs</button>
+      <button class="proto__link" type="button" data-finder-example="The faucet is a problem and the stairs squeak">A question and an unmatched phrase</button>
+      <button class="proto__link" type="button" data-finder-example="Mount a TV, hang shelves, assemble a dresser, replace a faucet and caulk the tub">Too many jobs</button>
+    </div>
     <div class="proto__go" role="group" aria-label="Jump to screen">
       <p class="proto__title">Jump to screen</p>
       <button class="proto__link" type="button" data-jump="type">Request type</button>
       <button class="proto__link" type="button" data-jump="job">Fast Fix 1 · The job</button>
-      <button class="proto__link finder-only" type="button" data-jump-picks>Fast Fix 1 · Selected jobs</button>
+      <button class="proto__link finder-only" type="button" data-jump-picks>Fast Fix 1 · With a description</button>
       <button class="proto__link" type="button" data-jump="check">Fast Fix 2 · Quick check</button>
       <button class="proto__link" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>
       <button class="proto__link" type="button" data-jump="booked">Booked</button>

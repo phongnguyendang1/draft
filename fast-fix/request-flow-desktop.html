@@ -776,105 +776,74 @@ html:has(body.frame-mobile[data-dock="on"]) { scroll-padding-bottom: 148px; }
 }
 
 /* =====================================================================
-   Describe-first variant: a plain "describe what you need" input at the start of step 1.
-   Same language as the rest of the flow: flat, tokens only, no shadows. It is just a form:
-   a labelled input, matched jobs shown as cards, and a few inline choices when a phrase is
-   ambiguous. Blue-tint surfaces are the sample's "recommended / info" surface.
+   Describe-first variant: ONE surface. An optional "describe what you need" input sits directly above
+   the job list. Typing selects matching jobs in that same list; ticking a job yourself always wins.
+   Same language as the rest of the flow: flat, tokens only, no shadows. Blue-tint = the selected surface.
    ===================================================================== */
 
 /* Variant switches */
 body:not(.variant-finder) .finder-only { display: none !important; }
 body.variant-finder .classic-only { display: none !important; }
+body:not(.variant-finder) .jobs-sec { margin-top: 0; padding-top: 0; border-top: 0; }
 
 /* ---------- Describe ---------- */
-.finder { display: flex; flex-direction: column; gap: var(--s-20); }
-.finder__panel { display: flex; flex-direction: column; gap: var(--s-20); }
-.finder__panel[hidden] { display: none; }
 .finder__input { margin-top: var(--s-8); min-height: 112px; }
+.finder__status {
+  display: flex; align-items: center; gap: 6px; min-height: 20px; margin: var(--s-8) 0 0;
+  font-size: 14px; line-height: 20px; color: var(--text-2);
+}
+.finder__status:focus { outline: none; }
+.finder__status-icon { display: inline-flex; flex: none; color: var(--blue-text); }
+.finder__status-icon .i { width: 16px; height: 16px; }
+.finder + .jobs-sec { margin-top: var(--s-12); padding-top: 0; border-top: 0; }
+
 .finder__chips { display: flex; flex-wrap: wrap; gap: var(--s-8); }
-.finder__chips-label { display: block; margin: 0 0 var(--s-8); font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
-.finder__row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); flex-wrap: wrap; }
 .chip { font-family: inherit; letter-spacing: var(--track); }
 .chip:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; }
-.finder__chips .chip, .finder-q .chip { min-height: 44px; }
+.finder-q .chip { min-height: 44px; }
 
-/* The member's own description, with the matched phrases highlighted (underline + tint, never colour alone) */
-.finder__you { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-12); padding: var(--s-12) var(--s-16); border-radius: var(--r-inner); background: var(--page); }
-.finder__you-body { min-width: 0; }
-.finder__you-label { margin: 0 0 2px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
-.finder__you-text { margin: 0; overflow-wrap: anywhere; }
-.finder__you mark { padding: 0 2px; border-radius: 4px; background: var(--blue-tint); color: inherit; box-shadow: inset 0 -2px 0 var(--blue); }
-.finder__maybe { text-decoration: underline dotted; text-decoration-thickness: 2px; text-underline-offset: 3px; }
-.finder__you .link { flex: none; min-height: 44px; margin: -12px -8px 0 0; padding: 0 var(--s-8); }
-.finder__summary { margin: 0; color: var(--text-2); }
-
-/* Loading */
-.skel { height: 64px; border-radius: var(--r-inner); background: var(--page); animation: finder-pulse 1.2s ease-in-out infinite; }
-.skel:nth-child(4) { animation-delay: .15s; }
-
-/* Inline choices when a phrase could mean more than one job, or matched none */
+/* One-tap questions: ambiguous phrase, or a phrase that matched no job */
 .finder-qs { display: flex; flex-direction: column; gap: var(--s-12); }
 .finder-qs:empty { display: none; }
-.finder-q { padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); animation: finder-in .2s ease both; }
-.finder-q__text { margin: 0 0 var(--s-12); font-weight: 600; }
+.finder-qs:not(:empty) { margin-top: var(--s-12); }
+.finder-q { padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); }
+.finder-q__text { margin: 0 0 var(--s-12); font-weight: 600; overflow-wrap: anywhere; }
 .finder-q .chip { background: var(--surface); }
 .finder-q .chip:hover { border-color: var(--blue); }
 
-/* ---------- Matched jobs ---------- */
-.picks__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-12); }
-.picks__head h2 { margin: 0; }
-.picks__head h2:focus { outline: none; }
-.picks { display: flex; flex-direction: column; gap: var(--s-12); margin: 0; }
-.pick { padding: var(--s-16); border-radius: var(--r-inner); background: var(--page); animation: finder-in .2s ease both; }
-.pick__top { display: flex; align-items: flex-start; gap: var(--s-12); }
-.pick .d-icon { background: var(--surface); }
-.pick__main { flex: 1; min-width: 0; padding-top: 8px; }
-.pick__title { margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; }
-.pick__quote { margin: 0; font-size: 14px; line-height: 20px; color: var(--text-2); overflow-wrap: anywhere; }
-.pick__remove { flex: none; margin: -2px -6px 0 0; }
-.pick__more { margin-top: var(--s-4); padding-left: 52px; }
-.pick__more .link { min-height: 44px; }
-.pick__box { margin-top: var(--s-4); }
-.pick__box[hidden] { display: none; }
-.pick__box label { display: block; font-size: 14px; line-height: 20px; font-weight: 600; }
-.pick__box label span { font-weight: 400; color: var(--text-2); }
-.pick__box .textarea { margin-top: var(--s-8); min-height: 80px; }
-.picks__empty { margin: 0; padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-faint); }
+/* ---------- The list (one place to select) ---------- */
+body.variant-finder #jobs { grid-template-columns: minmax(0, 1fr); gap: var(--s-8); }
 
-/* Add another + browse */
-.finder__add { display: flex; gap: var(--s-8); }
-.input {
-  flex: 1; min-width: 0; height: 48px; padding: 0 var(--s-16); border: 1px solid var(--slate); border-radius: var(--r-pill);
-  background: var(--surface); color: var(--ink); font: inherit; font-size: 16px; line-height: 24px; letter-spacing: var(--track);
-}
-.input::placeholder { color: var(--text-2); opacity: 1; }
-.input:hover { border-color: var(--blue); }
-.input:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; border-color: var(--blue-text); }
-.finder__browse-toggle { align-self: flex-start; min-height: 44px; }
+.job { display: flex; flex-direction: column; border-radius: var(--r-inner); background: var(--page); transition: background-color .15s ease, box-shadow .15s ease; }
+.job[hidden] { display: none; }
+.job:not(.is-on):hover { box-shadow: inset 0 0 0 1px var(--blue); }
+.job.is-on { background: var(--blue-tint); box-shadow: inset 0 0 0 2px var(--blue); }
+.job .opt, .job .opt:hover, .job .opt:has(input:checked), .job .opt:has(input:checked):hover { background: none; box-shadow: none; }
+.job.is-on .d-icon { color: var(--blue-text); }
+.job.is-on .opt__title { color: var(--ink); }
+.opt__quote { font-size: 14px; line-height: 20px; font-weight: 400; color: var(--text-2); overflow-wrap: anywhere; }
+.opt__quote[hidden] { display: none; }
 
-/* The full list, available under "Browse all jobs" */
-body.variant-finder .finder-browse:not(.is-open) { display: none; }
-.finder + .finder-browse { margin-top: var(--s-24); padding-top: var(--s-24); border-top: 1px solid var(--border); }
-
-/* ---------- Motion (subtle; off for people who ask for less) ---------- */
-@keyframes finder-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@keyframes finder-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-@media (prefers-reduced-motion: reduce) {
-  .finder-q, .pick, .skel { animation: none; }
-}
-
-/* ---------- Visibility by phase ---------- */
-body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .factions { display: none; }
+/* Optional details, right under the job they belong to. Always empty until the member writes. */
+.job__more { padding: 0 var(--s-16) var(--s-4) calc(var(--s-16) + 40px + var(--s-12)); }
+.job__more[hidden] { display: none; }
+.job__more > .link { min-height: 44px; }
+.job__box { padding-bottom: var(--s-12); }
+.job__box[hidden] { display: none; }
+.job__box label { display: block; font-size: 14px; line-height: 20px; font-weight: 600; }
+.job__box label span { font-weight: 400; color: var(--text-2); }
+.job__box .textarea { margin-top: var(--s-8); min-height: 80px; }
 
 /* ---------- Mobile ---------- */
 @container app (max-width: 767px) {
-  .finder__row { flex-direction: column-reverse; align-items: stretch; gap: var(--s-8); }
-  .finder__row .btn { width: 100%; }
-  .finder__row .link { align-self: center; min-height: 44px; }
-  .pick__more { padding-left: 0; }
-  .pick__main { padding-top: 0; align-self: center; }
-  .finder__add .btn { padding: 0 var(--s-16); }
+  .job__more { padding-left: var(--s-16); }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .job { transition: none; }
+}
+
+.fdock__status:empty { display: none; }
 
 </style>
 </head>
@@ -1025,64 +994,19 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
 
         <!-- ============ 1. The job ============ -->
         <section class="card" data-screen-id="job" aria-label="The job" hidden>
-          <div class="finder finder-only" id="finder" data-phase="ask">
 
-            <!-- Describe -->
-            <div class="finder__panel" id="finder-ask">
-              <div class="field" id="field-finder">
-                <label class="t-strong" for="finder-input">Describe what you need</label>
-                <p class="t-meta" id="finder-hint">Mention as many things as you like.</p>
-                <textarea class="textarea finder__input" id="finder-input" rows="3" maxlength="600" aria-describedby="finder-hint err-finder" placeholder="For example: the toilet keeps running, my front door lock sticks, and I need a TV mounted."></textarea>
-                <p class="error" id="err-finder" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Describe a few things first, or pick from the list.</span></p>
-              </div>
-              <div>
-                <p class="finder__chips-label">Or start with an example</p>
-                <div class="finder__chips" role="group" aria-label="Examples">
-                  <button class="chip" type="button" data-finder-example="The toilet keeps running and the bedroom door sticks">Running toilet and a sticking door</button>
-                  <button class="chip" type="button" data-finder-example="Mount a TV and hang some shelves">Mount a TV and hang shelves</button>
-                  <button class="chip" type="button" data-finder-example="Replace the kitchen faucet and a light fixture in the hallway">Replace a faucet and a light</button>
-                </div>
-              </div>
-              <div class="finder__row">
-                <button class="link" type="button" data-finder-browse>Pick from the list instead</button>
-                <button class="btn btn--primary btn--lg" type="button" data-finder-send><svg class="i"><use href="#ri-search-line"/></svg>Find jobs</button>
-              </div>
+          <!-- Describe-first variant: one optional input above the same list. Typing selects jobs in the list below. -->
+          <div class="fsec finder-only finder" id="finder">
+            <div class="field" id="field-finder">
+              <label class="t-strong" for="finder-input">Describe what you need</label>
+              <p class="t-meta" id="finder-hint">Write it your way, one job or several. Matching jobs are selected below.</p>
+              <textarea class="textarea finder__input" id="finder-input" rows="3" maxlength="600" aria-describedby="finder-hint" placeholder="For example: the toilet keeps running, my front door lock sticks, and I need a TV mounted."></textarea>
             </div>
-
-            <!-- Loading -->
-            <div class="finder__panel" id="finder-thinking" hidden aria-busy="true">
-              <div class="finder__you"><div class="finder__you-body"><p class="finder__you-label">Your description</p><p class="finder__you-text" id="finder-said"></p></div></div>
-              <p class="t-meta" role="status">Finding jobs&hellip;</p>
-              <div class="skel" aria-hidden="true"></div>
-              <div class="skel" aria-hidden="true"></div>
-            </div>
-
-            <!-- Matches -->
-            <div class="finder__panel" id="finder-picks" hidden>
-              <div class="finder__you" id="finder-you">
-                <div class="finder__you-body"><p class="finder__you-label">Your description</p><p class="finder__you-text" id="finder-you-text"></p></div>
-                <button class="link" type="button" id="finder-edit">Edit</button>
-              </div>
-              <p class="finder__summary" id="finder-summary"></p>
-              <div class="finder-qs" id="finder-questions"></div>
-              <div class="picks__head"><h2 class="t-strong" id="picks-title" tabindex="-1">Selected jobs</h2><span class="t-meta" id="picks-count"></span></div>
-              <ul class="picks" id="picks"></ul>
-              <p class="picks__empty t-meta" id="picks-empty" hidden>Nothing picked yet. Describe another job below, or browse the full list.</p>
-              <p class="error" id="err-picks" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Add at least one job, or browse the list.</span></p>
-              <div class="note" id="note-over-finder" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> We can send it to our team as a service request, or you can remove a job or two.</span></div>
-              <div id="finder-add-wrap">
-                <label class="finder__chips-label" for="finder-more">Add another job</label>
-                <div class="finder__add">
-                  <input class="input" type="text" id="finder-more" maxlength="300" placeholder="Describe another job">
-                  <button class="btn btn--secondary" type="button" id="finder-add">Add</button>
-                </div>
-              </div>
-              <button class="link finder__browse-toggle" type="button" id="finder-browse-toggle" aria-expanded="false" aria-controls="finder-browse"><span data-label>Browse all 25 jobs</span><svg class="i"><use href="#ri-arrow-down-s-line"/></svg></button>
-            </div>
-            <span class="sr-only" id="finder-live" aria-live="polite"></span>
+            <p class="finder__status" id="finder-status" role="status"></p>
+            <div class="finder-qs" id="finder-questions"></div>
           </div>
 
-          <div class="fsec finder-browse" id="finder-browse">
+          <div class="fsec jobs-sec">
             <fieldset id="fs-jobs" aria-describedby="jobs-hint err-jobs">
               <legend class="t-strong">Pick everything that applies</legend>
               <p class="t-meta" id="jobs-hint">Choose as many as you need. Don&rsquo;t see yours? Show all and pick Something else.</p>
@@ -1095,6 +1019,7 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
               <div class="note" id="note-over" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.</span></div>
             </fieldset>
           </div>
+          <span class="sr-only" id="finder-live" aria-live="polite"></span>
 
           <div class="fsec classic-only" role="group" aria-labelledby="details-title">
             <h2 class="t-strong" id="details-title">Tell us what you need done</h2>
@@ -1300,11 +1225,17 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
     <label class="proto__opt">No open times<span class="switch"><input type="checkbox" data-state-switch="noslots"><span class="switch__track"></span></span></label>
     <label class="proto__opt">Chosen time just taken<span class="switch"><input type="checkbox" data-state-switch="taken"><span class="switch__track"></span></span></label>
     <label class="proto__opt finder-only">Matching is unavailable<span class="switch"><input type="checkbox" data-state-switch="finderdown"><span class="switch__track"></span></span></label>
+    <div class="proto__go finder-only" role="group" aria-label="Try a description">
+      <p class="proto__title">Try a description</p>
+      <button class="proto__link" type="button" data-finder-example="The toilet keeps running, my front door lock sticks, and I need a TV mounted">Three clear jobs</button>
+      <button class="proto__link" type="button" data-finder-example="The faucet is a problem and the stairs squeak">A question and an unmatched phrase</button>
+      <button class="proto__link" type="button" data-finder-example="Mount a TV, hang shelves, assemble a dresser, replace a faucet and caulk the tub">Too many jobs</button>
+    </div>
     <div class="proto__go" role="group" aria-label="Jump to screen">
       <p class="proto__title">Jump to screen</p>
       <button class="proto__link" type="button" data-jump="type">Request type</button>
       <button class="proto__link" type="button" data-jump="job">Fast Fix 1 · The job</button>
-      <button class="proto__link finder-only" type="button" data-jump-picks>Fast Fix 1 · Selected jobs</button>
+      <button class="proto__link finder-only" type="button" data-jump-picks>Fast Fix 1 · With a description</button>
       <button class="proto__link" type="button" data-jump="check">Fast Fix 2 · Quick check</button>
       <button class="proto__link" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>
       <button class="proto__link" type="button" data-jump="booked">Booked</button>
@@ -1384,6 +1315,7 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
     type: "Request service", job: "Fast Fix: the job", check: "Fast Fix: quick check",
     time: "Fast Fix: pick a time", booked: "Fast Fix: booked", sent: "Request sent"
   };
+  var FIND_SUB = "Describe it, pick from the list, or both. Adding details is optional.";
   var BACK = { type: null, job: "type", check: "job", time: "check", booked: null, sent: null };
   var WHY = {
     ladder: "This needs more than a standard step ladder, so our team will plan the right equipment.",
@@ -1414,11 +1346,9 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
   };
 
 
-  /* ---------- Describe-first variant: matches what the member types to jobs from the 25-job list ---------- */
+  /* ---------- Describe-first variant: what the member types selects jobs in the list ---------- */
   var FIND = body.classList.contains("variant-finder");
   var REDUCED = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
-  state.finder = { phase: "ask", text: "", marks: [], questions: [], unmatched: [], src: {}, open: {}, down: false };
-  state.browse = false;
 
   /* PROTOTYPE NOTE: finderParse is a rule-based stand-in for the matching service. In production it returns only ids from the
      allowlist plus the phrase each one came from. Everything after the parse step is real UI. */
@@ -1478,7 +1408,7 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
   }
 
   function finderParse(text) {
-    var res = { picks: [], questions: [], unmatched: [], marks: [] };
+    var res = { picks: [], questions: [], unmatched: [] };
     clauses(text).forEach(function (c) {
       var hits = Object.keys(KW).filter(function (id) { return KW[id].test(c.text); });
       if (hits.indexOf("lock") > -1) hits = hits.filter(function (x) { return x !== "door"; });
@@ -1486,287 +1416,240 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
       if (hits.indexOf("faucet-swap") > -1) hits = hits.filter(function (x) { return x !== "faucet-leak"; });
       if (hits.length) {
         hits.forEach(function (id) { if (!res.picks.some(function (p) { return p.id === id; })) res.picks.push({ id: id, quote: c.text }); });
-        res.marks.push({ start: c.start, end: c.end, kind: "pick", ids: hits });
         return;
       }
       var amb = AMBIG.filter(function (a) { return a.re.test(c.text); })[0];
       if (amb) {
         res.questions.push({ kind: "ask", key: amb.key, text: amb.text, options: amb.options, quote: c.text, start: c.start, end: c.end });
-        res.marks.push({ start: c.start, end: c.end, kind: "ask" });
         return;
       }
       if (c.text.split(/\s+/).length >= 3 && !FILLER.test(c.text)) {
         res.unmatched.push({ kind: "none", quote: c.text, start: c.start, end: c.end });
-        res.marks.push({ start: c.start, end: c.end, kind: "none" });
       }
     });
-    if (!res.picks.length && !res.questions.length && !res.unmatched.length) {
+    if (!res.picks.length && !res.questions.length && !res.unmatched.length && text.length >= 8 && /\s/.test(text)) {
       res.unmatched.push({ kind: "none", quote: text, start: 0, end: text.length });
-      res.marks.push({ start: 0, end: text.length, kind: "none" });
     }
     return res;
   }
 
-  function addJob(id, quote) {
-    if (!state.jobs[id]) { state.jobs[id] = true; state.order.push(id); }
-    state.finder.src[id] = quote;
+  /* The member's description and the list are ONE selection. Typing selects matching jobs in the list below;
+     ticking a job yourself always wins. state.finder keeps only the bookkeeping:
+       src      job id -> the phrase it was selected from (shown under the job)
+       auto     ids selected by the text and not touched since (these follow the text if it changes)
+       removed  ids the member unticked while the text still matches (do not re-select them)
+       answers  ambiguity topic -> chosen job ids, or {skip:true}
+       others   unmatched phrases the member chose to add as "Something else";  dismissed: ones they skipped */
+  var finderTimer = null;
+  function finderFresh() {
+    return { text: "", src: {}, auto: {}, removed: {}, answers: {}, others: [], dismissed: [], questions: [], unmatched: [], open: {}, down: false };
   }
+  state.finder = finderFresh();
+
   function resetPicks() { state.hours = 0; state.date = null; state.time = null; }
-
-  function finderApply(res, offset) {
-    var j = state.finder, before = selectedJobs().length;
-    res.picks.forEach(function (p) { addJob(p.id, p.quote); });
-    res.questions.forEach(function (q) { q.start += offset; q.end += offset; j.questions.push(q); });
-    res.unmatched.forEach(function (u) { u.start += offset; u.end += offset; j.unmatched.push(u); });
-    res.marks.forEach(function (m) { j.marks.push({ start: m.start + offset, end: m.end + offset, kind: m.kind, ids: m.ids }); });
-    resetPicks();
-    return selectedJobs().length - before;
+  function selectJob(id) { if (!state.jobs[id]) { state.jobs[id] = true; state.order.push(id); } }
+  function unselectJob(id) {
+    state.jobs[id] = false;
+    var at = state.order.indexOf(id); if (at > -1) state.order.splice(at, 1);
   }
 
-  function finderReset() {
-    var j = state.finder;
-    Object.keys(j.src).forEach(function (id) {
-      state.jobs[id] = false;
-      var at = state.order.indexOf(id); if (at > -1) state.order.splice(at, 1);
-      delete state.notes[id];
+  /* Re-read the description and bring the list in line with it */
+  function finderSync() {
+    var j = state.finder, text = j.text.trim();
+    clearTimeout(finderTimer); finderTimer = null;
+    if (body.classList.contains("is-finderdown")) { j.down = true; renderFinderMeta(); return; }
+    j.down = false;
+    var res = text.length >= 2 ? finderParse(text) : { picks: [], questions: [], unmatched: [] };
+
+    var want = {}, order = [];
+    function wantJob(id, quote) { if (!(id in want)) { want[id] = quote; order.push(id); } }
+    res.picks.forEach(function (p) { wantJob(p.id, p.quote); });
+
+    var topics = {}, present = {};
+    j.questions = []; j.unmatched = [];
+    res.questions.forEach(function (q) {
+      topics[q.key] = 1;
+      var a = j.answers[q.key];
+      if (!a) j.questions.push(q);
+      else (a.ids || []).forEach(function (id) { wantJob(id, q.quote); });
     });
-    j.src = {}; j.marks = []; j.questions = []; j.unmatched = []; j.open = {};
-    resetPicks();
-  }
+    Object.keys(j.answers).forEach(function (k) { if (!topics[k]) delete j.answers[k]; });
 
+    var other = [];
+    res.unmatched.forEach(function (u) {
+      present[u.quote] = 1;
+      if (j.others.indexOf(u.quote) > -1) other.push(u.quote);
+      else if (j.dismissed.indexOf(u.quote) < 0) j.unmatched.push(u);
+    });
+    j.others = j.others.filter(function (q) { return present[q]; });
+    j.dismissed = j.dismissed.filter(function (q) { return present[q]; });
+    if (other.length) wantJob("other", other.join("; "));
+
+    var added = [], dropped = [];
+    Object.keys(j.auto).forEach(function (id) {
+      if (id in want) return;
+      delete j.auto[id];
+      if (state.jobs[id] && !(state.notes[id] || "").trim()) { unselectJob(id); dropped.push(id); }
+    });
+    Object.keys(j.removed).forEach(function (id) { if (!(id in want)) delete j.removed[id]; });
+    j.src = {};
+    order.forEach(function (id) {
+      j.src[id] = want[id];
+      if (!state.jobs[id] && !j.removed[id]) { selectJob(id); j.auto[id] = true; added.push(id); }
+    });
+    if (added.length || dropped.length) resetPicks();
+    if (selectedJobs().length) setError("jobs", false);
+
+    renderFinderMeta();
+    if (added.length) announce("Selected " + titlesOf(added) + ".");
+    else if (dropped.length) announce("Removed " + titlesOf(dropped) + ".");
+  }
+  function finderQueue() {
+    clearTimeout(finderTimer);
+    finderTimer = setTimeout(finderSync, REDUCED ? 250 : 500);
+  }
+  function finderSetText(text) {
+    var j = state.finder, ta = $("#finder-input");
+    j.text = text; ta.value = text;
+    finderSync();
+  }
   function finderSeed() {
-    var text = "The toilet keeps running, the front door lock sticks, and I need a light fixture replaced in the second-story hallway.";
-    finderReset();
-    state.finder.text = text; state.finder.down = false;
-    finderApply(finderParse(text), 0);
-    state.finder.phase = "picks";
-  }
-
-  function finderSub() {
-    var j = state.finder;
-    if (j.phase !== "picks") return "Describe it in your own words and we’ll select the matching jobs. Adding details is optional.";
-    return j.text ? "Selected based on what you wrote. Remove anything that doesn’t fit." : "Pick the jobs you need. Details are optional.";
+    state.finder = finderFresh();
+    finderSetText("The toilet keeps running, the front door lock sticks, and I need a light fixture replaced in the second-story hallway.");
   }
 
   function updateDock() {
-    var s = state.screen, show = /^(job|check|time)$/.test(s) && !(FIND && s === "job" && state.finder.phase !== "picks");
+    var show = /^(job|check|time)$/.test(state.screen);
     body.setAttribute("data-dock", show ? "on" : "off");
     $("#fdock").hidden = !show;
   }
 
-  /* The member's own sentence with the matched phrases highlighted (DOM only: member text is never HTML) */
-  function renderYou() {
-    var j = state.finder, you = $("#finder-you"), box = $("#finder-you-text");
-    you.hidden = !j.text;
-    box.innerHTML = "";
-    if (!j.text) return;
-    var t = j.text, pos = 0;
-    j.marks.slice().sort(function (a, b) { return a.start - b.start; }).forEach(function (m) {
-      if (m.start < pos) return;
-      var live = m.kind === "pick" ? (m.ids || []).some(function (id) { return state.jobs[id]; }) : true;
-      if (m.start > pos) box.appendChild(document.createTextNode(t.slice(pos, m.start)));
-      var seg = t.slice(m.start, m.end);
-      if (m.kind === "pick" && live) box.appendChild(el("mark", "", seg));
-      else if (m.kind === "ask" || m.kind === "none") box.appendChild(el("span", "finder__maybe", seg));
-      else box.appendChild(document.createTextNode(seg));
-      pos = m.end;
+  /* Under the input: what the text did, plus the one-tap questions it raised */
+  function renderFinderMeta() {
+    var j = state.finder;
+    var fromText = Object.keys(j.src).filter(function (id) { return state.jobs[id]; }).length;
+    var st = $("#finder-status");
+    st.innerHTML = "";
+    if (j.down) {
+      st.appendChild(statusIcon("ri-information-line"));
+      st.appendChild(el("span", "", "We couldn’t select jobs from that right now. Pick them from the list below."));
+    } else if (fromText) {
+      st.appendChild(statusIcon("ri-check-line"));
+      st.appendChild(el("span", "", fromText + (fromText === 1 ? " job" : " jobs") + " selected below."));
+    }
+    renderQuestions();
+    syncJobs();
+    updateOver();
+    updateCta();
+    updateSummary();
+  }
+  function statusIcon(name) {
+    var s = el("span", "finder__status-icon"); s.setAttribute("aria-hidden", "true");
+    s.innerHTML = '<svg class="i"><use href="#' + name + '"/></svg>';
+    return s;
+  }
+
+  function chipRow(card, labels, fn) {
+    var row = el("div", "finder__chips");
+    labels.forEach(function (l) {
+      var b = el("button", "chip", l.label); b.type = "button";
+      b.addEventListener("click", function () { fn(l); });
+      row.appendChild(b);
     });
-    if (pos < t.length) box.appendChild(document.createTextNode(t.slice(pos)));
+    card.appendChild(row);
   }
-
-  function finderSummary() {
-    var j = state.finder, n = selectedJobs().length, q = j.questions.length, u = j.unmatched.length, parts = [];
-    if (j.down) return "We couldn’t select jobs from that right now. You can still pick them from the list below.";
-    if (!j.text) return "Pick the jobs you need from the list. Adding details is up to you.";
-    if (n > 0) parts.push(n + (n === 1 ? " job" : " jobs") + " selected based on what you wrote.");
-    else parts.push("We couldn’t match that to a job on our list yet.");
-    if (q) parts.push(q === 1 ? "One question below." : q + " questions below.");
-    if (u && n > 0) parts.push("Part of your description didn’t match a job.");
-    return parts.join(" ");
-  }
-
   function renderQuestions() {
     var j = state.finder, box = $("#finder-questions");
     box.innerHTML = "";
     j.questions.forEach(function (q) {
-      var card = el("div", "finder-q"), row = el("div", "finder__chips");
+      var card = el("div", "finder-q");
       card.appendChild(el("p", "finder-q__text", q.text));
-      q.options.forEach(function (o) {
-        var b = el("button", "chip", o.label); b.type = "button";
-        b.addEventListener("click", function () { finderAnswer(q, o); });
-        row.appendChild(b);
-      });
-      var skip = el("button", "chip", "Skip"); skip.type = "button";
-      skip.addEventListener("click", function () { finderDismiss(q); });
-      row.appendChild(skip);
-      card.appendChild(row);
+      chipRow(card, q.options.concat([{ label: "Skip", ids: [] }]), function (o) { finderAnswer(q, o); });
       box.appendChild(card);
     });
     j.unmatched.forEach(function (u) {
-      var card = el("div", "finder-q"), row = el("div", "finder__chips");
+      var card = el("div", "finder-q");
       card.appendChild(el("p", "finder-q__text", "We couldn’t match “" + u.quote + "” to a job on our list. Add it as Something else?"));
-      var add = el("button", "chip", "Add as Something else"); add.type = "button";
-      add.addEventListener("click", function () { finderAddOther(u); });
-      var skip = el("button", "chip", "Skip"); skip.type = "button";
-      skip.addEventListener("click", function () { finderDismiss(u); });
-      row.appendChild(add); row.appendChild(skip);
-      card.appendChild(row);
+      chipRow(card, [{ label: "Add as Something else", add: true }, { label: "Skip" }], function (o) { finderUnmatched(u, o.add); });
       box.appendChild(card);
     });
   }
-
-  function dropMark(item) {
-    var j = state.finder;
-    j.marks = j.marks.filter(function (m) { return !((m.kind === "ask" || m.kind === "none") && m.start === item.start); });
+  function afterChoice(msg) {
+    var chip = $("#finder-questions .chip");
+    if (chip) chip.focus(); else { var st = $("#finder-status"); st.tabIndex = -1; st.focus(); }
+    if (msg) announce(msg);
   }
   function finderAnswer(q, opt) {
-    var j = state.finder;
-    opt.ids.forEach(function (id) { addJob(id, q.quote); });
-    dropMark(q);
-    j.marks.push({ start: q.start, end: q.end, kind: "pick", ids: opt.ids.slice() });
-    j.questions = j.questions.filter(function (x) { return x !== q; });
-    resetPicks();
-    renderFinder();
-    announce("Added " + titlesOf(opt.ids) + ".");
+    state.finder.answers[q.key] = opt.ids.length ? { ids: opt.ids.slice() } : { skip: true };
+    finderSync();
+    afterChoice(opt.ids.length ? "Selected " + titlesOf(opt.ids) + "." : "");
   }
-  function finderAddOther(u) {
+  function finderUnmatched(u, add) {
     var j = state.finder;
-    var had = j.src.other;
-    addJob("other", u.quote);
-    if (had) j.src.other = had + "; " + u.quote;
-    dropMark(u);
-    j.marks.push({ start: u.start, end: u.end, kind: "pick", ids: ["other"] });
-    j.unmatched = j.unmatched.filter(function (x) { return x !== u; });
-    j.open.other = false;
-    resetPicks();
-    renderFinder();
-    announce("Added Something else.");
-  }
-  function finderDismiss(item) {
-    var j = state.finder;
-    dropMark(item);
-    j.questions = j.questions.filter(function (x) { return x !== item; });
-    j.unmatched = j.unmatched.filter(function (x) { return x !== item; });
-    renderFinder();
-  }
-  function finderRemove(id) {
-    var j = state.finder, at = state.order.indexOf(id);
-    state.jobs[id] = false;
-    if (at > -1) state.order.splice(at, 1);
-    delete j.src[id]; delete j.open[id];
-    resetPicks();
-    renderFinder();
-    announce("Removed " + JOB[id].title + ".");
-    var next = $("#picks-title"); if (next) next.focus();
+    (add ? j.others : j.dismissed).push(u.quote);
+    finderSync();
+    afterChoice(add ? "Selected Something else." : "");
   }
 
-  /* One card per pick. Details are optional and start out holding the member's own words. */
-  function renderPicks() {
-    var j = state.finder, list = $("#picks"), jobs = selectedJobs();
-    list.innerHTML = "";
-    $("#picks-empty").hidden = jobs.length > 0;
-    $("#picks-count").textContent = jobs.length ? jobs.length + (jobs.length === 1 ? " job" : " jobs") : "";
-    jobs.forEach(function (jb) {
-      var li = el("li", "pick"), top = el("div", "pick__top");
-      var ic = el("span", "d-icon"); ic.setAttribute("aria-hidden", "true");
-      ic.innerHTML = '<svg class="i"><use href="#' + jb.icon + '"/></svg>';
-      var main = el("div", "pick__main");
-      main.appendChild(el("p", "pick__title", jb.title));
-      var q = j.src[jb.id];
-      if (q) main.appendChild(el("p", "pick__quote", "“" + q + "”"));
-      var rm = el("button", "icon-btn icon-btn--bare pick__remove"); rm.type = "button";
-      rm.setAttribute("aria-label", "Remove " + jb.title);
-      rm.innerHTML = '<svg class="i"><use href="#ri-close-line"/></svg>';
-      rm.addEventListener("click", function () { finderRemove(jb.id); });
-      top.appendChild(ic); top.appendChild(main); top.appendChild(rm);
-
-      var more = el("div", "pick__more"), open = !!j.open[jb.id], has = !!(state.notes[jb.id] || "").trim();
-      var tog = el("button", "link", open ? "Hide details" : (has ? "Edit details (optional)" : "Add details (optional)")); tog.type = "button";
-      tog.setAttribute("aria-expanded", String(open)); tog.setAttribute("aria-controls", "pbox-" + jb.id);
-      var box = el("div", "pick__box"); box.id = "pbox-" + jb.id; box.hidden = !open;
-      var lab = el("label"); lab.setAttribute("for", "pnote-" + jb.id);
-      lab.appendChild(document.createTextNode("More details about " + jb.title + " "));
-      lab.appendChild(el("span", "", "(optional)"));
-      var ta = el("textarea", "textarea"); ta.id = "pnote-" + jb.id; ta.rows = 3; ta.placeholder = jb.ex;
-      ta.value = state.notes[jb.id] || ""; ta.setAttribute("data-note", jb.id);
-      box.appendChild(lab); box.appendChild(ta);
-      tog.addEventListener("click", function () {
-        j.open[jb.id] = !j.open[jb.id];
-        box.hidden = !j.open[jb.id];
-        tog.setAttribute("aria-expanded", String(!!j.open[jb.id]));
-        tog.textContent = j.open[jb.id] ? "Hide details" : ((state.notes[jb.id] || "").trim() ? "Edit details (optional)" : "Add details (optional)");
-        if (j.open[jb.id]) ta.focus();
-      });
-      more.appendChild(tog); more.appendChild(box);
-      li.appendChild(top); li.appendChild(more);
-      list.appendChild(li);
+  /* A tick or untick in the list is the member's own choice */
+  function finderToggled(id, on) {
+    var j = state.finder;
+    delete j.auto[id];
+    if (on) j.questions.forEach(function (q) {
+      if (q.options.some(function (o) { return o.ids.indexOf(id) > -1; })) j.answers[q.key] = { skip: true };
     });
+    if (on) delete j.removed[id]; else { if (id in j.src) j.removed[id] = true; delete j.src[id]; }
+    resetPicks();
+    if (on) setError("jobs", false);
+    finderSync();
   }
 
-  function renderFinder() {
-    if (!FIND || state.screen !== "job") return;
+  /* The list: all 25 rows exist once; selection, quotes and the details box are updated in place so focus never jumps */
+  function buildJobRows() {
+    $("#jobs").innerHTML = JOBS.map(function (jb) {
+      return '<div class="job" id="job-' + jb.id + '">' +
+        '<label class="opt"><input type="checkbox" name="jobs" value="' + jb.id + '">' +
+        '<span class="d-icon" aria-hidden="true"><svg class="i"><use href="#' + jb.icon + '"/></svg></span>' +
+        '<span class="opt__main"><span class="opt__title">' + jb.title + '</span><span class="opt__quote" hidden></span></span>' +
+        '<span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>' +
+        '<div class="job__more" hidden>' +
+        '<button class="link" type="button" data-details-toggle="' + jb.id + '" aria-expanded="false" aria-controls="pbox-' + jb.id + '">Add details (optional)</button>' +
+        '<div class="job__box" id="pbox-' + jb.id + '" hidden>' +
+        '<label for="pnote-' + jb.id + '">More details about ' + jb.title + ' <span>(optional)</span></label>' +
+        '<textarea class="textarea" id="pnote-' + jb.id + '" rows="3" data-note="' + jb.id + '"></textarea></div></div></div>';
+    }).join("");
+    JOBS.forEach(function (jb) { $("#pnote-" + jb.id).placeholder = jb.ex; });
+  }
+  function syncJobs() {
     var j = state.finder;
-    body.setAttribute("data-finder-phase", j.phase);
-    $("#finder-ask").hidden = j.phase !== "ask";
-    $("#finder-thinking").hidden = j.phase !== "thinking";
-    $("#finder-picks").hidden = j.phase !== "picks";
-    $("#finder-browse").classList.toggle("is-open", j.phase === "picks" && state.browse);
-    var bt = $("#finder-browse-toggle");
-    bt.setAttribute("aria-expanded", String(state.browse));
-    $("[data-label]", bt).textContent = state.browse ? "Hide the full list" : "Browse all 25 jobs";
-    $("use", bt).setAttribute("href", state.browse ? "#ri-arrow-up-s-line" : "#ri-arrow-down-s-line");
-    $("#finder-add-wrap").hidden = j.down;
-    if (j.phase === "thinking") $("#finder-said").textContent = j.text;
-    if (j.phase === "picks") {
-      renderYou();
-      $("#finder-summary").textContent = finderSummary();
-      renderQuestions();
-      renderPicks();
-      renderJobs();
-    }
-    $("#sub").textContent = finderSub();
-    updateDock();
-    refresh();
+    if (!$("#jobs").firstElementChild) buildJobRows();
+    var shown = 0;
+    JOBS.forEach(function (jb, i) {
+      var row = $("#job-" + jb.id), on = !!state.jobs[jb.id], show = state.showAll || i < TOP || on;
+      if (show) shown++;
+      row.hidden = !show;
+      row.classList.toggle("is-on", on);
+      $("input", row).checked = on;
+      var q = $(".opt__quote", row), src = on ? j.src[jb.id] : "";
+      q.hidden = !src; q.textContent = src ? "“" + src + "”" : "";
+      $(".job__more", row).hidden = !on;
+      var open = on && !!j.open[jb.id], tog = $("[data-details-toggle]", row), ta = $("textarea", row);
+      if (ta.value !== (state.notes[jb.id] || "")) ta.value = state.notes[jb.id] || "";
+      $(".job__box", row).hidden = !open;
+      tog.setAttribute("aria-expanded", String(open));
+      tog.textContent = open ? "Hide details" : ((state.notes[jb.id] || "").trim() ? "Edit details (optional)" : "Add details (optional)");
+    });
+    var t = $("#jobs-toggle");
+    t.setAttribute("aria-expanded", String(state.showAll));
+    $("[data-label]", t).textContent = state.showAll ? "Show fewer jobs" : "Show all " + JOBS.length + " jobs";
+    $("use", t).setAttribute("href", state.showAll ? "#ri-arrow-up-s-line" : "#ri-arrow-down-s-line");
+    $("#jobs-count").textContent = "Showing " + shown + " of " + JOBS.length + " jobs";
   }
-
-  function finderSend() {
-    var j = state.finder, input = $("#finder-input"), txt = input.value.trim();
-    if (txt.length < 3) {
-      $("#err-finder").hidden = false; $("#field-finder").classList.add("is-invalid"); input.focus();
-      return;
-    }
-    $("#err-finder").hidden = true; $("#field-finder").classList.remove("is-invalid");
-    finderReset();
-    j.text = txt; j.down = false;
-    if (body.classList.contains("is-finderdown")) {
-      j.phase = "picks"; j.down = true; state.browse = true;
-      renderFinder(); $("#picks-title").focus();
-      return;
-    }
-    j.phase = "thinking";
-    renderFinder();
-    clearTimeout(finderTimer);
-    finderTimer = setTimeout(function () {
-      var added = finderApply(finderParse(txt), 0);
-      j.phase = "picks";
-      renderFinder();
-      var n = selectedJobs().length;
-      announce(n ? "Selected " + n + (n === 1 ? " job: " : " jobs: ") + titlesOf(state.order.filter(function (id) { return state.jobs[id]; })) + "." : "No jobs selected yet.");
-      $("#picks-title").focus();
-    }, REDUCED ? 0 : 700);
-  }
-  var finderTimer;
-
-  function finderAdd() {
-    var inp = $("#finder-more"), txt = inp.value.trim(), j = state.finder;
-    if (txt.length < 2) { inp.focus(); return; }
-    var offset = j.text ? j.text.length + 1 : 0;
-    j.text = j.text ? j.text + " " + txt : txt;
-    var added = finderApply(finderParse(txt), offset);
-    inp.value = "";
-    renderFinder();
-    announce(added > 0 ? "Added " + added + (added === 1 ? " job." : " jobs.") : "Nothing new to add yet.");
-    inp.focus();
+  function toggleDetails(id) {
+    var j = state.finder;
+    j.open[id] = !j.open[id];
+    syncJobs();
+    if (j.open[id]) $("#pnote-" + id).focus();
   }
 
 
@@ -1835,6 +1718,7 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
   /* ---------- Rendering: jobs ---------- */
   /* 10 jobs plus "Show all"; anything already picked stays visible when the list is collapsed */
   function renderJobs() {
+    if (FIND) { syncJobs(); return; }
     var shown = JOBS.filter(function (j, i) { return state.showAll || i < TOP || state.jobs[j.id]; });
     $("#jobs").innerHTML = shown.map(function (j) {
       return '<label class="opt"><input type="checkbox" name="jobs" value="' + j.id + '"' + (state.jobs[j.id] ? " checked" : "") + '>' +
@@ -1927,7 +1811,6 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
   /* ---------- Rendering: notes, status, CTA, summary ---------- */
   function updateOver() {
     $("#note-over").hidden = !overLimit();
-    $("#note-over-finder").hidden = !overLimit();
   }
 
   /* Step 3: the recommended length, with a way to change it */
@@ -1957,7 +1840,7 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
     if (screen === "job") {
       return {
         label: overLimit() ? "Send to our team" : "Continue",
-        status: n ? n + (n === 1 ? " job" : " jobs") + " picked" : "Nothing picked yet"
+        status: n ? n + (n === 1 ? " job" : " jobs") + (FIND ? " selected" : " picked") : (FIND ? "" : "Nothing picked yet")
       };
     }
     if (screen === "check") {
@@ -2090,7 +1973,7 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
 
     SCREENS.forEach(function (s) { $('[data-screen-id="' + s + '"]').hidden = s !== screen; });
     $("#h1").textContent = TITLES[screen][0];
-    var sub = TITLES[screen][1];
+    var sub = FIND && screen === "job" ? FIND_SUB : TITLES[screen][1];
     $("#sub").textContent = sub;
     document.title = PAGE_TITLE[screen] + SUFFIX;
 
@@ -2121,9 +2004,11 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
     updateDock();
 
     if (screen === "job") {
-      if (FIND && !selectedJobs().length && !state.finder.text && !state.browse && state.finder.phase !== "thinking") state.finder.phase = "ask";
-      renderJobs(); renderDetails();
-      renderFinder();
+      if (FIND) {
+        var ta = $("#finder-input");
+        if (ta.value !== state.finder.text) ta.value = state.finder.text;
+        renderFinderMeta();
+      } else { renderJobs(); renderDetails(); }
     }
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
@@ -2173,20 +2058,22 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
 
   function next() {
     var s = state.screen;
-    if (s === "job" && FIND) {
-      if (state.finder.phase !== "picks") { finderSend(); return; }
-      if (!selectedJobs().length) { $("#err-picks").hidden = false; focusFirst("#finder-more"); return; }
-      $("#err-picks").hidden = true;
-      if (overLimit()) { state.reason = "time"; navigate("sent"); return; }
-      navigate("check");
-      return;
-    }
     if (s === "job") {
+      if (FIND && finderTimer) {
+        var had = selectedJobs().length;
+        finderSync();
+        if (selectedJobs().length > had) {
+          var m = "We selected " + (selectedJobs().length - had) + (selectedJobs().length - had === 1 ? " job" : " jobs") + " from what you wrote. Check them, then press Continue.";
+          announce(m);
+          var st = $("#finder-status"); st.innerHTML = ""; st.appendChild(statusIcon("ri-check-line")); st.appendChild(el("span", "", m));
+          return;
+        }
+      }
       var jobs = selectedJobs(), bad = [];
       if (!jobs.length) bad.push("jobs");
-      jobs.forEach(function (j) { if (!(state.notes[j.id] || "").trim()) bad.push("note-" + j.id); });
+      if (!FIND) jobs.forEach(function (j) { if (!(state.notes[j.id] || "").trim()) bad.push("note-" + j.id); });
       setError("jobs", bad.indexOf("jobs") > -1);
-      jobs.forEach(function (j) { setError("note-" + j.id, bad.indexOf("note-" + j.id) > -1); });
+      if (!FIND) jobs.forEach(function (j) { setError("note-" + j.id, bad.indexOf("note-" + j.id) > -1); });
       if (bad.length) { focusFirst(bad[0] === "jobs" ? "#jobs input" : "#" + bad[0]); return; }
       if (overLimit()) { state.reason = "time"; navigate("sent"); return; }
       navigate("check");
@@ -2291,18 +2178,10 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
 
     if (FIND) {
       var ex = t.closest("[data-finder-example]");
-      if (ex) { var inp = $("#finder-input"); inp.value = ex.getAttribute("data-finder-example"); $("#err-finder").hidden = true; $("#field-finder").classList.remove("is-invalid"); inp.focus(); return; }
-      if (t.closest("[data-finder-send]")) { finderSend(); return; }
-      if (t.closest("[data-finder-browse]")) { state.finder.phase = "picks"; state.browse = true; renderFinder(); $("#picks-title").focus(); return; }
-      if (t.closest("#finder-edit")) { state.finder.phase = "ask"; renderFinder(); $("#finder-input").value = state.finder.text; $("#finder-input").focus(); return; }
-      if (t.closest("#finder-add")) { finderAdd(); return; }
-      if (t.closest("#finder-browse-toggle")) { state.browse = !state.browse; renderFinder(); return; }
-      if (t.closest("[data-jump-picks]")) {
-        if (!selectedJobs().length) finderSeed();
-        state.finder.phase = "picks";
-        navigate("job"); renderFinder();
-        return;
-      }
+      if (ex) { finderSetText(ex.getAttribute("data-finder-example")); navigate("job"); return; }
+      var dt = t.closest("[data-details-toggle]");
+      if (dt) { toggleDetails(dt.getAttribute("data-details-toggle")); return; }
+      if (t.closest("[data-jump-picks]")) { if (!selectedJobs().length) finderSeed(); navigate("job"); return; }
     }
 
     var go = t.closest("[data-go]");
@@ -2360,7 +2239,7 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
       state.hours = 0; state.date = null; state.time = null;
       setError("jobs", false);
       renderDetails();
-      if (FIND) renderFinder();
+      if (FIND) { finderToggled(el.value, el.checked); return; }
     }
     else if (el.name === "hours") {
       state.hours = +el.value === recommendedHours() ? 0 : +el.value;
@@ -2374,19 +2253,19 @@ body.variant-finder:not([data-finder-phase="picks"]) [data-screen-id="job"] .fac
       var name = el.getAttribute("data-state-switch");
       applySwitch(name, el.checked);
       if (name === "noslots" && state.screen === "time") render("time");
+      if (name === "finderdown" && FIND) finderSync();
     }
     refresh();
   });
 
   document.addEventListener("input", function (e) {
+    if (FIND && e.target.id === "finder-input") { state.finder.text = e.target.value; finderQueue(); updateSummary(); return; }
     var id = e.target.getAttribute && e.target.getAttribute("data-note");
     if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); refresh(); }
   });
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeMenus();
-    if (FIND && e.target.id === "finder-input" && e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); finderSend(); }
-    if (FIND && e.target.id === "finder-more" && e.key === "Enter") { e.preventDefault(); finderAdd(); }
   });
   window.addEventListener("hashchange", function () { render(fromHash()); });
 
