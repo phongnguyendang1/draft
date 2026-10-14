@@ -148,12 +148,16 @@
           <div class="fsec finder-only finder" id="finder">
             <div class="field" id="field-finder">
               <label class="t-strong" for="finder-input">Describe what you need</label>
-              <p class="t-meta" id="finder-hint">Write it your way, one job or several. Matching jobs are selected below.</p>
+              <p class="t-meta" id="finder-hint">Write it your way, one job or several, then choose Select jobs. Or just pick from the list.</p>
               <textarea class="textarea finder__input" id="finder-input" rows="3" maxlength="600" aria-describedby="finder-hint" placeholder="For example: the toilet keeps running, my front door lock sticks, and I need a TV mounted."></textarea>
               <p class="error" id="err-finder" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Describe what you need or pick a job below.</span></p>
             </div>
             <span class="sr-only" id="finder-live" aria-live="polite"></span>
-            <p class="finder__status" id="finder-status"></p>
+            <div class="finder__bar">
+              <p class="finder__status" id="finder-status"></p>
+              <button class="btn btn--secondary" type="button" id="finder-submit" aria-disabled="true" aria-describedby="finder-submit-hint">Select jobs</button>
+              <span class="sr-only" id="finder-submit-hint">Available when you change the description.</span>
+            </div>
             <div class="finder-qs" id="finder-questions"></div>
           </div>
 

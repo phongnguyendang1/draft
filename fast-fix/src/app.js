@@ -193,9 +193,8 @@
        removed  ids the member unticked while the text still matches (do not re-select them)
        answers  ambiguity topic -> chosen job ids, or {skip:true}
        others   unmatched phrases the member chose to add as "Something else";  dismissed: ones they skipped */
-  var finderTimer = null;
   function finderFresh() {
-    return { text: "", src: {}, auto: {}, removed: {}, answers: {}, others: [], dismissed: [], questions: [], unmatched: [], open: {}, down: false, flash: "", warned: "", pin: "", qsig: "" };
+    return { text: "", src: {}, auto: {}, removed: {}, answers: {}, others: [], dismissed: [], questions: [], unmatched: [], open: {}, down: false, flash: "", warned: "", pin: "", qsig: "", applied: "" };
   }
   state.finder = finderFresh();
 
@@ -215,9 +214,11 @@
   function selIds() { return state.order.filter(function (id) { return state.jobs[id]; }); }
 
   /* Re-read the description and bring the list in line with it */
-  function finderSync() {
-    var j = state.finder, text = j.text.trim();
-    clearTimeout(finderTimer); finderTimer = null;
+  function isDirty() { return state.finder.text.trim() !== state.finder.applied; }
+  function finderSync(submit) {
+    var j = state.finder;
+    if (submit) j.applied = j.text.trim();
+    var text = j.applied;
     if (body.classList.contains("is-finderdown")) { j.down = true; j.questions = []; j.unmatched = []; renderFinderMeta(); return; }
     j.down = false;
     var res = text.length >= 2 ? finderParse(text) : { picks: [], questions: [], unmatched: [] };
@@ -266,14 +267,10 @@
     if (added.length) announce("Selected " + titlesOf(added) + ".");
     else if (dropped.length) announce("Removed " + titlesOf(dropped) + ".");
   }
-  function finderQueue() {
-    clearTimeout(finderTimer);
-    finderTimer = setTimeout(finderSync, REDUCED ? 250 : 500);
-  }
   function finderSetText(text) {
     var j = state.finder, ta = $("#finder-input");
     j.text = text; ta.value = text;
-    finderSync();
+    finderSync(true);
   }
   /* Prototype helpers: start clean, then apply a description */
   function finderClearAll() {
@@ -294,7 +291,7 @@
 
   /* Under the input: what the text did, plus the one-tap questions it raised */
   function renderFinderMeta() {
-    var j = state.finder, text = j.text.trim();
+    var j = state.finder, text = j.applied;
     var st = $("#finder-status"), from = state.order.filter(function (id) { return state.jobs[id] && j.src[id]; });
     var msg = "", icon = "ri-check-line";
     if (j.flash) { msg = j.flash; icon = "ri-information-line"; }
@@ -308,10 +305,26 @@
       if (msg) { st.appendChild(statusIcon(icon)); st.appendChild(el("span", "finder__status-text", msg)); }
     }
     renderQuestions();
+    updateFinderBtn();
     syncJobs();
     updateOver();
     updateCta();
     updateSummary();
+  }
+  /* The submit button is only live when the description differs from what the list was last built from */
+  function updateFinderBtn() {
+    var b = $("#finder-submit"), j = state.finder, dirty = isDirty();
+    b.setAttribute("aria-disabled", String(!dirty));
+    setText(b, j.applied ? "Update jobs" : "Select jobs");
+  }
+  function finderSubmit() {
+    var b = $("#finder-submit");
+    if (b.getAttribute("aria-disabled") === "true") return;
+    var j = state.finder, before = selIds().join();
+    j.flash = ""; j.warned = "";
+    finderSync(true);
+    var n = selectedJobs().length, changed = selIds().join() !== before;
+    announce(n ? (changed ? "Jobs updated. " : "") + n + (n === 1 ? " job" : " jobs") + " selected." : "No jobs selected.");
   }
   function statusIcon(name) {
     var s = el("span", "finder__status-icon"); s.setAttribute("aria-hidden", "true");
@@ -402,7 +415,8 @@
     }
     resetPicks();
     if (on) { setError("jobs", false); setError("finder", false); }
-    finderSync();
+    j.questions = j.questions.filter(function (q) { return !(j.answers[q.key] && j.answers[q.key].skip && q.options.some(function (o) { return o.ids.indexOf(id) > -1; })); });
+    renderFinderMeta();
   }
 
   /* The list: all 25 rows exist once; selection, quotes and the details box are updated in place so focus never jumps */
@@ -782,7 +796,7 @@
 
   var firstRender = true;
   function render(screen) {
-    if (FIND && screen !== "job" && finderTimer) finderSync();
+    if (FIND && screen !== "job" && isDirty() && state.screen === "job") finderSync(true);
     if (FIND && /^(check|time|booked)$/.test(screen) && !selectedJobs().length && state.finder.text.trim()) { navigate("job"); return; }
     if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = "time"; navigate("sent"); return; }
     if (screen !== "type" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
@@ -879,8 +893,8 @@
   /* Describe-first step 1: Continue. Returns true when it handled the click (feedback shown, stay on the step). */
   function finderNext() {
     var j = state.finder, before = selIds().join();
-    if (finderTimer) {
-      finderSync();
+    if (isDirty()) {
+      finderSync(true);
       if (selIds().join() !== before) { finderFlash("We updated your jobs from what you wrote. Check them, then continue."); return true; }
     }
     if (!selectedJobs().length) {
@@ -1022,6 +1036,7 @@
     if (FIND) {
       var ex = t.closest("[data-finder-example]");
       if (ex) { finderClearAll(); finderSetText(ex.getAttribute("data-finder-example")); navigate("job"); return; }
+      if (t.closest("#finder-submit")) { finderSubmit(); return; }
       var dt = t.closest("[data-details-toggle]");
       if (dt) { toggleDetails(dt.getAttribute("data-details-toggle")); return; }
       if (t.closest("[data-jump-picks]")) { if (!selectedJobs().length) finderSeed(); navigate("job"); return; }
@@ -1096,19 +1111,20 @@
       var name = el.getAttribute("data-state-switch");
       applySwitch(name, el.checked);
       if (name === "noslots" && state.screen === "time") render("time");
-      if (name === "finderdown" && FIND) finderSync();
+      if (name === "finderdown" && FIND) finderSync(true);
     }
     refresh();
   });
 
   document.addEventListener("input", function (e) {
-    if (FIND && e.target.id === "finder-input") { state.finder.text = e.target.value; state.finder.flash = ""; setError("finder", false); finderQueue(); updateSummary(); return; }
+    if (FIND && e.target.id === "finder-input") { state.finder.text = e.target.value; state.finder.flash = ""; setError("finder", false); renderFinderMeta(); return; }
     var id = e.target.getAttribute && e.target.getAttribute("data-note");
     if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); if (FIND) syncJobsLabels(id); refresh(); }
   });
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeMenus();
+    if (FIND && e.target.id === "finder-input" && e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); finderSubmit(); }
   });
   window.addEventListener("hashchange", function () { render(fromHash()); });
 

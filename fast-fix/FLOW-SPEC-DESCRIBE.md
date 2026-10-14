@@ -4,7 +4,7 @@ Prototype: `request-flow-describe-desktop.html` (1280) and `request-flow-describ
 
 ## The idea: one surface, one selection
 
-Step 1 is a single screen. An optional input, **"Describe what you need"**, sits directly above the job list. As the member types, the matching jobs are ticked in that same list. They can also tick jobs themselves. There is only ever one selection, and it lives in the list.
+Step 1 is a single screen. An optional input, **"Describe what you need"**, sits directly above the job list. The member types, presses **Select jobs**, and the matching jobs are ticked in that same list. They can also tick jobs themselves. There is only ever one selection, and it lives in the list (a 2-column grid on desktop, one column on mobile).
 
 Nothing about it is presented as a special feature. No assistant, chat, avatar, sparkle, product name, or "suggested for you". It reads as a form that selects jobs from what you typed.
 
@@ -12,8 +12,8 @@ What this replaced: an earlier build had three phases (describe, matching, resul
 
 | Ask | How it is met |
 |---|---|
-| A plain input at the start of the flow | A labelled textarea at the top of step 1. No button needed |
-| Type a few things and have them sorted into the right picks | After a short pause, matching jobs are ticked in the list below |
+| A plain input at the start of the flow | A labelled textarea at the top of step 1 |
+| Type a few things and have them sorted into the right picks | A secondary "Select jobs" button under the input fills the list. It is only clickable when the description has changed since the last time (then it reads "Update jobs") |
 | Pick from the list if you prefer | The list is always visible: 10 jobs, "Show all 25 jobs". No mode switch |
 | The details box for each pick is optional | "Add details (optional)" under each ticked job opens an **empty** labelled box. Never required, never pre-filled |
 | No recommendations shown across the flow | No suggestion lines anywhere. Each ticked job only shows the member's own words it came from |
@@ -29,17 +29,16 @@ Describe it, pick from the list, or both. Adding details is optional.
 | Write it your way, one job or several. Matching jobs are      |
 | selected below.                                               |
 | [ textarea ........................................ ]         |
-| v Selected from your description: Running toilet, Door lock,  |
-|   Mount a TV.                                                 |
+| Selected from your description: Running toilet, Door lock,    |
+| Mount a TV.                              [ Update jobs ]      |
 | [ one-tap question cards, only when needed ]                  |
 |                                                               |
 | Pick everything that applies                                  |
-| [x] Running toilet        "the toilet keeps running"          |
-|       Add details (optional)                                  |
-| [ ] Clogged toilet                                            |
-| [x] Door lock issue       "my front door lock sticks"         |
-|       Add details (optional)                                  |
-| ...10 rows...                                                 |
+| [x] Running toilet          [ ] Clogged toilet                |
+|     "the toilet keeps...    |                                 |
+|     Add details (optional)                                    |
+| [x] Door lock issue         [ ] Sticking or loose door        |
+| ...10 tiles in 2 columns...                                   |
 | Show all 25 jobs                                              |
 |                                              [ Continue ]     |
 +--------------------------------------------------------------+
@@ -49,7 +48,7 @@ Mobile is the same order in one column, with the single yellow button in the sti
 
 ## Interaction model
 
-- **Matching runs after a pause** (about half a second after typing stops), never per keystroke, and again when Continue is pressed. Focus never moves while typing.
+- **Matching runs only when asked**: the **Select jobs / Update jobs** button (or Ctrl/Cmd+Enter), and when Continue is pressed with a changed description. The button is inactive until the text differs from what the list was last built from, and goes inactive again after it is used or if the edit is undone. Nothing changes while typing, and ticking a job by hand never applies unsent text.
 - **Ticking by hand always wins.** Matching only ever adds. A job the member unticks stays off while their text still matches it, and comes back only if they tick it again.
 - **Auto-ticked jobs follow the text.** If the member deletes the phrase, its untouched auto-tick is removed. A job with details written, or one ticked by hand, is never removed by an edit.
 - **Each ticked job shows its source phrase** ("the toilet keeps running") so it is obvious why it was ticked.
@@ -69,7 +68,8 @@ Mobile is the same order in one column, with the single yellow button in the sti
 | State | What the member sees |
 |---|---|
 | Load | Empty input, 10 unticked rows, "Show all 25 jobs", one yellow Continue. No counter, no "nothing selected" message |
-| Typed | Matching rows ticked in place, each with its source phrase; "Selected from your description: ..." under the input; the count in the dock on mobile |
+| Typed, not yet submitted | The list is unchanged; "Select jobs" (or "Update jobs") becomes clickable |
+| Submitted | Matching rows ticked in place, each with its source phrase; "Selected from your description: ..." under the input; the count in the dock on mobile |
 | Question | Blue-tint card between the input and the list with one-tap answers |
 | Unmatched | Blue-tint card offering "Add as Something else" or Skip |
 | Details | "Add details (optional)" opens "More details about Running toilet (optional)", empty |

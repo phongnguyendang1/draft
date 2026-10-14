@@ -11,13 +11,17 @@ body:not(.variant-finder) .jobs-sec { margin-top: 0; padding-top: 0; border-top:
 
 /* ---------- Describe ---------- */
 .finder__input { margin-top: var(--s-8); min-height: 112px; }
+.finder__bar { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-16); margin-top: var(--s-12); }
+.finder__bar .btn { flex: none; min-height: 44px; }
+.finder__bar .btn[aria-disabled="true"] { background: var(--surface); border-color: var(--border); color: var(--text-2); cursor: not-allowed; }
+.finder__bar .btn[aria-disabled="true"]:hover { background: var(--surface); }
 .finder__status {
-  display: flex; align-items: center; gap: 6px; min-height: 20px; margin: var(--s-8) 0 0;
+  display: flex; align-items: flex-start; gap: 6px; flex: 1; min-width: 0; min-height: 20px; margin: 10px 0 0;
   font-size: 14px; line-height: 20px; color: var(--text-2);
 }
 .finder__status:focus { outline: none; }
 .finder__status-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-.finder__status-icon { display: inline-flex; flex: none; color: var(--blue-text); }
+.finder__status-icon { display: inline-flex; flex: none; margin-top: 2px; color: var(--blue-text); }
 .finder__status-icon .i { width: 16px; height: 16px; }
 .finder + .jobs-sec { margin-top: var(--s-12); padding-top: 0; border-top: 0; }
 
@@ -36,7 +40,8 @@ body:not(.variant-finder) .jobs-sec { margin-top: 0; padding-top: 0; border-top:
 .finder-q .chip:hover { border-color: var(--blue); }
 
 /* ---------- The list (one place to select) ---------- */
-body.variant-finder #jobs { grid-template-columns: minmax(0, 1fr); gap: var(--s-8); }
+body.variant-finder #jobs { align-items: start; }
+body.variant-finder #jobs .job:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
 .job { display: flex; flex-direction: column; border-radius: var(--r-inner); background: var(--page); transition: background-color .15s ease, box-shadow .15s ease; }
 .job[hidden] { display: none; }
@@ -62,6 +67,8 @@ body.variant-finder #jobs { grid-template-columns: minmax(0, 1fr); gap: var(--s-
 
 /* ---------- Mobile ---------- */
 @container app (max-width: 767px) {
+  .finder__bar { flex-direction: column-reverse; align-items: stretch; gap: var(--s-8); }
+  .finder__status { margin-top: 0; }
   .job__more { padding-left: var(--s-16); }
 }
 
