@@ -35,7 +35,7 @@ def read(name):
 
 def used_icons():
     names = set()
-    for n in ("body.html", "app.js", "flow.css", "jev.css"):
+    for n in ("body.html", "app.js", "flow.css", "finder.css"):
         names |= set(re.findall(r"""(?:#|["'])ri-([a-z0-9]+(?:-[a-z0-9]+)*)""", read(n)))
     return sorted(names)
 
@@ -61,13 +61,13 @@ def refresh_icons(icon_dir):
 
 def build():
     font = read("font-face.css")
-    css = "\n".join([font, read("base.css"), read("chrome.css"), read("shared.css"), read("flow.css"), read("jev.css")])
+    css = "\n".join([font, read("base.css"), read("chrome.css"), read("shared.css"), read("flow.css"), read("finder.css")])
     sprite = read("sprite.svg")
     body = read("body.html").replace("{{SPRITE}}", sprite)
     js = read("app.js")
     for variant, vclass, vtitle, vprefix in (
         ("", "", "Request service", "request-flow"),
-        ("jev", " variant-jev", "Request service with Jev", "request-flow-jev"),
+        ("describe", " variant-finder", "Request service, describe first", "request-flow-describe"),
     ):
       for frame, suffix in (("desktop", "Desktop"), ("mobile", "Mobile")):
         out = "%s-%s.html" % (vprefix, frame)

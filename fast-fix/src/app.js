@@ -97,14 +97,14 @@
   };
 
 
-  /* ---------- Jev (variant): sorts what the member types into jobs from the 25-job list ---------- */
-  var JEV = body.classList.contains("variant-jev");
+  /* ---------- Describe-first variant: matches what the member types to jobs from the 25-job list ---------- */
+  var FIND = body.classList.contains("variant-finder");
   var REDUCED = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
-  state.jev = { phase: "ask", text: "", marks: [], questions: [], unmatched: [], flags: {}, src: {}, open: {}, down: false };
+  state.finder = { phase: "ask", text: "", marks: [], questions: [], unmatched: [], src: {}, open: {}, down: false };
   state.browse = false;
 
-  /* PROTOTYPE NOTE: jevParse is a rule-based stand-in for a model. In production Jev returns only ids from the
-     allowlist (structured output) plus the phrase each one came from. Everything after the parse step is real UI. */
+  /* PROTOTYPE NOTE: finderParse is a rule-based stand-in for the matching service. In production it returns only ids from the
+     allowlist plus the phrase each one came from. Everything after the parse step is real UI. */
   var KW = {
     "toilet-run": /(toilet|commode)\b[^.,;]*\b(runn\w*|won'?t stop|constantly)|runn\w*\s+toilet|flapper|fill valve/i,
     "toilet-clog": /(toilet|commode)\b[^.,;]*\b(clog\w*|block\w*|backed|plung\w*|won'?t flush|overflow\w*)|clog\w*\s+toilet/i,
@@ -139,26 +139,10 @@
     { key: "faucet", re: /\b(faucet|tap)\b/i, text: "Is the faucet leaking, or do you want it replaced?",
       options: [{ label: "Leaking", ids: ["faucet-leak"] }, { label: "Replace it", ids: ["faucet-swap"] }] }
   ];
-  /* Risk Jev notices. It never answers the vetting questions: it points at them. */
-  var FLAG = {
-    ladder: /roof|second[- ]stor(y|ey)|2nd (floor|stor)|two[- ]stor(y|ey)|attic|gutter|vaulted|high ceiling|tall ceiling|skylight|\bladder\b|stairwell/i,
-    trade: /\bgas\b|re-?wir\w*|new (outlet|wiring|circuit|line|water line)|(move|relocat\w*)\s+(the |a |my )?(sink|toilet|outlet|water|line|stove)|add (an? )?(outlet|circuit|line)|water line|breaker|\bpanel\b/i,
-    part: /need (to )?(buy|get|order)|need a new|don'?t (have|own)|haven'?t (got|bought)|no (part|parts|fixture)|still need/i
-  };
-  var FLAGMSG = {
-    ladder: function (q) { return "You mentioned “" + q + "”. I’ll ask about reach in the next step."; },
-    trade: function (q) { return "You mentioned “" + q + "”. Work like that can need a licensed trade, so I’ll ask about it next."; },
-    part: function () { return "You mentioned needing a part. I’ll ask about that next."; }
-  };
-  var CHECKFLAG = {
-    ladder: function (q) { return "From your message: “" + q + "”."; },
-    trade: function (q) { return "From your message: “" + q + "”."; },
-    part: function () { return "From your message: you mentioned needing a part."; }
-  };
   var FILLER = /^(please|thanks|thank you|hi|hello|hey|i need|i want|need help|can you|could you)\b.{0,12}$/i;
 
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
-  function announce(msg) { $("#jev-live").textContent = msg; }
+  function announce(msg) { $("#finder-live").textContent = msg; }
   function titlesOf(ids) { return ids.map(function (id) { return JOB[id].title; }).join(", "); }
 
   /* Split into clauses (with positions) on punctuation and "and / also / plus / &" */
@@ -176,8 +160,8 @@
     return out;
   }
 
-  function jevParse(text) {
-    var res = { picks: [], questions: [], unmatched: [], marks: [], flags: {} };
+  function finderParse(text) {
+    var res = { picks: [], questions: [], unmatched: [], marks: [] };
     clauses(text).forEach(function (c) {
       var hits = Object.keys(KW).filter(function (id) { return KW[id].test(c.text); });
       if (hits.indexOf("lock") > -1) hits = hits.filter(function (x) { return x !== "door"; });
@@ -203,63 +187,59 @@
       res.unmatched.push({ kind: "none", quote: text, start: 0, end: text.length });
       res.marks.push({ start: 0, end: text.length, kind: "none" });
     }
-    Object.keys(FLAG).forEach(function (k) { var m = FLAG[k].exec(text); if (m) res.flags[k] = m[0]; });
     return res;
   }
 
   function addJob(id, quote) {
     if (!state.jobs[id]) { state.jobs[id] = true; state.order.push(id); }
-    /* the member's own words become the optional details, so Ops sees what they said */
-    if (!state.notes[id]) state.notes[id] = quote;
-    state.jev.src[id] = quote;
+    state.finder.src[id] = quote;
   }
   function resetPicks() { state.hours = 0; state.date = null; state.time = null; }
 
-  function jevApply(res, offset) {
-    var j = state.jev, before = selectedJobs().length;
+  function finderApply(res, offset) {
+    var j = state.finder, before = selectedJobs().length;
     res.picks.forEach(function (p) { addJob(p.id, p.quote); });
     res.questions.forEach(function (q) { q.start += offset; q.end += offset; j.questions.push(q); });
     res.unmatched.forEach(function (u) { u.start += offset; u.end += offset; j.unmatched.push(u); });
-    Object.keys(res.flags).forEach(function (k) { j.flags[k] = res.flags[k]; });
     res.marks.forEach(function (m) { j.marks.push({ start: m.start + offset, end: m.end + offset, kind: m.kind, ids: m.ids }); });
     resetPicks();
     return selectedJobs().length - before;
   }
 
-  function jevReset() {
-    var j = state.jev;
+  function finderReset() {
+    var j = state.finder;
     Object.keys(j.src).forEach(function (id) {
       state.jobs[id] = false;
       var at = state.order.indexOf(id); if (at > -1) state.order.splice(at, 1);
       delete state.notes[id];
     });
-    j.src = {}; j.marks = []; j.questions = []; j.unmatched = []; j.flags = {}; j.open = {};
+    j.src = {}; j.marks = []; j.questions = []; j.unmatched = []; j.open = {};
     resetPicks();
   }
 
-  function jevSeed() {
+  function finderSeed() {
     var text = "The toilet keeps running, the front door lock sticks, and I need a light fixture replaced in the second-story hallway.";
-    jevReset();
-    state.jev.text = text; state.jev.down = false;
-    jevApply(jevParse(text), 0);
-    state.jev.phase = "picks";
+    finderReset();
+    state.finder.text = text; state.finder.down = false;
+    finderApply(finderParse(text), 0);
+    state.finder.phase = "picks";
   }
 
-  function jevSub() {
-    var j = state.jev;
-    if (j.phase !== "picks") return "Tell Jev in your own words. Jev sorts it into jobs, and you check the picks.";
-    return j.text ? "Check Jev’s picks and change anything that’s off." : "Pick the jobs you need. Details are optional.";
+  function finderSub() {
+    var j = state.finder;
+    if (j.phase !== "picks") return "Describe it in your own words and we’ll select the matching jobs. Adding details is optional.";
+    return j.text ? "Selected based on what you wrote. Remove anything that doesn’t fit." : "Pick the jobs you need. Details are optional.";
   }
 
   function updateDock() {
-    var s = state.screen, show = /^(job|check|time)$/.test(s) && !(JEV && s === "job" && state.jev.phase !== "picks");
+    var s = state.screen, show = /^(job|check|time)$/.test(s) && !(FIND && s === "job" && state.finder.phase !== "picks");
     body.setAttribute("data-dock", show ? "on" : "off");
     $("#fdock").hidden = !show;
   }
 
-  /* The member's own sentence with the phrases Jev used highlighted (DOM only: member text is never HTML) */
+  /* The member's own sentence with the matched phrases highlighted (DOM only: member text is never HTML) */
   function renderYou() {
-    var j = state.jev, you = $("#jev-you"), box = $("#jev-you-text");
+    var j = state.finder, you = $("#finder-you"), box = $("#finder-you-text");
     you.hidden = !j.text;
     box.innerHTML = "";
     if (!j.text) return;
@@ -270,48 +250,48 @@
       if (m.start > pos) box.appendChild(document.createTextNode(t.slice(pos, m.start)));
       var seg = t.slice(m.start, m.end);
       if (m.kind === "pick" && live) box.appendChild(el("mark", "", seg));
-      else if (m.kind === "ask" || m.kind === "none") box.appendChild(el("span", "jev__maybe", seg));
+      else if (m.kind === "ask" || m.kind === "none") box.appendChild(el("span", "finder__maybe", seg));
       else box.appendChild(document.createTextNode(seg));
       pos = m.end;
     });
     if (pos < t.length) box.appendChild(document.createTextNode(t.slice(pos)));
   }
 
-  function jevSummary() {
-    var j = state.jev, n = selectedJobs().length, q = j.questions.length, u = j.unmatched.length, parts = [];
-    if (j.down) return "Jev isn’t available right now. You can still pick your jobs from the list below.";
+  function finderSummary() {
+    var j = state.finder, n = selectedJobs().length, q = j.questions.length, u = j.unmatched.length, parts = [];
+    if (j.down) return "We couldn’t select jobs from that right now. You can still pick them from the list below.";
     if (!j.text) return "Pick the jobs you need from the list. Adding details is up to you.";
-    if (n > 0) parts.push("I found " + n + (n === 1 ? " job" : " jobs") + " in that. Check " + (n === 1 ? "it" : "them") + " over and change anything that is off.");
-    else parts.push("I couldn’t match that to a job on our list yet.");
-    if (q) parts.push(q === 1 ? "I have one quick question." : "I have " + q + " quick questions.");
-    if (u && n > 0) parts.push("I couldn’t place part of what you wrote.");
+    if (n > 0) parts.push(n + (n === 1 ? " job" : " jobs") + " selected based on what you wrote.");
+    else parts.push("We couldn’t match that to a job on our list yet.");
+    if (q) parts.push(q === 1 ? "One question below." : q + " questions below.");
+    if (u && n > 0) parts.push("Part of your description didn’t match a job.");
     return parts.join(" ");
   }
 
   function renderQuestions() {
-    var j = state.jev, box = $("#jev-questions");
+    var j = state.finder, box = $("#finder-questions");
     box.innerHTML = "";
     j.questions.forEach(function (q) {
-      var card = el("div", "jev-q"), row = el("div", "jev__chips");
-      card.appendChild(el("p", "jev-q__text", q.text));
+      var card = el("div", "finder-q"), row = el("div", "finder__chips");
+      card.appendChild(el("p", "finder-q__text", q.text));
       q.options.forEach(function (o) {
         var b = el("button", "chip", o.label); b.type = "button";
-        b.addEventListener("click", function () { jevAnswer(q, o); });
+        b.addEventListener("click", function () { finderAnswer(q, o); });
         row.appendChild(b);
       });
       var skip = el("button", "chip", "Skip"); skip.type = "button";
-      skip.addEventListener("click", function () { jevDismiss(q); });
+      skip.addEventListener("click", function () { finderDismiss(q); });
       row.appendChild(skip);
       card.appendChild(row);
       box.appendChild(card);
     });
     j.unmatched.forEach(function (u) {
-      var card = el("div", "jev-q"), row = el("div", "jev__chips");
-      card.appendChild(el("p", "jev-q__text", "I couldn’t match “" + u.quote + "” to a job on our list. Add it as Something else?"));
+      var card = el("div", "finder-q"), row = el("div", "finder__chips");
+      card.appendChild(el("p", "finder-q__text", "We couldn’t match “" + u.quote + "” to a job on our list. Add it as Something else?"));
       var add = el("button", "chip", "Add as Something else"); add.type = "button";
-      add.addEventListener("click", function () { jevAddOther(u); });
+      add.addEventListener("click", function () { finderAddOther(u); });
       var skip = el("button", "chip", "Skip"); skip.type = "button";
-      skip.addEventListener("click", function () { jevDismiss(u); });
+      skip.addEventListener("click", function () { finderDismiss(u); });
       row.appendChild(add); row.appendChild(skip);
       card.appendChild(row);
       box.appendChild(card);
@@ -319,53 +299,53 @@
   }
 
   function dropMark(item) {
-    var j = state.jev;
+    var j = state.finder;
     j.marks = j.marks.filter(function (m) { return !((m.kind === "ask" || m.kind === "none") && m.start === item.start); });
   }
-  function jevAnswer(q, opt) {
-    var j = state.jev;
+  function finderAnswer(q, opt) {
+    var j = state.finder;
     opt.ids.forEach(function (id) { addJob(id, q.quote); });
     dropMark(q);
     j.marks.push({ start: q.start, end: q.end, kind: "pick", ids: opt.ids.slice() });
     j.questions = j.questions.filter(function (x) { return x !== q; });
     resetPicks();
-    renderJev();
+    renderFinder();
     announce("Added " + titlesOf(opt.ids) + ".");
   }
-  function jevAddOther(u) {
-    var j = state.jev;
-    if (state.jobs.other) state.notes.other = (state.notes.other ? state.notes.other + " " : "") + u.quote;
-    else addJob("other", u.quote);
-    j.src.other = state.notes.other || u.quote;
+  function finderAddOther(u) {
+    var j = state.finder;
+    var had = j.src.other;
+    addJob("other", u.quote);
+    if (had) j.src.other = had + "; " + u.quote;
     dropMark(u);
     j.marks.push({ start: u.start, end: u.end, kind: "pick", ids: ["other"] });
     j.unmatched = j.unmatched.filter(function (x) { return x !== u; });
     j.open.other = false;
     resetPicks();
-    renderJev();
+    renderFinder();
     announce("Added Something else.");
   }
-  function jevDismiss(item) {
-    var j = state.jev;
+  function finderDismiss(item) {
+    var j = state.finder;
     dropMark(item);
     j.questions = j.questions.filter(function (x) { return x !== item; });
     j.unmatched = j.unmatched.filter(function (x) { return x !== item; });
-    renderJev();
+    renderFinder();
   }
-  function jevRemove(id) {
-    var j = state.jev, at = state.order.indexOf(id);
+  function finderRemove(id) {
+    var j = state.finder, at = state.order.indexOf(id);
     state.jobs[id] = false;
     if (at > -1) state.order.splice(at, 1);
     delete j.src[id]; delete j.open[id];
     resetPicks();
-    renderJev();
+    renderFinder();
     announce("Removed " + JOB[id].title + ".");
     var next = $("#picks-title"); if (next) next.focus();
   }
 
   /* One card per pick. Details are optional and start out holding the member's own words. */
   function renderPicks() {
-    var j = state.jev, list = $("#picks"), jobs = selectedJobs();
+    var j = state.finder, list = $("#picks"), jobs = selectedJobs();
     list.innerHTML = "";
     $("#picks-empty").hidden = jobs.length > 0;
     $("#picks-count").textContent = jobs.length ? jobs.length + (jobs.length === 1 ? " job" : " jobs") : "";
@@ -380,7 +360,7 @@
       var rm = el("button", "icon-btn icon-btn--bare pick__remove"); rm.type = "button";
       rm.setAttribute("aria-label", "Remove " + jb.title);
       rm.innerHTML = '<svg class="i"><use href="#ri-close-line"/></svg>';
-      rm.addEventListener("click", function () { jevRemove(jb.id); });
+      rm.addEventListener("click", function () { finderRemove(jb.id); });
       top.appendChild(ic); top.appendChild(main); top.appendChild(rm);
 
       var more = el("div", "pick__more"), open = !!j.open[jb.id], has = !!(state.notes[jb.id] || "").trim();
@@ -388,7 +368,7 @@
       tog.setAttribute("aria-expanded", String(open)); tog.setAttribute("aria-controls", "pbox-" + jb.id);
       var box = el("div", "pick__box"); box.id = "pbox-" + jb.id; box.hidden = !open;
       var lab = el("label"); lab.setAttribute("for", "pnote-" + jb.id);
-      lab.appendChild(document.createTextNode("Details for " + jb.title + " "));
+      lab.appendChild(document.createTextNode("More details about " + jb.title + " "));
       lab.appendChild(el("span", "", "(optional)"));
       var ta = el("textarea", "textarea"); ta.id = "pnote-" + jb.id; ta.rows = 3; ta.placeholder = jb.ex;
       ta.value = state.notes[jb.id] || ""; ta.setAttribute("data-note", jb.id);
@@ -406,98 +386,72 @@
     });
   }
 
-  function renderFlags() {
-    var box = $("#jev-flags");
-    box.innerHTML = "";
-    var f = state.jev.flags;
-    Object.keys(f).forEach(function (k) {
-      var row = el("p", "jev-flag");
-      row.innerHTML = '<svg class="i"><use href="#ri-sparkling-line"/></svg><span></span>';
-      row.lastChild.textContent = FLAGMSG[k](f[k]);
-      box.appendChild(row);
-    });
-  }
-
-  function renderJev() {
-    if (!JEV || state.screen !== "job") return;
-    var j = state.jev;
-    body.setAttribute("data-jev-phase", j.phase);
-    $("#jev-ask").hidden = j.phase !== "ask";
-    $("#jev-thinking").hidden = j.phase !== "thinking";
-    $("#jev-picks").hidden = j.phase !== "picks";
-    $("#jev-browse").classList.toggle("is-open", j.phase === "picks" && state.browse);
-    var bt = $("#jev-browse-toggle");
+  function renderFinder() {
+    if (!FIND || state.screen !== "job") return;
+    var j = state.finder;
+    body.setAttribute("data-finder-phase", j.phase);
+    $("#finder-ask").hidden = j.phase !== "ask";
+    $("#finder-thinking").hidden = j.phase !== "thinking";
+    $("#finder-picks").hidden = j.phase !== "picks";
+    $("#finder-browse").classList.toggle("is-open", j.phase === "picks" && state.browse);
+    var bt = $("#finder-browse-toggle");
     bt.setAttribute("aria-expanded", String(state.browse));
     $("[data-label]", bt).textContent = state.browse ? "Hide the full list" : "Browse all 25 jobs";
     $("use", bt).setAttribute("href", state.browse ? "#ri-arrow-up-s-line" : "#ri-arrow-down-s-line");
-    $("#jev-add-wrap").hidden = j.down;
-    if (j.phase === "thinking") $("#jev-said").textContent = j.text;
+    $("#finder-add-wrap").hidden = j.down;
+    if (j.phase === "thinking") $("#finder-said").textContent = j.text;
     if (j.phase === "picks") {
       renderYou();
-      $("#jev-summary").textContent = jevSummary();
+      $("#finder-summary").textContent = finderSummary();
       renderQuestions();
       renderPicks();
-      renderFlags();
       renderJobs();
     }
-    $("#sub").textContent = jevSub();
+    $("#sub").textContent = finderSub();
     updateDock();
     refresh();
   }
 
-  function jevSend() {
-    var j = state.jev, input = $("#jev-input"), txt = input.value.trim();
+  function finderSend() {
+    var j = state.finder, input = $("#finder-input"), txt = input.value.trim();
     if (txt.length < 3) {
-      $("#err-jev").hidden = false; $("#field-jev").classList.add("is-invalid"); input.focus();
+      $("#err-finder").hidden = false; $("#field-finder").classList.add("is-invalid"); input.focus();
       return;
     }
-    $("#err-jev").hidden = true; $("#field-jev").classList.remove("is-invalid");
-    jevReset();
+    $("#err-finder").hidden = true; $("#field-finder").classList.remove("is-invalid");
+    finderReset();
     j.text = txt; j.down = false;
-    if (body.classList.contains("is-jevdown")) {
+    if (body.classList.contains("is-finderdown")) {
       j.phase = "picks"; j.down = true; state.browse = true;
-      renderJev(); $("#picks-title").focus();
+      renderFinder(); $("#picks-title").focus();
       return;
     }
     j.phase = "thinking";
-    renderJev();
-    clearTimeout(jevTimer);
-    jevTimer = setTimeout(function () {
-      var added = jevApply(jevParse(txt), 0);
+    renderFinder();
+    clearTimeout(finderTimer);
+    finderTimer = setTimeout(function () {
+      var added = finderApply(finderParse(txt), 0);
       j.phase = "picks";
-      renderJev();
+      renderFinder();
       var n = selectedJobs().length;
-      announce(n ? "Jev found " + n + (n === 1 ? " job: " : " jobs: ") + titlesOf(state.order.filter(function (id) { return state.jobs[id]; })) + "." : "Jev could not match that to a job yet.");
+      announce(n ? "Selected " + n + (n === 1 ? " job: " : " jobs: ") + titlesOf(state.order.filter(function (id) { return state.jobs[id]; })) + "." : "No jobs selected yet.");
       $("#picks-title").focus();
-    }, REDUCED ? 0 : 1100);
+    }, REDUCED ? 0 : 700);
   }
-  var jevTimer;
+  var finderTimer;
 
-  function jevAdd() {
-    var inp = $("#jev-more"), txt = inp.value.trim(), j = state.jev;
+  function finderAdd() {
+    var inp = $("#finder-more"), txt = inp.value.trim(), j = state.finder;
     if (txt.length < 2) { inp.focus(); return; }
     var offset = j.text ? j.text.length + 1 : 0;
     j.text = j.text ? j.text + " " + txt : txt;
-    var added = jevApply(jevParse(txt), offset);
+    var added = finderApply(finderParse(txt), offset);
     inp.value = "";
-    renderJev();
+    renderFinder();
     announce(added > 0 ? "Added " + added + (added === 1 ? " job." : " jobs.") : "Nothing new to add yet.");
     inp.focus();
   }
 
-  /* Step 2: Jev points at the questions your words touched. You still answer all three. */
-  function renderCheckJev() {
-    if (!JEV) return;
-    var f = state.jev.flags, keys = Object.keys(f);
-    $("#jev-check-text").textContent = keys.length
-      ? "A couple of things you wrote are worth a careful answer here. I’ve marked them below, but your answers decide."
-      : "Nothing in what you wrote needs a second look. Answer these three and we will find a time.";
-    ["ladder", "trade", "part"].forEach(function (q) {
-      var p = $("#flag-" + q);
-      p.hidden = !f[q];
-      if (f[q]) p.lastChild.textContent = CHECKFLAG[q](f[q]);
-    });
-  }
 
   /* ---------- Formatting ---------- */
   function fmtMin(m) {
@@ -580,7 +534,7 @@
 
   /* One labelled text box per picked job, in the order picked. Built with the DOM (member text is never HTML). */
   function renderDetails() {
-    if (JEV) return;
+    if (FIND) return;
     var box = $("#details"), jobs = selectedJobs();
     $("#details-empty").hidden = jobs.length > 0;
     box.innerHTML = "";
@@ -656,7 +610,7 @@
   /* ---------- Rendering: notes, status, CTA, summary ---------- */
   function updateOver() {
     $("#note-over").hidden = !overLimit();
-    $("#note-over-jev").hidden = !overLimit();
+    $("#note-over-finder").hidden = !overLimit();
   }
 
   /* Step 3: the recommended length, with a way to change it */
@@ -664,9 +618,7 @@
     var rec = recommendedHours(), h = hours();
     $("#rec-value").textContent = hoursText(h);
     var n = selectedJobs().length;
-    var lead = JEV
-      ? (h === rec ? "Jev picked this for your " + n + (n === 1 ? " job. " : " jobs. ") : "You changed this from the " + hoursText(rec) + " Jev picked. ")
-      : (h === rec ? "Recommended for the jobs you picked. " : "You changed this from the recommended " + hoursText(rec) + ". ");
+    var lead = (h === rec ? "Recommended for the jobs you picked. " : "You changed this from the recommended " + hoursText(rec) + ". ");
     $("#rec-meta").textContent = lead + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
     $all('input[name="hours"]').forEach(function (r) { r.checked = +r.value === h; });
     $all("[data-rec-for]").forEach(function (el) { el.hidden = +el.getAttribute("data-rec-for") !== rec; });
@@ -720,6 +672,9 @@
     $("#s-addr").textContent = h.addr;
     $("#s-city").textContent = h.city;
 
+    var said = FIND ? (state.finder.text || "").trim() : "";
+    $("#s-desc-row").hidden = !(FIND && said && s !== "type");
+    $("#s-desc").textContent = said;
     var jobs = selectedJobs(), showJobs = s !== "type" && jobs.length > 0;
     $("#s-jobs-row").hidden = !showJobs;
     var list = $("#s-jobs");
@@ -781,8 +736,8 @@
 
   /* ---------- Navigation ---------- */
   function seedDemo(screen) {
-    if (!selectedJobs().length && JEV) {
-      jevSeed();
+    if (!selectedJobs().length && FIND) {
+      finderSeed();
     } else if (!selectedJobs().length) {
       state.jobs = { "toilet-run": true, lock: true };
       state.order = ["toilet-run", "lock"];
@@ -849,11 +804,10 @@
     updateDock();
 
     if (screen === "job") {
-      if (JEV && !selectedJobs().length && !state.jev.text && !state.browse && state.jev.phase !== "thinking") state.jev.phase = "ask";
+      if (FIND && !selectedJobs().length && !state.finder.text && !state.browse && state.finder.phase !== "thinking") state.finder.phase = "ask";
       renderJobs(); renderDetails();
-      renderJev();
+      renderFinder();
     }
-    if (screen === "check") renderCheckJev();
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
       $("#rec").hidden = noSlots;
@@ -902,9 +856,9 @@
 
   function next() {
     var s = state.screen;
-    if (s === "job" && JEV) {
-      if (state.jev.phase !== "picks") { jevSend(); return; }
-      if (!selectedJobs().length) { $("#err-picks").hidden = false; focusFirst("#jev-more"); return; }
+    if (s === "job" && FIND) {
+      if (state.finder.phase !== "picks") { finderSend(); return; }
+      if (!selectedJobs().length) { $("#err-picks").hidden = false; focusFirst("#finder-more"); return; }
       $("#err-picks").hidden = true;
       if (overLimit()) { state.reason = "time"; navigate("sent"); return; }
       navigate("check");
@@ -1018,18 +972,18 @@
       return;
     }
 
-    if (JEV) {
-      var ex = t.closest("[data-jev-example]");
-      if (ex) { var inp = $("#jev-input"); inp.value = ex.getAttribute("data-jev-example"); $("#err-jev").hidden = true; $("#field-jev").classList.remove("is-invalid"); inp.focus(); return; }
-      if (t.closest("[data-jev-send]")) { jevSend(); return; }
-      if (t.closest("[data-jev-browse]")) { state.jev.phase = "picks"; state.browse = true; renderJev(); $("#picks-title").focus(); return; }
-      if (t.closest("#jev-edit")) { state.jev.phase = "ask"; renderJev(); $("#jev-input").value = state.jev.text; $("#jev-input").focus(); return; }
-      if (t.closest("#jev-add")) { jevAdd(); return; }
-      if (t.closest("#jev-browse-toggle")) { state.browse = !state.browse; renderJev(); return; }
+    if (FIND) {
+      var ex = t.closest("[data-finder-example]");
+      if (ex) { var inp = $("#finder-input"); inp.value = ex.getAttribute("data-finder-example"); $("#err-finder").hidden = true; $("#field-finder").classList.remove("is-invalid"); inp.focus(); return; }
+      if (t.closest("[data-finder-send]")) { finderSend(); return; }
+      if (t.closest("[data-finder-browse]")) { state.finder.phase = "picks"; state.browse = true; renderFinder(); $("#picks-title").focus(); return; }
+      if (t.closest("#finder-edit")) { state.finder.phase = "ask"; renderFinder(); $("#finder-input").value = state.finder.text; $("#finder-input").focus(); return; }
+      if (t.closest("#finder-add")) { finderAdd(); return; }
+      if (t.closest("#finder-browse-toggle")) { state.browse = !state.browse; renderFinder(); return; }
       if (t.closest("[data-jump-picks]")) {
-        if (!selectedJobs().length) jevSeed();
-        state.jev.phase = "picks";
-        navigate("job"); renderJev();
+        if (!selectedJobs().length) finderSeed();
+        state.finder.phase = "picks";
+        navigate("job"); renderFinder();
         return;
       }
     }
@@ -1089,7 +1043,7 @@
       state.hours = 0; state.date = null; state.time = null;
       setError("jobs", false);
       renderDetails();
-      if (JEV) renderJev();
+      if (FIND) renderFinder();
     }
     else if (el.name === "hours") {
       state.hours = +el.value === recommendedHours() ? 0 : +el.value;
@@ -1114,8 +1068,8 @@
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeMenus();
-    if (JEV && e.target.id === "jev-input" && e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); jevSend(); }
-    if (JEV && e.target.id === "jev-more" && e.key === "Enter") { e.preventDefault(); jevAdd(); }
+    if (FIND && e.target.id === "finder-input" && e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); finderSend(); }
+    if (FIND && e.target.id === "finder-more" && e.key === "Enter") { e.preventDefault(); finderAdd(); }
   });
   window.addEventListener("hashchange", function () { render(fromHash()); });
 

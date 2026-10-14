@@ -82,7 +82,7 @@ Home Manager completion and incomplete-reason taxonomy, follow-on booking, contr
 - **Prototype states** button (bottom right): 2 homes, no open times, next time just taken, and a jump list to every screen.
 - Deep links: `#/job`, `#/check`, `#/time`, `#/booked`, `#/sent`.
 - Both frames share one source; only the body class differs.
-- **Jev version** (`request-flow-jev-desktop.html`, `request-flow-jev-mobile.html`): the same flow with an AI helper at the start of step 1. See `FLOW-SPEC-JEV.md`.
+- **Describe-first version** (`request-flow-describe-desktop.html`, `request-flow-describe-mobile.html`): the same flow, but step 1 starts with a plain "Describe what you need" input that matches to jobs. See `FLOW-SPEC-DESCRIBE.md`.
 
 ## Design language
 
