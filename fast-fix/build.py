@@ -35,7 +35,7 @@ def read(name):
 
 def used_icons():
     names = set()
-    for n in ("body.html", "app.js", "flow.css", "finder.css"):
+    for n in ("body.html", "app.js", "catalog.js", "flow.css", "finder.css"):
         names |= set(re.findall(r"""(?:#|["'])ri-([a-z0-9]+(?:-[a-z0-9]+)*)""", read(n)))
     return sorted(names)
 
@@ -64,7 +64,7 @@ def build():
     css = "\n".join([font, read("base.css"), read("chrome.css"), read("shared.css"), read("flow.css"), read("finder.css")])
     sprite = read("sprite.svg")
     body = read("body.html").replace("{{SPRITE}}", sprite)
-    js = read("app.js")
+    js = read("catalog.js") + "\n" + read("app.js")
     for variant, vclass, vtitle, vprefix in (
         ("", "", "Request service", "request-flow"),
         ("describe", " variant-finder", "Request service, describe first", "request-flow-describe"),

@@ -1,7 +1,7 @@
 /* =====================================================================
-   Describe-first variant: ONE surface. An optional "describe what you need" input sits directly above
-   the job list. Typing selects matching jobs in that same list; ticking a job yourself always wins.
-   Same language as the rest of the flow: flat, tokens only, no shadows. Blue-tint = the selected surface.
+   Describe-first variant. Step 1: one text box. Step 2: the jobs that were selected, then a search box and
+   100 jobs in 10 groups to add more. Same language as the rest of the flow: flat, tokens only, no shadows.
+   Blue-tint + 2px inset ring = selected (same as the tiles elsewhere).
    ===================================================================== */
 
 /* Variant switches */
@@ -9,55 +9,30 @@ body:not(.variant-finder) .finder-only { display: none !important; }
 body.variant-finder .classic-only { display: none !important; }
 body:not(.variant-finder) .jobs-sec { margin-top: 0; padding-top: 0; border-top: 0; }
 
-/* ---------- Describe ---------- */
-.finder__input { margin-top: var(--s-8); min-height: 112px; }
-.finder__bar { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-16); margin-top: var(--s-12); }
-.finder__bar .btn { flex: none; min-height: 44px; }
-.finder__bar .btn[aria-disabled="true"] { background: var(--surface); border-color: var(--border); color: var(--text-2); cursor: not-allowed; }
-.finder__bar .btn[aria-disabled="true"]:hover { background: var(--surface); }
-.finder__status {
-  display: flex; align-items: flex-start; gap: 6px; flex: 1; min-width: 0; min-height: 20px; margin: 10px 0 0;
-  font-size: 14px; line-height: 20px; color: var(--text-2);
-}
-.finder__status:focus { outline: none; }
-.finder__status-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-.finder__status-icon { display: inline-flex; flex: none; margin-top: 2px; color: var(--blue-text); }
-.finder__status-icon .i { width: 16px; height: 16px; }
-.finder + .jobs-sec { margin-top: var(--s-12); padding-top: 0; border-top: 0; }
+/* Four steps instead of three */
+body.variant-finder .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
-.finder__chips { display: flex; flex-wrap: wrap; gap: var(--s-8); }
-.chip { font-family: inherit; letter-spacing: var(--track); }
-.chip:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; }
-.finder-q .chip { min-height: 44px; }
+/* ---------- Step 1: describe ---------- */
+.describe__input { margin-top: var(--s-8); min-height: 176px; }
+[data-screen-id="describe"] .field .error { margin-top: var(--s-8); }
 
-/* One-tap questions: ambiguous phrase, or a phrase that matched no job */
-.finder-qs { display: flex; flex-direction: column; gap: var(--s-12); }
-.finder-qs:empty { display: none; }
-.finder-qs:not(:empty) { margin-top: var(--s-12); }
-.finder-q { padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); }
-.finder-q__text { margin: 0 0 var(--s-12); font-weight: 600; overflow-wrap: anywhere; }
-.finder-q .chip { background: var(--surface); border-color: var(--slate); }
-.finder-q .chip:hover { border-color: var(--blue); }
-
-/* ---------- The list (one place to select) ---------- */
-body.variant-finder #jobs { align-items: start; }
-body.variant-finder #jobs .job:last-child:nth-child(odd) { grid-column: 1 / -1; }
-
-.job { display: flex; flex-direction: column; border-radius: var(--r-inner); background: var(--page); transition: background-color .15s ease, box-shadow .15s ease; }
-.job[hidden] { display: none; }
-.job:not(.is-on):hover { box-shadow: inset 0 0 0 1px var(--blue); }
-.job.is-on { background: var(--blue-tint); box-shadow: inset 0 0 0 2px var(--blue); }
-.job .opt, .job .opt:hover, .job .opt:has(input:checked), .job .opt:has(input:checked):hover { background: none; box-shadow: none; }
-.job:has(.opt input:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; }
-.job .opt:has(input:focus-visible) { outline: none; }
-.job.is-on .d-icon { color: var(--blue-text); }
-.job.is-on .opt__title { color: var(--ink); }
-.opt__quote { font-size: 14px; line-height: 20px; font-weight: 400; color: var(--text-2); overflow-wrap: anywhere; }
-.opt__quote[hidden] { display: none; }
-
-/* Optional details, right under the job they belong to. Always empty until the member writes. */
+/* ---------- Step 2: selected jobs ---------- */
+.sel__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-12); }
+.sel__head h2 { margin: 0; }
+.sel__head h2:focus { outline: none; }
+.picks { display: flex; flex-direction: column; gap: var(--s-12); margin: var(--s-12) 0 0; padding: 0; list-style: none; }
+.picks:empty { display: none; }
+.picks__msg { margin: var(--s-12) 0 0; padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); color: var(--ink); }
+.picks__msg[hidden] { display: none; }
+.pick { border-radius: var(--r-inner); background: var(--blue-tint); box-shadow: inset 0 0 0 2px var(--blue); }
+.pick__top { display: flex; align-items: center; gap: var(--s-12); padding: var(--s-12) var(--s-16); }
+.pick .d-icon { background: var(--surface); color: var(--blue-text); }
+.pick__main { flex: 1; min-width: 0; }
+.pick__title { margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; }
+.pick__group { margin: 0; font-size: 14px; line-height: 20px; color: var(--text-2); }
+.pick__remove { flex: none; min-height: 44px; padding: 0 var(--s-8); }
+/* Optional details, right under the job. Always empty until the member writes. */
 .job__more { padding: 0 var(--s-16) var(--s-4) calc(var(--s-16) + 40px + var(--s-12)); }
-.job__more[hidden] { display: none; }
 .job__more > .link { min-height: 44px; }
 .job__box { padding-bottom: var(--s-12); }
 .job__box[hidden] { display: none; }
@@ -65,26 +40,63 @@ body.variant-finder #jobs .job:last-child:nth-child(odd) { grid-column: 1 / -1; 
 .job__box label span { font-weight: 400; color: var(--text-2); }
 .job__box .textarea { margin-top: var(--s-8); min-height: 80px; }
 
-/* ---------- Mobile ---------- */
-@container app (max-width: 767px) {
-  .finder__bar { flex-direction: column-reverse; align-items: stretch; gap: var(--s-8); }
-  .finder__status { margin-top: 0; }
-  .job__more { padding-left: var(--s-16); }
+/* ---------- Step 2: search ---------- */
+#add-title { margin: 0; }
+#add-title label { cursor: default; }
+.search { position: relative; margin-top: var(--s-12); }
+.search__icon { position: absolute; left: 16px; top: 14px; width: 20px; height: 20px; color: var(--text-2); pointer-events: none; }
+.input {
+  width: 100%; height: 48px; padding: 0 48px; border: 1px solid var(--slate); border-radius: var(--r-pill);
+  background: var(--surface); color: var(--ink); font: inherit; font-size: 16px; line-height: 24px; letter-spacing: var(--track);
 }
+.input::placeholder { color: var(--text-2); opacity: 1; }
+.input:hover { border-color: var(--blue); }
+.input:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; border-color: var(--blue-text); }
+.search__clear { position: absolute; right: 2px; top: 2px; }
+.search__clear[hidden] { display: none; }
+.search__none { margin: var(--s-12) 0 0; }
 
-@media (prefers-reduced-motion: reduce) {
-  .job { transition: none; }
+/* ---------- Step 2: groups (open one to see its jobs) ---------- */
+.tree { display: flex; flex-direction: column; gap: var(--s-8); margin-top: var(--s-16); }
+.grp { border-radius: var(--r-inner); background: var(--page); }
+.grp[hidden] { display: none; }
+.grp__h { margin: 0; }
+.grp__btn {
+  display: flex; align-items: center; gap: var(--s-12); width: 100%; min-height: 64px; padding: var(--s-12) var(--s-16);
+  border: 0; border-radius: var(--r-inner); background: none; color: var(--ink); font: inherit; text-align: left; cursor: pointer;
 }
-
+.grp__btn:hover .grp__title { color: var(--blue-text); }
+.grp__btn:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; }
+.grp .d-icon { background: var(--surface); }
+.grp__title { flex: 1; min-width: 0; font-size: 16px; line-height: 24px; font-weight: 600; }
+.grp__meta { flex: none; font-size: 14px; line-height: 20px; color: var(--text-2); }
+.grp__sel { flex: none; padding: 2px var(--s-8); border-radius: var(--r-pill); background: var(--blue-tint); color: var(--blue-text); font-size: 12px; line-height: 16px; font-weight: 600; }
+.grp__sel[hidden] { display: none; }
+.grp__chev { display: inline-flex; flex: none; color: var(--text-2); transition: transform .15s ease; }
+.grp__btn[aria-expanded="true"] .grp__chev { transform: rotate(180deg); }
+.grp__panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-8); padding: 0 var(--s-16) var(--s-16); }
+.grp__panel[hidden] { display: none; }
+.grp .opt { min-height: 56px; padding: var(--s-12) var(--s-16); background: var(--surface); }
+.grp .opt[hidden] { display: none; }
+.grp .opt:has(input:checked) { background: var(--blue-tint); }
+.grp .opt:has(input:checked):hover { box-shadow: inset 0 0 0 2px var(--blue); }
 .fdock__status:empty { display: none; }
 
-/* Describe-first wording on step 3: a plain "Visit length", no "Recommended" badges */
+/* ---------- Step 3 wording: a plain "Visit length", no "Recommended" badges ---------- */
 body.variant-finder .opt__rec { display: none !important; }
 
 /* The sticky top bar must not hide a control that is tabbed to */
 html:has(body.variant-finder) { scroll-padding-top: 96px; }
 
+/* ---------- Mobile ---------- */
+@container app (max-width: 767px) {
+  .grp__panel { grid-template-columns: minmax(0, 1fr); }
+  .job__more { padding-left: var(--s-16); }
+  .grp__meta { display: none; }
+  .describe__input { min-height: 160px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  body.variant-finder .job, body.variant-finder .opt, body.variant-finder .opt__box, body.variant-finder .textarea,
+  .grp__chev, body.variant-finder .opt, body.variant-finder .opt__box, body.variant-finder .textarea,
   body.variant-finder .chip, body.variant-finder .link { transition: none !important; }
 }

@@ -65,7 +65,8 @@
     </div>
 
     <ol class="steps" id="steps" aria-label="Fast Fix progress" hidden>
-      <li class="step" data-step="job"><span class="step__label"><svg class="i" aria-hidden="true"><use href="#ri-check-line"/></svg><span class="step__n">1</span>The job</span><span class="step__bar"></span></li>
+      <li class="step finder-only" data-step="describe"><span class="step__label"><svg class="i" aria-hidden="true"><use href="#ri-check-line"/></svg><span class="step__n">1</span>Describe</span><span class="step__bar"></span></li>
+      <li class="step" data-step="job"><span class="step__label"><svg class="i" aria-hidden="true"><use href="#ri-check-line"/></svg><span class="step__n">1</span><span class="step__t">The job</span></span><span class="step__bar"></span></li>
       <li class="step" data-step="check"><span class="step__label"><svg class="i" aria-hidden="true"><use href="#ri-check-line"/></svg><span class="step__n">2</span>Quick check</span><span class="step__bar"></span></li>
       <li class="step" data-step="time"><span class="step__label"><svg class="i" aria-hidden="true"><use href="#ri-check-line"/></svg><span class="step__n">3</span>Pick a time</span><span class="step__bar"></span></li>
     </ol>
@@ -141,27 +142,48 @@
           </ul>
         </section>
 
-        <!-- ============ 1. The job ============ -->
+        <!-- ============ 1. Describe (describe-first only) ============ -->
+        <section class="card finder-only" data-screen-id="describe" aria-label="Describe the job" hidden>
+          <div class="field" id="field-describe">
+            <label class="t-strong" for="desc">Describe what you need</label>
+            <p class="t-meta" id="desc-hint">One job or several. Say it your way.</p>
+            <textarea class="textarea describe__input" id="desc" rows="6" maxlength="600" aria-describedby="desc-hint" placeholder="For example: the toilet keeps running, my front door lock sticks, and I need a TV mounted."></textarea>
+            <p class="error" id="err-describe" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Tell us what you need done.</span></p>
+          </div>
+          <div class="factions">
+            <span class="factions__status" id="status-describe" aria-live="polite"></span>
+            <button class="btn btn--primary btn--lg" type="button" data-next>Continue</button>
+          </div>
+        </section>
+
+        <!-- ============ 1. The job (list-first) / 2. Your jobs (describe-first) ============ -->
         <section class="card" data-screen-id="job" aria-label="The job" hidden>
 
-          <!-- Describe-first variant: one optional input above the same list. Typing selects jobs in the list below. -->
-          <div class="fsec finder-only finder" id="finder">
-            <div class="field" id="field-finder">
-              <label class="t-strong" for="finder-input">Describe what you need</label>
-              <p class="t-meta" id="finder-hint">Write it your way, one job or several, then choose Select jobs. Or just pick from the list.</p>
-              <textarea class="textarea finder__input" id="finder-input" rows="3" maxlength="600" aria-describedby="finder-hint" placeholder="For example: the toilet keeps running, my front door lock sticks, and I need a TV mounted."></textarea>
-              <p class="error" id="err-finder" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Describe what you need or pick a job below.</span></p>
-            </div>
+          <!-- Describe-first: what was selected, then search and groups to add more -->
+          <div class="finder-only" id="pick-ui">
             <span class="sr-only" id="finder-live" aria-live="polite"></span>
-            <div class="finder__bar">
-              <p class="finder__status" id="finder-status"></p>
-              <button class="btn btn--secondary" type="button" id="finder-submit" aria-disabled="true" aria-describedby="finder-submit-hint">Select jobs</button>
-              <span class="sr-only" id="finder-submit-hint">Available when you change the description.</span>
+            <div class="fsec">
+              <div class="sel__head"><h2 class="t-strong" id="sel-title" tabindex="-1">Selected jobs</h2><span class="t-meta" id="sel-count"></span></div>
+              <p class="picks__msg t-meta" id="sel-msg" hidden></p>
+              <ul class="picks" id="sel"></ul>
+              <p class="error" id="err-sel" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Select at least one job.</span></p>
+              <div class="note" id="note-over-sel" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.</span></div>
             </div>
-            <div class="finder-qs" id="finder-questions"></div>
+            <div class="fsec">
+              <h2 class="t-strong" id="add-title"><label for="search">Add more jobs</label></h2>
+              <p class="t-meta" id="search-hint">Search by job or category, or open a category.</p>
+              <div class="search" role="search">
+                <svg class="i search__icon" aria-hidden="true"><use href="#ri-search-line"/></svg>
+                <input class="input" type="text" id="search" autocomplete="off" aria-describedby="search-hint" placeholder="Try “faucet” or “plumbing”">
+                <button class="icon-btn icon-btn--bare search__clear" type="button" id="search-clear" aria-label="Clear search" hidden><svg class="i"><use href="#ri-close-line"/></svg></button>
+              </div>
+              <span class="sr-only" id="search-live" aria-live="polite"></span>
+              <p class="t-meta search__none" id="search-none" hidden>No jobs match that. Try another word, or clear the search.</p>
+              <div class="tree" id="tree"></div>
+            </div>
           </div>
 
-          <div class="fsec jobs-sec">
+          <div class="fsec classic-only jobs-sec">
             <fieldset id="fs-jobs" aria-describedby="jobs-hint err-jobs">
               <legend class="t-strong">Pick everything that applies</legend>
               <p class="t-meta" id="jobs-hint">Choose as many as you need. Don&rsquo;t see yours? Show all and pick Something else.</p>
@@ -322,7 +344,6 @@
           <div class="d-head"><h2 class="t-title" id="summary-title">Your request</h2></div>
           <dl class="sum">
             <div class="sum__row"><dt class="sum__label" id="s-home-label">Home</dt><dd class="sum__val sum__home"><svg class="i"><use href="#ri-home-4-line"/></svg><span><span id="s-addr">4817 Mueller Blvd</span><span class="sum__sub" id="s-city">Austin, TX 78723</span></span></dd></div>
-            <div class="sum__row finder-only" id="s-desc-row" hidden><dt class="sum__label">Your description</dt><dd class="sum__val"><p class="sum__jobnote" id="s-desc"></p></dd></div>
             <div class="sum__row" id="s-jobs-row" hidden><dt class="sum__label">Jobs</dt><dd class="sum__val"><ul class="sum__jobs" id="s-jobs"></ul></dd></div>
             <div class="sum__row" id="s-answers-row" hidden><dt class="sum__label">Your answers</dt><dd class="sum__val"><ul class="sum__list sum__list--plain" id="s-answers"></ul></dd></div>
             <div class="sum__row" id="s-when-row" hidden><dt class="sum__label">When</dt><dd class="sum__val"><span id="s-when"></span><span class="sum__sub" id="s-hm"></span></dd></div>
@@ -379,19 +400,16 @@
     <label class="proto__opt">No open times<span class="switch"><input type="checkbox" data-state-switch="noslots"><span class="switch__track"></span></span></label>
     <label class="proto__opt">Chosen time just taken<span class="switch"><input type="checkbox" data-state-switch="taken"><span class="switch__track"></span></span></label>
     <label class="proto__opt finder-only">Matching is unavailable<span class="switch"><input type="checkbox" data-state-switch="finderdown"><span class="switch__track"></span></span></label>
-    <div class="proto__go finder-only" role="group" aria-label="Try a description">
-      <p class="proto__title">Try a description</p>
-      <button class="proto__link" type="button" data-finder-example="The toilet keeps running, my front door lock sticks, and I need a TV mounted">Three clear jobs</button>
-      <button class="proto__link" type="button" data-finder-example="The faucet is a problem and the stairs squeak">A question and an unmatched phrase</button>
-      <button class="proto__link" type="button" data-finder-example="Mount a TV, hang shelves, assemble a dresser, replace a faucet and caulk the tub">Too many jobs</button>
-    </div>
     <div class="proto__go" role="group" aria-label="Jump to screen">
       <p class="proto__title">Jump to screen</p>
       <button class="proto__link" type="button" data-jump="type">Request type</button>
-      <button class="proto__link" type="button" data-jump="job">Fast Fix 1 · The job</button>
-      <button class="proto__link finder-only" type="button" data-jump-picks>Fast Fix 1 · With a description</button>
-      <button class="proto__link" type="button" data-jump="check">Fast Fix 2 · Quick check</button>
-      <button class="proto__link" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>
+      <button class="proto__link finder-only" type="button" data-jump="describe">Fast Fix 1 · Describe</button>
+      <button class="proto__link classic-only" type="button" data-jump="job">Fast Fix 1 · The job</button>
+      <button class="proto__link finder-only" type="button" data-jump="job">Fast Fix 2 · Your jobs</button>
+      <button class="proto__link classic-only" type="button" data-jump="check">Fast Fix 2 · Quick check</button>
+      <button class="proto__link finder-only" type="button" data-jump="check">Fast Fix 3 · Quick check</button>
+      <button class="proto__link classic-only" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>
+      <button class="proto__link finder-only" type="button" data-jump="time">Fast Fix 4 · Pick a time</button>
       <button class="proto__link" type="button" data-jump="booked">Booked</button>
       <button class="proto__link" type="button" data-jump="sent">Sent to our team</button>
     </div>

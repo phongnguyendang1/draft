@@ -4,6 +4,7 @@
   "use strict";
 
   var body = document.body;
+  var FIND = body.classList.contains("variant-finder");
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
   function pad(n) { return (n < 10 ? "0" : "") + n; }
@@ -15,7 +16,7 @@
   };
   /* 25 jobs (illustrative; the real list is curated with Ops). `min` is an internal estimate used only to
      recommend a booking length. It is never shown to the member. `ex` is the placeholder example. */
-  var JOBS = [
+  var JOBS_CLASSIC = [
     { id: "toilet-run", title: "Running toilet", icon: "ri-drop-line", min: 60, ex: "Example: The hall bath toilet keeps running after I flush." },
     { id: "toilet-clog", title: "Clogged toilet", icon: "ri-water-flash-line", min: 60, ex: "Example: The guest bath toilet clogs every few days." },
     { id: "lock", title: "Door lock issue", icon: "ri-door-lock-line", min: 60, ex: "Example: The front door lock sticks and is hard to turn." },
@@ -42,6 +43,18 @@
     { id: "childproof", title: "Install safety latches or gates", icon: "ri-lock-line", min: 60, ex: "Example: Install safety latches on 6 lower cabinets." },
     { id: "other", title: "Something else", icon: "ri-add-line", min: 60, ex: "Example: Tell us what you need and how many items." }
   ];
+  /* Describe-first: the 100-job catalog (catalog.js), flattened. Each job knows its group. */
+  function catalogJobs() {
+    var out = [];
+    CATALOG.forEach(function (g) {
+      g.jobs.forEach(function (t) {
+        out.push({ id: t[0], title: t[1], kw: t[2], min: t[3], icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
+          ex: "Example: how many, which room, or anything we should know." });
+      });
+    });
+    return out;
+  }
+  var JOBS = FIND ? catalogJobs() : JOBS_CLASSIC;
   var JOB = {};
   JOBS.forEach(function (j) { JOB[j.id] = j; });
   var TOP = 10;
@@ -67,8 +80,15 @@
     type: "Request service", job: "Fast Fix: the job", check: "Fast Fix: quick check",
     time: "Fast Fix: pick a time", booked: "Fast Fix: booked", sent: "Request sent"
   };
-  var FIND_SUB = "Describe it, pick from the list, or both. Adding details is optional.";
   var BACK = { type: null, job: "type", check: "job", time: "check", booked: null, sent: null };
+  if (FIND) {
+    SCREENS = ["type", "describe", "job", "check", "time", "booked", "sent"];
+    TITLES.describe = ["What do you need done?", "Tell us in your own words. We’ll select the jobs for you."];
+    TITLES.job = ["Your jobs", "Remove any that don’t fit, or add more below."];
+    PAGE_TITLE.describe = "Fast Fix: describe the job";
+    PAGE_TITLE.job = "Fast Fix: your jobs";
+    BACK = { type: null, describe: "type", job: "describe", check: "job", time: "check", booked: null, sent: null };
+  }
   var WHY = {
     ladder: "This needs more than a standard step ladder, so our team will plan the right equipment.",
     trade: "Work with gas, wiring or water lines can need a licensed trade, so our team will plan it.",
@@ -98,385 +118,193 @@
   };
 
 
-  /* ---------- Describe-first variant: what the member types selects jobs in the list ---------- */
-  var FIND = body.classList.contains("variant-finder");
+  /* ---------- Describe-first variant ----------
+     Step 1: one text box. Step 2: the matching jobs are already selected (remove or add more), with search and
+     100 jobs in 10 groups underneath. The description is carried with the request but never shown again. */
   var REDUCED = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
-
-  /* PROTOTYPE NOTE: finderParse is a rule-based stand-in for the matching service. In production it returns only ids from the
-     allowlist plus the phrase each one came from. Everything after the parse step is real UI. */
-  var KW = {
-    "toilet-run": /(toilet|commode)\b[^.,;]*\b(runn\w*|won'?t stop|constantly)|runn\w*\s+toilet|flapper|fill valve/i,
-    "toilet-clog": /(toilet|commode)\b[^.,;]*\b(clog\w*|block\w*|backed|plung\w*|won'?t flush|overflow\w*)|clog\w*\s+toilet/i,
-    lock: /\block\b|deadbolt|key\b[^.,;]*(stuck|won'?t|jam)/i,
-    door: /\bdoor\b[^.,;]*\b(stick\w*|rub\w*|latch\w*|loose|squeak\w*|won'?t close|doesn'?t close|swollen|drag\w*)|\bstick\w*\s+door/i,
-    disposal: /disposal|disposer/i,
-    appliance: /dishwasher|washing machine|washer|dryer|fridge|refrigerator|oven|stove|microwave|appliance/i,
-    tv: /\b(tv|television)\b/i,
-    hang: /\b(shelf|shelves|curtain rods?|picture frames?|pictures|artwork|mirror|wall art|frames)\b/i,
-    assemble: /assembl\w*|put together|ikea|flat[- ]?pack/i,
-    caulk: /caulk\w*|re-?seal|seal\w*\s+(around|the)/i,
-    "faucet-leak": /(faucet|\btap\b)[^.,;]*\b(leak\w*|drip\w*)|(leak\w*|drip\w*)\s+(faucet|tap)/i,
-    "faucet-swap": /(replac\w*|swap\w*|install\w*|new)\b[^.,;]*(faucet|shower ?head)|(faucet|shower ?head)[^.,;]*\b(replac\w*|swap\w*|new)/i,
-    light: /light fixture|ceiling light|chandelier|pendant( light)?|vanity light|(replac\w*|swap\w*|install\w*|chang\w*)\s+(the\s+|a\s+|my\s+)?(\w+\s+)?light\b/i,
-    outlet: /\b(outlet|receptacle)s?\b|\bswitch(es)?\b/i,
-    smart: /doorbell|thermostat|smart (home|lock|plug)/i,
-    knob: /(knob|handle)s?\b[^.,;]*\b(replac\w*|swap\w*|loose|broken|new)|(replac\w*|swap\w*)\b[^.,;]*(knob|handle)/i,
-    "cab-door": /cabinet[^.,;]*(door|hinge)|\bhinges?\b/i,
-    "cab-hw": /cabinet[^.,;]*(handle|pull|knob|hardware)|drawer pulls?/i,
-    drywall: /drywall|hole in (the |a |my )?(wall|ceiling)|\bpatch\w*/i,
-    blinds: /\bblinds?\b|\bshades?\b|\bcurtains?\b(?!\s*rods?)/i,
-    weather: /weather ?strip\w*|door sweep|\bdraft/i,
-    smoke: /smoke (detector|alarm)s?|\bbatter(y|ies)\b|chirp\w*/i,
-    towel: /towel (bar|ring|rack)|toilet paper holder|robe hook|bath accessor\w*/i,
-    childproof: /child ?proof\w*|baby gate|safety latch\w*|cabinet lock/i
-  };
-  var AMBIG = [
-    { key: "toilet", re: /\b(toilet|commode)\b/i, text: "Is the toilet running, or clogged?",
-      options: [{ label: "Running", ids: ["toilet-run"] }, { label: "Clogged", ids: ["toilet-clog"] }, { label: "Both", ids: ["toilet-run", "toilet-clog"] }] },
-    { key: "door", re: /\bdoor\b/i, text: "What’s going on with the door?",
-      options: [{ label: "It sticks or is loose", ids: ["door"] }, { label: "The lock", ids: ["lock"] }, { label: "The knob or handle", ids: ["knob"] }] },
-    { key: "faucet", re: /\b(faucet|tap)\b/i, text: "Is the faucet leaking, or do you want it replaced?",
-      options: [{ label: "Leaking", ids: ["faucet-leak"] }, { label: "Replace it", ids: ["faucet-swap"] }] }
-  ];
-  var FILLER = /^(please|thanks|thank you|hi|hello|hey|i need|i want|need help|can you|could you)\b.{0,12}$/i;
+  state.desc = "";        /* what was typed in step 1: carried with the request, never displayed */
+  state.q = "";           /* search text */
+  state.open = {};        /* group id -> expanded */
+  state.sc = {};          /* group id -> collapsed while searching */
+  state.det = {};         /* job id -> details box open */
+  state.msg = "";         /* a plain note above the selected list (nothing matched / matching unavailable) */
 
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
-  function announce(msg) { $("#finder-live").textContent = ""; setTimeout(function () { $("#finder-live").textContent = msg; }, 30); }
-  function setText(node, txt) { if (node.textContent !== txt) node.textContent = txt; }
-  function titlesOf(ids) { return ids.map(function (id) { return JOB[id].title; }).join(", "); }
-
-  /* Split into clauses (with positions) on punctuation and "and / also / plus / &" */
-  function clauses(text) {
-    var out = [], re = /[^,;.\n]+/g, m;
-    while ((m = re.exec(text))) {
-      var base = m.index, pos = 0;
-      m[0].split(/(\s+and\s+|\s+also\s+|\s+plus\s+|\s*&\s*)/i).forEach(function (p) {
-        if (/^(\s+and\s+|\s+also\s+|\s+plus\s+|\s*&\s*)$/i.test(p)) { pos += p.length; return; }
-        var lead = p.length - p.replace(/^\s+/, "").length, t = p.trim();
-        if (t) out.push({ text: t, start: base + pos + lead, end: base + pos + lead + t.length });
-        pos += p.length;
-      });
-    }
-    return out;
-  }
-
-  function finderParse(text) {
-    var res = { picks: [], questions: [], unmatched: [] };
-    clauses(text).forEach(function (c) {
-      var hits = Object.keys(KW).filter(function (id) { return KW[id].test(c.text); });
-      if (hits.indexOf("lock") > -1 || hits.indexOf("knob") > -1) hits = hits.filter(function (x) { return x !== "door"; });
-      if (hits.indexOf("cab-hw") > -1) hits = hits.filter(function (x) { return x !== "knob"; });
-      if (hits.indexOf("faucet-swap") > -1) hits = hits.filter(function (x) { return x !== "faucet-leak"; });
-      if (hits.length) {
-        hits.forEach(function (id) { if (!res.picks.some(function (p) { return p.id === id; })) res.picks.push({ id: id, quote: c.text }); });
-        return;
-      }
-      var amb = AMBIG.filter(function (a) { return a.re.test(c.text); })[0];
-      if (amb) {
-        res.questions.push({ kind: "ask", key: amb.key, text: amb.text, options: amb.options, quote: c.text, start: c.start, end: c.end });
-        return;
-      }
-      if (c.text.split(/\s+/).length >= 3 && !FILLER.test(c.text)) {
-        res.unmatched.push({ kind: "none", quote: c.text, start: c.start, end: c.end });
-      }
-    });
-    if (!res.picks.length && !res.questions.length && !res.unmatched.length && text.length >= 8 && /\s/.test(text)) {
-      res.unmatched.push({ kind: "none", quote: text, start: 0, end: text.length });
-    }
-    return res;
-  }
-
-  /* The member's description and the list are ONE selection. Typing selects matching jobs in the list below;
-     ticking a job yourself always wins. state.finder keeps only the bookkeeping:
-       src      job id -> the phrase it was selected from (shown under the job)
-       auto     ids selected by the text and not touched since (these follow the text if it changes)
-       removed  ids the member unticked while the text still matches (do not re-select them)
-       answers  ambiguity topic -> chosen job ids, or {skip:true}
-       others   unmatched phrases the member chose to add as "Something else";  dismissed: ones they skipped */
-  function finderFresh() {
-    return { text: "", src: {}, auto: {}, removed: {}, answers: {}, others: [], dismissed: [], questions: [], unmatched: [], open: {}, down: false, flash: "", warned: "", pin: "", qsig: "", applied: "" };
-  }
-  state.finder = finderFresh();
-
+  function announce(msg) { var n = $("#finder-live"); n.textContent = ""; setTimeout(function () { n.textContent = msg; }, 30); }
+  function setText(node, txt) { if (node && node.textContent !== txt) node.textContent = txt; }
   function resetPicks() { state.hours = 0; state.date = null; state.time = null; }
   function selectJob(id) { if (!state.jobs[id]) { state.jobs[id] = true; state.order.push(id); } }
   function unselectJob(id) {
     state.jobs[id] = false;
     var at = state.order.indexOf(id); if (at > -1) state.order.splice(at, 1);
   }
+  function icon(name) { var s = el("span", "d-icon"); s.setAttribute("aria-hidden", "true"); s.innerHTML = '<svg class="i"><use href="#' + name + '"/></svg>'; return s; }
 
-  /* Phrases are matched loosely so a few more typed words do not look like a different phrase */
-  function sameQuote(x, y) {
-    x = x.toLowerCase(); y = y.toLowerCase();
-    return x === y || (Math.min(x.length, y.length) >= 6 && (x.indexOf(y) === 0 || y.indexOf(x) === 0));
+  /* PROTOTYPE NOTE: matching is a rule-based stand-in for the real service. It returns job ids only, from the catalog.
+     Everything after it is real UI. Words are reduced to a rough stem so "running" and "runs" meet. */
+  function stem(w) {
+    w = w.toLowerCase().replace(/'/g, "");
+    if (w.length >= 4) { var t = w.replace(/(ing|ed|es|s|y|e|er)$/, ""); if (t.length >= 3) w = t; }
+    return w.replace(/([a-z])\1$/, "$1");
   }
-  function findQuote(list, q) { for (var i = 0; i < list.length; i++) if (sameQuote(list[i], q)) return i; return -1; }
-  function selIds() { return state.order.filter(function (id) { return state.jobs[id]; }); }
-
-  /* Re-read the description and bring the list in line with it */
-  function isDirty() { return state.finder.text.trim() !== state.finder.applied; }
-  function finderSync(submit) {
-    var j = state.finder;
-    if (submit) j.applied = j.text.trim();
-    var text = j.applied;
-    if (body.classList.contains("is-finderdown")) { j.down = true; j.questions = []; j.unmatched = []; renderFinderMeta(); return; }
-    j.down = false;
-    var res = text.length >= 2 ? finderParse(text) : { picks: [], questions: [], unmatched: [] };
-
-    var want = {}, order = [], other = [];
-    function wantJob(id, quote) { if (!(id in want)) { want[id] = quote; order.push(id); } }
-    res.picks.forEach(function (p) { wantJob(p.id, p.quote); });
-
-    var topics = {};
-    j.questions = []; j.unmatched = [];
-    res.questions.forEach(function (q) {
-      if (topics[q.key]) return;
-      topics[q.key] = 1;
-      var a = j.answers[q.key];
-      if (!a) j.questions.push(q);
-      else if (a.other) other.push(q.quote);
-      else (a.ids || []).forEach(function (id) { wantJob(id, q.quote); });
+  function compileMatch() {
+    JOBS.forEach(function (j) {
+      j.alts = (j.kw || "").split("|").map(function (p) { return p.trim(); }).filter(Boolean).map(function (p) {
+        var generic = p.charAt(0) === "~", words = p.replace(/^~/, "").split(/\s+/).map(stem);
+        return { w: generic ? 0.5 : words.length, words: words };
+      });
+      j.titleHay = j.title.toLowerCase();
+      j.hay = (j.title + " " + j.groupTitle + " " + j.groupKw + " " + (j.kw || "").replace(/[|~]/g, " ")).toLowerCase();
     });
-    Object.keys(j.answers).forEach(function (k) { if (!topics[k]) delete j.answers[k]; });
-
-    var keepO = [], keepD = [];
-    res.unmatched.forEach(function (u) {
-      if (findQuote(j.others, u.quote) > -1) { keepO.push(u.quote); other.push(u.quote); }
-      else if (findQuote(j.dismissed, u.quote) > -1) keepD.push(u.quote);
-      else j.unmatched.push(u);
-    });
-    j.others = keepO; j.dismissed = keepD;
-    if (other.length) wantJob("other", other.join("; "));
-
-    var added = [], dropped = [];
-    Object.keys(j.auto).forEach(function (id) {
-      if (id in want) return;
-      delete j.auto[id];
-      if (state.jobs[id] && !(state.notes[id] || "").trim()) { unselectJob(id); dropped.push(id); }
-    });
-    Object.keys(j.removed).forEach(function (id) { if (!(id in want)) delete j.removed[id]; });
-    j.src = {};
-    order.forEach(function (id) {
-      j.src[id] = want[id];
-      if (!state.jobs[id] && !j.removed[id]) { selectJob(id); j.auto[id] = true; added.push(id); }
-    });
-    if (added.length || dropped.length) resetPicks();
-    if (selectedJobs().length) { setError("jobs", false); setError("finder", false); }
-
-    renderFinderMeta();
-    if (added.length) announce("Selected " + titlesOf(added) + ".");
-    else if (dropped.length) announce("Removed " + titlesOf(dropped) + ".");
   }
-  function finderSetText(text) {
-    var j = state.finder, ta = $("#finder-input");
-    j.text = text; ta.value = text;
-    finderSync(true);
+  function clauses(text) {
+    return text.split(/[,;.\n]+|\s+(?:and|also|plus)\s+|\s*&\s*/i).map(function (c) { return c.trim(); }).filter(Boolean);
   }
-  /* Prototype helpers: start clean, then apply a description */
-  function finderClearAll() {
-    JOBS.forEach(function (jb) { state.jobs[jb.id] = false; });
-    state.order = []; state.notes = {}; resetPicks();
-    state.finder = finderFresh();
-  }
-  function finderSeed() {
-    finderClearAll();
-    finderSetText("The toilet keeps running, the front door lock sticks, and I need a light fixture replaced in the second-story hallway.");
+  function matchText(text) {
+    var ids = [];
+    clauses(text).forEach(function (c) {
+      var words = {};
+      c.toLowerCase().split(/[^a-z']+/).forEach(function (w) { if (w) words[stem(w)] = 1; });
+      var best = 0, hit = null;
+      JOBS.forEach(function (j) {
+        var s = 0;
+        j.alts.forEach(function (a) { if (a.w > s && a.words.every(function (w) { return words[w]; })) s = a.w; });
+        if (s > best) { best = s; hit = j; }        /* strict: on a tie the first job in the catalog wins */
+      });
+      if (hit && ids.indexOf(hit.id) < 0) ids.push(hit.id);
+    });
+    return ids;
   }
 
   function updateDock() {
-    var show = /^(job|check|time)$/.test(state.screen);
+    var show = /^(describe|job|check|time)$/.test(state.screen);
     body.setAttribute("data-dock", show ? "on" : "off");
     $("#fdock").hidden = !show;
   }
 
-  /* Under the input: what the text did, plus the one-tap questions it raised */
-  function renderFinderMeta() {
-    var j = state.finder, text = j.applied;
-    var st = $("#finder-status"), from = state.order.filter(function (id) { return state.jobs[id] && j.src[id]; });
-    var msg = "", icon = "ri-check-line";
-    if (j.flash) { msg = j.flash; icon = "ri-information-line"; }
-    else if (j.down) { msg = "We couldn’t select jobs from that right now. Pick them from the list below."; icon = "ri-information-line"; }
-    else if (from.length) msg = "Selected from your description: " + titlesOf(from) + ".";
-    else if (text.length >= 4 && !j.questions.length && !j.unmatched.length && !selectedJobs().length) { msg = "Nothing matched yet. Add a few more words, or pick from the list below."; icon = "ri-information-line"; }
-    else if (j.text.length >= 520) { msg = (600 - j.text.length) + " characters left."; icon = "ri-information-line"; }
-    if (st.getAttribute("data-msg") !== msg + "|" + icon) {
-      st.setAttribute("data-msg", msg + "|" + icon);
-      st.innerHTML = "";
-      if (msg) { st.appendChild(statusIcon(icon)); st.appendChild(el("span", "finder__status-text", msg)); }
-    }
-    renderQuestions();
-    updateFinderBtn();
-    syncJobs();
-    updateOver();
-    updateCta();
-    updateSummary();
-  }
-  /* The submit button is only live when the description differs from what the list was last built from */
-  function updateFinderBtn() {
-    var b = $("#finder-submit"), j = state.finder, dirty = isDirty();
-    b.setAttribute("aria-disabled", String(!dirty));
-    setText(b, j.applied ? "Update jobs" : "Select jobs");
-  }
-  function finderSubmit() {
-    var b = $("#finder-submit");
-    if (b.getAttribute("aria-disabled") === "true") return;
-    var j = state.finder, before = selIds().join();
-    j.flash = ""; j.warned = "";
-    finderSync(true);
-    var n = selectedJobs().length, changed = selIds().join() !== before;
-    announce(n ? (changed ? "Jobs updated. " : "") + n + (n === 1 ? " job" : " jobs") + " selected." : "No jobs selected.");
-  }
-  function statusIcon(name) {
-    var s = el("span", "finder__status-icon"); s.setAttribute("aria-hidden", "true");
-    s.innerHTML = '<svg class="i"><use href="#' + name + '"/></svg>';
-    return s;
-  }
-  /* Show a message under the input, where the member is looking, and bring it into view */
-  function finderFlash(msg, focusSel) {
-    state.finder.flash = msg;
-    renderFinderMeta();
-    announce(msg);
-    var st = $("#finder-status");
-    st.scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
-    var f = focusSel && $(focusSel); if (f) f.focus({ preventScroll: true });
-  }
-
-  function chipRow(card, labels, fn) {
-    var row = el("div", "finder__chips");
-    labels.forEach(function (l) {
-      var b = el("button", "chip", l.label); b.type = "button";
-      b.addEventListener("click", function () { fn(l); });
-      row.appendChild(b);
+  /* ----- Step 2: selected jobs (top) ----- */
+  function renderSelected() {
+    var jobs = selectedJobs(), list = $("#sel");
+    list.innerHTML = "";
+    setText($("#sel-count"), jobs.length ? jobs.length + " selected" : "");
+    var msg = $("#sel-msg");
+    msg.hidden = jobs.length > 0 || !state.msg;
+    setText(msg, jobs.length ? "" : state.msg);
+    jobs.forEach(function (jb) {
+      var li = el("li", "pick"), top = el("div", "pick__top"), main = el("div", "pick__main");
+      main.appendChild(el("p", "pick__title", jb.title));
+      main.appendChild(el("p", "pick__group", jb.groupTitle));
+      var rm = el("button", "link pick__remove", "Remove"); rm.type = "button";
+      rm.setAttribute("aria-label", "Remove " + jb.title);
+      rm.addEventListener("click", function () { toggleJob(jb.id, false, "sel-title"); });
+      top.appendChild(icon(jb.icon)); top.appendChild(main); top.appendChild(rm);
+      var more = el("div", "job__more"), open = !!state.det[jb.id], has = !!(state.notes[jb.id] || "").trim();
+      var tog = el("button", "link", open ? "Hide details" : (has ? "Edit details (optional)" : "Add details (optional)")); tog.type = "button";
+      tog.setAttribute("data-details-toggle", jb.id); tog.setAttribute("aria-expanded", String(open)); tog.setAttribute("aria-controls", "pbox-" + jb.id);
+      tog.setAttribute("aria-label", tog.textContent + " for " + jb.title);
+      var box = el("div", "job__box"); box.id = "pbox-" + jb.id; box.hidden = !open;
+      var lab = el("label"); lab.setAttribute("for", "pnote-" + jb.id);
+      lab.appendChild(document.createTextNode("More details about " + jb.title + " ")); lab.appendChild(el("span", "", "(optional)"));
+      var ta = el("textarea", "textarea"); ta.id = "pnote-" + jb.id; ta.rows = 3; ta.placeholder = jb.ex; ta.value = state.notes[jb.id] || "";
+      ta.setAttribute("data-note", jb.id);
+      var err = el("p", "error"); err.id = "err-note-" + jb.id; err.hidden = true; err.setAttribute("role", "alert");
+      err.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span></span>';
+      err.lastChild.textContent = "Add a few words so we know what you need.";
+      box.appendChild(lab); box.appendChild(ta); box.appendChild(err);
+      more.appendChild(tog); more.appendChild(box);
+      li.appendChild(top); li.appendChild(more);
+      list.appendChild(li);
     });
-    card.appendChild(row);
-  }
-  function renderQuestions() {
-    var j = state.finder, box = $("#finder-questions");
-    var sig = j.questions.map(function (q) { return q.key + ":" + q.quote; }).concat(j.unmatched.map(function (u) { return "u:" + u.quote; })).join("|");
-    if (sig === j.qsig && (box.firstElementChild || !sig)) return;
-    var first = !j.qsig;
-    j.qsig = sig;
-    box.innerHTML = "";
-    j.questions.forEach(function (q) {
-      var card = el("div", "finder-q");
-      card.setAttribute("role", "group"); card.setAttribute("aria-label", q.text);
-      card.appendChild(el("p", "finder-q__text", q.text));
-      chipRow(card, q.options.concat([{ label: "Something else", ids: [], other: true }, { label: "Skip", ids: [] }]), function (o) { finderAnswer(q, o); });
-      box.appendChild(card);
-    });
-    j.unmatched.forEach(function (u) {
-      var card = el("div", "finder-q");
-      var t = "We couldn’t match “" + u.quote + "” to a job on our list. Add it as Something else?";
-      card.setAttribute("role", "group"); card.setAttribute("aria-label", t);
-      card.appendChild(el("p", "finder-q__text", t));
-      chipRow(card, [{ label: "Add as Something else", add: true }, { label: "Skip" }], function (o) { finderUnmatched(u, o.add); });
-      box.appendChild(card);
-    });
-    var n = j.questions.length + j.unmatched.length;
-    if (n && !first) announce(n === 1 ? "One question about your description, below the input." : n + " questions about your description, below the input.");
-  }
-  function afterChoice(msg, focusId) {
-    var chip = $("#finder-questions .chip");
-    if (chip) chip.focus();
-    else {
-      var cb = focusId && $("#job-" + focusId + " input");
-      if (cb && cb.offsetParent) cb.focus(); else $("#finder-input").focus({ preventScroll: true });
-    }
-    if (msg) announce(msg);
-  }
-  function finderAnswer(q, opt) {
-    var j = state.finder, id = opt.ids[0] || (opt.other ? "other" : "");
-    j.answers[q.key] = opt.other ? { other: true } : (opt.ids.length ? { ids: opt.ids.slice() } : { skip: true });
-    j.flash = "";
-    finderSync();
-    afterChoice(opt.other ? "Selected Something else." : (opt.ids.length ? "Selected " + titlesOf(opt.ids) + "." : ""), id);
-  }
-  function finderUnmatched(u, add) {
-    var j = state.finder;
-    (add ? j.others : j.dismissed).push(u.quote);
-    j.flash = "";
-    finderSync();
-    afterChoice(add ? "Selected Something else." : "", add ? "other" : "");
-  }
-
-  /* A tick or untick in the list is the member's own choice */
-  function finderToggled(id, on) {
-    var j = state.finder;
-    delete j.auto[id];
-    j.flash = "";
-    if (on) {
-      j.questions.forEach(function (q) {
-        if (q.options.some(function (o) { return o.ids.indexOf(id) > -1; })) j.answers[q.key] = { skip: true };
-      });
-      delete j.removed[id];
-    } else {
-      j.removed[id] = true; delete j.src[id];
-      if (JOBS.findIndex(function (x) { return x.id === id; }) >= TOP && !state.showAll) j.pin = id;
-    }
-    resetPicks();
-    if (on) { setError("jobs", false); setError("finder", false); }
-    j.questions = j.questions.filter(function (q) { return !(j.answers[q.key] && j.answers[q.key].skip && q.options.some(function (o) { return o.ids.indexOf(id) > -1; })); });
-    renderFinderMeta();
-  }
-
-  /* The list: all 25 rows exist once; selection, quotes and the details box are updated in place so focus never jumps */
-  function buildJobRows() {
-    $("#jobs").innerHTML = JOBS.map(function (jb) {
-      return '<div class="job" id="job-' + jb.id + '">' +
-        '<label class="opt"><input type="checkbox" name="jobs" value="' + jb.id + '">' +
-        '<span class="d-icon" aria-hidden="true"><svg class="i"><use href="#' + jb.icon + '"/></svg></span>' +
-        '<span class="opt__main"><span class="opt__title">' + jb.title + '</span><span class="opt__quote" hidden></span></span>' +
-        '<span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>' +
-        '<div class="job__more" hidden>' +
-        '<button class="link" type="button" data-details-toggle="' + jb.id + '" aria-expanded="false" aria-controls="pbox-' + jb.id + '">Add details (optional)</button>' +
-        '<div class="job__box" id="pbox-' + jb.id + '" hidden>' +
-        '<label for="pnote-' + jb.id + '">More details about ' + jb.title + ' <span>(optional)</span></label>' +
-        '<textarea class="textarea" id="pnote-' + jb.id + '" rows="3" data-note="' + jb.id + '"></textarea>' +
-        '<p class="error" id="err-note-' + jb.id + '" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Add a few words so we know what you need.</span></p></div></div></div>';
-    }).join("");
-    JOBS.forEach(function (jb) { $("#pnote-" + jb.id).placeholder = jb.ex; });
-  }
-  function syncJobs() {
-    var j = state.finder;
-    if (!$("#jobs").firstElementChild) buildJobRows();
-    if (j.pin && !(document.activeElement && document.activeElement.closest && document.activeElement.closest("#job-" + j.pin))) j.pin = "";
-    var shown = 0;
-    JOBS.forEach(function (jb, i) {
-      var row = $("#job-" + jb.id), on = !!state.jobs[jb.id], show = state.showAll || i < TOP || on || j.pin === jb.id;
-      if (show) shown++;
-      row.hidden = !show;
-      row.classList.toggle("is-on", on);
-      $("input", row).checked = on;
-      var q = $(".opt__quote", row), src = on ? j.src[jb.id] : "";
-      q.hidden = !src; q.textContent = src ? "“" + src + "”" : "";
-      $(".job__more", row).hidden = !on;
-      var open = on && !!j.open[jb.id], tog = $("[data-details-toggle]", row), ta = $("textarea", row);
-      if (ta.value !== (state.notes[jb.id] || "")) ta.value = state.notes[jb.id] || "";
-      $(".job__box", row).hidden = !open;
-      tog.setAttribute("aria-expanded", String(open));
-      var tl = open ? "Hide details" : ((state.notes[jb.id] || "").trim() ? "Edit details (optional)" : "Add details (optional)");
-      setText(tog, tl);
-      tog.setAttribute("aria-label", tl + " for " + jb.title);
-    });
-    var t = $("#jobs-toggle");
-    t.setAttribute("aria-expanded", String(state.showAll));
-    $("[data-label]", t).textContent = state.showAll ? "Show fewer jobs" : "Show all " + JOBS.length + " jobs";
-    $("use", t).setAttribute("href", state.showAll ? "#ri-arrow-up-s-line" : "#ri-arrow-down-s-line");
-    setText($("#jobs-count"), "Showing " + shown + " of " + JOBS.length + " jobs");
-  }
-  function syncJobsLabels(id) {
-    var tog = $("#job-" + id + " [data-details-toggle]");
-    if (!tog || state.finder.open[id]) return;
-    var tl = (state.notes[id] || "").trim() ? "Edit details (optional)" : "Add details (optional)";
-    setText(tog, tl); tog.setAttribute("aria-label", tl + " for " + JOB[id].title);
   }
   function toggleDetails(id) {
-    var j = state.finder;
-    j.open[id] = !j.open[id];
-    syncJobs();
-    if (j.open[id]) $("#pnote-" + id).focus();
+    state.det[id] = !state.det[id];
+    renderSelected();
+    var t = $('[data-details-toggle="' + id + '"]');
+    if (state.det[id]) $("#pnote-" + id).focus(); else if (t) t.focus();
   }
 
+  /* ----- Step 2: search + groups (bottom) ----- */
+  var GROUPS = [];
+  function buildTree() {
+    var tree = $("#tree"); tree.innerHTML = "";
+    CATALOG.forEach(function (g) {
+      var root = el("div", "grp"), h = el("h3", "grp__h"), btn = el("button", "grp__btn"); btn.type = "button";
+      btn.setAttribute("aria-expanded", "false"); btn.setAttribute("aria-controls", "gp-" + g.id); btn.setAttribute("data-grp", g.id);
+      btn.appendChild(icon(g.icon));
+      btn.appendChild(el("span", "grp__title", g.title));
+      var sel = el("span", "grp__sel"); sel.hidden = true; btn.appendChild(sel);
+      var meta = el("span", "grp__meta"); btn.appendChild(meta);
+      var chev = el("span", "grp__chev"); chev.setAttribute("aria-hidden", "true"); chev.innerHTML = '<svg class="i"><use href="#ri-arrow-down-s-line"/></svg>'; btn.appendChild(chev);
+      h.appendChild(btn);
+      var panel = el("div", "grp__panel"); panel.id = "gp-" + g.id; panel.hidden = true;
+      panel.setAttribute("role", "group"); panel.setAttribute("aria-label", g.title);
+      var tiles = [];
+      JOBS.filter(function (j) { return j.group === g.id; }).forEach(function (j) {
+        var lab = el("label", "opt"), inp = el("input"); inp.type = "checkbox"; inp.name = "jobs"; inp.value = j.id;
+        lab.appendChild(inp);
+        var m = el("span", "opt__main"); m.appendChild(el("span", "opt__title", j.title)); lab.appendChild(m);
+        var bx = el("span", "opt__box"); bx.setAttribute("aria-hidden", "true"); bx.innerHTML = '<svg class="i"><use href="#ri-check-line"/></svg>'; lab.appendChild(bx);
+        panel.appendChild(lab);
+        tiles.push({ job: j, el: lab, input: inp });
+      });
+      root.appendChild(h); root.appendChild(panel); tree.appendChild(root);
+      GROUPS.push({ id: g.id, title: g.title, titleHay: g.title.toLowerCase(), root: root, btn: btn, panel: panel, sel: sel, meta: meta, tiles: tiles });
+    });
+  }
+  /* A search word matches the start of a word ("door" finds doorbell, not outdoor) */
+  function wordStart(hay, tk) {
+    var i = hay.indexOf(tk);
+    while (i > -1) { if (i === 0 || /[^a-z0-9]/.test(hay.charAt(i - 1))) return true; i = hay.indexOf(tk, i + 1); }
+    return false;
+  }
+  function hit(hay, tk) { return wordStart(hay, tk) || (tk.length > 3 && wordStart(hay, tk.replace(/(es|s)$/, ""))); }
+  /* Search: a group name shows the whole group; otherwise job names; if neither hits, related words and the group's keywords */
+  function syncTree() {
+    var toks = state.q.toLowerCase().split(/[^a-z0-9']+/).filter(Boolean), total = 0, any = false;
+    var byGroup = {}, byTitle = {};
+    if (toks.length) {
+      GROUPS.forEach(function (g) { byGroup[g.id] = toks.every(function (t) { return hit(g.titleHay, t); }); });
+      JOBS.forEach(function (j) { byTitle[j.id] = toks.every(function (t) { return hit(j.titleHay, t); }); });
+      var found = GROUPS.some(function (g) { return byGroup[g.id]; }) || JOBS.some(function (j) { return byTitle[j.id]; });
+      if (!found) JOBS.forEach(function (j) { byTitle[j.id] = toks.every(function (t) { return hit(j.hay, t); }); });
+    }
+    GROUPS.forEach(function (g) {
+      var shown = 0, n = 0;
+      g.tiles.forEach(function (t) {
+        var on = !!state.jobs[t.job.id];
+        if (on) n++;
+        t.input.checked = on;
+        var show = !toks.length || byGroup[g.id] || byTitle[t.job.id];
+        t.el.hidden = !show; if (show) shown++;
+      });
+      total += toks.length ? shown : 0;
+      var open = toks.length ? shown > 0 && !state.sc[g.id] : !!state.open[g.id];
+      g.root.hidden = toks.length > 0 && shown === 0;
+      if (shown) any = true;
+      g.btn.setAttribute("aria-expanded", String(open));
+      g.panel.hidden = !open;
+      setText(g.meta, toks.length ? shown + " of " + g.tiles.length : g.tiles.length + " jobs");
+      g.sel.hidden = n === 0; setText(g.sel, n + " selected");
+    });
+    $("#search-none").hidden = !(toks.length && !any);
+    $("#search-clear").hidden = !state.q;
+    setText($("#search-live"), toks.length ? (any ? total + (total === 1 ? " job" : " jobs") + " found" : "No jobs found") : "");
+  }
+
+  /* ----- one place for every add / remove ----- */
+  function toggleJob(id, on, focusId) {
+    if (on) selectJob(id); else unselectJob(id);
+    resetPicks();
+    setError("sel", false); setError("note-other", false);
+    renderSelected(); syncTree(); refresh();
+    var n = selectedJobs().length;
+    announce((on ? "Added " : "Removed ") + JOB[id].title + ". " + n + (n === 1 ? " job" : " jobs") + " selected.");
+    if (focusId) { var f = $("#" + focusId); if (f) f.focus({ preventScroll: false }); }
+  }
+
+  function renderJobsStep() {
+    renderSelected(); syncTree();
+  }
 
   /* ---------- Formatting ---------- */
   function fmtMin(m) {
@@ -543,7 +371,7 @@
   /* ---------- Rendering: jobs ---------- */
   /* 10 jobs plus "Show all"; anything already picked stays visible when the list is collapsed */
   function renderJobs() {
-    if (FIND) { syncJobs(); return; }
+    if (FIND) return;
     var shown = JOBS.filter(function (j, i) { return state.showAll || i < TOP || state.jobs[j.id]; });
     $("#jobs").innerHTML = shown.map(function (j) {
       return '<label class="opt"><input type="checkbox" name="jobs" value="' + j.id + '"' + (state.jobs[j.id] ? " checked" : "") + '>' +
@@ -638,6 +466,7 @@
   function updateOver() {
     var now = overLimit();
     $("#note-over").hidden = !now;
+    $("#note-over-sel").hidden = !now;
     if (FIND && now !== lastOver) { lastOver = now; if (now) announce("That is more than a Fast Fix covers. We will send this to our team."); }
   }
 
@@ -666,6 +495,7 @@
 
   function ctaFor(screen) {
     var n = selectedJobs().length;
+    if (screen === "describe") return { label: "Continue", status: "" };
     if (screen === "job") {
       return {
         label: overLimit() ? "Send to our team" : "Continue",
@@ -701,10 +531,7 @@
     $("#s-addr").textContent = h.addr;
     $("#s-city").textContent = h.city;
 
-    var said = FIND ? (state.finder.text || "").trim() : "";
-    $("#s-desc-row").hidden = !(FIND && said && s !== "type");
-    $("#s-desc").textContent = said;
-    var jobs = selectedJobs(), showJobs = s !== "type" && jobs.length > 0;
+    var jobs = selectedJobs(), showJobs = s !== "type" && s !== "describe" && jobs.length > 0;
     $("#s-jobs-row").hidden = !showJobs;
     var list = $("#s-jobs");
     list.innerHTML = "";
@@ -760,15 +587,16 @@
     if (el) el.hidden = !on;
     var field = $("#field-" + id);
     if (field) field.classList.toggle("is-invalid", on);
-    var host = id === "jobs" ? $("#fs-jobs") : id === "finder" ? $("#finder-input") : null;
-    if (host) host.setAttribute("aria-describedby", (id === "jobs" ? "jobs-hint" : "finder-hint") + (on ? " err-" + id : ""));
+    var host = id === "jobs" ? $("#fs-jobs") : id === "describe" ? $("#desc") : null;
+    if (host) host.setAttribute("aria-describedby", (id === "jobs" ? "jobs-hint" : "desc-hint") + (on ? " err-" + id : ""));
   }
   function clearErrors(ids) { ids.forEach(function (id) { setError(id, false); }); }
 
   /* ---------- Navigation ---------- */
   function seedDemo(screen) {
     if (!selectedJobs().length && FIND) {
-      finderSeed();
+      ["toilet-run", "lock", "light-fixture"].forEach(selectJob);
+      state.hours = 0;
     } else if (!selectedJobs().length) {
       state.jobs = { "toilet-run": true, lock: true };
       state.order = ["toilet-run", "lock"];
@@ -796,10 +624,8 @@
 
   var firstRender = true;
   function render(screen) {
-    if (FIND && screen !== "job" && isDirty() && state.screen === "job") finderSync(true);
-    if (FIND && /^(check|time|booked)$/.test(screen) && !selectedJobs().length && state.finder.text.trim()) { navigate("job"); return; }
     if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = "time"; navigate("sent"); return; }
-    if (screen !== "type" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
+    if (screen !== "type" && screen !== "describe" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
     if (screen === "booked" && (!state.date || state.time === null)) seedDemo(screen);
     if (screen === "sent" && !state.reason) seedDemo(screen);
     state.screen = screen;
@@ -807,12 +633,11 @@
 
     SCREENS.forEach(function (s) { $('[data-screen-id="' + s + '"]').hidden = s !== screen; });
     $("#h1").textContent = TITLES[screen][0];
-    var sub = FIND && screen === "job" ? FIND_SUB : TITLES[screen][1];
-    $("#sub").textContent = sub;
+    $("#sub").textContent = TITLES[screen][1];
     document.title = PAGE_TITLE[screen] + SUFFIX;
 
     /* stepper */
-    var idx = ["job", "check", "time"].indexOf(screen);
+    var idx = (FIND ? ["describe", "job", "check", "time"] : ["job", "check", "time"]).indexOf(screen);
     $("#steps").hidden = idx < 0;
     $all(".step").forEach(function (el, i) {
       el.classList.toggle("is-done", i < idx);
@@ -838,11 +663,7 @@
     updateDock();
 
     if (screen === "job") {
-      if (FIND) {
-        var ta = $("#finder-input");
-        if (ta.value !== state.finder.text) ta.value = state.finder.text;
-        renderFinderMeta();
-      } else { renderJobs(); renderDetails(); }
+      if (FIND) renderJobsStep(); else { renderJobs(); renderDetails(); }
     }
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
@@ -890,33 +711,43 @@
     setError("time", true);
   }
 
-  /* Describe-first step 1: Continue. Returns true when it handled the click (feedback shown, stay on the step). */
-  function finderNext() {
-    var j = state.finder, before = selIds().join();
-    if (isDirty()) {
-      finderSync(true);
-      if (selIds().join() !== before) { finderFlash("We updated your jobs from what you wrote. Check them, then continue."); return true; }
+  /* Describe-first, step 1: the description selects jobs. It is kept with the request, never shown again. */
+  function describeNext() {
+    var ta = $("#desc"), txt = ta.value.trim();
+    if (txt.length < 3) {
+      setError("describe", true);
+      $("#err-describe").scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
+      ta.focus({ preventScroll: true });
+      return;
     }
+    setError("describe", false);
+    state.desc = state.desc ? state.desc + " " + txt : txt;
+    state.msg = "";
+    if (body.classList.contains("is-finderdown")) state.msg = "We couldn’t select jobs from your description. Search or browse below to add them.";
+    else {
+      var ids = matchText(txt);
+      ids.forEach(selectJob);
+      if (!ids.length && !selectedJobs().length) state.msg = "We couldn’t match your description to a job. Search or browse below to add some.";
+    }
+    resetPicks();
+    ta.value = "";
+    state.q = ""; $("#search").value = ""; state.sc = {};
+    navigate("job");
+  }
+  /* Describe-first, step 2: Continue. Returns true when it handled the click (feedback shown, stay on the step). */
+  function jobsNext() {
     if (!selectedJobs().length) {
-      setError("finder", true);
-      announce("Describe what you need or pick a job below.");
-      $("#finder-input").scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
-      $("#finder-input").focus({ preventScroll: true });
+      setError("sel", true);
+      announce("Select at least one job.");
+      $("#err-sel").scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
+      $("#search").focus({ preventScroll: true });
       return true;
     }
-    var o = state.jobs.other && !(state.notes.other || "").trim() && !j.text.trim();
-    if (o) {
-      j.open.other = true; syncJobs();
+    if (state.jobs.other && !(state.notes.other || "").trim()) {
+      state.det.other = true; renderSelected();
       setError("note-other", true);
-      $("#job-other").scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
+      $("#pnote-other").scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
       $("#pnote-other").focus({ preventScroll: true });
-      return true;
-    }
-    var qn = j.questions.length + j.unmatched.length;
-    j.flash = "";
-    if (qn && j.warned !== j.qsig) {
-      j.warned = j.qsig;
-      finderFlash((qn === 1 ? "1 question is left. " : qn + " questions are left. ") + "Answer or skip, then continue. Anything you skip stays in your description.", "#finder-questions .chip");
       return true;
     }
     return false;
@@ -924,8 +755,9 @@
 
   function next() {
     var s = state.screen;
+    if (s === "describe") { describeNext(); return; }
     if (s === "job") {
-      if (FIND) { if (finderNext()) return; }
+      if (FIND && jobsNext()) return;
       var jobs = selectedJobs(), bad = [];
       if (!jobs.length) bad.push("jobs");
       if (!FIND) jobs.forEach(function (j) { if (!(state.notes[j.id] || "").trim()) bad.push("note-" + j.id); });
@@ -1034,12 +866,16 @@
     }
 
     if (FIND) {
-      var ex = t.closest("[data-finder-example]");
-      if (ex) { finderClearAll(); finderSetText(ex.getAttribute("data-finder-example")); navigate("job"); return; }
-      if (t.closest("#finder-submit")) { finderSubmit(); return; }
       var dt = t.closest("[data-details-toggle]");
       if (dt) { toggleDetails(dt.getAttribute("data-details-toggle")); return; }
-      if (t.closest("[data-jump-picks]")) { if (!selectedJobs().length) finderSeed(); navigate("job"); return; }
+      var gb = t.closest("[data-grp]");
+      if (gb) {
+        var gid = gb.getAttribute("data-grp");
+        if (state.q.trim()) state.sc[gid] = !state.sc[gid]; else state.open[gid] = !state.open[gid];
+        syncTree();
+        return;
+      }
+      if (t.closest("#search-clear")) { state.q = ""; state.sc = {}; $("#search").value = ""; syncTree(); $("#search").focus(); return; }
     }
 
     var go = t.closest("[data-go]");
@@ -1097,7 +933,7 @@
       state.hours = 0; state.date = null; state.time = null;
       setError("jobs", false);
       renderDetails();
-      if (FIND) { finderToggled(el.value, el.checked); return; }
+      if (FIND) { toggleJob(el.value, el.checked); return; }
     }
     else if (el.name === "hours") {
       state.hours = +el.value === recommendedHours() ? 0 : +el.value;
@@ -1111,26 +947,37 @@
       var name = el.getAttribute("data-state-switch");
       applySwitch(name, el.checked);
       if (name === "noslots" && state.screen === "time") render("time");
-      if (name === "finderdown" && FIND) finderSync(true);
+
     }
     refresh();
   });
 
   document.addEventListener("input", function (e) {
-    if (FIND && e.target.id === "finder-input") { state.finder.text = e.target.value; state.finder.flash = ""; setError("finder", false); renderFinderMeta(); return; }
+    if (FIND && e.target.id === "search") { state.q = e.target.value; state.sc = {}; syncTree(); return; }
+    if (FIND && e.target.id === "desc") { if (e.target.value.trim().length >= 3) setError("describe", false); return; }
     var id = e.target.getAttribute && e.target.getAttribute("data-note");
-    if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); if (FIND) syncJobsLabels(id); refresh(); }
+    if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); refresh(); }
   });
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeMenus();
-    if (FIND && e.target.id === "finder-input" && e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); finderSubmit(); }
+    if (FIND && e.target.id === "desc" && e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); describeNext(); }
+    if (FIND && e.target.id === "search" && e.key === "Escape" && state.q) { state.q = ""; state.sc = {}; e.target.value = ""; syncTree(); }
+    if (FIND && e.target.id === "search" && e.key === "Enter") e.preventDefault();
   });
   window.addEventListener("hashchange", function () { render(fromHash()); });
 
   /* ---------- Init ---------- */
-  if (FIND) $("#finder").appendChild($("#note-over"));
-  renderJobs();
+  if (FIND) {
+    compileMatch(); buildTree();
+    $all(".step__n").forEach(function (n, i) { n.textContent = String(i + 1); });
+    setText($('.step[data-step="job"] .step__t'), "Your jobs");
+    $('[data-go="job"]').setAttribute("data-go", "describe");
+    $('[data-go="describe"]').setAttribute("href", "#/describe");
+  } else {
+    $(".step.finder-only").remove();
+    renderJobs();
+  }
   applySwitch("multi", true);
   render(fromHash());
 })();

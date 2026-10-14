@@ -2,106 +2,79 @@
 
 Prototype: `request-flow-describe-desktop.html` (1280) and `request-flow-describe-mobile.html` (390). The list-first version is unchanged (`request-flow-*.html`); both build from the same source.
 
-## The idea: one surface, one selection
+## The idea: one direction, no branches
 
-Step 1 is a single screen. An optional input, **"Describe what you need"**, sits directly above the job list. The member types, presses **Select jobs**, and the matching jobs are ticked in that same list. They can also tick jobs themselves. There is only ever one selection, and it lives in the list (a 2-column grid on desktop, one column on mobile).
+1. **Describe.** One text box, one button. That is all.
+2. **Your jobs.** The matching jobs are already selected. The member can remove any, or add more from a searchable list of 100 jobs in 10 groups. There is no record of what was typed and no way to edit it.
+3. **Quick check, Pick a time, Booked.** Unchanged from the list-first version.
 
-Nothing about it is presented as a special feature. No assistant, chat, avatar, sparkle, product name, or "suggested for you". It reads as a form that selects jobs from what you typed.
-
-What this replaced: an earlier build had three phases (describe, matching, results) behind a "Find jobs" button, a separate "Selected jobs" list that could read "nothing selected", an "Add another job" input, and a "Browse all jobs" toggle that opened a second selection grid. That meant two places to select, three places to type, and a path that depended on which button was pressed first.
-
-| Ask | How it is met |
-|---|---|
-| A plain input at the start of the flow | A labelled textarea at the top of step 1 |
-| Type a few things and have them sorted into the right picks | A secondary "Select jobs" button under the input fills the list. It is only clickable when the description has changed since the last time (then it reads "Update jobs") |
-| Pick from the list if you prefer | The list is always visible: 10 jobs, "Show all 25 jobs". No mode switch |
-| The details box for each pick is optional | "Add details (optional)" under each ticked job opens an **empty** labelled box. Never required, never pre-filled |
-| No recommendations shown across the flow | No suggestion lines anywhere. Each ticked job only shows the member's own words it came from |
-
-## Layout
+Nothing is presented as a special feature: no assistant, chat, avatar, sparkle, product name or "suggested for you". It reads as a form that fills in your jobs from what you wrote.
 
 ```
-What do you need done?
-Describe it, pick from the list, or both. Adding details is optional.
-
-+--------------------------------------------------------------+
-| Describe what you need                                        |
-| Write it your way, one job or several. Matching jobs are      |
-| selected below.                                               |
-| [ textarea ........................................ ]         |
-| Selected from your description: Running toilet, Door lock,    |
-| Mount a TV.                              [ Update jobs ]      |
-| [ one-tap question cards, only when needed ]                  |
-|                                                               |
-| Pick everything that applies                                  |
-| [x] Running toilet          [ ] Clogged toilet                |
-|     "the toilet keeps...    |                                 |
-|     Add details (optional)                                    |
-| [x] Door lock issue         [ ] Sticking or loose door        |
-| ...10 tiles in 2 columns...                                   |
-| Show all 25 jobs                                              |
-|                                              [ Continue ]     |
-+--------------------------------------------------------------+
+Request type -> Fast Fix
+ 1 Describe         one text box, Continue
+ 2 Your jobs        Selected jobs (remove, optional details)
+                    Add more jobs: search + 10 groups of 10
+ 3 Quick check      the 3 questions (unchanged)
+ 4 Pick a time     (unchanged) -> Booked, or Sent to our team from any no-go
 ```
 
-Mobile is the same order in one column, with the single yellow button in the sticky dock and a short status above it.
+## Step 1: Describe
 
-## Interaction model
+- Label "Describe what you need", hint "One job or several. Say it your way.", a large textarea (example in the placeholder), and the single yellow **Continue**.
+- Empty submit: an inline error under the box, scrolled into view, focus in the box.
+- Nothing else on the screen. No list, no chips, no examples to click, no skip.
 
-- **Matching runs only when asked**: the **Select jobs / Update jobs** button (or Ctrl/Cmd+Enter), and when Continue is pressed with a changed description. The button is inactive until the text differs from what the list was last built from, and goes inactive again after it is used or if the edit is undone. Nothing changes while typing, and ticking a job by hand never applies unsent text.
-- **Ticking by hand always wins.** Matching only ever adds. A job the member unticks stays off while their text still matches it, and comes back only if they tick it again.
-- **Auto-ticked jobs follow the text.** If the member deletes the phrase, its untouched auto-tick is removed. A job with details written, or one ticked by hand, is never removed by an edit.
-- **Each ticked job shows its source phrase** ("the toilet keeps running") so it is obvious why it was ticked.
-- **Ambiguous words** ("the toilet", "the door", "the faucet") show a one-tap question between the input and the list: "Is the faucet leaking, or do you want it replaced?" Leaking / Replace it / Skip. Ticking one of the options in the list yourself also resolves it. Answers are remembered per topic while the text still mentions it.
-- **Unmatched phrases** are offered as "Something else": "We couldn't match 'the stairs squeak' to a job on our list. Add it as Something else?" The member's words are never dropped. The full description also travels with the request and is shown in the summary.
-- **Every ambiguity card has "Something else" and "Skip"**, so there is never a dead end.
-- **Questions never trap.** If cards are still open, Continue stops once ("2 questions are left. Answer or skip, then continue. Anything you skip stays in your description.") and the next Continue goes on. The description still goes to Ops.
-- **Continue flushes pending text.** If that changes the selection, the page stays once with "We updated your jobs from what you wrote. Check them, then continue." so nothing changes behind the member's back.
-- **One count.** The line under the input names what the text selected; the only count is the status by the Continue button (and the dock on mobile).
-- **Feedback is shown where the member is looking.** The empty-Continue error, the "check them" message and the over-limit note all appear directly under the input, scrolled into view, not at the bottom of the list.
-- **Something else needs a few words** (in the description or in its details box). That is the one case where details are asked for.
-- **Too many jobs** (internal estimates add up to more than 3 hours): info note under the input, the status by the button reads "More than a Fast Fix covers", and the button becomes "Send to our team". Unticking reverts all three. Estimates are never shown.
-- **Matching unavailable**: "We couldn't select jobs from that right now. Pick them from the list below." Nothing is lost.
+## Step 2: Your jobs
 
-## States
+**Selected jobs (top).** One card per job: icon, name, its group, **Remove**, and **Add details (optional)**. Details open an empty, labelled box: "More details about Running toilet (optional)". Never pre-filled, never required.
 
-| State | What the member sees |
+- Removing a job is one tap and also updates the group list below.
+- Nothing about the original description is shown: not echoed, not editable, no "Edit".
+- If nothing matched (or matching is unavailable) a plain note replaces the list: "We couldn't match your description to a job. Search or browse below to add some."
+
+**Add more jobs (below).** A search box, then 10 groups. Each group is a row (icon, name, "10 jobs", a "2 selected" badge when it holds selections, chevron). Open a group to see its jobs as tiles (2 columns on desktop, 1 on mobile). Ticking a tile adds it to Selected jobs; unticking removes it. Groups are collapsed by default.
+
+| Group | Examples |
 |---|---|
-| Load | Empty input, 10 unticked rows, "Show all 25 jobs", one yellow Continue. No counter, no "nothing selected" message |
-| Typed, not yet submitted | The list is unchanged; "Select jobs" (or "Update jobs") becomes clickable |
-| Submitted | Matching rows ticked in place, each with its source phrase; "Selected from your description: ..." under the input; the count in the dock on mobile |
-| Question | Blue-tint card between the input and the list with one-tap answers |
-| Unmatched | Blue-tint card offering "Add as Something else" or Skip |
-| Details | "Add details (optional)" opens "More details about Running toilet (optional)", empty |
-| Show all | All 25 rows in the same list, same order. A ticked job beyond the first 10 appears in place even when collapsed |
-| Too many jobs | Note under the list, "Send to our team" |
-| Nothing ticked, Continue | Error under the input, scrolled into view, focus in the input: "Describe what you need or pick a job below." |
-| Nothing matched | "Nothing matched yet. Add a few more words, or pick from the list below." |
-| Matching unavailable | Plain note under the input, list still works |
+| Plumbing | Running toilet, Leaky faucet, Clogged sink or drain |
+| Doors & Locks | Door lock issue, Sticking or loose door, Replace a door knob |
+| Walls, Paint & Tile | Patch a drywall hole, Caulk a tub, Re-grout |
+| Mounting & Hanging | Mount a TV, Hang shelves, Hang a mirror |
+| Lighting & Electrical Swaps | Replace a light fixture, Replace an outlet or switch, Smoke detector batteries |
+| Kitchen & Appliances | Appliance diagnostic, Dishwasher issue, Cabinet handles |
+| Furniture & Assembly | Assemble furniture, Bed frame, Anchor furniture to the wall |
+| Windows & Blinds | Install blinds, Replace a window screen, Fix a sticking window |
+| Home Care & Safety | Safety latches, Grab bar, HVAC filters, Squeaky stair |
+| Outdoors & Other | Gate latch, Fence panel, Garage door keypad, Something else |
+
+**Search** matches the job name, its group name and related words (so "plumbing" opens the Plumbing group with all 10 jobs, "faucet" finds the faucet jobs across groups, "flapper" finds Running toilet). Matching groups open automatically and show how many of their jobs match; clearing the search returns to the collapsed groups. No results: "No jobs match that. Try another word, or clear the search."
+
+**Rules**
+- **Something else** needs a few words in its details box before Continue (the one place details are asked for).
+- **Too many jobs** (internal estimates add up to more than 3 hours): note under Selected jobs, the status by the button reads "More than a Fast Fix covers", and the button becomes **Send to our team**. Estimates are never shown.
+- **Continue with nothing selected**: error under Selected jobs, scrolled into view.
+- A second description (Back to step 1) adds to the selection; it never removes anything. The box is always empty when you arrive.
+- The description is **kept with the request for Ops but never displayed** to the member again (see open question 2).
 
 ## Notes for engineering
 
-- **The prototype's matching is a rule-based stand-in** (`finderParse`). Everything after the parse step is real UI logic. Production can use any approach behind the same contract (rules, search, or a language model) as long as it returns only ids from the allowlist plus the phrase each came from, and the ids are validated server-side. The member never sees which method ran.
-  - Output shape: `picks[{id, quote}]`, `questions[{key, text, options[ids]}]`, `unmatched[{quote}]`.
-  - Cap the input length (600 characters here). Prefer a question over a low-confidence selection. Only high-confidence matches should tick.
-- **Selection state** is one set of job ids. Bookkeeping per job: where it came from (text or hand), the phrase, and whether the member removed it. Details text is kept when a job is unticked and restored if it is ticked again; only ticked jobs are sent.
-- **Latency and failure:** match on pause; if a call fails or takes more than a few seconds, show the quiet note and leave everything as is. Drop stale responses.
-- **Member text is data.** It is rendered as text only, never as markup.
-- **Suggested metrics:** share who type vs only tick; auto-ticked jobs later unticked (an accuracy proxy); questions answered vs skipped; unmatched converted to Something else; share who add details; no-go rate vs the list-first version; time to booking; completion rate.
+- **Matching is a rule-based stand-in** (`matchText` in `app.js`, keywords in `catalog.js`). Production can use any approach behind the same contract (rules, search, or a language model) as long as it returns only job ids from the catalog and the ids are validated server-side. One job per clause of the description; when unsure, prefer fewer. The member never sees which method ran.
+- **Catalog**: `catalog.js` holds the 100 jobs, their groups, search keywords and internal minutes. The real list is curated with Ops.
+- **Suggested metrics:** share of auto-selected jobs removed (accuracy), jobs added by search vs by group, searches with no result (catalog gaps), "Something else" rate, no-go rate vs the list-first version, time to booking, completion rate.
+- Member text is rendered as text only, never as markup.
 
 ## Open questions
 
-1. **Visit length on step 3.** The length is still derived from the jobs (sum of internal per-job estimates, rounded up, 1 to 3 hours), as requested for the list-first version, but this version never calls it a recommendation: it reads "Visit length" with "Based on the jobs you selected", and there are no "Recommended" badges. If even that should go, step 3 can open on a plain 1 / 2 / 3 hour choice.
-2. **What happens to the typed text?** Where it is stored, how long, and whether it is logged.
-3. **Details optional only in this version.** The list-first version still requires a box per job. Decide whether to align them.
-4. **Describe on the request-type page too?** A box there could route between Fast Fix, Service request and Account.
-5. Everything in `FLOW-SPEC.md` still applies (price, 3-hour visits, eligibility, routing of the auto-submitted request).
+1. **Visit length on step 4.** The length is still derived from the selected jobs (sum of internal per-job estimates, rounded up, 1 to 3 hours). This version labels it "Visit length" with "Based on the jobs you selected" and shows no "Recommended" badges. If even that should go, step 4 can open on a plain 1 / 2 / 3 hour choice.
+2. **What happens to the typed text?** It is kept with the request so Ops can read what the member said. Where it is stored, for how long and whether it is logged still needs deciding. If it must not be kept, the "Something else" details box becomes the only place for free text.
+3. **Details optional only in this version.** The list-first version still requires a box per job.
+4. Everything in `FLOW-SPEC.md` still applies (price, 3-hour visits, eligibility, routing of the auto-submitted request).
 
 ## Try these in the prototype
 
-Open "Prototype states" (bottom right), "Try a description":
-
-- `The toilet keeps running, my front door lock sticks, and I need a TV mounted` (three clear jobs)
-- `The faucet is a problem and the stairs squeak` (a question and an unmatched phrase)
-- `Mount a TV, hang shelves, assemble a dresser, replace a faucet and caulk the tub` (too many jobs)
-- Switch "Matching is unavailable" on and type
+- `The toilet keeps running, my front door lock sticks, and I need a TV mounted` (three jobs selected)
+- `the stairs squeak and I want a new faucet` (two jobs, from different groups)
+- `blorp zazzle` (nothing matched: search or browse)
+- Search `plumbing`, `door`, `faucet`, `flapper`
+- "Prototype states": "Matching is unavailable", and Jump to screen
