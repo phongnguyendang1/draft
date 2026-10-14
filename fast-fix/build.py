@@ -35,7 +35,7 @@ def read(name):
 
 def used_icons():
     names = set()
-    for n in ("body.html", "app.js", "flow.css"):
+    for n in ("body.html", "app.js", "flow.css", "jev.css"):
         names |= set(re.findall(r"""(?:#|["'])ri-([a-z0-9]+(?:-[a-z0-9]+)*)""", read(n)))
     return sorted(names)
 
@@ -61,20 +61,23 @@ def refresh_icons(icon_dir):
 
 def build():
     font = read("font-face.css")
-    css = "\n".join([font, read("base.css"), read("chrome.css"), read("shared.css"), read("flow.css")])
+    css = "\n".join([font, read("base.css"), read("chrome.css"), read("shared.css"), read("flow.css"), read("jev.css")])
     sprite = read("sprite.svg")
     body = read("body.html").replace("{{SPRITE}}", sprite)
     js = read("app.js")
-    for frame, out, title in (
-        ("desktop", "request-flow-desktop.html", "HomeHub · Request service · Desktop"),
-        ("mobile", "request-flow-mobile.html", "HomeHub · Request service · Mobile"),
+    for variant, vclass, vtitle, vprefix in (
+        ("", "", "Request service", "request-flow"),
+        ("jev", " variant-jev", "Request service with Jev", "request-flow-jev"),
     ):
+      for frame, suffix in (("desktop", "Desktop"), ("mobile", "Mobile")):
+        out = "%s-%s.html" % (vprefix, frame)
+        title = "HomeHub \u00b7 %s \u00b7 %s" % (vtitle, suffix)
         html = (
             '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
             "<title>%s</title>\n<style>\n%s\n</style>\n</head>\n"
-            '<body class="frame-%s">\n%s\n<script>\n%s\n</script>\n</body>\n</html>\n'
-        ) % (title, css, frame, body, js)
+            '<body class="frame-%s%s">\n%s\n<script>\n%s\n</script>\n</body>\n</html>\n'
+        ) % (title, css, frame, vclass, body, js)
         path = os.path.join(HERE, out)
         with open(path, "w", encoding="utf-8") as f:
             f.write(html)

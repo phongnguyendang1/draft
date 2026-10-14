@@ -96,6 +96,409 @@
     date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}
   };
 
+
+  /* ---------- Jev (variant): sorts what the member types into jobs from the 25-job list ---------- */
+  var JEV = body.classList.contains("variant-jev");
+  var REDUCED = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  state.jev = { phase: "ask", text: "", marks: [], questions: [], unmatched: [], flags: {}, src: {}, open: {}, down: false };
+  state.browse = false;
+
+  /* PROTOTYPE NOTE: jevParse is a rule-based stand-in for a model. In production Jev returns only ids from the
+     allowlist (structured output) plus the phrase each one came from. Everything after the parse step is real UI. */
+  var KW = {
+    "toilet-run": /(toilet|commode)\b[^.,;]*\b(runn\w*|won'?t stop|constantly)|runn\w*\s+toilet|flapper|fill valve/i,
+    "toilet-clog": /(toilet|commode)\b[^.,;]*\b(clog\w*|block\w*|backed|plung\w*|won'?t flush|overflow\w*)|clog\w*\s+toilet/i,
+    lock: /\block\b|deadbolt|key\b[^.,;]*(stuck|won'?t|jam)/i,
+    door: /\bdoor\b[^.,;]*\b(stick\w*|rub\w*|latch\w*|loose|squeak\w*|won'?t close|doesn'?t close|swollen|drag\w*)|\bstick\w*\s+door/i,
+    disposal: /disposal|disposer/i,
+    appliance: /dishwasher|washing machine|washer|dryer|fridge|refrigerator|oven|stove|microwave|appliance/i,
+    tv: /\b(tv|television)\b/i,
+    hang: /\b(shelf|shelves|curtain rods?|picture frames?|pictures|artwork|mirror|wall art|frames)\b/i,
+    assemble: /assembl\w*|put together|ikea|flat[- ]?pack/i,
+    caulk: /caulk\w*|re-?seal|seal\w*\s+(around|the)/i,
+    "faucet-leak": /(faucet|\btap\b)[^.,;]*\b(leak\w*|drip\w*)|(leak\w*|drip\w*)\s+(faucet|tap)/i,
+    "faucet-swap": /(replac\w*|swap\w*|install\w*|new)\b[^.,;]*(faucet|shower ?head)|(faucet|shower ?head)[^.,;]*\b(replac\w*|swap\w*|new)/i,
+    light: /light fixture|ceiling light|chandelier|pendant( light)?|vanity light|(replac\w*|swap\w*|install\w*|chang\w*)\s+(the\s+|a\s+|my\s+)?(\w+\s+)?light\b/i,
+    outlet: /\b(outlet|receptacle)s?\b|\bswitch(es)?\b/i,
+    smart: /doorbell|thermostat|smart (home|lock|plug)/i,
+    knob: /(knob|handle)s?\b[^.,;]*\b(replac\w*|swap\w*|loose|broken|new)|(replac\w*|swap\w*)\b[^.,;]*(knob|handle)/i,
+    "cab-door": /cabinet[^.,;]*(door|hinge)|\bhinges?\b/i,
+    "cab-hw": /cabinet[^.,;]*(handle|pull|knob|hardware)|drawer pulls?/i,
+    drywall: /drywall|hole in (the |a |my )?(wall|ceiling)|\bpatch\w*/i,
+    blinds: /\bblinds?\b|\bshades?\b|\bcurtains?\b(?!\s*rods?)/i,
+    weather: /weather ?strip\w*|door sweep|\bdraft/i,
+    smoke: /smoke (detector|alarm)s?|\bbatter(y|ies)\b|chirp\w*/i,
+    towel: /towel (bar|ring|rack)|toilet paper holder|robe hook|bath accessor\w*/i,
+    childproof: /child ?proof\w*|baby gate|safety latch\w*|cabinet lock/i
+  };
+  var AMBIG = [
+    { key: "toilet", re: /\b(toilet|commode)\b/i, text: "Is the toilet running, or clogged?",
+      options: [{ label: "Running", ids: ["toilet-run"] }, { label: "Clogged", ids: ["toilet-clog"] }, { label: "Both", ids: ["toilet-run", "toilet-clog"] }] },
+    { key: "door", re: /\bdoor\b/i, text: "What’s going on with the door?",
+      options: [{ label: "It sticks or is loose", ids: ["door"] }, { label: "The lock", ids: ["lock"] }, { label: "The knob or handle", ids: ["knob"] }] },
+    { key: "faucet", re: /\b(faucet|tap)\b/i, text: "Is the faucet leaking, or do you want it replaced?",
+      options: [{ label: "Leaking", ids: ["faucet-leak"] }, { label: "Replace it", ids: ["faucet-swap"] }] }
+  ];
+  /* Risk Jev notices. It never answers the vetting questions: it points at them. */
+  var FLAG = {
+    ladder: /roof|second[- ]stor(y|ey)|2nd (floor|stor)|two[- ]stor(y|ey)|attic|gutter|vaulted|high ceiling|tall ceiling|skylight|\bladder\b|stairwell/i,
+    trade: /\bgas\b|re-?wir\w*|new (outlet|wiring|circuit|line|water line)|(move|relocat\w*)\s+(the |a |my )?(sink|toilet|outlet|water|line|stove)|add (an? )?(outlet|circuit|line)|water line|breaker|\bpanel\b/i,
+    part: /need (to )?(buy|get|order)|need a new|don'?t (have|own)|haven'?t (got|bought)|no (part|parts|fixture)|still need/i
+  };
+  var FLAGMSG = {
+    ladder: function (q) { return "You mentioned “" + q + "”. I’ll ask about reach in the next step."; },
+    trade: function (q) { return "You mentioned “" + q + "”. Work like that can need a licensed trade, so I’ll ask about it next."; },
+    part: function () { return "You mentioned needing a part. I’ll ask about that next."; }
+  };
+  var CHECKFLAG = {
+    ladder: function (q) { return "From your message: “" + q + "”."; },
+    trade: function (q) { return "From your message: “" + q + "”."; },
+    part: function () { return "From your message: you mentioned needing a part."; }
+  };
+  var FILLER = /^(please|thanks|thank you|hi|hello|hey|i need|i want|need help|can you|could you)\b.{0,12}$/i;
+
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function announce(msg) { $("#jev-live").textContent = msg; }
+  function titlesOf(ids) { return ids.map(function (id) { return JOB[id].title; }).join(", "); }
+
+  /* Split into clauses (with positions) on punctuation and "and / also / plus / &" */
+  function clauses(text) {
+    var out = [], re = /[^,;.\n]+/g, m;
+    while ((m = re.exec(text))) {
+      var base = m.index, pos = 0;
+      m[0].split(/(\s+and\s+|\s+also\s+|\s+plus\s+|\s*&\s*)/i).forEach(function (p) {
+        if (/^(\s+and\s+|\s+also\s+|\s+plus\s+|\s*&\s*)$/i.test(p)) { pos += p.length; return; }
+        var lead = p.length - p.replace(/^\s+/, "").length, t = p.trim();
+        if (t) out.push({ text: t, start: base + pos + lead, end: base + pos + lead + t.length });
+        pos += p.length;
+      });
+    }
+    return out;
+  }
+
+  function jevParse(text) {
+    var res = { picks: [], questions: [], unmatched: [], marks: [], flags: {} };
+    clauses(text).forEach(function (c) {
+      var hits = Object.keys(KW).filter(function (id) { return KW[id].test(c.text); });
+      if (hits.indexOf("lock") > -1) hits = hits.filter(function (x) { return x !== "door"; });
+      if (hits.indexOf("cab-hw") > -1) hits = hits.filter(function (x) { return x !== "knob"; });
+      if (hits.indexOf("faucet-swap") > -1) hits = hits.filter(function (x) { return x !== "faucet-leak"; });
+      if (hits.length) {
+        hits.forEach(function (id) { if (!res.picks.some(function (p) { return p.id === id; })) res.picks.push({ id: id, quote: c.text }); });
+        res.marks.push({ start: c.start, end: c.end, kind: "pick", ids: hits });
+        return;
+      }
+      var amb = AMBIG.filter(function (a) { return a.re.test(c.text); })[0];
+      if (amb) {
+        res.questions.push({ kind: "ask", key: amb.key, text: amb.text, options: amb.options, quote: c.text, start: c.start, end: c.end });
+        res.marks.push({ start: c.start, end: c.end, kind: "ask" });
+        return;
+      }
+      if (c.text.split(/\s+/).length >= 3 && !FILLER.test(c.text)) {
+        res.unmatched.push({ kind: "none", quote: c.text, start: c.start, end: c.end });
+        res.marks.push({ start: c.start, end: c.end, kind: "none" });
+      }
+    });
+    if (!res.picks.length && !res.questions.length && !res.unmatched.length) {
+      res.unmatched.push({ kind: "none", quote: text, start: 0, end: text.length });
+      res.marks.push({ start: 0, end: text.length, kind: "none" });
+    }
+    Object.keys(FLAG).forEach(function (k) { var m = FLAG[k].exec(text); if (m) res.flags[k] = m[0]; });
+    return res;
+  }
+
+  function addJob(id, quote) {
+    if (!state.jobs[id]) { state.jobs[id] = true; state.order.push(id); }
+    /* the member's own words become the optional details, so Ops sees what they said */
+    if (!state.notes[id]) state.notes[id] = quote;
+    state.jev.src[id] = quote;
+  }
+  function resetPicks() { state.hours = 0; state.date = null; state.time = null; }
+
+  function jevApply(res, offset) {
+    var j = state.jev, before = selectedJobs().length;
+    res.picks.forEach(function (p) { addJob(p.id, p.quote); });
+    res.questions.forEach(function (q) { q.start += offset; q.end += offset; j.questions.push(q); });
+    res.unmatched.forEach(function (u) { u.start += offset; u.end += offset; j.unmatched.push(u); });
+    Object.keys(res.flags).forEach(function (k) { j.flags[k] = res.flags[k]; });
+    res.marks.forEach(function (m) { j.marks.push({ start: m.start + offset, end: m.end + offset, kind: m.kind, ids: m.ids }); });
+    resetPicks();
+    return selectedJobs().length - before;
+  }
+
+  function jevReset() {
+    var j = state.jev;
+    Object.keys(j.src).forEach(function (id) {
+      state.jobs[id] = false;
+      var at = state.order.indexOf(id); if (at > -1) state.order.splice(at, 1);
+      delete state.notes[id];
+    });
+    j.src = {}; j.marks = []; j.questions = []; j.unmatched = []; j.flags = {}; j.open = {};
+    resetPicks();
+  }
+
+  function jevSeed() {
+    var text = "The toilet keeps running, the front door lock sticks, and I need a light fixture replaced in the second-story hallway.";
+    jevReset();
+    state.jev.text = text; state.jev.down = false;
+    jevApply(jevParse(text), 0);
+    state.jev.phase = "picks";
+  }
+
+  function jevSub() {
+    var j = state.jev;
+    if (j.phase !== "picks") return "Tell Jev in your own words. Jev sorts it into jobs, and you check the picks.";
+    return j.text ? "Check Jev’s picks and change anything that’s off." : "Pick the jobs you need. Details are optional.";
+  }
+
+  function updateDock() {
+    var s = state.screen, show = /^(job|check|time)$/.test(s) && !(JEV && s === "job" && state.jev.phase !== "picks");
+    body.setAttribute("data-dock", show ? "on" : "off");
+    $("#fdock").hidden = !show;
+  }
+
+  /* The member's own sentence with the phrases Jev used highlighted (DOM only: member text is never HTML) */
+  function renderYou() {
+    var j = state.jev, you = $("#jev-you"), box = $("#jev-you-text");
+    you.hidden = !j.text;
+    box.innerHTML = "";
+    if (!j.text) return;
+    var t = j.text, pos = 0;
+    j.marks.slice().sort(function (a, b) { return a.start - b.start; }).forEach(function (m) {
+      if (m.start < pos) return;
+      var live = m.kind === "pick" ? (m.ids || []).some(function (id) { return state.jobs[id]; }) : true;
+      if (m.start > pos) box.appendChild(document.createTextNode(t.slice(pos, m.start)));
+      var seg = t.slice(m.start, m.end);
+      if (m.kind === "pick" && live) box.appendChild(el("mark", "", seg));
+      else if (m.kind === "ask" || m.kind === "none") box.appendChild(el("span", "jev__maybe", seg));
+      else box.appendChild(document.createTextNode(seg));
+      pos = m.end;
+    });
+    if (pos < t.length) box.appendChild(document.createTextNode(t.slice(pos)));
+  }
+
+  function jevSummary() {
+    var j = state.jev, n = selectedJobs().length, q = j.questions.length, u = j.unmatched.length, parts = [];
+    if (j.down) return "Jev isn’t available right now. You can still pick your jobs from the list below.";
+    if (!j.text) return "Pick the jobs you need from the list. Adding details is up to you.";
+    if (n > 0) parts.push("I found " + n + (n === 1 ? " job" : " jobs") + " in that. Check " + (n === 1 ? "it" : "them") + " over and change anything that is off.");
+    else parts.push("I couldn’t match that to a job on our list yet.");
+    if (q) parts.push(q === 1 ? "I have one quick question." : "I have " + q + " quick questions.");
+    if (u && n > 0) parts.push("I couldn’t place part of what you wrote.");
+    return parts.join(" ");
+  }
+
+  function renderQuestions() {
+    var j = state.jev, box = $("#jev-questions");
+    box.innerHTML = "";
+    j.questions.forEach(function (q) {
+      var card = el("div", "jev-q"), row = el("div", "jev__chips");
+      card.appendChild(el("p", "jev-q__text", q.text));
+      q.options.forEach(function (o) {
+        var b = el("button", "chip", o.label); b.type = "button";
+        b.addEventListener("click", function () { jevAnswer(q, o); });
+        row.appendChild(b);
+      });
+      var skip = el("button", "chip", "Skip"); skip.type = "button";
+      skip.addEventListener("click", function () { jevDismiss(q); });
+      row.appendChild(skip);
+      card.appendChild(row);
+      box.appendChild(card);
+    });
+    j.unmatched.forEach(function (u) {
+      var card = el("div", "jev-q"), row = el("div", "jev__chips");
+      card.appendChild(el("p", "jev-q__text", "I couldn’t match “" + u.quote + "” to a job on our list. Add it as Something else?"));
+      var add = el("button", "chip", "Add as Something else"); add.type = "button";
+      add.addEventListener("click", function () { jevAddOther(u); });
+      var skip = el("button", "chip", "Skip"); skip.type = "button";
+      skip.addEventListener("click", function () { jevDismiss(u); });
+      row.appendChild(add); row.appendChild(skip);
+      card.appendChild(row);
+      box.appendChild(card);
+    });
+  }
+
+  function dropMark(item) {
+    var j = state.jev;
+    j.marks = j.marks.filter(function (m) { return !((m.kind === "ask" || m.kind === "none") && m.start === item.start); });
+  }
+  function jevAnswer(q, opt) {
+    var j = state.jev;
+    opt.ids.forEach(function (id) { addJob(id, q.quote); });
+    dropMark(q);
+    j.marks.push({ start: q.start, end: q.end, kind: "pick", ids: opt.ids.slice() });
+    j.questions = j.questions.filter(function (x) { return x !== q; });
+    resetPicks();
+    renderJev();
+    announce("Added " + titlesOf(opt.ids) + ".");
+  }
+  function jevAddOther(u) {
+    var j = state.jev;
+    if (state.jobs.other) state.notes.other = (state.notes.other ? state.notes.other + " " : "") + u.quote;
+    else addJob("other", u.quote);
+    j.src.other = state.notes.other || u.quote;
+    dropMark(u);
+    j.marks.push({ start: u.start, end: u.end, kind: "pick", ids: ["other"] });
+    j.unmatched = j.unmatched.filter(function (x) { return x !== u; });
+    j.open.other = false;
+    resetPicks();
+    renderJev();
+    announce("Added Something else.");
+  }
+  function jevDismiss(item) {
+    var j = state.jev;
+    dropMark(item);
+    j.questions = j.questions.filter(function (x) { return x !== item; });
+    j.unmatched = j.unmatched.filter(function (x) { return x !== item; });
+    renderJev();
+  }
+  function jevRemove(id) {
+    var j = state.jev, at = state.order.indexOf(id);
+    state.jobs[id] = false;
+    if (at > -1) state.order.splice(at, 1);
+    delete j.src[id]; delete j.open[id];
+    resetPicks();
+    renderJev();
+    announce("Removed " + JOB[id].title + ".");
+    var next = $("#picks-title"); if (next) next.focus();
+  }
+
+  /* One card per pick. Details are optional and start out holding the member's own words. */
+  function renderPicks() {
+    var j = state.jev, list = $("#picks"), jobs = selectedJobs();
+    list.innerHTML = "";
+    $("#picks-empty").hidden = jobs.length > 0;
+    $("#picks-count").textContent = jobs.length ? jobs.length + (jobs.length === 1 ? " job" : " jobs") : "";
+    jobs.forEach(function (jb) {
+      var li = el("li", "pick"), top = el("div", "pick__top");
+      var ic = el("span", "d-icon"); ic.setAttribute("aria-hidden", "true");
+      ic.innerHTML = '<svg class="i"><use href="#' + jb.icon + '"/></svg>';
+      var main = el("div", "pick__main");
+      main.appendChild(el("p", "pick__title", jb.title));
+      var q = j.src[jb.id];
+      if (q) main.appendChild(el("p", "pick__quote", "“" + q + "”"));
+      var rm = el("button", "icon-btn icon-btn--bare pick__remove"); rm.type = "button";
+      rm.setAttribute("aria-label", "Remove " + jb.title);
+      rm.innerHTML = '<svg class="i"><use href="#ri-close-line"/></svg>';
+      rm.addEventListener("click", function () { jevRemove(jb.id); });
+      top.appendChild(ic); top.appendChild(main); top.appendChild(rm);
+
+      var more = el("div", "pick__more"), open = !!j.open[jb.id], has = !!(state.notes[jb.id] || "").trim();
+      var tog = el("button", "link", open ? "Hide details" : (has ? "Edit details (optional)" : "Add details (optional)")); tog.type = "button";
+      tog.setAttribute("aria-expanded", String(open)); tog.setAttribute("aria-controls", "pbox-" + jb.id);
+      var box = el("div", "pick__box"); box.id = "pbox-" + jb.id; box.hidden = !open;
+      var lab = el("label"); lab.setAttribute("for", "pnote-" + jb.id);
+      lab.appendChild(document.createTextNode("Details for " + jb.title + " "));
+      lab.appendChild(el("span", "", "(optional)"));
+      var ta = el("textarea", "textarea"); ta.id = "pnote-" + jb.id; ta.rows = 3; ta.placeholder = jb.ex;
+      ta.value = state.notes[jb.id] || ""; ta.setAttribute("data-note", jb.id);
+      box.appendChild(lab); box.appendChild(ta);
+      tog.addEventListener("click", function () {
+        j.open[jb.id] = !j.open[jb.id];
+        box.hidden = !j.open[jb.id];
+        tog.setAttribute("aria-expanded", String(!!j.open[jb.id]));
+        tog.textContent = j.open[jb.id] ? "Hide details" : ((state.notes[jb.id] || "").trim() ? "Edit details (optional)" : "Add details (optional)");
+        if (j.open[jb.id]) ta.focus();
+      });
+      more.appendChild(tog); more.appendChild(box);
+      li.appendChild(top); li.appendChild(more);
+      list.appendChild(li);
+    });
+  }
+
+  function renderFlags() {
+    var box = $("#jev-flags");
+    box.innerHTML = "";
+    var f = state.jev.flags;
+    Object.keys(f).forEach(function (k) {
+      var row = el("p", "jev-flag");
+      row.innerHTML = '<svg class="i"><use href="#ri-sparkling-line"/></svg><span></span>';
+      row.lastChild.textContent = FLAGMSG[k](f[k]);
+      box.appendChild(row);
+    });
+  }
+
+  function renderJev() {
+    if (!JEV || state.screen !== "job") return;
+    var j = state.jev;
+    body.setAttribute("data-jev-phase", j.phase);
+    $("#jev-ask").hidden = j.phase !== "ask";
+    $("#jev-thinking").hidden = j.phase !== "thinking";
+    $("#jev-picks").hidden = j.phase !== "picks";
+    $("#jev-browse").classList.toggle("is-open", j.phase === "picks" && state.browse);
+    var bt = $("#jev-browse-toggle");
+    bt.setAttribute("aria-expanded", String(state.browse));
+    $("[data-label]", bt).textContent = state.browse ? "Hide the full list" : "Browse all 25 jobs";
+    $("use", bt).setAttribute("href", state.browse ? "#ri-arrow-up-s-line" : "#ri-arrow-down-s-line");
+    $("#jev-add-wrap").hidden = j.down;
+    if (j.phase === "thinking") $("#jev-said").textContent = j.text;
+    if (j.phase === "picks") {
+      renderYou();
+      $("#jev-summary").textContent = jevSummary();
+      renderQuestions();
+      renderPicks();
+      renderFlags();
+      renderJobs();
+    }
+    $("#sub").textContent = jevSub();
+    updateDock();
+    refresh();
+  }
+
+  function jevSend() {
+    var j = state.jev, input = $("#jev-input"), txt = input.value.trim();
+    if (txt.length < 3) {
+      $("#err-jev").hidden = false; $("#field-jev").classList.add("is-invalid"); input.focus();
+      return;
+    }
+    $("#err-jev").hidden = true; $("#field-jev").classList.remove("is-invalid");
+    jevReset();
+    j.text = txt; j.down = false;
+    if (body.classList.contains("is-jevdown")) {
+      j.phase = "picks"; j.down = true; state.browse = true;
+      renderJev(); $("#picks-title").focus();
+      return;
+    }
+    j.phase = "thinking";
+    renderJev();
+    clearTimeout(jevTimer);
+    jevTimer = setTimeout(function () {
+      var added = jevApply(jevParse(txt), 0);
+      j.phase = "picks";
+      renderJev();
+      var n = selectedJobs().length;
+      announce(n ? "Jev found " + n + (n === 1 ? " job: " : " jobs: ") + titlesOf(state.order.filter(function (id) { return state.jobs[id]; })) + "." : "Jev could not match that to a job yet.");
+      $("#picks-title").focus();
+    }, REDUCED ? 0 : 1100);
+  }
+  var jevTimer;
+
+  function jevAdd() {
+    var inp = $("#jev-more"), txt = inp.value.trim(), j = state.jev;
+    if (txt.length < 2) { inp.focus(); return; }
+    var offset = j.text ? j.text.length + 1 : 0;
+    j.text = j.text ? j.text + " " + txt : txt;
+    var added = jevApply(jevParse(txt), offset);
+    inp.value = "";
+    renderJev();
+    announce(added > 0 ? "Added " + added + (added === 1 ? " job." : " jobs.") : "Nothing new to add yet.");
+    inp.focus();
+  }
+
+  /* Step 2: Jev points at the questions your words touched. You still answer all three. */
+  function renderCheckJev() {
+    if (!JEV) return;
+    var f = state.jev.flags, keys = Object.keys(f);
+    $("#jev-check-text").textContent = keys.length
+      ? "A couple of things you wrote are worth a careful answer here. I’ve marked them below, but your answers decide."
+      : "Nothing in what you wrote needs a second look. Answer these three and we will find a time.";
+    ["ladder", "trade", "part"].forEach(function (q) {
+      var p = $("#flag-" + q);
+      p.hidden = !f[q];
+      if (f[q]) p.lastChild.textContent = CHECKFLAG[q](f[q]);
+    });
+  }
+
   /* ---------- Formatting ---------- */
   function fmtMin(m) {
     var h = Math.floor(m / 60), r = m % 60;
@@ -177,6 +580,7 @@
 
   /* One labelled text box per picked job, in the order picked. Built with the DOM (member text is never HTML). */
   function renderDetails() {
+    if (JEV) return;
     var box = $("#details"), jobs = selectedJobs();
     $("#details-empty").hidden = jobs.length > 0;
     box.innerHTML = "";
@@ -250,13 +654,20 @@
   }
 
   /* ---------- Rendering: notes, status, CTA, summary ---------- */
-  function updateOver() { $("#note-over").hidden = !overLimit(); }
+  function updateOver() {
+    $("#note-over").hidden = !overLimit();
+    $("#note-over-jev").hidden = !overLimit();
+  }
 
   /* Step 3: the recommended length, with a way to change it */
   function updateRec() {
     var rec = recommendedHours(), h = hours();
     $("#rec-value").textContent = hoursText(h);
-    $("#rec-meta").textContent = (h === rec ? "Recommended for the jobs you picked. " : "You changed this from the recommended " + hoursText(rec) + ". ") + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
+    var n = selectedJobs().length;
+    var lead = JEV
+      ? (h === rec ? "Jev picked this for your " + n + (n === 1 ? " job. " : " jobs. ") : "You changed this from the " + hoursText(rec) + " Jev picked. ")
+      : (h === rec ? "Recommended for the jobs you picked. " : "You changed this from the recommended " + hoursText(rec) + ". ");
+    $("#rec-meta").textContent = lead + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
     $all('input[name="hours"]').forEach(function (r) { r.checked = +r.value === h; });
     $all("[data-rec-for]").forEach(function (el) { el.hidden = +el.getAttribute("data-rec-for") !== rec; });
     var note = $("#note-hours");
@@ -370,7 +781,9 @@
 
   /* ---------- Navigation ---------- */
   function seedDemo(screen) {
-    if (!selectedJobs().length) {
+    if (!selectedJobs().length && JEV) {
+      jevSeed();
+    } else if (!selectedJobs().length) {
       state.jobs = { "toilet-run": true, lock: true };
       state.order = ["toilet-run", "lock"];
       state.notes = { "toilet-run": "The toilet in the hall bath keeps running after I flush.", lock: "The front door lock sticks and is hard to turn." };
@@ -402,7 +815,6 @@
     if (screen === "sent" && !state.reason) seedDemo(screen);
     state.screen = screen;
     body.setAttribute("data-screen", screen);
-    body.setAttribute("data-dock", /^(job|check|time)$/.test(screen) ? "on" : "off");
 
     SCREENS.forEach(function (s) { $('[data-screen-id="' + s + '"]').hidden = s !== screen; });
     $("#h1").textContent = TITLES[screen][0];
@@ -434,9 +846,14 @@
     $("#hmcard").hidden = screen !== "booked";
 
     /* dock */
-    $("#fdock").hidden = !/^(job|check|time)$/.test(screen);
+    updateDock();
 
-    if (screen === "job") { renderJobs(); renderDetails(); }
+    if (screen === "job") {
+      if (JEV && !selectedJobs().length && !state.jev.text && !state.browse && state.jev.phase !== "thinking") state.jev.phase = "ask";
+      renderJobs(); renderDetails();
+      renderJev();
+    }
+    if (screen === "check") renderCheckJev();
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
       $("#rec").hidden = noSlots;
@@ -485,6 +902,14 @@
 
   function next() {
     var s = state.screen;
+    if (s === "job" && JEV) {
+      if (state.jev.phase !== "picks") { jevSend(); return; }
+      if (!selectedJobs().length) { $("#err-picks").hidden = false; focusFirst("#jev-more"); return; }
+      $("#err-picks").hidden = true;
+      if (overLimit()) { state.reason = "time"; navigate("sent"); return; }
+      navigate("check");
+      return;
+    }
     if (s === "job") {
       var jobs = selectedJobs(), bad = [];
       if (!jobs.length) bad.push("jobs");
@@ -593,6 +1018,22 @@
       return;
     }
 
+    if (JEV) {
+      var ex = t.closest("[data-jev-example]");
+      if (ex) { var inp = $("#jev-input"); inp.value = ex.getAttribute("data-jev-example"); $("#err-jev").hidden = true; $("#field-jev").classList.remove("is-invalid"); inp.focus(); return; }
+      if (t.closest("[data-jev-send]")) { jevSend(); return; }
+      if (t.closest("[data-jev-browse]")) { state.jev.phase = "picks"; state.browse = true; renderJev(); $("#picks-title").focus(); return; }
+      if (t.closest("#jev-edit")) { state.jev.phase = "ask"; renderJev(); $("#jev-input").value = state.jev.text; $("#jev-input").focus(); return; }
+      if (t.closest("#jev-add")) { jevAdd(); return; }
+      if (t.closest("#jev-browse-toggle")) { state.browse = !state.browse; renderJev(); return; }
+      if (t.closest("[data-jump-picks]")) {
+        if (!selectedJobs().length) jevSeed();
+        state.jev.phase = "picks";
+        navigate("job"); renderJev();
+        return;
+      }
+    }
+
     var go = t.closest("[data-go]");
     if (go) { e.preventDefault(); navigate(go.getAttribute("data-go")); return; }
     var hand = t.closest("[data-handoff]");
@@ -648,6 +1089,7 @@
       state.hours = 0; state.date = null; state.time = null;
       setError("jobs", false);
       renderDetails();
+      if (JEV) renderJev();
     }
     else if (el.name === "hours") {
       state.hours = +el.value === recommendedHours() ? 0 : +el.value;
@@ -670,7 +1112,11 @@
     if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); refresh(); }
   });
 
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenus(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeMenus();
+    if (JEV && e.target.id === "jev-input" && e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); jevSend(); }
+    if (JEV && e.target.id === "jev-more" && e.key === "Enter") { e.preventDefault(); jevAdd(); }
+  });
   window.addEventListener("hashchange", function () { render(fromHash()); });
 
   /* ---------- Init ---------- */

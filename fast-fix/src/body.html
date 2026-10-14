@@ -143,7 +143,79 @@
 
         <!-- ============ 1. The job ============ -->
         <section class="card" data-screen-id="job" aria-label="The job" hidden>
-          <div class="fsec">
+          <div class="jev jev-only" id="jev" data-phase="ask">
+
+            <!-- Ask: tell Jev in your own words -->
+            <div class="jev__panel" id="jev-ask">
+              <div class="jev__head">
+                <span class="jev__avatar jev__avatar--lg" aria-hidden="true"><svg class="i"><use href="#ri-sparkling-line"/></svg></span>
+                <div>
+                  <p class="jev__name">Jev <span class="badge badge--included">AI helper</span></p>
+                  <p class="t-meta">Tell me what you need and I&rsquo;ll sort it into jobs.</p>
+                </div>
+              </div>
+              <div class="jev__bubble"><p>Hi Sarah. What needs doing around the house? A few words is plenty, and you can mention several things at once.</p></div>
+              <div class="field" id="field-jev">
+                <label class="sr-only" for="jev-input">Tell Jev what you need done</label>
+                <textarea class="textarea jev__input" id="jev-input" rows="3" maxlength="600" aria-describedby="err-jev" placeholder="For example: the toilet keeps running, my front door lock sticks, and I need a TV mounted."></textarea>
+                <p class="error" id="err-jev" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Tell Jev a few words first, or pick from the list.</span></p>
+              </div>
+              <div>
+                <p class="jev__chips-label">Or try one of these</p>
+                <div class="jev__chips" role="group" aria-label="Examples">
+                  <button class="chip" type="button" data-jev-example="The toilet keeps running and the bedroom door sticks">Running toilet and a sticking door</button>
+                  <button class="chip" type="button" data-jev-example="Mount a TV and hang some shelves">Mount a TV and hang shelves</button>
+                  <button class="chip" type="button" data-jev-example="Replace the kitchen faucet and a light fixture in the hallway">Replace a faucet and a light</button>
+                </div>
+              </div>
+              <div class="jev__row">
+                <button class="link" type="button" data-jev-browse>Pick from the list instead</button>
+                <button class="btn btn--primary btn--lg" type="button" data-jev-send><svg class="i"><use href="#ri-sparkling-line"/></svg>Sort it out</button>
+              </div>
+              <p class="jev__note t-meta"><svg class="i"><use href="#ri-sparkling-line"/></svg>Jev is an AI helper. You will check every pick before you continue.</p>
+            </div>
+
+            <!-- Thinking -->
+            <div class="jev__panel" id="jev-thinking" hidden aria-busy="true">
+              <div class="jev__you"><div class="jev__you-body"><p class="jev__you-label">You said</p><p class="jev__you-text" id="jev-said"></p></div></div>
+              <div class="jev__msg">
+                <span class="jev__avatar jev__avatar--sm" aria-hidden="true"><svg class="i"><use href="#ri-sparkling-line"/></svg></span>
+                <div class="jev__bubble"><div class="jev__typing" aria-hidden="true"><span></span><span></span><span></span></div><p class="sr-only">Jev is sorting your list.</p></div>
+              </div>
+              <div class="skel" aria-hidden="true"></div>
+              <div class="skel" aria-hidden="true"></div>
+            </div>
+
+            <!-- Picks -->
+            <div class="jev__panel" id="jev-picks" hidden>
+              <div class="jev__you" id="jev-you">
+                <div class="jev__you-body"><p class="jev__you-label">You said</p><p class="jev__you-text" id="jev-you-text"></p></div>
+                <button class="link" type="button" id="jev-edit">Edit</button>
+              </div>
+              <div class="jev__msg">
+                <span class="jev__avatar jev__avatar--sm" aria-hidden="true"><svg class="i"><use href="#ri-sparkling-line"/></svg></span>
+                <div class="jev__bubble"><p id="jev-summary"></p></div>
+              </div>
+              <div class="jev-qs" id="jev-questions"></div>
+              <div class="picks__head"><h2 class="t-strong" id="picks-title" tabindex="-1">Jev&rsquo;s picks</h2><span class="t-meta" id="picks-count"></span></div>
+              <ul class="picks" id="picks"></ul>
+              <p class="picks__empty t-meta" id="picks-empty" hidden>Nothing picked yet. Add something below, or browse the full list.</p>
+              <p class="error" id="err-picks" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Add at least one job, or browse the list.</span></p>
+              <div class="note" id="note-over-jev" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> I can send it to our team as a service request, or you can remove a job or two.</span></div>
+              <div class="jev-flags" id="jev-flags"></div>
+              <div id="jev-add-wrap">
+                <label class="jev__chips-label" for="jev-more">Anything else?</label>
+                <div class="jev__add">
+                  <input class="input" type="text" id="jev-more" maxlength="300" placeholder="Add another job in your own words">
+                  <button class="btn btn--secondary" type="button" id="jev-add">Add</button>
+                </div>
+              </div>
+              <button class="link jev__browse-toggle" type="button" id="jev-browse-toggle" aria-expanded="false" aria-controls="jev-browse"><span data-label>Browse all 25 jobs</span><svg class="i"><use href="#ri-arrow-down-s-line"/></svg></button>
+            </div>
+            <span class="sr-only" id="jev-live" aria-live="polite"></span>
+          </div>
+
+          <div class="fsec jev-browse" id="jev-browse">
             <fieldset id="fs-jobs" aria-describedby="jobs-hint err-jobs">
               <legend class="t-strong">Pick everything that applies</legend>
               <p class="t-meta" id="jobs-hint">Choose as many as you need. Don&rsquo;t see yours? Show all and pick Something else.</p>
@@ -157,7 +229,7 @@
             </fieldset>
           </div>
 
-          <div class="fsec" role="group" aria-labelledby="details-title">
+          <div class="fsec classic-only" role="group" aria-labelledby="details-title">
             <h2 class="t-strong" id="details-title">Tell us what you need done</h2>
             <p class="t-meta" id="details-hint">Include what needs to be repaired or installed and how many items.</p>
             <div class="details" id="details"></div>
@@ -172,10 +244,15 @@
 
         <!-- ============ 2. Quick check ============ -->
         <section class="card" data-screen-id="check" aria-label="Quick check" hidden>
+          <div class="jev__msg jev-only" id="jev-check">
+            <span class="jev__avatar jev__avatar--sm" aria-hidden="true"><svg class="i"><use href="#ri-sparkling-line"/></svg></span>
+            <div class="jev__bubble"><p id="jev-check-text"></p></div>
+          </div>
           <div class="fsec">
             <fieldset id="fs-ladder" aria-describedby="hint-ladder err-ladder">
               <legend class="t-strong">Can you reach it with a standard step ladder?</legend>
               <p class="t-meta" id="hint-ladder">Think roofs, second-story outsides and vaulted ceilings.</p>
+              <p class="jev-flag jev-only" id="flag-ladder" hidden><svg class="i"><use href="#ri-sparkling-line"/></svg><span></span></p>
               <div class="opts opts--3 opts--stack" id="ladder-opts">
                 <label class="opt"><input type="radio" name="ladder" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Yes</span></label>
                 <label class="opt"><input type="radio" name="ladder" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No, it’s higher</span></label>
@@ -190,6 +267,7 @@
             <fieldset id="fs-trade" aria-describedby="hint-trade err-trade">
               <legend class="t-strong">Does it involve gas, new wiring, or moving water lines?</legend>
               <p class="t-meta" id="hint-trade">Swapping a fixture is fine. Adding or relocating one is not.</p>
+              <p class="jev-flag jev-only" id="flag-trade" hidden><svg class="i"><use href="#ri-sparkling-line"/></svg><span></span></p>
               <div class="opts opts--3 opts--stack" id="trade-opts">
                 <label class="opt"><input type="radio" name="trade" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No</span></label>
                 <label class="opt"><input type="radio" name="trade" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Yes</span></label>
@@ -204,6 +282,7 @@
             <fieldset id="fs-part" aria-describedby="hint-part err-part">
               <legend class="t-strong">Do you already have the part or fixture, if one’s needed?</legend>
               <p class="t-meta" id="hint-part">For example a new faucet, lock set or TV mount.</p>
+              <p class="jev-flag jev-only" id="flag-part" hidden><svg class="i"><use href="#ri-sparkling-line"/></svg><span></span></p>
               <div class="opts opts--3 opts--stack" id="part-opts">
                 <label class="opt"><input type="radio" name="part" value="have"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Have it</span></label>
                 <label class="opt"><input type="radio" name="part" value="none"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No part needed</span></label>
@@ -226,7 +305,7 @@
           <div class="rec" id="rec">
             <div class="rec__head">
               <div class="rec__text">
-                <p class="rec__label">Recommended time</p>
+                <p class="rec__label"><span class="classic-only">Recommended time</span><span class="jev-only"><svg class="i"><use href="#ri-sparkling-line"/></svg>Recommended by Jev</span></p>
                 <p class="rec__value" id="rec-value">2 hours</p>
                 <p class="t-meta" id="rec-meta"></p>
               </div>
@@ -359,10 +438,12 @@
     <label class="proto__opt">Member has 2 homes<span class="switch"><input type="checkbox" data-state-switch="multi" checked><span class="switch__track"></span></span></label>
     <label class="proto__opt">No open times<span class="switch"><input type="checkbox" data-state-switch="noslots"><span class="switch__track"></span></span></label>
     <label class="proto__opt">Chosen time just taken<span class="switch"><input type="checkbox" data-state-switch="taken"><span class="switch__track"></span></span></label>
+    <label class="proto__opt jev-only">Jev is unavailable<span class="switch"><input type="checkbox" data-state-switch="jevdown"><span class="switch__track"></span></span></label>
     <div class="proto__go" role="group" aria-label="Jump to screen">
       <p class="proto__title">Jump to screen</p>
       <button class="proto__link" type="button" data-jump="type">Request type</button>
       <button class="proto__link" type="button" data-jump="job">Fast Fix 1 · The job</button>
+      <button class="proto__link jev-only" type="button" data-jump-picks>Fast Fix 1 · Jev&rsquo;s picks</button>
       <button class="proto__link" type="button" data-jump="check">Fast Fix 2 · Quick check</button>
       <button class="proto__link" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>
       <button class="proto__link" type="button" data-jump="booked">Booked</button>
