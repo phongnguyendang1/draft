@@ -150,8 +150,10 @@
               <label class="t-strong" for="finder-input">Describe what you need</label>
               <p class="t-meta" id="finder-hint">Write it your way, one job or several. Matching jobs are selected below.</p>
               <textarea class="textarea finder__input" id="finder-input" rows="3" maxlength="600" aria-describedby="finder-hint" placeholder="For example: the toilet keeps running, my front door lock sticks, and I need a TV mounted."></textarea>
+              <p class="error" id="err-finder" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Describe what you need or pick a job below.</span></p>
             </div>
-            <p class="finder__status" id="finder-status" role="status"></p>
+            <span class="sr-only" id="finder-live" aria-live="polite"></span>
+            <p class="finder__status" id="finder-status"></p>
             <div class="finder-qs" id="finder-questions"></div>
           </div>
 
@@ -168,7 +170,6 @@
               <div class="note" id="note-over" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.</span></div>
             </fieldset>
           </div>
-          <span class="sr-only" id="finder-live" aria-live="polite"></span>
 
           <div class="fsec classic-only" role="group" aria-labelledby="details-title">
             <h2 class="t-strong" id="details-title">Tell us what you need done</h2>

@@ -29,7 +29,8 @@ Describe it, pick from the list, or both. Adding details is optional.
 | Write it your way, one job or several. Matching jobs are      |
 | selected below.                                               |
 | [ textarea ........................................ ]         |
-| v 3 jobs selected below.                                      |
+| v Selected from your description: Running toilet, Door lock,  |
+|   Mount a TV.                                                 |
 | [ one-tap question cards, only when needed ]                  |
 |                                                               |
 | Pick everything that applies                                  |
@@ -54,9 +55,13 @@ Mobile is the same order in one column, with the single yellow button in the sti
 - **Each ticked job shows its source phrase** ("the toilet keeps running") so it is obvious why it was ticked.
 - **Ambiguous words** ("the toilet", "the door", "the faucet") show a one-tap question between the input and the list: "Is the faucet leaking, or do you want it replaced?" Leaking / Replace it / Skip. Ticking one of the options in the list yourself also resolves it. Answers are remembered per topic while the text still mentions it.
 - **Unmatched phrases** are offered as "Something else": "We couldn't match 'the stairs squeak' to a job on our list. Add it as Something else?" The member's words are never dropped. The full description also travels with the request and is shown in the summary.
-- **Questions never block.** Continue works with a question open; the description still goes to Ops.
-- **Continue flushes pending text.** If that selects jobs, the page stays once with "We selected N jobs from what you wrote. Check them, then press Continue." so nothing is selected behind the member's back.
-- **Too many jobs** (internal estimates add up to more than 3 hours): info note under the list, and the button becomes "Send to our team". Unticking reverts both. Estimates are never shown.
+- **Every ambiguity card has "Something else" and "Skip"**, so there is never a dead end.
+- **Questions never trap.** If cards are still open, Continue stops once ("2 questions are left. Answer or skip, then continue. Anything you skip stays in your description.") and the next Continue goes on. The description still goes to Ops.
+- **Continue flushes pending text.** If that changes the selection, the page stays once with "We updated your jobs from what you wrote. Check them, then continue." so nothing changes behind the member's back.
+- **One count.** The line under the input names what the text selected; the only count is the status by the Continue button (and the dock on mobile).
+- **Feedback is shown where the member is looking.** The empty-Continue error, the "check them" message and the over-limit note all appear directly under the input, scrolled into view, not at the bottom of the list.
+- **Something else needs a few words** (in the description or in its details box). That is the one case where details are asked for.
+- **Too many jobs** (internal estimates add up to more than 3 hours): info note under the input, the status by the button reads "More than a Fast Fix covers", and the button becomes "Send to our team". Unticking reverts all three. Estimates are never shown.
 - **Matching unavailable**: "We couldn't select jobs from that right now. Pick them from the list below." Nothing is lost.
 
 ## States
@@ -64,13 +69,14 @@ Mobile is the same order in one column, with the single yellow button in the sti
 | State | What the member sees |
 |---|---|
 | Load | Empty input, 10 unticked rows, "Show all 25 jobs", one yellow Continue. No counter, no "nothing selected" message |
-| Typed | Matching rows ticked in place, each with its source phrase, "N jobs selected below." under the input, the dock status on mobile |
+| Typed | Matching rows ticked in place, each with its source phrase; "Selected from your description: ..." under the input; the count in the dock on mobile |
 | Question | Blue-tint card between the input and the list with one-tap answers |
 | Unmatched | Blue-tint card offering "Add as Something else" or Skip |
 | Details | "Add details (optional)" opens "More details about Running toilet (optional)", empty |
 | Show all | All 25 rows in the same list, same order. A ticked job beyond the first 10 appears in place even when collapsed |
 | Too many jobs | Note under the list, "Send to our team" |
-| Nothing ticked, Continue | Inline error: pick at least one job or describe what you need |
+| Nothing ticked, Continue | Error under the input, scrolled into view, focus in the input: "Describe what you need or pick a job below." |
+| Nothing matched | "Nothing matched yet. Add a few more words, or pick from the list below." |
 | Matching unavailable | Plain note under the input, list still works |
 
 ## Notes for engineering
@@ -85,7 +91,7 @@ Mobile is the same order in one column, with the single yellow button in the sti
 
 ## Open questions
 
-1. **Recommended time on step 3.** It is rule-based (sum of internal per-job estimates, rounded up, 1 to 3 hours) and was requested for the list-first version. It is kept here. If "no recommendations" should include it, step 3 can open on a plain 1 / 2 / 3 hour choice.
+1. **Visit length on step 3.** The length is still derived from the jobs (sum of internal per-job estimates, rounded up, 1 to 3 hours), as requested for the list-first version, but this version never calls it a recommendation: it reads "Visit length" with "Based on the jobs you selected", and there are no "Recommended" badges. If even that should go, step 3 can open on a plain 1 / 2 / 3 hour choice.
 2. **What happens to the typed text?** Where it is stored, how long, and whether it is logged.
 3. **Details optional only in this version.** The list-first version still requires a box per job. Decide whether to align them.
 4. **Describe on the request-type page too?** A box there could route between Fast Fix, Service request and Account.

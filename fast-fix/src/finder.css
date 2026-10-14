@@ -16,6 +16,7 @@ body:not(.variant-finder) .jobs-sec { margin-top: 0; padding-top: 0; border-top:
   font-size: 14px; line-height: 20px; color: var(--text-2);
 }
 .finder__status:focus { outline: none; }
+.finder__status-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 .finder__status-icon { display: inline-flex; flex: none; color: var(--blue-text); }
 .finder__status-icon .i { width: 16px; height: 16px; }
 .finder + .jobs-sec { margin-top: var(--s-12); padding-top: 0; border-top: 0; }
@@ -31,7 +32,7 @@ body:not(.variant-finder) .jobs-sec { margin-top: 0; padding-top: 0; border-top:
 .finder-qs:not(:empty) { margin-top: var(--s-12); }
 .finder-q { padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); }
 .finder-q__text { margin: 0 0 var(--s-12); font-weight: 600; overflow-wrap: anywhere; }
-.finder-q .chip { background: var(--surface); }
+.finder-q .chip { background: var(--surface); border-color: var(--slate); }
 .finder-q .chip:hover { border-color: var(--blue); }
 
 /* ---------- The list (one place to select) ---------- */
@@ -42,6 +43,8 @@ body.variant-finder #jobs { grid-template-columns: minmax(0, 1fr); gap: var(--s-
 .job:not(.is-on):hover { box-shadow: inset 0 0 0 1px var(--blue); }
 .job.is-on { background: var(--blue-tint); box-shadow: inset 0 0 0 2px var(--blue); }
 .job .opt, .job .opt:hover, .job .opt:has(input:checked), .job .opt:has(input:checked):hover { background: none; box-shadow: none; }
+.job:has(.opt input:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; }
+.job .opt:has(input:focus-visible) { outline: none; }
 .job.is-on .d-icon { color: var(--blue-text); }
 .job.is-on .opt__title { color: var(--ink); }
 .opt__quote { font-size: 14px; line-height: 20px; font-weight: 400; color: var(--text-2); overflow-wrap: anywhere; }
@@ -67,3 +70,14 @@ body.variant-finder #jobs { grid-template-columns: minmax(0, 1fr); gap: var(--s-
 }
 
 .fdock__status:empty { display: none; }
+
+/* Describe-first wording on step 3: a plain "Visit length", no "Recommended" badges */
+body.variant-finder .opt__rec { display: none !important; }
+
+/* The sticky top bar must not hide a control that is tabbed to */
+html:has(body.variant-finder) { scroll-padding-top: 96px; }
+
+@media (prefers-reduced-motion: reduce) {
+  body.variant-finder .job, body.variant-finder .opt, body.variant-finder .opt__box, body.variant-finder .textarea,
+  body.variant-finder .chip, body.variant-finder .link { transition: none !important; }
+}

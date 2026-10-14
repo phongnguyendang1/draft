@@ -141,7 +141,8 @@
   var FILLER = /^(please|thanks|thank you|hi|hello|hey|i need|i want|need help|can you|could you)\b.{0,12}$/i;
 
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
-  function announce(msg) { $("#finder-live").textContent = msg; }
+  function announce(msg) { $("#finder-live").textContent = ""; setTimeout(function () { $("#finder-live").textContent = msg; }, 30); }
+  function setText(node, txt) { if (node.textContent !== txt) node.textContent = txt; }
   function titlesOf(ids) { return ids.map(function (id) { return JOB[id].title; }).join(", "); }
 
   /* Split into clauses (with positions) on punctuation and "and / also / plus / &" */
@@ -163,7 +164,7 @@
     var res = { picks: [], questions: [], unmatched: [] };
     clauses(text).forEach(function (c) {
       var hits = Object.keys(KW).filter(function (id) { return KW[id].test(c.text); });
-      if (hits.indexOf("lock") > -1) hits = hits.filter(function (x) { return x !== "door"; });
+      if (hits.indexOf("lock") > -1 || hits.indexOf("knob") > -1) hits = hits.filter(function (x) { return x !== "door"; });
       if (hits.indexOf("cab-hw") > -1) hits = hits.filter(function (x) { return x !== "knob"; });
       if (hits.indexOf("faucet-swap") > -1) hits = hits.filter(function (x) { return x !== "faucet-leak"; });
       if (hits.length) {
@@ -194,7 +195,7 @@
        others   unmatched phrases the member chose to add as "Something else";  dismissed: ones they skipped */
   var finderTimer = null;
   function finderFresh() {
-    return { text: "", src: {}, auto: {}, removed: {}, answers: {}, others: [], dismissed: [], questions: [], unmatched: [], open: {}, down: false };
+    return { text: "", src: {}, auto: {}, removed: {}, answers: {}, others: [], dismissed: [], questions: [], unmatched: [], open: {}, down: false, flash: "", warned: "", pin: "", qsig: "" };
   }
   state.finder = finderFresh();
 
@@ -205,36 +206,45 @@
     var at = state.order.indexOf(id); if (at > -1) state.order.splice(at, 1);
   }
 
+  /* Phrases are matched loosely so a few more typed words do not look like a different phrase */
+  function sameQuote(x, y) {
+    x = x.toLowerCase(); y = y.toLowerCase();
+    return x === y || (Math.min(x.length, y.length) >= 6 && (x.indexOf(y) === 0 || y.indexOf(x) === 0));
+  }
+  function findQuote(list, q) { for (var i = 0; i < list.length; i++) if (sameQuote(list[i], q)) return i; return -1; }
+  function selIds() { return state.order.filter(function (id) { return state.jobs[id]; }); }
+
   /* Re-read the description and bring the list in line with it */
   function finderSync() {
     var j = state.finder, text = j.text.trim();
     clearTimeout(finderTimer); finderTimer = null;
-    if (body.classList.contains("is-finderdown")) { j.down = true; renderFinderMeta(); return; }
+    if (body.classList.contains("is-finderdown")) { j.down = true; j.questions = []; j.unmatched = []; renderFinderMeta(); return; }
     j.down = false;
     var res = text.length >= 2 ? finderParse(text) : { picks: [], questions: [], unmatched: [] };
 
-    var want = {}, order = [];
+    var want = {}, order = [], other = [];
     function wantJob(id, quote) { if (!(id in want)) { want[id] = quote; order.push(id); } }
     res.picks.forEach(function (p) { wantJob(p.id, p.quote); });
 
-    var topics = {}, present = {};
+    var topics = {};
     j.questions = []; j.unmatched = [];
     res.questions.forEach(function (q) {
+      if (topics[q.key]) return;
       topics[q.key] = 1;
       var a = j.answers[q.key];
       if (!a) j.questions.push(q);
+      else if (a.other) other.push(q.quote);
       else (a.ids || []).forEach(function (id) { wantJob(id, q.quote); });
     });
     Object.keys(j.answers).forEach(function (k) { if (!topics[k]) delete j.answers[k]; });
 
-    var other = [];
+    var keepO = [], keepD = [];
     res.unmatched.forEach(function (u) {
-      present[u.quote] = 1;
-      if (j.others.indexOf(u.quote) > -1) other.push(u.quote);
-      else if (j.dismissed.indexOf(u.quote) < 0) j.unmatched.push(u);
+      if (findQuote(j.others, u.quote) > -1) { keepO.push(u.quote); other.push(u.quote); }
+      else if (findQuote(j.dismissed, u.quote) > -1) keepD.push(u.quote);
+      else j.unmatched.push(u);
     });
-    j.others = j.others.filter(function (q) { return present[q]; });
-    j.dismissed = j.dismissed.filter(function (q) { return present[q]; });
+    j.others = keepO; j.dismissed = keepD;
     if (other.length) wantJob("other", other.join("; "));
 
     var added = [], dropped = [];
@@ -250,7 +260,7 @@
       if (!state.jobs[id] && !j.removed[id]) { selectJob(id); j.auto[id] = true; added.push(id); }
     });
     if (added.length || dropped.length) resetPicks();
-    if (selectedJobs().length) setError("jobs", false);
+    if (selectedJobs().length) { setError("jobs", false); setError("finder", false); }
 
     renderFinderMeta();
     if (added.length) announce("Selected " + titlesOf(added) + ".");
@@ -265,8 +275,14 @@
     j.text = text; ta.value = text;
     finderSync();
   }
-  function finderSeed() {
+  /* Prototype helpers: start clean, then apply a description */
+  function finderClearAll() {
+    JOBS.forEach(function (jb) { state.jobs[jb.id] = false; });
+    state.order = []; state.notes = {}; resetPicks();
     state.finder = finderFresh();
+  }
+  function finderSeed() {
+    finderClearAll();
     finderSetText("The toilet keeps running, the front door lock sticks, and I need a light fixture replaced in the second-story hallway.");
   }
 
@@ -278,16 +294,18 @@
 
   /* Under the input: what the text did, plus the one-tap questions it raised */
   function renderFinderMeta() {
-    var j = state.finder;
-    var fromText = Object.keys(j.src).filter(function (id) { return state.jobs[id]; }).length;
-    var st = $("#finder-status");
-    st.innerHTML = "";
-    if (j.down) {
-      st.appendChild(statusIcon("ri-information-line"));
-      st.appendChild(el("span", "", "We couldn’t select jobs from that right now. Pick them from the list below."));
-    } else if (fromText) {
-      st.appendChild(statusIcon("ri-check-line"));
-      st.appendChild(el("span", "", fromText + (fromText === 1 ? " job" : " jobs") + " selected below."));
+    var j = state.finder, text = j.text.trim();
+    var st = $("#finder-status"), from = state.order.filter(function (id) { return state.jobs[id] && j.src[id]; });
+    var msg = "", icon = "ri-check-line";
+    if (j.flash) { msg = j.flash; icon = "ri-information-line"; }
+    else if (j.down) { msg = "We couldn’t select jobs from that right now. Pick them from the list below."; icon = "ri-information-line"; }
+    else if (from.length) msg = "Selected from your description: " + titlesOf(from) + ".";
+    else if (text.length >= 4 && !j.questions.length && !j.unmatched.length && !selectedJobs().length) { msg = "Nothing matched yet. Add a few more words, or pick from the list below."; icon = "ri-information-line"; }
+    else if (j.text.length >= 520) { msg = (600 - j.text.length) + " characters left."; icon = "ri-information-line"; }
+    if (st.getAttribute("data-msg") !== msg + "|" + icon) {
+      st.setAttribute("data-msg", msg + "|" + icon);
+      st.innerHTML = "";
+      if (msg) { st.appendChild(statusIcon(icon)); st.appendChild(el("span", "finder__status-text", msg)); }
     }
     renderQuestions();
     syncJobs();
@@ -299,6 +317,15 @@
     var s = el("span", "finder__status-icon"); s.setAttribute("aria-hidden", "true");
     s.innerHTML = '<svg class="i"><use href="#' + name + '"/></svg>';
     return s;
+  }
+  /* Show a message under the input, where the member is looking, and bring it into view */
+  function finderFlash(msg, focusSel) {
+    state.finder.flash = msg;
+    renderFinderMeta();
+    announce(msg);
+    var st = $("#finder-status");
+    st.scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
+    var f = focusSel && $(focusSel); if (f) f.focus({ preventScroll: true });
   }
 
   function chipRow(card, labels, fn) {
@@ -312,47 +339,69 @@
   }
   function renderQuestions() {
     var j = state.finder, box = $("#finder-questions");
+    var sig = j.questions.map(function (q) { return q.key + ":" + q.quote; }).concat(j.unmatched.map(function (u) { return "u:" + u.quote; })).join("|");
+    if (sig === j.qsig && (box.firstElementChild || !sig)) return;
+    var first = !j.qsig;
+    j.qsig = sig;
     box.innerHTML = "";
     j.questions.forEach(function (q) {
       var card = el("div", "finder-q");
+      card.setAttribute("role", "group"); card.setAttribute("aria-label", q.text);
       card.appendChild(el("p", "finder-q__text", q.text));
-      chipRow(card, q.options.concat([{ label: "Skip", ids: [] }]), function (o) { finderAnswer(q, o); });
+      chipRow(card, q.options.concat([{ label: "Something else", ids: [], other: true }, { label: "Skip", ids: [] }]), function (o) { finderAnswer(q, o); });
       box.appendChild(card);
     });
     j.unmatched.forEach(function (u) {
       var card = el("div", "finder-q");
-      card.appendChild(el("p", "finder-q__text", "We couldn’t match “" + u.quote + "” to a job on our list. Add it as Something else?"));
+      var t = "We couldn’t match “" + u.quote + "” to a job on our list. Add it as Something else?";
+      card.setAttribute("role", "group"); card.setAttribute("aria-label", t);
+      card.appendChild(el("p", "finder-q__text", t));
       chipRow(card, [{ label: "Add as Something else", add: true }, { label: "Skip" }], function (o) { finderUnmatched(u, o.add); });
       box.appendChild(card);
     });
+    var n = j.questions.length + j.unmatched.length;
+    if (n && !first) announce(n === 1 ? "One question about your description, below the input." : n + " questions about your description, below the input.");
   }
-  function afterChoice(msg) {
+  function afterChoice(msg, focusId) {
     var chip = $("#finder-questions .chip");
-    if (chip) chip.focus(); else { var st = $("#finder-status"); st.tabIndex = -1; st.focus(); }
+    if (chip) chip.focus();
+    else {
+      var cb = focusId && $("#job-" + focusId + " input");
+      if (cb && cb.offsetParent) cb.focus(); else $("#finder-input").focus({ preventScroll: true });
+    }
     if (msg) announce(msg);
   }
   function finderAnswer(q, opt) {
-    state.finder.answers[q.key] = opt.ids.length ? { ids: opt.ids.slice() } : { skip: true };
+    var j = state.finder, id = opt.ids[0] || (opt.other ? "other" : "");
+    j.answers[q.key] = opt.other ? { other: true } : (opt.ids.length ? { ids: opt.ids.slice() } : { skip: true });
+    j.flash = "";
     finderSync();
-    afterChoice(opt.ids.length ? "Selected " + titlesOf(opt.ids) + "." : "");
+    afterChoice(opt.other ? "Selected Something else." : (opt.ids.length ? "Selected " + titlesOf(opt.ids) + "." : ""), id);
   }
   function finderUnmatched(u, add) {
     var j = state.finder;
     (add ? j.others : j.dismissed).push(u.quote);
+    j.flash = "";
     finderSync();
-    afterChoice(add ? "Selected Something else." : "");
+    afterChoice(add ? "Selected Something else." : "", add ? "other" : "");
   }
 
   /* A tick or untick in the list is the member's own choice */
   function finderToggled(id, on) {
     var j = state.finder;
     delete j.auto[id];
-    if (on) j.questions.forEach(function (q) {
-      if (q.options.some(function (o) { return o.ids.indexOf(id) > -1; })) j.answers[q.key] = { skip: true };
-    });
-    if (on) delete j.removed[id]; else { if (id in j.src) j.removed[id] = true; delete j.src[id]; }
+    j.flash = "";
+    if (on) {
+      j.questions.forEach(function (q) {
+        if (q.options.some(function (o) { return o.ids.indexOf(id) > -1; })) j.answers[q.key] = { skip: true };
+      });
+      delete j.removed[id];
+    } else {
+      j.removed[id] = true; delete j.src[id];
+      if (JOBS.findIndex(function (x) { return x.id === id; }) >= TOP && !state.showAll) j.pin = id;
+    }
     resetPicks();
-    if (on) setError("jobs", false);
+    if (on) { setError("jobs", false); setError("finder", false); }
     finderSync();
   }
 
@@ -368,16 +417,18 @@
         '<button class="link" type="button" data-details-toggle="' + jb.id + '" aria-expanded="false" aria-controls="pbox-' + jb.id + '">Add details (optional)</button>' +
         '<div class="job__box" id="pbox-' + jb.id + '" hidden>' +
         '<label for="pnote-' + jb.id + '">More details about ' + jb.title + ' <span>(optional)</span></label>' +
-        '<textarea class="textarea" id="pnote-' + jb.id + '" rows="3" data-note="' + jb.id + '"></textarea></div></div></div>';
+        '<textarea class="textarea" id="pnote-' + jb.id + '" rows="3" data-note="' + jb.id + '"></textarea>' +
+        '<p class="error" id="err-note-' + jb.id + '" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Add a few words so we know what you need.</span></p></div></div></div>';
     }).join("");
     JOBS.forEach(function (jb) { $("#pnote-" + jb.id).placeholder = jb.ex; });
   }
   function syncJobs() {
     var j = state.finder;
     if (!$("#jobs").firstElementChild) buildJobRows();
+    if (j.pin && !(document.activeElement && document.activeElement.closest && document.activeElement.closest("#job-" + j.pin))) j.pin = "";
     var shown = 0;
     JOBS.forEach(function (jb, i) {
-      var row = $("#job-" + jb.id), on = !!state.jobs[jb.id], show = state.showAll || i < TOP || on;
+      var row = $("#job-" + jb.id), on = !!state.jobs[jb.id], show = state.showAll || i < TOP || on || j.pin === jb.id;
       if (show) shown++;
       row.hidden = !show;
       row.classList.toggle("is-on", on);
@@ -389,13 +440,21 @@
       if (ta.value !== (state.notes[jb.id] || "")) ta.value = state.notes[jb.id] || "";
       $(".job__box", row).hidden = !open;
       tog.setAttribute("aria-expanded", String(open));
-      tog.textContent = open ? "Hide details" : ((state.notes[jb.id] || "").trim() ? "Edit details (optional)" : "Add details (optional)");
+      var tl = open ? "Hide details" : ((state.notes[jb.id] || "").trim() ? "Edit details (optional)" : "Add details (optional)");
+      setText(tog, tl);
+      tog.setAttribute("aria-label", tl + " for " + jb.title);
     });
     var t = $("#jobs-toggle");
     t.setAttribute("aria-expanded", String(state.showAll));
     $("[data-label]", t).textContent = state.showAll ? "Show fewer jobs" : "Show all " + JOBS.length + " jobs";
     $("use", t).setAttribute("href", state.showAll ? "#ri-arrow-up-s-line" : "#ri-arrow-down-s-line");
-    $("#jobs-count").textContent = "Showing " + shown + " of " + JOBS.length + " jobs";
+    setText($("#jobs-count"), "Showing " + shown + " of " + JOBS.length + " jobs");
+  }
+  function syncJobsLabels(id) {
+    var tog = $("#job-" + id + " [data-details-toggle]");
+    if (!tog || state.finder.open[id]) return;
+    var tl = (state.notes[id] || "").trim() ? "Edit details (optional)" : "Add details (optional)";
+    setText(tog, tl); tog.setAttribute("aria-label", tl + " for " + JOB[id].title);
   }
   function toggleDetails(id) {
     var j = state.finder;
@@ -561,22 +620,26 @@
   }
 
   /* ---------- Rendering: notes, status, CTA, summary ---------- */
+  var lastOver = false;
   function updateOver() {
-    $("#note-over").hidden = !overLimit();
+    var now = overLimit();
+    $("#note-over").hidden = !now;
+    if (FIND && now !== lastOver) { lastOver = now; if (now) announce("That is more than a Fast Fix covers. We will send this to our team."); }
   }
 
   /* Step 3: the recommended length, with a way to change it */
   function updateRec() {
     var rec = recommendedHours(), h = hours();
     $("#rec-value").textContent = hoursText(h);
+    if (FIND) setText($(".rec__label"), "Visit length");
     var n = selectedJobs().length;
-    var lead = (h === rec ? "Recommended for the jobs you picked. " : "You changed this from the recommended " + hoursText(rec) + ". ");
+    var lead = FIND ? (h === rec ? "Based on the jobs you selected. " : "You changed this from " + hoursText(rec) + ". ") : (h === rec ? "Recommended for the jobs you picked. " : "You changed this from the recommended " + hoursText(rec) + ". ");
     $("#rec-meta").textContent = lead + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
     $all('input[name="hours"]').forEach(function (r) { r.checked = +r.value === h; });
     $all("[data-rec-for]").forEach(function (el) { el.hidden = +el.getAttribute("data-rec-for") !== rec; });
     var note = $("#note-hours");
     note.hidden = h >= rec;
-    $("#note-hours-text").textContent = h >= rec ? "" : "We recommend " + hoursText(rec) + " for these jobs. Booking " + hoursText(h) + " may not be enough, so your Home Manager might not finish everything.";
+    $("#note-hours-text").textContent = h >= rec ? "" : (FIND ? "These jobs usually need about " + hoursText(rec) + ". " : "We recommend " + hoursText(rec) + " for these jobs. ") + "Booking " + hoursText(h) + " may not be enough, so your Home Manager might not finish everything.";
   }
 
   function updateChecksNotes() {
@@ -592,7 +655,7 @@
     if (screen === "job") {
       return {
         label: overLimit() ? "Send to our team" : "Continue",
-        status: n ? n + (n === 1 ? " job" : " jobs") + (FIND ? " selected" : " picked") : (FIND ? "" : "Nothing picked yet")
+        status: FIND && overLimit() ? "More than a Fast Fix covers" : n ? n + (n === 1 ? " job" : " jobs") + (FIND ? " selected" : " picked") : (FIND ? "" : "Nothing picked yet")
       };
     }
     if (screen === "check") {
@@ -612,9 +675,9 @@
   function updateCta() {
     var c = ctaFor(state.screen);
     if (!c) return;
-    $all("[data-next]").forEach(function (b) { b.textContent = c.label; });
-    $("#status-" + state.screen).textContent = c.status;
-    $("#dock-status").textContent = c.status;
+    $all("[data-next]").forEach(function (b) { setText(b, c.label); });
+    setText($("#status-" + state.screen), c.status);
+    setText($("#dock-status"), c.status);
   }
 
   function updateSummary() {
@@ -683,6 +746,8 @@
     if (el) el.hidden = !on;
     var field = $("#field-" + id);
     if (field) field.classList.toggle("is-invalid", on);
+    var host = id === "jobs" ? $("#fs-jobs") : id === "finder" ? $("#finder-input") : null;
+    if (host) host.setAttribute("aria-describedby", (id === "jobs" ? "jobs-hint" : "finder-hint") + (on ? " err-" + id : ""));
   }
   function clearErrors(ids) { ids.forEach(function (id) { setError(id, false); }); }
 
@@ -717,6 +782,9 @@
 
   var firstRender = true;
   function render(screen) {
+    if (FIND && screen !== "job" && finderTimer) finderSync();
+    if (FIND && /^(check|time|booked)$/.test(screen) && !selectedJobs().length && state.finder.text.trim()) { navigate("job"); return; }
+    if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = "time"; navigate("sent"); return; }
     if (screen !== "type" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
     if (screen === "booked" && (!state.date || state.time === null)) seedDemo(screen);
     if (screen === "sent" && !state.reason) seedDemo(screen);
@@ -808,23 +876,46 @@
     setError("time", true);
   }
 
+  /* Describe-first step 1: Continue. Returns true when it handled the click (feedback shown, stay on the step). */
+  function finderNext() {
+    var j = state.finder, before = selIds().join();
+    if (finderTimer) {
+      finderSync();
+      if (selIds().join() !== before) { finderFlash("We updated your jobs from what you wrote. Check them, then continue."); return true; }
+    }
+    if (!selectedJobs().length) {
+      setError("finder", true);
+      announce("Describe what you need or pick a job below.");
+      $("#finder-input").scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
+      $("#finder-input").focus({ preventScroll: true });
+      return true;
+    }
+    var o = state.jobs.other && !(state.notes.other || "").trim() && !j.text.trim();
+    if (o) {
+      j.open.other = true; syncJobs();
+      setError("note-other", true);
+      $("#job-other").scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
+      $("#pnote-other").focus({ preventScroll: true });
+      return true;
+    }
+    var qn = j.questions.length + j.unmatched.length;
+    j.flash = "";
+    if (qn && j.warned !== j.qsig) {
+      j.warned = j.qsig;
+      finderFlash((qn === 1 ? "1 question is left. " : qn + " questions are left. ") + "Answer or skip, then continue. Anything you skip stays in your description.", "#finder-questions .chip");
+      return true;
+    }
+    return false;
+  }
+
   function next() {
     var s = state.screen;
     if (s === "job") {
-      if (FIND && finderTimer) {
-        var had = selectedJobs().length;
-        finderSync();
-        if (selectedJobs().length > had) {
-          var m = "We selected " + (selectedJobs().length - had) + (selectedJobs().length - had === 1 ? " job" : " jobs") + " from what you wrote. Check them, then press Continue.";
-          announce(m);
-          var st = $("#finder-status"); st.innerHTML = ""; st.appendChild(statusIcon("ri-check-line")); st.appendChild(el("span", "", m));
-          return;
-        }
-      }
+      if (FIND) { if (finderNext()) return; }
       var jobs = selectedJobs(), bad = [];
       if (!jobs.length) bad.push("jobs");
       if (!FIND) jobs.forEach(function (j) { if (!(state.notes[j.id] || "").trim()) bad.push("note-" + j.id); });
-      setError("jobs", bad.indexOf("jobs") > -1);
+      if (!FIND) setError("jobs", bad.indexOf("jobs") > -1);
       if (!FIND) jobs.forEach(function (j) { setError("note-" + j.id, bad.indexOf("note-" + j.id) > -1); });
       if (bad.length) { focusFirst(bad[0] === "jobs" ? "#jobs input" : "#" + bad[0]); return; }
       if (overLimit()) { state.reason = "time"; navigate("sent"); return; }
@@ -930,7 +1021,7 @@
 
     if (FIND) {
       var ex = t.closest("[data-finder-example]");
-      if (ex) { finderSetText(ex.getAttribute("data-finder-example")); navigate("job"); return; }
+      if (ex) { finderClearAll(); finderSetText(ex.getAttribute("data-finder-example")); navigate("job"); return; }
       var dt = t.closest("[data-details-toggle]");
       if (dt) { toggleDetails(dt.getAttribute("data-details-toggle")); return; }
       if (t.closest("[data-jump-picks]")) { if (!selectedJobs().length) finderSeed(); navigate("job"); return; }
@@ -1011,9 +1102,9 @@
   });
 
   document.addEventListener("input", function (e) {
-    if (FIND && e.target.id === "finder-input") { state.finder.text = e.target.value; finderQueue(); updateSummary(); return; }
+    if (FIND && e.target.id === "finder-input") { state.finder.text = e.target.value; state.finder.flash = ""; setError("finder", false); finderQueue(); updateSummary(); return; }
     var id = e.target.getAttribute && e.target.getAttribute("data-note");
-    if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); refresh(); }
+    if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); if (FIND) syncJobsLabels(id); refresh(); }
   });
 
   document.addEventListener("keydown", function (e) {
@@ -1022,6 +1113,7 @@
   window.addEventListener("hashchange", function () { render(fromHash()); });
 
   /* ---------- Init ---------- */
+  if (FIND) $("#finder").appendChild($("#note-over"));
   renderJobs();
   applySwitch("multi", true);
   render(fromHash());
