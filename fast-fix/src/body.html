@@ -156,17 +156,15 @@
           </div>
         </section>
 
-        <!-- ============ 1. The job (list-first) / 2. Your jobs (describe-first) ============ -->
+        <!-- ============ The job (pick-it-yourself) / Your jobs (describe-first): selected jobs, search, groups ============ -->
         <section class="card" data-screen-id="job" aria-label="The job" hidden>
 
-          <!-- Describe-first: what was selected, then search and groups to add more -->
-          <div class="finder-only" id="pick-ui">
+          <div id="pick-ui">
             <span class="sr-only" id="finder-live" aria-live="polite"></span>
-            <div class="fsec">
+            <div class="fsec" id="sel-sec">
               <div class="sel__head"><h2 class="t-strong" id="sel-title" tabindex="-1">Selected jobs</h2><span class="t-meta" id="sel-count"></span></div>
               <p class="picks__msg t-meta" id="sel-msg" hidden></p>
               <ul class="picks" id="sel"></ul>
-              <p class="error" id="err-sel" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Select at least one job.</span></p>
               <div class="note" id="note-over-sel" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.</span></div>
             </div>
             <div class="fsec">
@@ -177,31 +175,11 @@
                 <input class="input" type="text" id="search" autocomplete="off" aria-describedby="search-hint" placeholder="Try “faucet” or “plumbing”">
                 <button class="icon-btn icon-btn--bare search__clear" type="button" id="search-clear" aria-label="Clear search" hidden><svg class="i"><use href="#ri-close-line"/></svg></button>
               </div>
+              <p class="error" id="err-sel" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Select at least one job.</span></p>
               <span class="sr-only" id="search-live" aria-live="polite"></span>
               <p class="t-meta search__none" id="search-none" hidden>No jobs match that. Try another word, or clear the search.</p>
               <div class="tree" id="tree"></div>
             </div>
-          </div>
-
-          <div class="fsec classic-only jobs-sec">
-            <fieldset id="fs-jobs" aria-describedby="jobs-hint err-jobs">
-              <legend class="t-strong">Pick everything that applies</legend>
-              <p class="t-meta" id="jobs-hint">Choose as many as you need. Don&rsquo;t see yours? Show all and pick Something else.</p>
-              <div class="opts" id="jobs"></div>
-              <div class="jobs__more">
-                <button class="link" type="button" id="jobs-toggle" aria-expanded="false" aria-controls="jobs"><span data-label>Show all 25 jobs</span><svg class="i"><use href="#ri-arrow-down-s-line"/></svg></button>
-                <span class="sr-only" id="jobs-count" aria-live="polite"></span>
-              </div>
-              <p class="error" id="err-jobs" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Pick at least one job.</span></p>
-              <div class="note" id="note-over" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.</span></div>
-            </fieldset>
-          </div>
-
-          <div class="fsec classic-only" role="group" aria-labelledby="details-title">
-            <h2 class="t-strong" id="details-title">Tell us what you need done</h2>
-            <p class="t-meta" id="details-hint">Include what needs to be repaired or installed and how many items.</p>
-            <div class="details" id="details"></div>
-            <p class="t-meta details__empty" id="details-empty">Pick a job above and a box for it will appear here.</p>
           </div>
 
           <div class="factions">

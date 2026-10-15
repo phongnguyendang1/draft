@@ -30,13 +30,13 @@ Step 4 in the diagram (Home Manager completion, taxonomy, follow-on) is Home Man
 | Screen | What the member does | Notes |
 |---|---|---|
 | **Request type** | Chooses Fast Fix, Service request or Account. | The only emergency path is the 911 notice above the cards (gas smell, gas leak or burning smell); there is no Emergency card. Fast Fix is the tinted card and says it is for small jobs of 1 to 3 hours. Service request says to choose it for anything more involved or if unsure. Members with 2 homes get the home switcher from the dashboard. |
-| **1 The job** | Picks every job that applies from a list of 10, with a "Show all 25 jobs" button for the rest. Each picked job gets its own labelled text box below (label = the job name, with an example in the box); every box is required. | No times, estimates or "how long" question here. A job picked from the full list stays visible when the list is collapsed. "Something else" is the last of the 25. If the picked jobs add up to more than a Fast Fix covers, an inline note appears and the button becomes "Send to our team". |
+| **1 The job** | Finds jobs with a search box, or opens one of 10 groups (each holds 10 jobs, 100 in total), and ticks every job that applies. Ticked jobs collect under "Selected jobs" below the groups, each with Remove and an optional, empty "Add details" box labelled with the job name. | No times, estimates or "how long" question here. Search matches the job name, the group name and related words ("plumbing" opens the Plumbing group, "flapper" finds Running toilet). Nothing is shown as selected until something is. "Something else" is the last job (Outdoors & Other) and is the one job that needs a few words in its details box. If the picked jobs add up to more than a Fast Fix covers, a note appears under Selected jobs and the button becomes "Send to our team". |
 | **2 Quick check** | Answers Mark's three questions: (1) Can you reach it with a standard step ladder? Yes / No, it's higher / Not sure. (2) Does it involve gas, new wiring, or moving water lines? No / Yes / Not sure. (3) Do you already have the part or fixture, if one's needed? Have it / No part needed / Need one. | Wording, option order and routing are Mark's (the "good" answer sits in a different position on each question, so members have to read). The outcome is shown inline as soon as a routing answer is chosen, and the button changes from "Continue to times" to "Send to our team". Once an answer routes the request, the other questions show "Optional." so nothing blocks the hand-off. |
 | **3 Pick a time** | Sees a **recommended time** based on what they picked (only reached after passing the vetting questions), can change it, then picks a date and a time and confirms. | Recommendation = the picked jobs' internal estimates added up and rounded up to a whole hour, 1 to 3. Estimates are never shown. "Change" reveals 1 / 2 / 3 hours with the recommended one tagged; going lower shows a warning that the visit may not be enough; changing the length refreshes the open times. Real open slots, confirmed on the spot, Central Time. |
 | **Booked** | Reads the confirmation. | Date, time, Home Manager, address, jobs, hours booked. Home Manager card with message button. |
 | **Sent to our team** | Reads what happens next. | The "no-go" path: nothing to re-enter. The "What you sent" card shows the jobs, description and the answers that triggered the hand-off (parts, what makes it involved, time asked for), so Ops gets the "why". Gentle one-line reason, no blame. |
 
-States covered: empty-form validation (inline errors with text and icon, focus moves to the first problem), lower-than-recommended warning, too many jobs, each routing answer on step 2, no open times, "that time was just taken", 1 vs 2 homes.
+States covered: nothing picked on Continue (inline error with text and icon, scrolled into view), "Something else" without words, lower-than-recommended warning, too many jobs, each routing answer on step 2, no open times, "that time was just taken", 1 vs 2 homes.
 
 ## Outcome rules (member-facing)
 
@@ -53,10 +53,10 @@ States covered: empty-form validation (inline errors with text and icon, focus m
 ## Gap-fills (each is a design assumption to confirm)
 
 - **Name "Fast Fix".** Jira epic PFX-537 is titled "Fast Fix (formerly Quick Book)". Mark's Slack also says Quick Fix and the diagram says Book a Handyman.
-- **$55 per hour, billed per hour** is shown on step 1 and in the summary. Source: PreFix Service Pricing Guide (Jan 2026) co-pay rate. Slack does not mention price. Confirm it applies to Fast Fix, or remove the price rows.
+- **$55 per hour, billed per hour** is shown on step 3 and in the summary. Source: PreFix Service Pricing Guide (Jan 2026) co-pay rate. Slack does not mention price. Confirm it applies to Fast Fix, or remove the price rows.
 - **Slot picker pattern** (date, then time, start and end shown, times in the address timezone, refresh on "just taken") follows the shipped Member Calendar documentation, so engineering can reuse it.
 - **Member-facing hints under the questions.** Mark's notes on what each question catches were internal. The prototype turns two into short hints: "Think roofs, second-story outsides and vaulted ceilings." and "Swapping a fixture is fine. Adding or relocating one is not." Third hint ("For example a new faucet, lock set or TV mount.") is mine. Edit or drop freely.
-- **Recommended time.** The 25 jobs and their internal time estimates are placeholders (default about 1 hour, a few 30 minutes). Ops needs to tune them; the recommendation is only as good as they are.
+- **Recommended time.** The 100 jobs and their internal time estimates are placeholders (default about 1 hour, a few 30 minutes). Ops needs to tune them; the recommendation is only as good as they are.
 - **Active leak or no power.** With no Emergency card, those members use the Service request card unless the 911 notice is widened. Say if you want text added.
 - **Job list and wording are illustrative.** Mark: the top 10 to 20 list and the vetting questions will be worked out with Justin and James H. Estimates mostly default to 1 hour in the existing proof of concept.
 - **Home Manager name on the confirmation** comes from the member's assigned Home Manager.
@@ -82,7 +82,8 @@ Home Manager completion and incomplete-reason taxonomy, follow-on booking, contr
 - **Prototype states** button (bottom right): 2 homes, no open times, next time just taken, and a jump list to every screen.
 - Deep links: `#/job`, `#/check`, `#/time`, `#/booked`, `#/sent`.
 - Both frames share one source; only the body class differs.
-- **Describe-first version** (`request-flow-describe-desktop.html`, `request-flow-describe-mobile.html`): the same flow, but step 1 starts with a plain "Describe what you need" input that ticks matching jobs in the same list (one surface, one selection). See `FLOW-SPEC-DESCRIBE.md`.
+- **Pick-it-yourself version** (`request-flow-desktop.html`, `request-flow-mobile.html`): no description step. This is the version documented above.
+- **Describe-first version** (`request-flow-describe-desktop.html`, `request-flow-describe-mobile.html`): adds a first step with one text box that pre-selects the jobs, then the same search and groups. See `FLOW-SPEC-DESCRIBE.md`.
 
 ## Design language
 

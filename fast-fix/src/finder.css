@@ -7,7 +7,6 @@
 /* Variant switches */
 body:not(.variant-finder) .finder-only { display: none !important; }
 body.variant-finder .classic-only { display: none !important; }
-body:not(.variant-finder) .jobs-sec { margin-top: 0; padding-top: 0; border-top: 0; }
 
 /* Four steps instead of three */
 body.variant-finder .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }

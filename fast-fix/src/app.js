@@ -16,33 +16,6 @@
   };
   /* 25 jobs (illustrative; the real list is curated with Ops). `min` is an internal estimate used only to
      recommend a booking length. It is never shown to the member. `ex` is the placeholder example. */
-  var JOBS_CLASSIC = [
-    { id: "toilet-run", title: "Running toilet", icon: "ri-drop-line", min: 60, ex: "Example: The hall bath toilet keeps running after I flush." },
-    { id: "toilet-clog", title: "Clogged toilet", icon: "ri-water-flash-line", min: 60, ex: "Example: The guest bath toilet clogs every few days." },
-    { id: "lock", title: "Door lock issue", icon: "ri-door-lock-line", min: 60, ex: "Example: The front door lock sticks and is hard to turn." },
-    { id: "door", title: "Sticking or loose door", icon: "ri-door-closed-line", min: 30, ex: "Example: The bedroom door rubs the frame and will not latch." },
-    { id: "disposal", title: "Garbage disposal issue", icon: "ri-recycle-line", min: 60, ex: "Example: The kitchen disposal hums but does not spin." },
-    { id: "appliance", title: "Appliance diagnostic", icon: "ri-fridge-line", min: 60, ex: "Example: The dishwasher stopped draining." },
-    { id: "tv", title: "Mount a TV", icon: "ri-tv-line", min: 60, ex: "Example: Mount one 55 inch TV on the living room wall." },
-    { id: "hang", title: "Hang shelves, curtain rods or art", icon: "ri-ruler-line", min: 60, ex: "Example: Hang 2 curtain rods and 3 framed pictures." },
-    { id: "assemble", title: "Assemble furniture", icon: "ri-sofa-line", min: 60, ex: "Example: Assemble 1 dresser and 2 bookshelves." },
-    { id: "caulk", title: "Caulk or seal", icon: "ri-paint-brush-line", min: 60, ex: "Example: Re-caulk around the kitchen sink." },
-    { id: "faucet-leak", title: "Leaky faucet", icon: "ri-contrast-drop-line", min: 60, ex: "Example: The bathroom faucet drips when it is off." },
-    { id: "faucet-swap", title: "Replace a faucet or showerhead", icon: "ri-showers-line", min: 60, ex: "Example: Replace the kitchen faucet. I have the new one." },
-    { id: "light", title: "Replace a light fixture", icon: "ri-lightbulb-line", min: 60, ex: "Example: Replace 2 light fixtures in the hallway." },
-    { id: "outlet", title: "Replace an outlet or switch", icon: "ri-plug-line", min: 60, ex: "Example: Replace 3 outlets and 1 switch with new ones." },
-    { id: "smart", title: "Install a doorbell or thermostat", icon: "ri-router-line", min: 60, ex: "Example: Install a video doorbell at the front door." },
-    { id: "knob", title: "Replace a door knob or handle", icon: "ri-key-2-line", min: 30, ex: "Example: Replace 4 interior door knobs." },
-    { id: "cab-door", title: "Fix a cabinet door or hinge", icon: "ri-archive-drawer-line", min: 30, ex: "Example: A kitchen cabinet door hangs crooked." },
-    { id: "cab-hw", title: "Install cabinet handles", icon: "ri-hammer-line", min: 60, ex: "Example: Install handles on 12 kitchen cabinets." },
-    { id: "drywall", title: "Patch a small drywall hole", icon: "ri-brush-line", min: 60, ex: "Example: Patch a small hole in the hallway wall." },
-    { id: "blinds", title: "Install blinds or curtains", icon: "ri-window-line", min: 60, ex: "Example: Install blinds on 3 windows." },
-    { id: "weather", title: "Add weatherstripping or a door sweep", icon: "ri-home-gear-line", min: 30, ex: "Example: Add a door sweep to the back door." },
-    { id: "smoke", title: "Replace smoke detector batteries", icon: "ri-alarm-warning-line", min: 30, ex: "Example: Replace batteries in 4 smoke detectors." },
-    { id: "towel", title: "Install a towel bar or bath accessory", icon: "ri-ruler-2-line", min: 30, ex: "Example: Install a towel bar and a toilet paper holder." },
-    { id: "childproof", title: "Install safety latches or gates", icon: "ri-lock-line", min: 60, ex: "Example: Install safety latches on 6 lower cabinets." },
-    { id: "other", title: "Something else", icon: "ri-add-line", min: 60, ex: "Example: Tell us what you need and how many items." }
-  ];
   /* Describe-first: the 100-job catalog (catalog.js), flattened. Each job knows its group. */
   function catalogJobs() {
     var out = [];
@@ -54,10 +27,9 @@
     });
     return out;
   }
-  var JOBS = FIND ? catalogJobs() : JOBS_CLASSIC;
+  var JOBS = catalogJobs();
   var JOB = {};
   JOBS.forEach(function (j) { JOB[j.id] = j; });
-  var TOP = 10;
   var RATE = 55;
   var MAX_MIN = 180;
   var TODAY = new Date(2026, 9, 13);
@@ -70,7 +42,7 @@
   var SCREENS = ["type", "job", "check", "time", "booked", "sent"];
   var TITLES = {
     type: ["How can we help?", "Choose what fits best."],
-    job: ["What do you need done?", "Fast Fix is for small jobs. All fields are required."],
+    job: ["What do you need done?", "Search, or open a category, and pick everything that applies. Adding details is optional."],
     check: ["A quick check", "Three quick questions so we book the right visit. All are required."],
     time: ["Pick a time", "Real open times with your Home Manager. Your booking is confirmed right away."],
     booked: ["You’re booked", "Confirmed. Nothing else to do."],
@@ -186,6 +158,7 @@
   function renderSelected() {
     var jobs = selectedJobs(), list = $("#sel");
     list.innerHTML = "";
+    if (!FIND) $("#sel-sec").hidden = jobs.length === 0;
     setText($("#sel-count"), jobs.length ? jobs.length + " selected" : "");
     var msg = $("#sel-msg");
     msg.hidden = jobs.length > 0 || !state.msg;
@@ -368,57 +341,6 @@
     return null;
   }
 
-  /* ---------- Rendering: jobs ---------- */
-  /* 10 jobs plus "Show all"; anything already picked stays visible when the list is collapsed */
-  function renderJobs() {
-    if (FIND) return;
-    var shown = JOBS.filter(function (j, i) { return state.showAll || i < TOP || state.jobs[j.id]; });
-    $("#jobs").innerHTML = shown.map(function (j) {
-      return '<label class="opt"><input type="checkbox" name="jobs" value="' + j.id + '"' + (state.jobs[j.id] ? " checked" : "") + '>' +
-        '<span class="d-icon" aria-hidden="true"><svg class="i"><use href="#' + j.icon + '"/></svg></span>' +
-        '<span class="opt__main"><span class="opt__title">' + j.title + '</span></span>' +
-        '<span class="opt__box" aria-hidden="true"><svg class="i"><use href="#ri-check-line"/></svg></span></label>';
-    }).join("");
-    var t = $("#jobs-toggle");
-    t.setAttribute("aria-expanded", String(state.showAll));
-    $("[data-label]", t).textContent = state.showAll ? "Show fewer jobs" : "Show all " + JOBS.length + " jobs";
-    $("use", t).setAttribute("href", state.showAll ? "#ri-arrow-up-s-line" : "#ri-arrow-down-s-line");
-    $("#jobs-count").textContent = "Showing " + shown.length + " of " + JOBS.length + " jobs";
-  }
-
-  /* One labelled text box per picked job, in the order picked. Built with the DOM (member text is never HTML). */
-  function renderDetails() {
-    if (FIND) return;
-    var box = $("#details"), jobs = selectedJobs();
-    $("#details-empty").hidden = jobs.length > 0;
-    box.innerHTML = "";
-    jobs.forEach(function (j) {
-      var wrap = document.createElement("div");
-      wrap.className = "field detail";
-      wrap.id = "field-note-" + j.id;
-      var label = document.createElement("label");
-      label.setAttribute("for", "note-" + j.id);
-      label.textContent = j.title;
-      var ta = document.createElement("textarea");
-      ta.className = "textarea";
-      ta.id = "note-" + j.id;
-      ta.rows = 3;
-      ta.placeholder = j.ex;
-      ta.value = state.notes[j.id] || "";
-      ta.setAttribute("data-note", j.id);
-      ta.setAttribute("aria-describedby", "details-hint err-note-" + j.id);
-      var err = document.createElement("p");
-      err.className = "error";
-      err.id = "err-note-" + j.id;
-      err.hidden = true;
-      err.setAttribute("role", "alert");
-      err.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span></span>';
-      err.lastChild.textContent = "Add a few details about " + j.title.toLowerCase() + ".";
-      wrap.appendChild(label); wrap.appendChild(ta); wrap.appendChild(err);
-      box.appendChild(wrap);
-    });
-  }
-
   /* Push state into the form controls (used when jumping straight to a screen) */
   function syncInputs() {
     Q.forEach(function (q) {
@@ -465,9 +387,8 @@
   var lastOver = false;
   function updateOver() {
     var now = overLimit();
-    $("#note-over").hidden = !now;
     $("#note-over-sel").hidden = !now;
-    if (FIND && now !== lastOver) { lastOver = now; if (now) announce("That is more than a Fast Fix covers. We will send this to our team."); }
+    if (now !== lastOver) { lastOver = now; if (now) announce("That is more than a Fast Fix covers. We will send this to our team."); }
   }
 
   /* Step 3: the recommended length, with a way to change it */
@@ -499,7 +420,7 @@
     if (screen === "job") {
       return {
         label: overLimit() ? "Send to our team" : "Continue",
-        status: FIND && overLimit() ? "More than a Fast Fix covers" : n ? n + (n === 1 ? " job" : " jobs") + (FIND ? " selected" : " picked") : (FIND ? "" : "Nothing picked yet")
+        status: overLimit() ? "More than a Fast Fix covers" : n ? n + (n === 1 ? " job" : " jobs") + " selected" : ""
       };
     }
     if (screen === "check") {
@@ -594,13 +515,8 @@
 
   /* ---------- Navigation ---------- */
   function seedDemo(screen) {
-    if (!selectedJobs().length && FIND) {
+    if (!selectedJobs().length) {
       ["toilet-run", "lock", "light-fixture"].forEach(selectJob);
-      state.hours = 0;
-    } else if (!selectedJobs().length) {
-      state.jobs = { "toilet-run": true, lock: true };
-      state.order = ["toilet-run", "lock"];
-      state.notes = { "toilet-run": "The toilet in the hall bath keeps running after I flush.", lock: "The front door lock sticks and is hard to turn." };
       state.hours = 0;
     }
     if (screen === "time" || screen === "booked") { state.ladder = state.ladder || "yes"; state.trade = state.trade || "no"; state.part = state.part || "have"; }
@@ -663,7 +579,7 @@
     updateDock();
 
     if (screen === "job") {
-      if (FIND) renderJobsStep(); else { renderJobs(); renderDetails(); }
+      renderJobsStep();
     }
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
@@ -757,13 +673,7 @@
     var s = state.screen;
     if (s === "describe") { describeNext(); return; }
     if (s === "job") {
-      if (FIND && jobsNext()) return;
-      var jobs = selectedJobs(), bad = [];
-      if (!jobs.length) bad.push("jobs");
-      if (!FIND) jobs.forEach(function (j) { if (!(state.notes[j.id] || "").trim()) bad.push("note-" + j.id); });
-      if (!FIND) setError("jobs", bad.indexOf("jobs") > -1);
-      if (!FIND) jobs.forEach(function (j) { setError("note-" + j.id, bad.indexOf("note-" + j.id) > -1); });
-      if (bad.length) { focusFirst(bad[0] === "jobs" ? "#jobs input" : "#" + bad[0]); return; }
+      if (jobsNext()) return;
       if (overLimit()) { state.reason = "time"; navigate("sent"); return; }
       navigate("check");
       return;
@@ -856,7 +766,6 @@
     var pick = t.closest("[data-home-pick]");
     if (pick) { pickHome(pick.getAttribute("data-home-pick")); return; }
 
-    if (t.closest("#jobs-toggle")) { state.showAll = !state.showAll; renderJobs(); return; }
     if (t.closest("#rec-change")) {
       var rc = $("#rec-change"), openRec = rc.getAttribute("aria-expanded") !== "true";
       rc.setAttribute("aria-expanded", String(openRec));
@@ -865,7 +774,7 @@
       return;
     }
 
-    if (FIND) {
+    {
       var dt = t.closest("[data-details-toggle]");
       if (dt) { toggleDetails(dt.getAttribute("data-details-toggle")); return; }
       var gb = t.closest("[data-grp]");
@@ -924,17 +833,7 @@
 
   document.addEventListener("change", function (e) {
     var el = e.target;
-    if (el.name === "jobs") {
-      state.jobs[el.value] = el.checked;
-      var at = state.order.indexOf(el.value);
-      if (el.checked && at < 0) state.order.push(el.value);
-      if (!el.checked && at > -1) state.order.splice(at, 1);
-      /* a different set of jobs means a different recommendation: drop any chosen length and time */
-      state.hours = 0; state.date = null; state.time = null;
-      setError("jobs", false);
-      renderDetails();
-      if (FIND) { toggleJob(el.value, el.checked); return; }
-    }
+    if (el.name === "jobs") { toggleJob(el.value, el.checked); return; }
     else if (el.name === "hours") {
       state.hours = +el.value === recommendedHours() ? 0 : +el.value;
       state.time = null; state.date = firstOpenDay();
@@ -953,7 +852,7 @@
   });
 
   document.addEventListener("input", function (e) {
-    if (FIND && e.target.id === "search") { state.q = e.target.value; state.sc = {}; syncTree(); return; }
+    if (e.target.id === "search") { state.q = e.target.value; state.sc = {}; syncTree(); return; }
     if (FIND && e.target.id === "desc") { if (e.target.value.trim().length >= 3) setError("describe", false); return; }
     var id = e.target.getAttribute && e.target.getAttribute("data-note");
     if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); refresh(); }
@@ -962,21 +861,24 @@
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeMenus();
     if (FIND && e.target.id === "desc" && e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); describeNext(); }
-    if (FIND && e.target.id === "search" && e.key === "Escape" && state.q) { state.q = ""; state.sc = {}; e.target.value = ""; syncTree(); }
-    if (FIND && e.target.id === "search" && e.key === "Enter") e.preventDefault();
+    if (e.target.id === "search" && e.key === "Escape" && state.q) { state.q = ""; state.sc = {}; e.target.value = ""; syncTree(); }
+    if (e.target.id === "search" && e.key === "Enter") e.preventDefault();
   });
   window.addEventListener("hashchange", function () { render(fromHash()); });
 
   /* ---------- Init ---------- */
+  compileMatch(); buildTree();
   if (FIND) {
-    compileMatch(); buildTree();
     $all(".step__n").forEach(function (n, i) { n.textContent = String(i + 1); });
     setText($('.step[data-step="job"] .step__t'), "Your jobs");
     $('[data-go="job"]').setAttribute("data-go", "describe");
     $('[data-go="describe"]').setAttribute("href", "#/describe");
   } else {
+    /* Pick-it-yourself order: search and groups first, the selected jobs (with optional details) below them */
     $(".step.finder-only").remove();
-    renderJobs();
+    $("#pick-ui").appendChild($("#sel-sec"));
+    setText($("#add-title label"), "Find your jobs");
+    setText($("#search-hint"), "Search by job or category, or open a category. Pick everything that applies.");
   }
   applySwitch("multi", true);
   render(fromHash());
