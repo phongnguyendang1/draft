@@ -165,6 +165,7 @@
               <div class="sel__head"><h2 class="t-strong" id="sel-title" tabindex="-1">Selected jobs</h2><span class="t-meta" id="sel-count"></span></div>
               <p class="picks__msg t-meta" id="sel-msg" hidden></p>
               <ul class="picks" id="sel"></ul>
+              <div class="note manual-only" id="sr-flag" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span>After you book, we’ll take you to a service request for your other job. <button class="link" type="button" data-sr-undo>Undo</button></span></div>
               <div class="note" id="note-over-sel" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.</span></div>
             </div>
             <div class="fsec">
@@ -177,8 +178,9 @@
               </div>
               <p class="error" id="err-sel" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Select at least one job.</span></p>
               <span class="sr-only" id="search-live" aria-live="polite"></span>
-              <p class="t-meta search__none" id="search-none" hidden>No jobs match that. Try another word, or clear the search.</p>
+              <p class="t-meta search__none" id="search-none" hidden>No jobs match that. Try another word, or clear the search.<span class="manual-only"> Still nothing? <button class="link" type="button" data-sr-link>Submit a service request</button></span></p>
               <div class="tree" id="tree"></div>
+              <p class="sr-pointer t-meta manual-only" id="sr-pointer">Can’t find your job? Fast Fix only covers the jobs listed here. <button class="link" type="button" data-sr-link>Submit a service request</button></p>
             </div>
           </div>
 
@@ -206,30 +208,33 @@
 
           <div class="fsec">
             <fieldset id="fs-trade" aria-describedby="hint-trade err-trade">
-              <legend class="t-strong">Does it involve gas, new wiring, or moving water lines?</legend>
+              <legend class="t-strong">Is the work only a swap or repair of what is already there, with no gas, new wiring or moved water lines?</legend>
               <p class="t-meta" id="hint-trade">Swapping a fixture is fine. Adding or relocating one is not.</p>
               <div class="opts opts--3 opts--stack" id="trade-opts">
-                <label class="opt"><input type="radio" name="trade" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No</span></label>
                 <label class="opt"><input type="radio" name="trade" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Yes</span></label>
+                <label class="opt"><input type="radio" name="trade" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No</span></label>
                 <label class="opt"><input type="radio" name="trade" value="unsure"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Not sure</span></label>
               </div>
-              <p class="error" id="err-trade" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose no, yes or not sure.</span></p>
+              <p class="error" id="err-trade" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes, no or not sure.</span></p>
               <div class="note" id="note-trade" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> Work like this can need a licensed trade, so we will send it to our team as a service request. You will not need to enter anything again.</span></div>
             </fieldset>
           </div>
 
           <div class="fsec">
             <fieldset id="fs-part" aria-describedby="hint-part err-part">
-              <legend class="t-strong">Do you already have the part or fixture, if one’s needed?</legend>
-              <p class="t-meta" id="hint-part">For example a new faucet, lock set or TV mount.</p>
-              <div class="opts opts--3 opts--stack" id="part-opts">
-                <label class="opt"><input type="radio" name="part" value="have"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Have it</span></label>
-                <label class="opt"><input type="radio" name="part" value="none"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No part needed</span></label>
-                <label class="opt"><input type="radio" name="part" value="need"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Need one</span></label>
+              <legend class="t-strong">Do you have the part or fixture, if the job needs one?</legend>
+              <p class="t-meta" id="hint-part">If the job needs no part, answer Yes. For example a new faucet, lock set or TV mount.</p>
+              <div class="opts opts--2 opts--stack" id="part-opts">
+                <label class="opt"><input type="radio" name="part" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Yes</span></label>
+                <label class="opt"><input type="radio" name="part" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No</span></label>
               </div>
-              <p class="error" id="err-part" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose have it, no part needed or need one.</span></p>
+              <p class="error" id="err-part" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes or no.</span></p>
               <div class="note" id="note-part" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>No problem.</strong> We will send this to our team as a service request so they can plan the part. You will not need to enter anything again.</span></div>
             </fieldset>
+          </div>
+
+          <div class="fsec" id="ko-sec" hidden>
+            <div id="ko-box"></div>
           </div>
 
           <div class="factions">
@@ -248,14 +253,7 @@
                 <p class="rec__value" id="rec-value">2 hours</p>
                 <p class="t-meta" id="rec-meta"></p>
               </div>
-              <button class="link" type="button" id="rec-change" aria-expanded="false" aria-controls="rec-options"><span data-label>Change</span></button>
             </div>
-            <div class="opts opts--3" id="rec-options" role="radiogroup" aria-label="How long to book" hidden>
-              <label class="opt opt--dur"><input type="radio" name="hours" value="1"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>1 hour</span><span class="opt__meta">$55</span><span class="opt__rec" data-rec-for="1" hidden>Recommended</span></label>
-              <label class="opt opt--dur"><input type="radio" name="hours" value="2"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>2 hours</span><span class="opt__meta">$110</span><span class="opt__rec" data-rec-for="2" hidden>Recommended</span></label>
-              <label class="opt opt--dur"><input type="radio" name="hours" value="3"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>3 hours</span><span class="opt__meta">$165</span><span class="opt__rec" data-rec-for="3" hidden>Recommended</span></label>
-            </div>
-            <div class="note" id="note-hours" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span id="note-hours-text"></span></div>
           </div>
 
           <div class="book" id="book">
@@ -298,6 +296,7 @@
           </ul>
           <div class="result__actions">
             <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>
+            <a class="btn btn--secondary" href="#" id="b-sr" data-handoff="Service request" hidden>Submit a service request for your other job</a>
             <a class="link" href="#" data-toast="Added to your calendar">Add to calendar</a>
             <a class="link" href="#" data-toast="Opens Appointments">Reschedule or cancel</a>
           </div>
@@ -313,6 +312,7 @@
           <div class="note" role="note"><svg class="i"><use href="#ri-information-line"/></svg><span id="sent-why"></span></div>
           <div class="result__actions">
             <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>
+            <a class="btn btn--secondary" href="#" id="sent-sr" data-handoff="Service request" hidden>Submit a service request for your other job</a>
           </div>
         </section>
       </div>
@@ -365,6 +365,18 @@
   <div class="fdock" id="fdock" hidden>
     <p class="fdock__status" id="dock-status" aria-live="polite"></p>
     <button class="btn btn--primary btn--lg" type="button" data-next id="dock-btn">Continue</button>
+  </div>
+</div>
+
+<div class="modal" id="sr-modal" role="dialog" aria-modal="true" aria-labelledby="sr-modal-title" hidden>
+  <div class="modal__scrim" data-modal-close></div>
+  <div class="modal__box">
+    <h2 class="t-title" id="sr-modal-title">Can’t find your other job?</h2>
+    <p class="modal__text">Book the jobs you’ve picked first. When you’re done, we’ll take you to a service request for the rest.</p>
+    <div class="modal__actions">
+      <button class="btn btn--primary" type="button" data-sr-confirm>Book these first</button>
+      <button class="btn btn--secondary" type="button" data-modal-close>Cancel</button>
+    </div>
   </div>
 </div>
 

@@ -35,7 +35,8 @@ def read(name):
 
 def used_icons():
     names = set()
-    for n in ("body.html", "app.js", "catalog.js", "flow.css", "finder.css"):
+    for n in ("body.html", "app.js", "catalog.js", "catalog_manual.js", "flow.css", "finder.css"):
+        if not os.path.exists(os.path.join(SRC, n)): continue
         names |= set(re.findall(r"""(?:#|["'])ri-([a-z0-9]+(?:-[a-z0-9]+)*)""", read(n)))
     return sorted(names)
 
@@ -64,12 +65,15 @@ def build():
     css = "\n".join([font, read("base.css"), read("chrome.css"), read("shared.css"), read("flow.css"), read("finder.css")])
     sprite = read("sprite.svg")
     body = read("body.html").replace("{{SPRITE}}", sprite)
-    js = read("catalog.js") + "\n" + read("app.js")
+    app_js = read("app.js")
     for variant, vclass, vtitle, vprefix in (
         ("", "", "Request service", "request-flow"),
         ("describe", " variant-finder", "Request service, describe first", "request-flow-describe"),
     ):
       for frame, suffix in (("desktop", "Desktop"), ("mobile", "Mobile")):
+        # the pick-it-yourself version has its own symptom-worded catalog; describe-first keeps the earlier one
+        cat = "catalog_manual.js" if (variant == "" and os.path.exists(os.path.join(SRC, "catalog_manual.js"))) else "catalog.js"
+        js = read(cat) + "\n" + app_js
         out = "%s-%s.html" % (vprefix, frame)
         title = "HomeHub \u00b7 %s \u00b7 %s" % (vtitle, suffix)
         html = (

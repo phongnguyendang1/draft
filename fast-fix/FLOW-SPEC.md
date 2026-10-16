@@ -15,10 +15,9 @@ Request type (How can we help?)  [911 notice above the cards: gas smell, gas lea
  |- Fast Fix ............. 1 The job -> 2 Quick check -> 3 Pick a time -> Booked
  |                              |              |                |
  |                              |              |                '- no open times --.
- |                              |              '- step ladder: No / Not sure ------+
- |                              |              '- gas, wiring, water lines: Yes / Not sure --+--> Sent to our team
- |                              |              '- part or fixture: Need one -------+
- |                              '- jobs add up to more than 3 hours ----------------'     (auto-submitted
+ |                              |              '- any question answered No / Not sure -------+
+ |                              |              '- any task knockout question answered No -----+--> Sent to our team
+ |                              '- more than 4 tasks, or over 3 hours ------------------------'     (auto-submitted
  |- Service request ...... existing flow                                                   service request)
  '- Account ............. existing flow
 ```
@@ -30,22 +29,24 @@ Step 4 in the diagram (Home Manager completion, taxonomy, follow-on) is Home Man
 | Screen | What the member does | Notes |
 |---|---|---|
 | **Request type** | Chooses Fast Fix, Service request or Account. | The only emergency path is the 911 notice above the cards (gas smell, gas leak or burning smell); there is no Emergency card. Fast Fix is the tinted card and says it is for small jobs of 1 to 3 hours. Service request says to choose it for anything more involved or if unsure. Members with 2 homes get the home switcher from the dashboard. |
-| **1 The job** | Finds jobs with a search box, or opens one of 10 groups (each holds 10 jobs, 100 in total), and ticks every job that applies. Ticked jobs collect under "Selected jobs" below the groups, each with Remove and an optional, empty "Add details" box labelled with the job name. | No times, estimates or "how long" question here. Search matches the job name, the group name and related words ("plumbing" opens the Plumbing group, "flapper" finds Running toilet). Nothing is shown as selected until something is. "Something else" is the last job (Outdoors & Other) and is the one job that needs a few words in its details box. If the picked jobs add up to more than a Fast Fix covers, a note appears under Selected jobs and the button becomes "Send to our team". |
-| **2 Quick check** | Answers Mark's three questions: (1) Can you reach it with a standard step ladder? Yes / No, it's higher / Not sure. (2) Does it involve gas, new wiring, or moving water lines? No / Yes / Not sure. (3) Do you already have the part or fixture, if one's needed? Have it / No part needed / Need one. | Wording, option order and routing are Mark's (the "good" answer sits in a different position on each question, so members have to read). The outcome is shown inline as soon as a routing answer is chosen, and the button changes from "Continue to times" to "Send to our team". Once an answer routes the request, the other questions show "Optional." so nothing blocks the hand-off. |
-| **3 Pick a time** | Sees a **recommended time** based on what they picked (only reached after passing the vetting questions), can change it, then picks a date and a time and confirms. | Recommendation = the picked jobs' internal estimates added up and rounded up to a whole hour, 1 to 3. Estimates are never shown. "Change" reveals 1 / 2 / 3 hours with the recommended one tagged; going lower shows a warning that the visit may not be enough; changing the length refreshes the open times. Real open slots, confirmed on the spot, Central Time. |
-| **Booked** | Reads the confirmation. | Date, time, Home Manager, address, jobs, hours booked. Home Manager card with message button. |
+| **1 The job** | Finds a task with a search box, or opens one of 10 groups (100 tasks in total, worded as symptoms like "Running toilet"), and picks up to 4. Each picked task collects under "Selected jobs" below the groups with Remove and a **required** comment box labelled with the task. | Members can only choose from the list: there is no free-form task and no "Something else". If they can not find a job, a pointer under the list (and under empty search results) sends them to a Service Request. If they already picked jobs, a modal says to book those first, and after booking they get a button to submit a service request for the other job. Search matches task name, group name and related words. More than 4 tasks, or over 3 hours of internal minutes, goes to the team. On a phone only one group is open at a time. |
+| **2 Quick check** | Answers three questions, worded so **Yes is the right answer on all three** and Yes is always the first option: (1) Can you reach it with a standard step ladder? Yes / No, it's higher / Not sure. (2) Is the work only a swap or repair of what is already there, with no gas, new wiring or moved water lines? Yes / No / Not sure. (3) Do you have the part or fixture, if the job needs one? Yes / No (answer Yes when no part is needed). Then, for any picked task that has them, task-specific **knockout questions** (0 to 3, Yes is right). | Any No or Not sure sends the request to the team. Question copy is a placeholder for Mark and Justin to finalize, and the task-specific questions are placeholders for design. The outcome is shown inline as soon as a routing answer is chosen, and the button changes from "Continue to times" to "Send to our team". Once an answer routes the request, the other questions stop blocking. |
+| **3 Pick a time** | Sees the **recommended time** (only reached after passing the quick check), then picks a date and a start time and confirms. Members can not change the recommended time. | Recommendation = the picked tasks' internal durations (mostly 30 or 60 minutes) added up and rounded up to a whole hour, minimum 1. Durations are never shown per task. The calendar shows the visit length once and **start times only** (no ranges), matching the current member calendar. Real open slots, confirmed on the spot, Central Time. A line explains the Home Manager does what fits in the time booked and anything left over can be scheduled for another visit. |
+| **Booked** | Reads the confirmation. | Date, start time, Home Manager, address, jobs, hours booked. Home Manager card with message button. If the member asked for a service request for another job, a button to start it appears here. |
 | **Sent to our team** | Reads what happens next. | The "no-go" path: nothing to re-enter. The "What you sent" card shows the jobs, description and the answers that triggered the hand-off (parts, what makes it involved, time asked for), so Ops gets the "why". Gentle one-line reason, no blame. |
 
-States covered: nothing picked on Continue (inline error with text and icon, scrolled into view), "Something else" without words, lower-than-recommended warning, too many jobs, each routing answer on step 2, no open times, "that time was just taken", 1 vs 2 homes.
+States covered: nothing picked on Continue, a task without its required comment, more than 4 tasks, over 3 hours, a job that is not on the list (pointer, modal, button after booking), each routing answer and each knockout answer on step 2, no open times, "that time was just taken", 1 vs 2 homes.
 
 ## Outcome rules (member-facing)
 
 | Condition | Result |
 |---|---|
-| Picked jobs add up to more than a Fast Fix covers (over 3 hours) | Sent to our team, shown on step 1 before continuing |
-| Step ladder = "No, it's higher" or "Not sure" ("Yes" is the good answer) | Sent to our team |
-| Gas, new wiring or moving water lines = "Yes" or "Not sure" ("No" is the good answer) | Sent to our team |
-| Part or fixture = "Need one" ("Have it" and "No part needed" pass) | Sent to our team |
+| More than 4 tasks picked, or the picked tasks add up to over 3 hours | Sent to our team, shown on step 1 before continuing (the count rule says "more than 4 jobs") |
+| Step ladder = "No, it's higher" or "Not sure" | Sent to our team |
+| Swap or repair only, no gas, new wiring or moved water lines = "No" or "Not sure" | Sent to our team |
+| Part or fixture = "No" (Yes also covers "no part needed") | Sent to our team |
+| Any task-specific knockout question = "No" (placeholder questions) | Sent to our team |
+| A job is not on the list | Member is pointed to a Service Request; if jobs are already picked they book those first and get a button to the service request afterwards |
 | No open times for the visit length | Sent to our team |
 | Chosen time was just taken | Stay on step 3, list refreshes, pick another |
 | Everything fine | Booked |

@@ -21,8 +21,9 @@
     var out = [];
     CATALOG.forEach(function (g) {
       g.jobs.forEach(function (t) {
-        out.push({ id: t[0], title: t[1], kw: t[2], min: t[3], icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
-          ex: "Example: how many, which room, or anything we should know." });
+        var o = Array.isArray(t) ? { id: t[0], title: t[1], kw: t[2], min: t[3] } : t;
+        out.push({ id: o.id, title: o.title, kw: o.kw, min: o.min, icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
+          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [] });
       });
     });
     return out;
@@ -32,6 +33,7 @@
   JOBS.forEach(function (j) { JOB[j.id] = j; });
   var RATE = 55;
   var MAX_MIN = 180;
+  var MAX_TASKS = 4;   /* pick-it-yourself version: more than this goes to a service request */
   var TODAY = new Date(2026, 9, 13);
   var FIRST_DAY = new Date(2026, 9, 14);
   var LAST_MONTH = { y: 2027, m: 1 };
@@ -42,8 +44,8 @@
   var SCREENS = ["type", "job", "check", "time", "booked", "sent"];
   var TITLES = {
     type: ["How can we help?", "Choose what fits best."],
-    job: ["What do you need done?", "Search, or open a category, and pick everything that applies. Adding details is optional."],
-    check: ["A quick check", "Three quick questions so we book the right visit. All are required."],
+    job: ["What do you need done?", "Search, or open a category, and pick up to 4 jobs. Add a short note to each."],
+    check: ["A quick check", "A few quick questions so we book the right visit. All are required."],
     time: ["Pick a time", "Real open times with your Home Manager. Your booking is confirmed right away."],
     booked: ["You’re booked", "Confirmed. Nothing else to do."],
     sent: ["Request sent", "Our team will take it from here."]
@@ -66,27 +68,29 @@
     trade: "Work with gas, wiring or water lines can need a licensed trade, so our team will plan it.",
     part: "You still need the part, so our team will help plan it.",
     time: "These jobs add up to more than a Fast Fix covers, so our team will plan the visit.",
+    count: "You picked more than 4 jobs, so our team will plan the visit.",
+    ko: "One of your answers means our team should plan this visit.",
     slots: "We could not find an open time, so our team will find one for you."
   };
   /* Step 2: the vetting questions (Mark's wording). Any answer listed in BAD sends the request to the team. */
   var Q = ["ladder", "trade", "part"];
-  var BAD = { ladder: ["no", "unsure"], trade: ["yes", "unsure"], part: ["need"] };
+  var BAD = { ladder: ["no", "unsure"], trade: ["no", "unsure"], part: ["no"] };
   var HINT = {
     ladder: "Think roofs, second-story outsides and vaulted ceilings.",
     trade: "Swapping a fixture is fine. Adding or relocating one is not.",
-    part: "For example a new faucet, lock set or TV mount."
+    part: "If the job needs no part, answer Yes. For example a new faucet, lock set or TV mount."
   };
   var QNAME = { ladder: "Standard step ladder", trade: "Gas, wiring or water lines", part: "Part or fixture" };
   var QLABEL = {
     ladder: { yes: "Yes", no: "No, it’s higher", unsure: "Not sure" },
-    trade: { no: "No", yes: "Yes", unsure: "Not sure" },
-    part: { have: "Have it", none: "No part needed", need: "Need one" }
+    trade: { yes: "Yes", no: "No", unsure: "Not sure" },
+    part: { yes: "Yes", no: "No" }
   };
 
   /* ---------- State ---------- */
   var state = {
     screen: "type", home: "mueller", jobs: {}, order: [], notes: {}, showAll: false, hours: 0, ladder: "", trade: "", part: "",
-    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}
+    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false
   };
 
 
@@ -159,7 +163,7 @@
     var jobs = selectedJobs(), list = $("#sel");
     list.innerHTML = "";
     if (!FIND) $("#sel-sec").hidden = jobs.length === 0;
-    setText($("#sel-count"), jobs.length ? jobs.length + " selected" : "");
+    setText($("#sel-count"), jobs.length ? (FIND ? jobs.length + " selected" : jobs.length + " of " + MAX_TASKS + " selected") : "");
     var msg = $("#sel-msg");
     msg.hidden = jobs.length > 0 || !state.msg;
     setText(msg, jobs.length ? "" : state.msg);
@@ -171,6 +175,20 @@
       rm.setAttribute("aria-label", "Remove " + jb.title);
       rm.addEventListener("click", function () { toggleJob(jb.id, false, "sel-title"); });
       top.appendChild(icon(jb.icon)); top.appendChild(main); top.appendChild(rm);
+      if (!FIND) {
+        var req = el("div", "job__box job__box--req field"); req.id = "field-note-" + jb.id;
+        var rl = el("label"); rl.setAttribute("for", "pnote-" + jb.id);
+        rl.appendChild(document.createTextNode("Tell us more about " + jb.title + " ")); rl.appendChild(el("span", "", "(required)"));
+        var rt = el("textarea", "textarea"); rt.id = "pnote-" + jb.id; rt.rows = 3; rt.placeholder = jb.ex; rt.value = state.notes[jb.id] || "";
+        rt.setAttribute("data-note", jb.id); rt.setAttribute("aria-required", "true"); rt.setAttribute("aria-describedby", "err-note-" + jb.id);
+        var re = el("p", "error"); re.id = "err-note-" + jb.id; re.hidden = true; re.setAttribute("role", "alert");
+        re.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span></span>';
+        re.lastChild.textContent = "Add a few words about this job so your Home Manager knows what to expect.";
+        req.appendChild(rl); req.appendChild(rt); req.appendChild(re);
+        li.appendChild(top); li.appendChild(req);
+        list.appendChild(li);
+        return;
+      }
       var more = el("div", "job__more"), open = !!state.det[jb.id], has = !!(state.notes[jb.id] || "").trim();
       var tog = el("button", "link", open ? "Hide details" : (has ? "Edit details (optional)" : "Add details (optional)")); tog.type = "button";
       tog.setAttribute("data-details-toggle", jb.id); tog.setAttribute("aria-expanded", String(open)); tog.setAttribute("aria-controls", "pbox-" + jb.id);
@@ -264,6 +282,27 @@
     setText($("#search-live"), toks.length ? (any ? total + (total === 1 ? " job" : " jobs") + " found" : "No jobs found") : "");
   }
 
+  /* ----- "I can not find my job": point to a service request; if jobs are already picked, finish booking first ----- */
+  var lastFocus = null;
+  function srAction() {
+    if (selectedJobs().length) openModal(); else toast("Continues in the current service request flow");
+  }
+  function modalEls() { return $all("#sr-modal button"); }
+  function openModal() {
+    lastFocus = document.activeElement;
+    $("#sr-modal").hidden = false; body.classList.add("is-modal");
+    $("[data-sr-confirm]").focus();
+  }
+  function closeModal() {
+    $("#sr-modal").hidden = true; body.classList.remove("is-modal");
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  function updateSrFlag() {
+    $("#sr-flag").hidden = !state.srAfter;
+    $("#b-sr").hidden = !state.srAfter;
+    $("#sent-sr").hidden = !state.srAfter;
+  }
+
   /* ----- one place for every add / remove ----- */
   function toggleJob(id, on, focusId) {
     if (on) selectJob(id); else unselectJob(id);
@@ -306,11 +345,20 @@
     return state.order.filter(function (id) { return state.jobs[id]; }).map(function (id) { return JOB[id]; });
   }
   function totalMin() { return selectedJobs().reduce(function (s, j) { return s + j.min; }, 0); }
-  function overLimit() { return totalMin() > MAX_MIN; }
+  function overCount() { return !FIND && selectedJobs().length > MAX_TASKS; }
+  function overLimit() { return overCount() || totalMin() > MAX_MIN; }
+  function overReason() { return overCount() ? "count" : "time"; }
   /* Recommended booking length: what the picked jobs add up to, rounded up to a whole hour, 1 to 3 */
   function recommendedHours() { return Math.min(3, Math.max(1, Math.ceil(totalMin() / 60))); }
   function isBad(q) { return BAD[q].indexOf(state[q]) > -1; }
-  function routedBy() { return Q.filter(isBad); }
+  /* Per-task knockout questions (placeholder copy): every question is worded so Yes is the right answer */
+  function koItems() {
+    var out = [];
+    selectedJobs().forEach(function (jb) { (jb.ko || []).forEach(function (q, i) { out.push({ key: jb.id + "-" + i, job: jb, q: q }); }); });
+    return out;
+  }
+  function koBad() { return koItems().filter(function (k) { return state.ko[k.key] === "no"; }); }
+  function routedBy() { return Q.filter(isBad).concat(koBad().length ? ["ko"] : []); }
   function checkOutcome() { var r = routedBy(); return r.length ? r[0] : ""; }
   function hours() { return state.hours || recommendedHours(); }
   function hoursText(h) { return h + (h === 1 ? " hour" : " hours"); }
@@ -376,10 +424,10 @@
       return;
     }
     var d = parse(state.date);
-    meta.textContent = "Open times on " + longDate(d) + ". Times are in Central Time.";
+    meta.textContent = "Open times on " + longDate(d) + ". Visit length: " + hoursText(hours()) + ". Times are in Central Time.";
     box.innerHTML = slotsFor(state.date).map(function (s) {
       return '<label class="time"><input type="radio" name="slot" value="' + s + '"' + (state.time === s ? " checked" : "") + '>' +
-        '<span>' + range(s, hours()) + '</span><svg class="i" aria-hidden="true"><use href="#ri-check-line"/></svg></label>';
+        '<span>' + t12(s) + '</span><svg class="i" aria-hidden="true"><use href="#ri-check-line"/></svg></label>';
     }).join("");
   }
 
@@ -388,22 +436,18 @@
   function updateOver() {
     var now = overLimit();
     $("#note-over-sel").hidden = !now;
+    if (now) $("#note-over-sel span").innerHTML = overCount()
+      ? "<strong>That’s more than 4 jobs.</strong> To book a time now, keep it to 4 jobs or fewer. Otherwise we’ll send this to our team as a service request, and you won’t need to enter anything else."
+      : "<strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.";
     if (now !== lastOver) { lastOver = now; if (now) announce("That is more than a Fast Fix covers. We will send this to our team."); }
   }
 
-  /* Step 3: the recommended length, with a way to change it */
+  /* Step 3: the recommended length (members can not change it) */
   function updateRec() {
-    var rec = recommendedHours(), h = hours();
+    var h = hours();
     $("#rec-value").textContent = hoursText(h);
     if (FIND) setText($(".rec__label"), "Visit length");
-    var n = selectedJobs().length;
-    var lead = FIND ? (h === rec ? "Based on the jobs you selected. " : "You changed this from " + hoursText(rec) + ". ") : (h === rec ? "Recommended for the jobs you picked. " : "You changed this from the recommended " + hoursText(rec) + ". ");
-    $("#rec-meta").textContent = lead + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
-    $all('input[name="hours"]').forEach(function (r) { r.checked = +r.value === h; });
-    $all("[data-rec-for]").forEach(function (el) { el.hidden = +el.getAttribute("data-rec-for") !== rec; });
-    var note = $("#note-hours");
-    note.hidden = h >= rec;
-    $("#note-hours-text").textContent = h >= rec ? "" : (FIND ? "These jobs usually need about " + hoursText(rec) + ". " : "We recommend " + hoursText(rec) + " for these jobs. ") + "Booking " + hoursText(h) + " may not be enough, so your Home Manager might not finish everything.";
+    $("#rec-meta").textContent = (FIND ? "Based on the jobs you selected. " : "Based on the jobs you picked. ") + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
   }
 
   function updateChecksNotes() {
@@ -411,6 +455,31 @@
     Q.forEach(function (q) {
       $("#note-" + q).hidden = !isBad(q);
       $("#hint-" + q).textContent = (routed && !state[q] ? "Optional. " : "") + HINT[q];
+    });
+    koItems().forEach(function (k) { var n = $("#note-ko-" + k.key); if (n) n.hidden = state.ko[k.key] !== "no"; });
+  }
+  function renderKo() {
+    var box = $("#ko-box"), items = koItems();
+    box.innerHTML = "";
+    $("#ko-sec").hidden = items.length === 0;
+    items.forEach(function (k) {
+      var fs = el("fieldset"); fs.id = "fs-ko-" + k.key; fs.className = "ko";
+      var lg = el("legend", "t-strong", k.q);
+      var meta = el("p", "t-meta", "About: " + k.job.title);
+      var opts = el("div", "opts opts--2 opts--stack");
+      [["yes", "Yes"], ["no", "No"]].forEach(function (o) {
+        var lab = el("label", "opt"), inp = el("input"); inp.type = "radio"; inp.name = "ko-" + k.key; inp.value = o[0]; inp.checked = state.ko[k.key] === o[0];
+        var rd = el("span", "opt__radio"); rd.setAttribute("aria-hidden", "true");
+        lab.appendChild(inp); lab.appendChild(rd); lab.appendChild(el("span", "opt__title", o[1]));
+        opts.appendChild(lab);
+      });
+      var err = el("p", "error"); err.id = "err-ko-" + k.key; err.hidden = true; err.setAttribute("role", "alert");
+      err.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes or no.</span>';
+      var note = el("div", "note"); note.id = "note-ko-" + k.key; note.hidden = true; note.setAttribute("role", "status");
+      note.innerHTML = '<svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> We will send this to our team as a service request. You will not need to enter anything again.</span>';
+      fs.setAttribute("aria-describedby", "err-ko-" + k.key);
+      fs.appendChild(lg); fs.appendChild(meta); fs.appendChild(opts); fs.appendChild(err); fs.appendChild(note);
+      box.appendChild(fs);
     });
   }
 
@@ -420,7 +489,7 @@
     if (screen === "job") {
       return {
         label: overLimit() ? "Send to our team" : "Continue",
-        status: overLimit() ? "More than a Fast Fix covers" : n ? n + (n === 1 ? " job" : " jobs") + " selected" : ""
+        status: overLimit() ? "More than a Fast Fix covers" : n ? (FIND ? n + (n === 1 ? " job" : " jobs") + " selected" : n + " of " + MAX_TASKS + " jobs selected") : ""
       };
     }
     if (screen === "check") {
@@ -431,7 +500,7 @@
     }
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
-      var slot = state.date && state.time !== null ? shortDate(parse(state.date)) + " · " + range(state.time, hours()) : "Pick a date and a time";
+      var slot = state.date && state.time !== null ? shortDate(parse(state.date)) + " · " + t12(state.time) : "Pick a date and a time";
       return { label: noSlots ? "Send to our team" : "Confirm booking", status: noSlots ? "Ready to send" : slot };
     }
     return null;
@@ -475,13 +544,14 @@
     var showWhen = (s === "time") && state.date && state.time !== null;
     $("#s-when-row").hidden = !showWhen;
     if (showWhen) {
-      $("#s-when").textContent = shortDate(parse(state.date)) + " · " + range(state.time, hours());
+      $("#s-when").textContent = shortDate(parse(state.date)) + " · " + t12(state.time);
       $("#s-hm").textContent = "with " + h.hm;
     }
 
     var ans = [];
     if (s === "sent") {
       Q.forEach(function (q) { if (state[q]) ans.push([QNAME[q], QLABEL[q][state[q]]]); });
+      koItems().forEach(function (k) { if (state.ko[k.key]) ans.push([k.job.title, state.ko[k.key] === "yes" ? "Yes" : "No"]); });
     }
     $("#s-answers-row").hidden = ans.length === 0;
     $("#s-answers").innerHTML = ans.map(function (r) { return "<li><span>" + r[0] + "</span><span>" + r[1] + "</span></li>"; }).join("");
@@ -495,6 +565,7 @@
   }
 
   function refresh() {
+    updateSrFlag();
     updateOver();
     updateChecksNotes();
     if (state.screen === "time") updateRec();
@@ -519,7 +590,10 @@
       ["toilet-run", "lock", "light-fixture"].forEach(selectJob);
       state.hours = 0;
     }
-    if (screen === "time" || screen === "booked") { state.ladder = state.ladder || "yes"; state.trade = state.trade || "no"; state.part = state.part || "have"; }
+    if (screen === "time" || screen === "booked") {
+      state.ladder = state.ladder || "yes"; state.trade = state.trade || "yes"; state.part = state.part || "yes";
+      koItems().forEach(function (k) { state.ko[k.key] = state.ko[k.key] || "yes"; });
+    }
     if (screen === "sent" && !state.reason) { state.reason = "ladder"; state.ladder = "no"; }
     if (screen === "booked" && (!state.date || state.time === null)) {
       state.date = firstOpenDay();
@@ -540,7 +614,7 @@
 
   var firstRender = true;
   function render(screen) {
-    if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = "time"; navigate("sent"); return; }
+    if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = overReason(); navigate("sent"); return; }
     if (screen !== "type" && screen !== "describe" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
     if (screen === "booked" && (!state.date || state.time === null)) seedDemo(screen);
     if (screen === "sent" && !state.reason) seedDemo(screen);
@@ -581,6 +655,7 @@
     if (screen === "job") {
       renderJobsStep();
     }
+    if (screen === "check") renderKo();
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
       $("#rec").hidden = noSlots;
@@ -608,7 +683,7 @@
   function fillBooked() {
     var h = HOMES[state.home], d = parse(state.date);
     $("#b-date").textContent = longDate(d);
-    $("#b-time").textContent = range(state.time, hours()) + " · Central Time";
+    $("#b-time").textContent = t12(state.time) + " · Central Time";
     $("#b-addr").textContent = h.addr;
     $("#b-city").textContent = h.city;
     $("#b-jobs").textContent = selectedJobs().map(function (j) { return j.title; }).join(", ");
@@ -659,7 +734,18 @@
       $("#search").focus({ preventScroll: true });
       return true;
     }
-    if (state.jobs.other && !(state.notes.other || "").trim()) {
+    if (!FIND) {
+      var miss = selectedJobs().filter(function (j) { return (state.notes[j.id] || "").trim().length < 3; });
+      selectedJobs().forEach(function (j) { setError("note-" + j.id, miss.indexOf(j) > -1); });
+      if (miss.length) {
+        announce("Add a note for " + miss[0].title + (miss.length > 1 ? " and " + (miss.length - 1) + " more" : "") + ".");
+        var box0 = $("#pnote-" + miss[0].id);
+        box0.scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
+        box0.focus({ preventScroll: true });
+        return true;
+      }
+    }
+    if (FIND && state.jobs.other && !(state.notes.other || "").trim()) {
       state.det.other = true; renderSelected();
       setError("note-other", true);
       $("#pnote-other").scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
@@ -674,16 +760,20 @@
     if (s === "describe") { describeNext(); return; }
     if (s === "job") {
       if (jobsNext()) return;
-      if (overLimit()) { state.reason = "time"; navigate("sent"); return; }
+      if (overLimit()) { state.reason = overReason(); navigate("sent"); return; }
       navigate("check");
       return;
     }
     if (s === "check") {
       var bad2 = [];
       /* Once an answer sends the request to the team, the other questions stop blocking */
-      if (routedBy().length === 0) Q.forEach(function (q) { if (!state[q]) bad2.push(q); });
+      if (routedBy().length === 0) {
+        Q.forEach(function (q) { if (!state[q]) bad2.push(q); });
+        koItems().forEach(function (k) { if (!state.ko[k.key]) bad2.push("ko-" + k.key); });
+      }
       Q.forEach(function (q) { setError(q, bad2.indexOf(q) > -1); });
-      if (bad2.length) { focusFirst("#" + bad2[0] + "-opts input"); return; }
+      koItems().forEach(function (k) { setError("ko-" + k.key, bad2.indexOf("ko-" + k.key) > -1); });
+      if (bad2.length) { focusFirst(/^ko-/.test(bad2[0]) ? "#fs-" + bad2[0] + " input" : "#" + bad2[0] + "-opts input"); return; }
       var out = checkOutcome();
       if (out) { state.reason = out; navigate("sent"); return; }
       navigate("time");
@@ -699,7 +789,7 @@
       }
       if (body.classList.contains("is-taken")) {
         state.taken[state.date + "@" + state.time] = true;
-        var gone = range(state.time, hours());
+        var gone = t12(state.time);
         state.time = null;
         applySwitch("taken", false);
         renderCal(); renderTimes();
@@ -766,24 +856,27 @@
     var pick = t.closest("[data-home-pick]");
     if (pick) { pickHome(pick.getAttribute("data-home-pick")); return; }
 
-    if (t.closest("#rec-change")) {
-      var rc = $("#rec-change"), openRec = rc.getAttribute("aria-expanded") !== "true";
-      rc.setAttribute("aria-expanded", String(openRec));
-      $("[data-label]", rc).textContent = openRec ? "Done" : "Change";
-      $("#rec-options").hidden = !openRec;
-      return;
-    }
-
     {
       var dt = t.closest("[data-details-toggle]");
       if (dt) { toggleDetails(dt.getAttribute("data-details-toggle")); return; }
       var gb = t.closest("[data-grp]");
       if (gb) {
         var gid = gb.getAttribute("data-grp");
-        if (state.q.trim()) state.sc[gid] = !state.sc[gid]; else state.open[gid] = !state.open[gid];
+        if (state.q.trim()) state.sc[gid] = !state.sc[gid];
+        else {
+          var willOpen = !state.open[gid];
+          /* on a phone only one group is open at a time, so the page never grows without limit */
+          if (willOpen && !FIND && $(".app").getBoundingClientRect().width < 768) state.open = {};
+          state.open[gid] = willOpen;
+        }
         syncTree();
+        if (state.open[gid] && !FIND && $(".app").getBoundingClientRect().width < 768) gb.scrollIntoView({ block: "start", behavior: REDUCED ? "auto" : "smooth" });
         return;
       }
+      if (t.closest("[data-sr-link]")) { srAction(); return; }
+      if (t.closest("[data-sr-confirm]")) { state.srAfter = true; closeModal(); updateSrFlag(); announce("After you book, you can submit a service request for your other job."); return; }
+      if (t.closest("[data-sr-undo]")) { state.srAfter = false; updateSrFlag(); return; }
+      if (t.closest("[data-modal-close]")) { closeModal(); return; }
       if (t.closest("#search-clear")) { state.q = ""; state.sc = {}; $("#search").value = ""; syncTree(); $("#search").focus(); return; }
     }
 
@@ -834,13 +927,8 @@
   document.addEventListener("change", function (e) {
     var el = e.target;
     if (el.name === "jobs") { toggleJob(el.value, el.checked); return; }
-    else if (el.name === "hours") {
-      state.hours = +el.value === recommendedHours() ? 0 : +el.value;
-      state.time = null; state.date = firstOpenDay();
-      if (state.date) { var hd = parse(state.date); state.month = { y: hd.getFullYear(), m: hd.getMonth() }; }
-      renderCal(); renderTimes();
-    }
     else if (Q.indexOf(el.name) > -1) { state[el.name] = el.value; setError(el.name, false); }
+    else if (/^ko-/.test(el.name)) { state.ko[el.name.slice(3)] = el.value; setError(el.name, false); }
     else if (el.name === "slot") { state.time = +el.value; setError("time", false); }
     else if (el.hasAttribute("data-state-switch")) {
       var name = el.getAttribute("data-state-switch");
@@ -859,7 +947,12 @@
   });
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeMenus();
+    if (e.key === "Escape") { closeMenus(); if (!$("#sr-modal").hidden) closeModal(); }
+    if (e.key === "Tab" && !$("#sr-modal").hidden) {
+      var mb = modalEls(), first = mb[0], last = mb[mb.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
     if (FIND && e.target.id === "desc" && e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); describeNext(); }
     if (e.target.id === "search" && e.key === "Escape" && state.q) { state.q = ""; state.sc = {}; e.target.value = ""; syncTree(); }
     if (e.target.id === "search" && e.key === "Enter") e.preventDefault();
@@ -878,7 +971,7 @@
     $(".step.finder-only").remove();
     $("#pick-ui").appendChild($("#sel-sec"));
     setText($("#add-title label"), "Find your jobs");
-    setText($("#search-hint"), "Search by job or category, or open a category. Pick everything that applies.");
+    setText($("#search-hint"), "Search by job or category, or open a category. You can pick up to 4.");
   }
   applySwitch("multi", true);
   render(fromHash());

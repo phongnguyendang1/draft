@@ -862,7 +862,7 @@ body.variant-finder .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 body.variant-finder .opt__rec { display: none !important; }
 
 /* The sticky top bar must not hide a control that is tabbed to */
-html:has(body.variant-finder) { scroll-padding-top: 96px; }
+html { scroll-padding-top: 96px; }
 
 /* ---------- Mobile ---------- */
 @container app (max-width: 767px) {
@@ -876,6 +876,40 @@ html:has(body.variant-finder) { scroll-padding-top: 96px; }
   .grp__chev, body.variant-finder .opt, body.variant-finder .opt__box, body.variant-finder .textarea,
   body.variant-finder .chip, body.variant-finder .link { transition: none !important; }
 }
+
+/* ---------- Pick-it-yourself version ---------- */
+body.variant-finder .manual-only { display: none !important; }
+.opts--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Required note under each selected job */
+.job__box--req { padding: 0 var(--s-16) var(--s-16) calc(var(--s-16) + 40px + var(--s-12)); }
+.job__box--req .textarea { min-height: 88px; }
+
+/* Pointer to a service request when the job is not on the list */
+.sr-pointer { margin: var(--s-16) 0 0; }
+.sr-pointer .link, .search__none .link { min-height: 44px; }
+
+/* Per-task knockout questions on the quick check */
+.ko { margin: 0; }
+.ko + .ko { margin-top: var(--s-24); }
+.ko .t-meta { margin: var(--s-4) 0 0; }
+body.is-modal { overflow: hidden; }
+
+/* Modal: flat, no shadow */
+.modal { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: var(--s-16); }
+.modal[hidden] { display: none; }
+.modal__scrim { position: absolute; inset: 0; background: var(--ink); opacity: .5; }
+.modal__box { position: relative; width: 100%; max-width: 440px; padding: var(--s-24); border-radius: var(--r-card, 24px); background: var(--surface); }
+.modal__text { margin: var(--s-8) 0 0; }
+.modal__actions { display: flex; flex-direction: column; gap: var(--s-12); margin-top: var(--s-24); }
+.modal__actions .btn { width: 100%; height: 48px; }
+
+@container app (max-width: 767px) {
+  .job__box--req { padding-left: var(--s-16); }
+}
+
+/* Error text sits on a white chip inside the blue-tint card so red keeps its contrast */
+.job__box--req .error { background: var(--surface); padding: var(--s-8) var(--s-12); border-radius: var(--r-inner); }
 
 </style>
 </head>
@@ -1048,6 +1082,7 @@ html:has(body.variant-finder) { scroll-padding-top: 96px; }
               <div class="sel__head"><h2 class="t-strong" id="sel-title" tabindex="-1">Selected jobs</h2><span class="t-meta" id="sel-count"></span></div>
               <p class="picks__msg t-meta" id="sel-msg" hidden></p>
               <ul class="picks" id="sel"></ul>
+              <div class="note manual-only" id="sr-flag" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span>After you book, we’ll take you to a service request for your other job. <button class="link" type="button" data-sr-undo>Undo</button></span></div>
               <div class="note" id="note-over-sel" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.</span></div>
             </div>
             <div class="fsec">
@@ -1060,8 +1095,9 @@ html:has(body.variant-finder) { scroll-padding-top: 96px; }
               </div>
               <p class="error" id="err-sel" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Select at least one job.</span></p>
               <span class="sr-only" id="search-live" aria-live="polite"></span>
-              <p class="t-meta search__none" id="search-none" hidden>No jobs match that. Try another word, or clear the search.</p>
+              <p class="t-meta search__none" id="search-none" hidden>No jobs match that. Try another word, or clear the search.<span class="manual-only"> Still nothing? <button class="link" type="button" data-sr-link>Submit a service request</button></span></p>
               <div class="tree" id="tree"></div>
+              <p class="sr-pointer t-meta manual-only" id="sr-pointer">Can’t find your job? Fast Fix only covers the jobs listed here. <button class="link" type="button" data-sr-link>Submit a service request</button></p>
             </div>
           </div>
 
@@ -1089,30 +1125,33 @@ html:has(body.variant-finder) { scroll-padding-top: 96px; }
 
           <div class="fsec">
             <fieldset id="fs-trade" aria-describedby="hint-trade err-trade">
-              <legend class="t-strong">Does it involve gas, new wiring, or moving water lines?</legend>
+              <legend class="t-strong">Is the work only a swap or repair of what is already there, with no gas, new wiring or moved water lines?</legend>
               <p class="t-meta" id="hint-trade">Swapping a fixture is fine. Adding or relocating one is not.</p>
               <div class="opts opts--3 opts--stack" id="trade-opts">
-                <label class="opt"><input type="radio" name="trade" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No</span></label>
                 <label class="opt"><input type="radio" name="trade" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Yes</span></label>
+                <label class="opt"><input type="radio" name="trade" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No</span></label>
                 <label class="opt"><input type="radio" name="trade" value="unsure"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Not sure</span></label>
               </div>
-              <p class="error" id="err-trade" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose no, yes or not sure.</span></p>
+              <p class="error" id="err-trade" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes, no or not sure.</span></p>
               <div class="note" id="note-trade" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> Work like this can need a licensed trade, so we will send it to our team as a service request. You will not need to enter anything again.</span></div>
             </fieldset>
           </div>
 
           <div class="fsec">
             <fieldset id="fs-part" aria-describedby="hint-part err-part">
-              <legend class="t-strong">Do you already have the part or fixture, if one’s needed?</legend>
-              <p class="t-meta" id="hint-part">For example a new faucet, lock set or TV mount.</p>
-              <div class="opts opts--3 opts--stack" id="part-opts">
-                <label class="opt"><input type="radio" name="part" value="have"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Have it</span></label>
-                <label class="opt"><input type="radio" name="part" value="none"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No part needed</span></label>
-                <label class="opt"><input type="radio" name="part" value="need"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Need one</span></label>
+              <legend class="t-strong">Do you have the part or fixture, if the job needs one?</legend>
+              <p class="t-meta" id="hint-part">If the job needs no part, answer Yes. For example a new faucet, lock set or TV mount.</p>
+              <div class="opts opts--2 opts--stack" id="part-opts">
+                <label class="opt"><input type="radio" name="part" value="yes"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">Yes</span></label>
+                <label class="opt"><input type="radio" name="part" value="no"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">No</span></label>
               </div>
-              <p class="error" id="err-part" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose have it, no part needed or need one.</span></p>
+              <p class="error" id="err-part" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes or no.</span></p>
               <div class="note" id="note-part" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span><strong>No problem.</strong> We will send this to our team as a service request so they can plan the part. You will not need to enter anything again.</span></div>
             </fieldset>
+          </div>
+
+          <div class="fsec" id="ko-sec" hidden>
+            <div id="ko-box"></div>
           </div>
 
           <div class="factions">
@@ -1131,14 +1170,7 @@ html:has(body.variant-finder) { scroll-padding-top: 96px; }
                 <p class="rec__value" id="rec-value">2 hours</p>
                 <p class="t-meta" id="rec-meta"></p>
               </div>
-              <button class="link" type="button" id="rec-change" aria-expanded="false" aria-controls="rec-options"><span data-label>Change</span></button>
             </div>
-            <div class="opts opts--3" id="rec-options" role="radiogroup" aria-label="How long to book" hidden>
-              <label class="opt opt--dur"><input type="radio" name="hours" value="1"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>1 hour</span><span class="opt__meta">$55</span><span class="opt__rec" data-rec-for="1" hidden>Recommended</span></label>
-              <label class="opt opt--dur"><input type="radio" name="hours" value="2"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>2 hours</span><span class="opt__meta">$110</span><span class="opt__rec" data-rec-for="2" hidden>Recommended</span></label>
-              <label class="opt opt--dur"><input type="radio" name="hours" value="3"><span class="opt__title"><svg class="i opt__tick" aria-hidden="true"><use href="#ri-checkbox-circle-fill"/></svg>3 hours</span><span class="opt__meta">$165</span><span class="opt__rec" data-rec-for="3" hidden>Recommended</span></label>
-            </div>
-            <div class="note" id="note-hours" role="status" aria-live="polite" hidden><svg class="i"><use href="#ri-information-line"/></svg><span id="note-hours-text"></span></div>
           </div>
 
           <div class="book" id="book">
@@ -1181,6 +1213,7 @@ html:has(body.variant-finder) { scroll-padding-top: 96px; }
           </ul>
           <div class="result__actions">
             <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>
+            <a class="btn btn--secondary" href="#" id="b-sr" data-handoff="Service request" hidden>Submit a service request for your other job</a>
             <a class="link" href="#" data-toast="Added to your calendar">Add to calendar</a>
             <a class="link" href="#" data-toast="Opens Appointments">Reschedule or cancel</a>
           </div>
@@ -1196,6 +1229,7 @@ html:has(body.variant-finder) { scroll-padding-top: 96px; }
           <div class="note" role="note"><svg class="i"><use href="#ri-information-line"/></svg><span id="sent-why"></span></div>
           <div class="result__actions">
             <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>
+            <a class="btn btn--secondary" href="#" id="sent-sr" data-handoff="Service request" hidden>Submit a service request for your other job</a>
           </div>
         </section>
       </div>
@@ -1248,6 +1282,18 @@ html:has(body.variant-finder) { scroll-padding-top: 96px; }
   <div class="fdock" id="fdock" hidden>
     <p class="fdock__status" id="dock-status" aria-live="polite"></p>
     <button class="btn btn--primary btn--lg" type="button" data-next id="dock-btn">Continue</button>
+  </div>
+</div>
+
+<div class="modal" id="sr-modal" role="dialog" aria-modal="true" aria-labelledby="sr-modal-title" hidden>
+  <div class="modal__scrim" data-modal-close></div>
+  <div class="modal__box">
+    <h2 class="t-title" id="sr-modal-title">Can’t find your other job?</h2>
+    <p class="modal__text">Book the jobs you’ve picked first. When you’re done, we’ll take you to a service request for the rest.</p>
+    <div class="modal__actions">
+      <button class="btn btn--primary" type="button" data-sr-confirm>Book these first</button>
+      <button class="btn btn--secondary" type="button" data-modal-close>Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -1430,8 +1476,9 @@ var CATALOG = [
     var out = [];
     CATALOG.forEach(function (g) {
       g.jobs.forEach(function (t) {
-        out.push({ id: t[0], title: t[1], kw: t[2], min: t[3], icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
-          ex: "Example: how many, which room, or anything we should know." });
+        var o = Array.isArray(t) ? { id: t[0], title: t[1], kw: t[2], min: t[3] } : t;
+        out.push({ id: o.id, title: o.title, kw: o.kw, min: o.min, icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
+          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [] });
       });
     });
     return out;
@@ -1441,6 +1488,7 @@ var CATALOG = [
   JOBS.forEach(function (j) { JOB[j.id] = j; });
   var RATE = 55;
   var MAX_MIN = 180;
+  var MAX_TASKS = 4;   /* pick-it-yourself version: more than this goes to a service request */
   var TODAY = new Date(2026, 9, 13);
   var FIRST_DAY = new Date(2026, 9, 14);
   var LAST_MONTH = { y: 2027, m: 1 };
@@ -1451,8 +1499,8 @@ var CATALOG = [
   var SCREENS = ["type", "job", "check", "time", "booked", "sent"];
   var TITLES = {
     type: ["How can we help?", "Choose what fits best."],
-    job: ["What do you need done?", "Search, or open a category, and pick everything that applies. Adding details is optional."],
-    check: ["A quick check", "Three quick questions so we book the right visit. All are required."],
+    job: ["What do you need done?", "Search, or open a category, and pick up to 4 jobs. Add a short note to each."],
+    check: ["A quick check", "A few quick questions so we book the right visit. All are required."],
     time: ["Pick a time", "Real open times with your Home Manager. Your booking is confirmed right away."],
     booked: ["You’re booked", "Confirmed. Nothing else to do."],
     sent: ["Request sent", "Our team will take it from here."]
@@ -1475,27 +1523,29 @@ var CATALOG = [
     trade: "Work with gas, wiring or water lines can need a licensed trade, so our team will plan it.",
     part: "You still need the part, so our team will help plan it.",
     time: "These jobs add up to more than a Fast Fix covers, so our team will plan the visit.",
+    count: "You picked more than 4 jobs, so our team will plan the visit.",
+    ko: "One of your answers means our team should plan this visit.",
     slots: "We could not find an open time, so our team will find one for you."
   };
   /* Step 2: the vetting questions (Mark's wording). Any answer listed in BAD sends the request to the team. */
   var Q = ["ladder", "trade", "part"];
-  var BAD = { ladder: ["no", "unsure"], trade: ["yes", "unsure"], part: ["need"] };
+  var BAD = { ladder: ["no", "unsure"], trade: ["no", "unsure"], part: ["no"] };
   var HINT = {
     ladder: "Think roofs, second-story outsides and vaulted ceilings.",
     trade: "Swapping a fixture is fine. Adding or relocating one is not.",
-    part: "For example a new faucet, lock set or TV mount."
+    part: "If the job needs no part, answer Yes. For example a new faucet, lock set or TV mount."
   };
   var QNAME = { ladder: "Standard step ladder", trade: "Gas, wiring or water lines", part: "Part or fixture" };
   var QLABEL = {
     ladder: { yes: "Yes", no: "No, it’s higher", unsure: "Not sure" },
-    trade: { no: "No", yes: "Yes", unsure: "Not sure" },
-    part: { have: "Have it", none: "No part needed", need: "Need one" }
+    trade: { yes: "Yes", no: "No", unsure: "Not sure" },
+    part: { yes: "Yes", no: "No" }
   };
 
   /* ---------- State ---------- */
   var state = {
     screen: "type", home: "mueller", jobs: {}, order: [], notes: {}, showAll: false, hours: 0, ladder: "", trade: "", part: "",
-    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}
+    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false
   };
 
 
@@ -1568,7 +1618,7 @@ var CATALOG = [
     var jobs = selectedJobs(), list = $("#sel");
     list.innerHTML = "";
     if (!FIND) $("#sel-sec").hidden = jobs.length === 0;
-    setText($("#sel-count"), jobs.length ? jobs.length + " selected" : "");
+    setText($("#sel-count"), jobs.length ? (FIND ? jobs.length + " selected" : jobs.length + " of " + MAX_TASKS + " selected") : "");
     var msg = $("#sel-msg");
     msg.hidden = jobs.length > 0 || !state.msg;
     setText(msg, jobs.length ? "" : state.msg);
@@ -1580,6 +1630,20 @@ var CATALOG = [
       rm.setAttribute("aria-label", "Remove " + jb.title);
       rm.addEventListener("click", function () { toggleJob(jb.id, false, "sel-title"); });
       top.appendChild(icon(jb.icon)); top.appendChild(main); top.appendChild(rm);
+      if (!FIND) {
+        var req = el("div", "job__box job__box--req field"); req.id = "field-note-" + jb.id;
+        var rl = el("label"); rl.setAttribute("for", "pnote-" + jb.id);
+        rl.appendChild(document.createTextNode("Tell us more about " + jb.title + " ")); rl.appendChild(el("span", "", "(required)"));
+        var rt = el("textarea", "textarea"); rt.id = "pnote-" + jb.id; rt.rows = 3; rt.placeholder = jb.ex; rt.value = state.notes[jb.id] || "";
+        rt.setAttribute("data-note", jb.id); rt.setAttribute("aria-required", "true"); rt.setAttribute("aria-describedby", "err-note-" + jb.id);
+        var re = el("p", "error"); re.id = "err-note-" + jb.id; re.hidden = true; re.setAttribute("role", "alert");
+        re.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span></span>';
+        re.lastChild.textContent = "Add a few words about this job so your Home Manager knows what to expect.";
+        req.appendChild(rl); req.appendChild(rt); req.appendChild(re);
+        li.appendChild(top); li.appendChild(req);
+        list.appendChild(li);
+        return;
+      }
       var more = el("div", "job__more"), open = !!state.det[jb.id], has = !!(state.notes[jb.id] || "").trim();
       var tog = el("button", "link", open ? "Hide details" : (has ? "Edit details (optional)" : "Add details (optional)")); tog.type = "button";
       tog.setAttribute("data-details-toggle", jb.id); tog.setAttribute("aria-expanded", String(open)); tog.setAttribute("aria-controls", "pbox-" + jb.id);
@@ -1673,6 +1737,27 @@ var CATALOG = [
     setText($("#search-live"), toks.length ? (any ? total + (total === 1 ? " job" : " jobs") + " found" : "No jobs found") : "");
   }
 
+  /* ----- "I can not find my job": point to a service request; if jobs are already picked, finish booking first ----- */
+  var lastFocus = null;
+  function srAction() {
+    if (selectedJobs().length) openModal(); else toast("Continues in the current service request flow");
+  }
+  function modalEls() { return $all("#sr-modal button"); }
+  function openModal() {
+    lastFocus = document.activeElement;
+    $("#sr-modal").hidden = false; body.classList.add("is-modal");
+    $("[data-sr-confirm]").focus();
+  }
+  function closeModal() {
+    $("#sr-modal").hidden = true; body.classList.remove("is-modal");
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  function updateSrFlag() {
+    $("#sr-flag").hidden = !state.srAfter;
+    $("#b-sr").hidden = !state.srAfter;
+    $("#sent-sr").hidden = !state.srAfter;
+  }
+
   /* ----- one place for every add / remove ----- */
   function toggleJob(id, on, focusId) {
     if (on) selectJob(id); else unselectJob(id);
@@ -1715,11 +1800,20 @@ var CATALOG = [
     return state.order.filter(function (id) { return state.jobs[id]; }).map(function (id) { return JOB[id]; });
   }
   function totalMin() { return selectedJobs().reduce(function (s, j) { return s + j.min; }, 0); }
-  function overLimit() { return totalMin() > MAX_MIN; }
+  function overCount() { return !FIND && selectedJobs().length > MAX_TASKS; }
+  function overLimit() { return overCount() || totalMin() > MAX_MIN; }
+  function overReason() { return overCount() ? "count" : "time"; }
   /* Recommended booking length: what the picked jobs add up to, rounded up to a whole hour, 1 to 3 */
   function recommendedHours() { return Math.min(3, Math.max(1, Math.ceil(totalMin() / 60))); }
   function isBad(q) { return BAD[q].indexOf(state[q]) > -1; }
-  function routedBy() { return Q.filter(isBad); }
+  /* Per-task knockout questions (placeholder copy): every question is worded so Yes is the right answer */
+  function koItems() {
+    var out = [];
+    selectedJobs().forEach(function (jb) { (jb.ko || []).forEach(function (q, i) { out.push({ key: jb.id + "-" + i, job: jb, q: q }); }); });
+    return out;
+  }
+  function koBad() { return koItems().filter(function (k) { return state.ko[k.key] === "no"; }); }
+  function routedBy() { return Q.filter(isBad).concat(koBad().length ? ["ko"] : []); }
   function checkOutcome() { var r = routedBy(); return r.length ? r[0] : ""; }
   function hours() { return state.hours || recommendedHours(); }
   function hoursText(h) { return h + (h === 1 ? " hour" : " hours"); }
@@ -1785,10 +1879,10 @@ var CATALOG = [
       return;
     }
     var d = parse(state.date);
-    meta.textContent = "Open times on " + longDate(d) + ". Times are in Central Time.";
+    meta.textContent = "Open times on " + longDate(d) + ". Visit length: " + hoursText(hours()) + ". Times are in Central Time.";
     box.innerHTML = slotsFor(state.date).map(function (s) {
       return '<label class="time"><input type="radio" name="slot" value="' + s + '"' + (state.time === s ? " checked" : "") + '>' +
-        '<span>' + range(s, hours()) + '</span><svg class="i" aria-hidden="true"><use href="#ri-check-line"/></svg></label>';
+        '<span>' + t12(s) + '</span><svg class="i" aria-hidden="true"><use href="#ri-check-line"/></svg></label>';
     }).join("");
   }
 
@@ -1797,22 +1891,18 @@ var CATALOG = [
   function updateOver() {
     var now = overLimit();
     $("#note-over-sel").hidden = !now;
+    if (now) $("#note-over-sel span").innerHTML = overCount()
+      ? "<strong>That’s more than 4 jobs.</strong> To book a time now, keep it to 4 jobs or fewer. Otherwise we’ll send this to our team as a service request, and you won’t need to enter anything else."
+      : "<strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.";
     if (now !== lastOver) { lastOver = now; if (now) announce("That is more than a Fast Fix covers. We will send this to our team."); }
   }
 
-  /* Step 3: the recommended length, with a way to change it */
+  /* Step 3: the recommended length (members can not change it) */
   function updateRec() {
-    var rec = recommendedHours(), h = hours();
+    var h = hours();
     $("#rec-value").textContent = hoursText(h);
     if (FIND) setText($(".rec__label"), "Visit length");
-    var n = selectedJobs().length;
-    var lead = FIND ? (h === rec ? "Based on the jobs you selected. " : "You changed this from " + hoursText(rec) + ". ") : (h === rec ? "Recommended for the jobs you picked. " : "You changed this from the recommended " + hoursText(rec) + ". ");
-    $("#rec-meta").textContent = lead + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
-    $all('input[name="hours"]').forEach(function (r) { r.checked = +r.value === h; });
-    $all("[data-rec-for]").forEach(function (el) { el.hidden = +el.getAttribute("data-rec-for") !== rec; });
-    var note = $("#note-hours");
-    note.hidden = h >= rec;
-    $("#note-hours-text").textContent = h >= rec ? "" : (FIND ? "These jobs usually need about " + hoursText(rec) + ". " : "We recommend " + hoursText(rec) + " for these jobs. ") + "Booking " + hoursText(h) + " may not be enough, so your Home Manager might not finish everything.";
+    $("#rec-meta").textContent = (FIND ? "Based on the jobs you selected. " : "Based on the jobs you picked. ") + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
   }
 
   function updateChecksNotes() {
@@ -1820,6 +1910,31 @@ var CATALOG = [
     Q.forEach(function (q) {
       $("#note-" + q).hidden = !isBad(q);
       $("#hint-" + q).textContent = (routed && !state[q] ? "Optional. " : "") + HINT[q];
+    });
+    koItems().forEach(function (k) { var n = $("#note-ko-" + k.key); if (n) n.hidden = state.ko[k.key] !== "no"; });
+  }
+  function renderKo() {
+    var box = $("#ko-box"), items = koItems();
+    box.innerHTML = "";
+    $("#ko-sec").hidden = items.length === 0;
+    items.forEach(function (k) {
+      var fs = el("fieldset"); fs.id = "fs-ko-" + k.key; fs.className = "ko";
+      var lg = el("legend", "t-strong", k.q);
+      var meta = el("p", "t-meta", "About: " + k.job.title);
+      var opts = el("div", "opts opts--2 opts--stack");
+      [["yes", "Yes"], ["no", "No"]].forEach(function (o) {
+        var lab = el("label", "opt"), inp = el("input"); inp.type = "radio"; inp.name = "ko-" + k.key; inp.value = o[0]; inp.checked = state.ko[k.key] === o[0];
+        var rd = el("span", "opt__radio"); rd.setAttribute("aria-hidden", "true");
+        lab.appendChild(inp); lab.appendChild(rd); lab.appendChild(el("span", "opt__title", o[1]));
+        opts.appendChild(lab);
+      });
+      var err = el("p", "error"); err.id = "err-ko-" + k.key; err.hidden = true; err.setAttribute("role", "alert");
+      err.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes or no.</span>';
+      var note = el("div", "note"); note.id = "note-ko-" + k.key; note.hidden = true; note.setAttribute("role", "status");
+      note.innerHTML = '<svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> We will send this to our team as a service request. You will not need to enter anything again.</span>';
+      fs.setAttribute("aria-describedby", "err-ko-" + k.key);
+      fs.appendChild(lg); fs.appendChild(meta); fs.appendChild(opts); fs.appendChild(err); fs.appendChild(note);
+      box.appendChild(fs);
     });
   }
 
@@ -1829,7 +1944,7 @@ var CATALOG = [
     if (screen === "job") {
       return {
         label: overLimit() ? "Send to our team" : "Continue",
-        status: overLimit() ? "More than a Fast Fix covers" : n ? n + (n === 1 ? " job" : " jobs") + " selected" : ""
+        status: overLimit() ? "More than a Fast Fix covers" : n ? (FIND ? n + (n === 1 ? " job" : " jobs") + " selected" : n + " of " + MAX_TASKS + " jobs selected") : ""
       };
     }
     if (screen === "check") {
@@ -1840,7 +1955,7 @@ var CATALOG = [
     }
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
-      var slot = state.date && state.time !== null ? shortDate(parse(state.date)) + " · " + range(state.time, hours()) : "Pick a date and a time";
+      var slot = state.date && state.time !== null ? shortDate(parse(state.date)) + " · " + t12(state.time) : "Pick a date and a time";
       return { label: noSlots ? "Send to our team" : "Confirm booking", status: noSlots ? "Ready to send" : slot };
     }
     return null;
@@ -1884,13 +1999,14 @@ var CATALOG = [
     var showWhen = (s === "time") && state.date && state.time !== null;
     $("#s-when-row").hidden = !showWhen;
     if (showWhen) {
-      $("#s-when").textContent = shortDate(parse(state.date)) + " · " + range(state.time, hours());
+      $("#s-when").textContent = shortDate(parse(state.date)) + " · " + t12(state.time);
       $("#s-hm").textContent = "with " + h.hm;
     }
 
     var ans = [];
     if (s === "sent") {
       Q.forEach(function (q) { if (state[q]) ans.push([QNAME[q], QLABEL[q][state[q]]]); });
+      koItems().forEach(function (k) { if (state.ko[k.key]) ans.push([k.job.title, state.ko[k.key] === "yes" ? "Yes" : "No"]); });
     }
     $("#s-answers-row").hidden = ans.length === 0;
     $("#s-answers").innerHTML = ans.map(function (r) { return "<li><span>" + r[0] + "</span><span>" + r[1] + "</span></li>"; }).join("");
@@ -1904,6 +2020,7 @@ var CATALOG = [
   }
 
   function refresh() {
+    updateSrFlag();
     updateOver();
     updateChecksNotes();
     if (state.screen === "time") updateRec();
@@ -1928,7 +2045,10 @@ var CATALOG = [
       ["toilet-run", "lock", "light-fixture"].forEach(selectJob);
       state.hours = 0;
     }
-    if (screen === "time" || screen === "booked") { state.ladder = state.ladder || "yes"; state.trade = state.trade || "no"; state.part = state.part || "have"; }
+    if (screen === "time" || screen === "booked") {
+      state.ladder = state.ladder || "yes"; state.trade = state.trade || "yes"; state.part = state.part || "yes";
+      koItems().forEach(function (k) { state.ko[k.key] = state.ko[k.key] || "yes"; });
+    }
     if (screen === "sent" && !state.reason) { state.reason = "ladder"; state.ladder = "no"; }
     if (screen === "booked" && (!state.date || state.time === null)) {
       state.date = firstOpenDay();
@@ -1949,7 +2069,7 @@ var CATALOG = [
 
   var firstRender = true;
   function render(screen) {
-    if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = "time"; navigate("sent"); return; }
+    if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = overReason(); navigate("sent"); return; }
     if (screen !== "type" && screen !== "describe" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
     if (screen === "booked" && (!state.date || state.time === null)) seedDemo(screen);
     if (screen === "sent" && !state.reason) seedDemo(screen);
@@ -1990,6 +2110,7 @@ var CATALOG = [
     if (screen === "job") {
       renderJobsStep();
     }
+    if (screen === "check") renderKo();
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
       $("#rec").hidden = noSlots;
@@ -2017,7 +2138,7 @@ var CATALOG = [
   function fillBooked() {
     var h = HOMES[state.home], d = parse(state.date);
     $("#b-date").textContent = longDate(d);
-    $("#b-time").textContent = range(state.time, hours()) + " · Central Time";
+    $("#b-time").textContent = t12(state.time) + " · Central Time";
     $("#b-addr").textContent = h.addr;
     $("#b-city").textContent = h.city;
     $("#b-jobs").textContent = selectedJobs().map(function (j) { return j.title; }).join(", ");
@@ -2068,7 +2189,18 @@ var CATALOG = [
       $("#search").focus({ preventScroll: true });
       return true;
     }
-    if (state.jobs.other && !(state.notes.other || "").trim()) {
+    if (!FIND) {
+      var miss = selectedJobs().filter(function (j) { return (state.notes[j.id] || "").trim().length < 3; });
+      selectedJobs().forEach(function (j) { setError("note-" + j.id, miss.indexOf(j) > -1); });
+      if (miss.length) {
+        announce("Add a note for " + miss[0].title + (miss.length > 1 ? " and " + (miss.length - 1) + " more" : "") + ".");
+        var box0 = $("#pnote-" + miss[0].id);
+        box0.scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
+        box0.focus({ preventScroll: true });
+        return true;
+      }
+    }
+    if (FIND && state.jobs.other && !(state.notes.other || "").trim()) {
       state.det.other = true; renderSelected();
       setError("note-other", true);
       $("#pnote-other").scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
@@ -2083,16 +2215,20 @@ var CATALOG = [
     if (s === "describe") { describeNext(); return; }
     if (s === "job") {
       if (jobsNext()) return;
-      if (overLimit()) { state.reason = "time"; navigate("sent"); return; }
+      if (overLimit()) { state.reason = overReason(); navigate("sent"); return; }
       navigate("check");
       return;
     }
     if (s === "check") {
       var bad2 = [];
       /* Once an answer sends the request to the team, the other questions stop blocking */
-      if (routedBy().length === 0) Q.forEach(function (q) { if (!state[q]) bad2.push(q); });
+      if (routedBy().length === 0) {
+        Q.forEach(function (q) { if (!state[q]) bad2.push(q); });
+        koItems().forEach(function (k) { if (!state.ko[k.key]) bad2.push("ko-" + k.key); });
+      }
       Q.forEach(function (q) { setError(q, bad2.indexOf(q) > -1); });
-      if (bad2.length) { focusFirst("#" + bad2[0] + "-opts input"); return; }
+      koItems().forEach(function (k) { setError("ko-" + k.key, bad2.indexOf("ko-" + k.key) > -1); });
+      if (bad2.length) { focusFirst(/^ko-/.test(bad2[0]) ? "#fs-" + bad2[0] + " input" : "#" + bad2[0] + "-opts input"); return; }
       var out = checkOutcome();
       if (out) { state.reason = out; navigate("sent"); return; }
       navigate("time");
@@ -2108,7 +2244,7 @@ var CATALOG = [
       }
       if (body.classList.contains("is-taken")) {
         state.taken[state.date + "@" + state.time] = true;
-        var gone = range(state.time, hours());
+        var gone = t12(state.time);
         state.time = null;
         applySwitch("taken", false);
         renderCal(); renderTimes();
@@ -2175,24 +2311,27 @@ var CATALOG = [
     var pick = t.closest("[data-home-pick]");
     if (pick) { pickHome(pick.getAttribute("data-home-pick")); return; }
 
-    if (t.closest("#rec-change")) {
-      var rc = $("#rec-change"), openRec = rc.getAttribute("aria-expanded") !== "true";
-      rc.setAttribute("aria-expanded", String(openRec));
-      $("[data-label]", rc).textContent = openRec ? "Done" : "Change";
-      $("#rec-options").hidden = !openRec;
-      return;
-    }
-
     {
       var dt = t.closest("[data-details-toggle]");
       if (dt) { toggleDetails(dt.getAttribute("data-details-toggle")); return; }
       var gb = t.closest("[data-grp]");
       if (gb) {
         var gid = gb.getAttribute("data-grp");
-        if (state.q.trim()) state.sc[gid] = !state.sc[gid]; else state.open[gid] = !state.open[gid];
+        if (state.q.trim()) state.sc[gid] = !state.sc[gid];
+        else {
+          var willOpen = !state.open[gid];
+          /* on a phone only one group is open at a time, so the page never grows without limit */
+          if (willOpen && !FIND && $(".app").getBoundingClientRect().width < 768) state.open = {};
+          state.open[gid] = willOpen;
+        }
         syncTree();
+        if (state.open[gid] && !FIND && $(".app").getBoundingClientRect().width < 768) gb.scrollIntoView({ block: "start", behavior: REDUCED ? "auto" : "smooth" });
         return;
       }
+      if (t.closest("[data-sr-link]")) { srAction(); return; }
+      if (t.closest("[data-sr-confirm]")) { state.srAfter = true; closeModal(); updateSrFlag(); announce("After you book, you can submit a service request for your other job."); return; }
+      if (t.closest("[data-sr-undo]")) { state.srAfter = false; updateSrFlag(); return; }
+      if (t.closest("[data-modal-close]")) { closeModal(); return; }
       if (t.closest("#search-clear")) { state.q = ""; state.sc = {}; $("#search").value = ""; syncTree(); $("#search").focus(); return; }
     }
 
@@ -2243,13 +2382,8 @@ var CATALOG = [
   document.addEventListener("change", function (e) {
     var el = e.target;
     if (el.name === "jobs") { toggleJob(el.value, el.checked); return; }
-    else if (el.name === "hours") {
-      state.hours = +el.value === recommendedHours() ? 0 : +el.value;
-      state.time = null; state.date = firstOpenDay();
-      if (state.date) { var hd = parse(state.date); state.month = { y: hd.getFullYear(), m: hd.getMonth() }; }
-      renderCal(); renderTimes();
-    }
     else if (Q.indexOf(el.name) > -1) { state[el.name] = el.value; setError(el.name, false); }
+    else if (/^ko-/.test(el.name)) { state.ko[el.name.slice(3)] = el.value; setError(el.name, false); }
     else if (el.name === "slot") { state.time = +el.value; setError("time", false); }
     else if (el.hasAttribute("data-state-switch")) {
       var name = el.getAttribute("data-state-switch");
@@ -2268,7 +2402,12 @@ var CATALOG = [
   });
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeMenus();
+    if (e.key === "Escape") { closeMenus(); if (!$("#sr-modal").hidden) closeModal(); }
+    if (e.key === "Tab" && !$("#sr-modal").hidden) {
+      var mb = modalEls(), first = mb[0], last = mb[mb.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
     if (FIND && e.target.id === "desc" && e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); describeNext(); }
     if (e.target.id === "search" && e.key === "Escape" && state.q) { state.q = ""; state.sc = {}; e.target.value = ""; syncTree(); }
     if (e.target.id === "search" && e.key === "Enter") e.preventDefault();
@@ -2287,7 +2426,7 @@ var CATALOG = [
     $(".step.finder-only").remove();
     $("#pick-ui").appendChild($("#sel-sec"));
     setText($("#add-title label"), "Find your jobs");
-    setText($("#search-hint"), "Search by job or category, or open a category. Pick everything that applies.");
+    setText($("#search-hint"), "Search by job or category, or open a category. You can pick up to 4.");
   }
   applySwitch("multi", true);
   render(fromHash());

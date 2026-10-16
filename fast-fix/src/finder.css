@@ -85,7 +85,7 @@ body.variant-finder .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 body.variant-finder .opt__rec { display: none !important; }
 
 /* The sticky top bar must not hide a control that is tabbed to */
-html:has(body.variant-finder) { scroll-padding-top: 96px; }
+html { scroll-padding-top: 96px; }
 
 /* ---------- Mobile ---------- */
 @container app (max-width: 767px) {
@@ -99,3 +99,37 @@ html:has(body.variant-finder) { scroll-padding-top: 96px; }
   .grp__chev, body.variant-finder .opt, body.variant-finder .opt__box, body.variant-finder .textarea,
   body.variant-finder .chip, body.variant-finder .link { transition: none !important; }
 }
+
+/* ---------- Pick-it-yourself version ---------- */
+body.variant-finder .manual-only { display: none !important; }
+.opts--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Required note under each selected job */
+.job__box--req { padding: 0 var(--s-16) var(--s-16) calc(var(--s-16) + 40px + var(--s-12)); }
+.job__box--req .textarea { min-height: 88px; }
+
+/* Pointer to a service request when the job is not on the list */
+.sr-pointer { margin: var(--s-16) 0 0; }
+.sr-pointer .link, .search__none .link { min-height: 44px; }
+
+/* Per-task knockout questions on the quick check */
+.ko { margin: 0; }
+.ko + .ko { margin-top: var(--s-24); }
+.ko .t-meta { margin: var(--s-4) 0 0; }
+body.is-modal { overflow: hidden; }
+
+/* Modal: flat, no shadow */
+.modal { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: var(--s-16); }
+.modal[hidden] { display: none; }
+.modal__scrim { position: absolute; inset: 0; background: var(--ink); opacity: .5; }
+.modal__box { position: relative; width: 100%; max-width: 440px; padding: var(--s-24); border-radius: var(--r-card, 24px); background: var(--surface); }
+.modal__text { margin: var(--s-8) 0 0; }
+.modal__actions { display: flex; flex-direction: column; gap: var(--s-12); margin-top: var(--s-24); }
+.modal__actions .btn { width: 100%; height: 48px; }
+
+@container app (max-width: 767px) {
+  .job__box--req { padding-left: var(--s-16); }
+}
+
+/* Error text sits on a white chip inside the blue-tint card so red keeps its contrast */
+.job__box--req .error { background: var(--surface); padding: var(--s-8) var(--s-12); border-radius: var(--r-inner); }
