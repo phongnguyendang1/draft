@@ -1,0 +1,1506 @@
+<title>Consultation Proposal Flow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600&display=swap">
+
+<style>
+/* Layout: sticky control bar → swimlane map (systems × steps) → step header → [system screen | step notes] → sticky prev/next bar.
+   House style follows the existing PreFix prototypes (IBM Plex, teal accent). Each system gets an identity color from a validated categorical order. */
+:root{
+  --ground:#F4F6F5; --surface:#FFFFFF; --surface-2:#FAFBFA; --surface-sunk:#EDF1F0;
+  --ink:#16211F; --ink-2:#3E4B48; --muted:#5D6B68; --line:#DCE3E1; --line-strong:#C3CECB;
+  --accent:#0F5257; --accent-ink:#0B3D41; --accent-soft:#E2EEED; --on-accent:#FFFFFF;
+  --ok:#17673F; --ok-soft:#E3F1E8; --ok-line:#B6D8C4;
+  --warn:#8A5200; --warn-soft:#FAEEDA; --warn-line:#E7CFA2;
+  --bad:#A4262C; --bad-soft:#FBE9E9; --bad-line:#EDC4C4;
+  --scrim:rgba(9,16,15,.46);
+  --shadow:0 1px 2px rgba(22,33,31,.05),0 8px 24px -12px rgba(22,33,31,.18);
+  --shadow-lift:0 2px 4px rgba(22,33,31,.06),0 24px 48px -20px rgba(22,33,31,.30);
+
+  /* system identity (categorical slots 1–7, fixed order) */
+  --c-hh:#2a78d6; --c-em:#eb6834; --c-pr:#1baf7a; --c-zd:#eda100; --c-op:#e87ba4; --c-hm:#008300; --c-mb:#6250d6;
+  --series-1:#2a78d6;
+
+  /* Django Admin look */
+  --dj-head:#417690; --dj-head-ink:#F5DD5D; --dj-crumb:#79AEC8; --dj-on:#FFFFFF; --dj-link:#2F6C8B; --dj-sel:#FFFBD6; --dj-msg:#DFF0D8; --dj-msg-ink:#2E5A2A;
+  /* Zendesk-ish rail */
+  --zd-rail:#1E3B33; --zd-rail-ink:#CFE0DA; --zd-note:#FFF6E0; --zd-note-line:#EBD39A;
+  /* device */
+  --bezel:#1B2321; --bezel-hi:#3A4542;
+  --hot:#0F5257;
+
+  --f-sans:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --f-serif:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --f-dj:"Segoe UI",system-ui,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0E1413; --surface:#161E1D; --surface-2:#1B2423; --surface-sunk:#111917;
+  --ink:#E9EEEC; --ink-2:#C2CDCA; --muted:#8D9C99; --line:#283432; --line-strong:#3A4846;
+  --accent:#63BDB4; --accent-ink:#8FD4CC; --accent-soft:#17302F; --on-accent:#08201F;
+  --ok:#6BC894; --ok-soft:#132A20; --ok-line:#28503C;
+  --warn:#E0A85B; --warn-soft:#2C2213; --warn-line:#54401F;
+  --bad:#F08A8A; --bad-soft:#2C1817; --bad-line:#592E2E;
+  --scrim:rgba(0,0,0,.6);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  --shadow-lift:0 2px 4px rgba(0,0,0,.5),0 24px 48px -20px rgba(0,0,0,.8);
+  --c-hh:#3987e5; --c-em:#d95926; --c-pr:#199e70; --c-zd:#c98500; --c-op:#d55181; --c-hm:#008300; --c-mb:#9085e9;
+  --series-1:#3987e5;
+  --dj-head:#264B5D; --dj-head-ink:#F5DD5D; --dj-crumb:#2F5E75; --dj-on:#F2F6F8; --dj-link:#81C6E8; --dj-sel:#33331C; --dj-msg:#1D3320; --dj-msg-ink:#A8DDA0;
+  --zd-rail:#0B1714; --zd-rail-ink:#9FBFB4; --zd-note:#2C2413; --zd-note-line:#54401F;
+  --bezel:#050807; --bezel-hi:#2A3330;
+  --hot:#63BDB4;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --ground:#0E1413; --surface:#161E1D; --surface-2:#1B2423; --surface-sunk:#111917;
+  --ink:#E9EEEC; --ink-2:#C2CDCA; --muted:#8D9C99; --line:#283432; --line-strong:#3A4846;
+  --accent:#63BDB4; --accent-ink:#8FD4CC; --accent-soft:#17302F; --on-accent:#08201F;
+  --ok:#6BC894; --ok-soft:#132A20; --ok-line:#28503C;
+  --warn:#E0A85B; --warn-soft:#2C2213; --warn-line:#54401F;
+  --bad:#F08A8A; --bad-soft:#2C1817; --bad-line:#592E2E;
+  --scrim:rgba(0,0,0,.6);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  --shadow-lift:0 2px 4px rgba(0,0,0,.5),0 24px 48px -20px rgba(0,0,0,.8);
+  --c-hh:#3987e5; --c-em:#d95926; --c-pr:#199e70; --c-zd:#c98500; --c-op:#d55181; --c-hm:#008300; --c-mb:#9085e9;
+  --series-1:#3987e5;
+  --dj-head:#264B5D; --dj-head-ink:#F5DD5D; --dj-crumb:#2F5E75; --dj-on:#F2F6F8; --dj-link:#81C6E8; --dj-sel:#33331C; --dj-msg:#1D3320; --dj-msg-ink:#A8DDA0;
+  --zd-rail:#0B1714; --zd-rail-ink:#9FBFB4; --zd-note:#2C2413; --zd-note-line:#54401F;
+  --bezel:#050807; --bezel-hi:#2A3330;
+  --hot:#63BDB4;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+h1,h2,h3,h4{text-wrap:balance}
+.in{max-width:1340px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.lbl{font:500 10px/1.3 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- buttons, pills, tags ---------- */
+.btn{appearance:none;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:8px;padding:7px 13px;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:7px;line-height:1.3}
+.btn:hover{border-color:var(--muted)}
+.btn--pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:500}
+.btn--pri:hover{background:var(--accent-ink);border-color:var(--accent-ink)}
+.btn--lg{padding:11px 20px;font-size:14.5px}
+.btn--ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn--ghost:hover{color:var(--ink);border-color:var(--line-strong)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;border-radius:20px;padding:2px 9px;border:1px solid var(--line);color:var(--muted);background:var(--surface-2);white-space:nowrap}
+.pill--ok{color:var(--ok);border-color:var(--ok-line);background:var(--ok-soft)}
+.pill--warn{color:var(--warn);border-color:var(--warn-line);background:var(--warn-soft)}
+.pill--bad{color:var(--bad);border-color:var(--bad-line);background:var(--bad-soft)}
+.pill--acc{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-soft)}
+.newtag{display:inline-block;font:600 9.5px/1.4 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);border:1px dashed var(--accent);border-radius:4px;padding:0 5px;vertical-align:2px;white-space:nowrap}
+.hot{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--hot)}
+@media (prefers-reduced-motion:no-preference){.hot{animation:hotpulse 1.9s ease-in-out infinite}}
+@keyframes hotpulse{0%,100%{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--hot)}50%{box-shadow:0 0 0 3px var(--surface),0 0 0 9px color-mix(in srgb,var(--hot) 22%,transparent)}}
+body.nohot .hot{animation:none;box-shadow:none}
+
+/* ---------- top bar ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .in{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand .mk{width:24px;height:24px;border-radius:7px;background:var(--accent);flex:none;position:relative}
+.brand .mk::after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--on-accent)}
+.brand b{display:block;font-weight:600;letter-spacing:-.01em;font-size:14.5px;line-height:1.2}
+.brand .lbl{margin-top:2px}
+.ctrls{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;margin-left:auto}
+.ctl{display:flex;align-items:center;gap:8px}
+.seg{display:flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{appearance:none;border:0;background:transparent;padding:6px 11px;cursor:pointer;font-size:12.5px;color:var(--muted);border-right:1px solid var(--line);white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:500}
+.seg button small{font-family:var(--f-mono);font-size:10.5px;opacity:.8;margin-left:5px}
+.toggle{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2);cursor:pointer;background:none;border:0;padding:4px}
+.toggle .box{width:28px;height:16px;border-radius:10px;background:var(--line-strong);position:relative;flex:none;transition:background .15s}
+.toggle .box::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--surface);transition:transform .15s}
+.toggle[aria-pressed="true"] .box{background:var(--accent)}
+.toggle[aria-pressed="true"] .box::after{transform:translateX(12px)}
+@media (max-width:720px){.top{position:static}.ctrls{margin-left:0;width:100%}.ctl .lbl{display:none}}
+
+/* ---------- swimlane map ---------- */
+.mapband{background:var(--surface);border-bottom:1px solid var(--line)}
+.maphead{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;padding-block:9px 2px}
+.maphead p{margin:0;font-size:12.5px;color:var(--muted);flex:1;min-width:240px}
+.maphead p b{color:var(--ink-2);font-weight:600}
+.mapscroll{overflow-x:auto;padding-block:4px 12px}
+.mapscroll svg{display:block}
+.mapscroll svg text{font-family:var(--f-mono)}
+.mnode{cursor:pointer}
+.mnode:focus{outline:none}
+.mnode:focus-visible .ring{stroke:var(--accent);stroke-width:2.5}
+
+/* ---------- step header ---------- */
+.head{display:flex;flex-direction:column;gap:9px;padding-block:22px 16px;scroll-margin-top:86px}
+.sysline{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+.sysbadge{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line-strong);background:var(--surface);border-radius:99px;padding:5px 13px 5px 7px;box-shadow:var(--shadow)}
+.sysbadge .sw{width:20px;height:20px;border-radius:50%;background:var(--c);flex:none;box-shadow:inset 0 0 0 3px var(--surface)}
+.sysbadge b{font-size:14px;font-weight:600}
+.sysbadge span{font-size:12.5px;color:var(--muted)}
+.handoff{font:500 11px var(--f-mono);color:var(--muted);display:inline-flex;gap:7px;align-items:center;flex-wrap:wrap}
+.handoff i{width:8px;height:8px;border-radius:50%;background:var(--c);display:inline-block}
+.handoff .arr{color:var(--line-strong)}
+.stepno{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.head h1{font-family:var(--f-serif);font-weight:500;font-size:clamp(22px,2.6vw,30px);line-height:1.2;margin:0;letter-spacing:-.012em;max-width:36ch}
+.actor{margin:0;font-size:13px;color:var(--ink-2);display:flex;align-items:center;gap:8px}
+.actor .avatar{width:22px;height:22px;font-size:9.5px}
+.summary{margin:0;color:var(--ink-2);max-width:78ch;font-size:14.5px}
+
+/* ---------- stage ---------- */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start;padding-bottom:32px}
+@media (max-width:1080px){.stage{grid-template-columns:minmax(0,1fr)}}
+#screen{min-width:0}
+.notes{display:flex;flex-direction:column;gap:12px;min-width:0}
+.nb{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px}
+.nb h3{margin:0 0 8px;font:500 10.5px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.nb ul,.nb ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--ink-2)}
+.nb li::marker{color:var(--muted)}
+.nb .none{margin:0;font-size:13px;color:var(--muted)}
+.recs{list-style:none;padding:0 !important;gap:0 !important}
+.recs li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 10px;padding:7px 8px;border-top:1px solid var(--line);font-size:12.5px;margin:0 -8px;border-radius:6px}
+.recs li:first-child{border-top:0}
+.recs .rk{color:var(--muted);font-family:var(--f-mono);font-size:11.5px}
+.recs .rv{font-weight:500;color:var(--ink);text-align:right}
+.recs li.chg{background:var(--accent-soft);border-top-color:transparent}
+.recs li.chg + li{border-top-color:transparent}
+.recs .was{grid-column:1/-1;text-align:right;font-size:11.5px;color:var(--muted)}
+.recs .was s{text-decoration-thickness:1px}
+.q{margin:0;font-size:13px;color:var(--ink-2)}
+
+/* ---------- frames ---------- */
+.frame{border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden;min-width:0}
+.fbar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface-sunk);border-bottom:1px solid var(--line)}
+.lights{display:flex;gap:5px;flex:none}
+.lights i{width:9px;height:9px;border-radius:50%;background:var(--line-strong)}
+.url{flex:1;min-width:0;font:12px var(--f-mono);color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:3px 9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fsys{display:inline-flex;gap:6px;align-items:center;font:500 10.5px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);flex:none}
+.fsys i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+@media (max-width:520px){.fsys span{display:none}}
+.fbody{position:relative;container-type:inline-size}
+.fscroll{max-height:min(80vh,860px);overflow:auto;overscroll-behavior:contain}
+.tablet{border-radius:28px;background:var(--bezel);padding:16px;border:1px solid var(--bezel-hi);box-shadow:var(--shadow-lift)}
+.tcap{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 6px 10px;color:var(--zd-rail-ink);font:500 10.5px var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+.tcap i{width:9px;height:9px;border-radius:50%;background:var(--c);display:inline-block;margin-right:6px;vertical-align:-1px}
+.tscreen{border-radius:14px;overflow:hidden;background:var(--surface);position:relative;container-type:inline-size}
+.tscroll{max-height:min(78vh,760px);overflow:auto;overscroll-behavior:contain}
+@media (max-width:560px){.tablet{padding:8px;border-radius:18px}.tscreen{border-radius:10px}}
+.overlay{position:absolute;inset:0;background:var(--scrim);display:flex;align-items:center;justify-content:center;padding:16px;z-index:5}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lift);width:min(640px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column}
+.modal.sm{width:min(470px,100%)}
+.mhead{padding:16px 18px 12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.mhead h3{margin:0;font-family:var(--f-serif);font-weight:500;font-size:20px}
+.mhead p{margin:0;font-size:13px;color:var(--ink-2)}
+.mbody{padding:14px 18px;display:flex;flex-direction:column;gap:12px}
+.mfoot{padding:12px 18px;border-top:1px solid var(--line);background:var(--surface-2);display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.mfoot .spacer{margin-right:auto;font-size:12.5px;color:var(--muted)}
+
+/* ---------- shared portal chrome (HomeHub + HM Portal) ---------- */
+.chrome{display:flex;align-items:center;gap:8px 16px;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--surface-2);font-size:13px;flex-wrap:wrap}
+.mark{display:inline-flex;align-items:center;gap:7px;font-weight:600;letter-spacing:-.01em}
+.mark .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block}
+.mark small{font:500 10px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-left:2px}
+.crumbs{color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;font-size:12.5px;min-width:0}
+.crumbs b{color:var(--ink);font-weight:500}
+.who{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px}
+.avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-size:10.5px;font-weight:600;flex:none}
+.pbody{display:grid;grid-template-columns:232px minmax(0,1fr)}
+.prail{padding:16px 14px;border-right:1px solid var(--line);background:var(--surface-2);display:flex;flex-direction:column;gap:14px}
+.pmain{padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+@container (max-width:660px){.pbody{grid-template-columns:minmax(0,1fr)}.prail{border-right:0;border-bottom:1px solid var(--line)}.crumbs{display:none}}
+.addr{font-family:var(--f-serif);font-size:16.5px;font-weight:500;margin:0;line-height:1.25}
+.addr-meta{margin:3px 0 0;color:var(--muted);font-size:12.5px}
+.facts{margin:0;display:flex;flex-direction:column;gap:11px}
+.fact dt{font:500 10px var(--f-mono);letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-bottom:1px}
+.fact dd{margin:0;font-size:13px;line-height:1.35}
+.fact dd small{display:block;color:var(--muted);font-size:12px}
+.quote{margin:0;font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--line-strong);padding-left:9px;font-style:italic}
+
+.fld{display:flex;flex-direction:column;gap:5px;min-width:0}
+.fld label,.flabel{font-size:12.5px;font-weight:600;color:var(--ink)}
+.inp{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;font:inherit;font-size:13.5px;background:var(--surface);color:var(--ink)}
+.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+textarea.inp{resize:vertical;line-height:1.5;display:block}
+textarea.grow{resize:none;overflow:hidden;min-height:44px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;font-weight:500;border-radius:20px;padding:4px 11px;border:1px solid var(--line);color:var(--ink-2);background:var(--surface-2);white-space:nowrap}
+.chip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.ph{aspect-ratio:4/3;max-width:100%;border-radius:8px;border:1px solid var(--line);background:repeating-linear-gradient(135deg,var(--surface-sunk) 0 9px,var(--surface-2) 9px 18px);display:flex;align-items:flex-end;padding:6px;min-width:0}
+.ph span{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--ink-2);line-height:1.35}
+.ph.add{align-items:center;justify-content:center;background:var(--surface);border-style:dashed;color:var(--muted);font-size:22px}
+.phs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-width:520px}
+@container (max-width:480px){.phs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- HomeHub ---------- */
+.hh-body{padding:22px 22px 26px;display:flex;flex-direction:column;gap:16px;max-width:700px}
+.hh-body.wide{max-width:none}
+.hh-body h2{margin:0;font-family:var(--f-serif);font-weight:500;font-size:22px;letter-spacing:-.01em}
+.hh-body > p{margin:-8px 0 0;font-size:13.5px;color:var(--ink-2)}
+.hh-note{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;padding:9px 12px;font-size:13px;color:var(--ink-2)}
+.hh-acts{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+.hh-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px;align-items:start}
+@container (max-width:680px){.hh-grid{grid-template-columns:minmax(0,1fr)}}
+.appt{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:9px;background:var(--surface)}
+.appt.focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.appt-top{display:flex;gap:6px;flex-wrap:wrap}
+.appt h3{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.appt-when{margin:0;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+.appt-who{margin:0;font-size:13px;color:var(--muted)}
+.appt-exp{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;font-size:13px}
+.appt-exp b{display:block;margin-bottom:4px}
+.appt-exp ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;color:var(--ink-2)}
+.appt-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.side-card{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:9px;background:var(--surface-2)}
+.side-card h4{margin:0;font:500 10.5px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lrow{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;font-size:13px;padding-top:8px;border-top:1px solid var(--line)}
+.lrow:first-of-type{border-top:0;padding-top:0}
+.lrow b{font-weight:500;display:block}
+.lrow small{color:var(--muted);font-size:12px}
+.linkbtn{appearance:none;background:none;border:0;padding:0;color:var(--accent);font-weight:500;cursor:pointer;text-decoration:underline;text-underline-offset:2px;font-size:13px}
+
+/* ---------- Zendesk ---------- */
+.zd{display:grid;grid-template-columns:46px 214px minmax(0,1fr);min-height:540px;font-size:13px}
+.zd-rail{background:var(--zd-rail);display:flex;flex-direction:column;align-items:center;gap:14px;padding:14px 0}
+.zd-rail i{width:20px;height:20px;border-radius:6px;background:color-mix(in srgb,var(--zd-rail-ink) 28%,transparent);display:block}
+.zd-rail i.on{background:var(--zd-rail-ink)}
+.zd-views{border-right:1px solid var(--line);background:var(--surface-2);padding:14px 8px;display:flex;flex-direction:column;gap:2px}
+.zd-views .lbl{padding:0 8px 6px}
+.zv{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:6px;font-size:12.5px;color:var(--ink-2);border:1px solid transparent}
+.zv span:last-child{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.zv.on{background:var(--surface);border-color:var(--line);color:var(--ink);font-weight:600}
+.zd-wrap{min-width:0;display:flex;flex-direction:column}
+.zd-viewchip{display:none;margin:0;padding:8px 14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted);background:var(--surface-2)}
+.zd-main{display:grid;grid-template-columns:minmax(0,1fr) 220px;min-width:0;flex:1}
+.zd-ticket{padding:14px 16px 18px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.zd-side{border-left:1px solid var(--line);background:var(--surface-2);padding:14px;display:flex;flex-direction:column;gap:11px}
+.zf{display:flex;flex-direction:column;gap:3px}
+.zf .lbl{font-size:9.5px}
+.zf .vf{border:1px solid var(--line-strong);border-radius:6px;padding:5px 8px;background:var(--surface);font-size:12.5px;min-height:29px}
+.zd-tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin:-14px -16px 0;padding:8px 12px 0;background:var(--surface-2)}
+.zd-tab{font-size:12px;padding:6px 10px;border:1px solid var(--line);border-bottom:0;border-radius:6px 6px 0 0;background:var(--surface);color:var(--ink);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zd-subj{margin:0;font-size:16.5px;font-weight:600;letter-spacing:-.01em}
+.zd-meta{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.msg{border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:var(--surface);display:flex;flex-direction:column;gap:6px}
+.msg.note{background:var(--zd-note);border-color:var(--zd-note-line)}
+.msg.sys{background:var(--surface-2);border-style:dashed}
+.msg header{display:flex;gap:8px;align-items:center;font-size:12.5px;flex-wrap:wrap}
+.msg header span.t{color:var(--muted);margin-left:auto;font-size:11.5px}
+.msg p{margin:0;font-size:13px;color:var(--ink-2)}
+.msg .avatar{width:22px;height:22px;font-size:9.5px}
+.att{font-size:12px;color:var(--muted)}
+.zd-next{border:1px solid var(--line-strong);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:var(--surface);text-align:left}
+.opt.on{border-color:var(--accent);background:var(--accent-soft)}
+.opt .radio{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--line-strong);flex:none;margin-top:2px}
+.opt.on .radio{border:5px solid var(--accent)}
+.opt b{display:block;font-size:13px}
+.opt small{display:block;font-size:12px;color:var(--ink-2);margin-top:1px}
+.zlist{border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.zrow{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:10px;padding:8px 11px;border-top:1px solid var(--line);font-size:12.5px;align-items:center}
+.zrow:first-child{border-top:0}
+.zrow.hl{background:var(--accent-soft)}
+.zrow .id{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.zrow .s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+.mini td,.mini th{padding:5px 6px;border-top:1px solid var(--line);text-align:left}
+.mini th{font-weight:500;color:var(--muted);font-size:11.5px;border-top:0}
+.mini td:last-child,.mini th:last-child{text-align:right}
+.mini tr.tot td{font-weight:600}
+@container (max-width:880px){.zd{grid-template-columns:46px minmax(0,1fr)}.zd-views{display:none}.zd-viewchip{display:block}}
+@container (max-width:640px){.zd{grid-template-columns:minmax(0,1fr)}.zd-rail{display:none}.zd-main{grid-template-columns:minmax(0,1fr)}.zd-side{border-left:0;border-top:1px solid var(--line)}}
+
+/* ---------- Django Admin ---------- */
+.dj{font-family:var(--f-dj);font-size:13px;color:var(--ink);background:var(--surface)}
+.dj-head{background:var(--dj-head);color:var(--dj-on);padding:10px 18px;display:flex;justify-content:space-between;gap:6px 14px;flex-wrap:wrap;align-items:center}
+.dj-head b{color:var(--dj-head-ink);font-weight:300;font-size:20px;letter-spacing:.2px}
+.dj-head span{font-size:11px;letter-spacing:.4px;text-transform:uppercase;opacity:.92}
+.dj-crumb{background:var(--dj-crumb);color:var(--dj-on);padding:8px 18px;font-size:12.5px}
+.dj-content{padding:16px 18px 20px;display:flex;flex-direction:column;gap:14px}
+.dj-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dj h2{font-weight:400;font-size:20px;margin:0;color:var(--ink-2)}
+.dj-msg{background:var(--dj-msg);color:var(--dj-msg-ink);padding:9px 12px;border-radius:4px;font-size:12.5px}
+.dj-fs{border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.dj-cap{background:var(--dj-crumb);color:var(--dj-on);padding:6px 12px;font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.djr{display:grid;grid-template-columns:170px minmax(0,1fr);gap:4px 14px;padding:9px 12px;border-top:1px solid var(--line);align-items:start}
+.dj-cap + .djr{border-top:0}
+.djl{font-weight:600;color:var(--ink-2);padding-top:5px}
+.djr.req .djl::after{content:" *";color:var(--bad)}
+.vf{border:1px solid var(--line-strong);border-radius:4px;padding:5px 9px;background:var(--surface);min-height:30px;max-width:460px}
+.vf.sel{display:flex;justify-content:space-between;gap:8px}
+.vf.sel::after{content:"▾";color:var(--muted)}
+.vf.ro{border-color:transparent;background:transparent;padding-left:0}
+.vf.chg{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.help{margin:4px 0 0;font-size:11.5px;color:var(--muted);max-width:60ch}
+.optlist{margin:6px 0 0;border:1px solid var(--line-strong);border-radius:4px;max-width:460px;background:var(--surface);overflow:hidden}
+.optlist div{padding:4px 9px;font-size:12.5px;display:flex;gap:8px;align-items:center}
+.optlist div.sel{background:var(--dj-head);color:var(--dj-on)}
+.optlist div.sel .newtag{color:var(--dj-on);border-color:var(--dj-on);background:transparent}
+.optlist div.sep{border-top:1px solid var(--line)}
+.submit-row{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;padding:11px 12px;background:var(--surface-sunk);border:1px solid var(--line);border-radius:4px}
+.djbtn{appearance:none;background:var(--dj-head);color:var(--dj-on);border:1px solid var(--dj-head);border-radius:4px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:var(--f-dj)}
+.djbtn.alt{background:var(--surface);color:var(--dj-link);border-color:var(--line-strong)}
+.djbtn.def{font-weight:600}
+.dj .tbl{overflow-x:auto;border:1px solid var(--line);border-radius:4px}
+.dj table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+.dj th{text-align:left;background:var(--surface-sunk);font-weight:600;color:var(--ink-2);padding:7px 9px;border-bottom:1px solid var(--line);font-size:11px;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.dj td{padding:8px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+.dj tr:last-child td{border-bottom:0}
+.dj tr.hl td{background:var(--dj-sel)}
+.dj td.num,.dj th.num{text-align:right}
+.lnk{appearance:none;background:none;border:0;padding:0;color:var(--dj-link);font-weight:600;cursor:pointer;font-family:var(--f-dj);font-size:inherit;text-align:left}
+.dj-split{display:grid;grid-template-columns:minmax(0,1fr) 196px;gap:14px;align-items:start}
+.dj-filter{border:1px solid var(--line);border-radius:4px;overflow:hidden;font-size:12.5px}
+.dj-filter h4{margin:0;background:var(--surface-sunk);padding:7px 10px;font-size:12px;border-bottom:1px solid var(--line)}
+.dj-filter p{margin:0;padding:8px 10px 2px;font-weight:600;color:var(--ink-2);font-size:12px}
+.dj-filter ul{list-style:none;margin:0;padding:0 10px 8px}
+.dj-filter li{padding:3px 0;color:var(--dj-link)}
+.dj-filter li.on{color:var(--ink);font-weight:600}
+.dj-filter li.on::before{content:"› "}
+.life{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px}
+.life span{border:1px solid var(--line);border-radius:20px;padding:2px 9px;color:var(--muted);background:var(--surface)}
+.life span.on{border-color:var(--accent);background:var(--accent);color:var(--on-accent);font-weight:600}
+.life span.done{color:var(--ink-2);background:var(--surface-sunk)}
+.life i{color:var(--line-strong);font-style:normal}
+.cal{border:1px solid var(--line);border-radius:4px;padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.cal-axis,.cal-lane{display:grid;grid-template-columns:86px minmax(0,1fr);gap:8px;align-items:center;font-size:11.5px}
+.cal-axis .tk{position:relative;height:14px;color:var(--muted);font-family:var(--f-mono);font-size:10.5px}
+.cal-axis .tk span{position:absolute;transform:translateX(-50%)}
+.cal-lane .tr{position:relative;height:26px;background:var(--surface-2);border:1px solid var(--line);border-radius:4px}
+.cal-lane .blk{position:absolute;top:2px;bottom:2px;border-radius:3px;padding:0 6px;font-size:11px;display:flex;align-items:center;white-space:nowrap;overflow:hidden}
+.blk.busy{background:var(--surface-sunk);color:var(--muted);border:1px solid var(--line)}
+.blk.new{background:var(--accent);color:var(--on-accent);font-weight:600}
+.dj mark{background:var(--dj-sel);color:inherit;padding:0 2px;border-radius:2px;outline:1px solid var(--warn-line)}
+@container (max-width:660px){.djr{grid-template-columns:minmax(0,1fr)}.djl{padding-top:0}.dj-split{grid-template-columns:minmax(0,1fr)}.dj-head span{display:none}}
+
+/* ---------- HM Portal ---------- */
+.hm-head{display:flex;justify-content:space-between;gap:10px 14px;align-items:flex-start;flex-wrap:wrap}
+.hm-head h2{margin:0;font-family:var(--f-serif);font-weight:500;font-size:20px}
+.hm-head p{margin:3px 0 0;font-size:13px;color:var(--ink-2);max-width:60ch}
+.memsees{display:inline-block;font:600 9.5px/1.4 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);border-radius:4px;padding:0 5px;vertical-align:1px;margin-left:4px}
+.wa{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:13px;display:flex;flex-direction:column;gap:10px}
+.wa-top{display:flex;gap:8px;align-items:baseline;justify-content:space-between;flex-wrap:wrap}
+.wa h4{margin:0;font-size:14.5px;font-weight:600}
+.wa-meas{margin:-6px 0 0;font:12px var(--f-mono);color:var(--muted)}
+.wa-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:end}
+@container (max-width:520px){.wa-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wa-grid .fld:last-child{grid-column:1/-1}}
+.stepper{display:flex;align-items:center;gap:8px}
+.stepper button{width:34px;height:34px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);cursor:pointer;font-size:16px;line-height:1}
+.stepper button:hover{border-color:var(--accent);color:var(--accent)}
+.stepper output{font:600 15px var(--f-mono);min-width:24px;text-align:center}
+.money{display:flex;align-items:center;gap:6px}
+.money span{color:var(--muted)}
+.money .inp{max-width:110px;font-variant-numeric:tabular-nums}
+.lt{font:600 15px var(--f-sans);font-variant-numeric:tabular-nums;padding:6px 0}
+.addwa{border:1px dashed var(--line-strong);border-radius:var(--r);padding:10px;text-align:center;color:var(--muted);font-size:13px;background:transparent}
+.hm-sec h3{margin:0 0 8px;font:500 10.5px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.qa{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.qa div{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:10px;padding:8px 12px;border-top:1px solid var(--line);font-size:13px}
+.qa div:first-child{border-top:0}
+.qa span:first-child{color:var(--muted)}
+@container (max-width:480px){.qa div{grid-template-columns:minmax(0,1fr);gap:2px}}
+.sumbar{position:sticky;bottom:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow-lift);padding:10px 12px;margin-top:2px}
+.sumk{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);align-items:baseline}
+.sumk b{font-family:var(--f-mono);color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.sumk .big b{font-family:var(--f-sans);font-size:17px}
+.rate{font-size:11.5px;color:var(--muted);margin:0}
+.choice{border:1px solid var(--line);border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.choice h4{margin:0;font-size:15px;font-weight:600}
+.choice p{margin:0;font-size:13px;color:var(--ink-2)}
+.choice .cmeta{font:11.5px var(--f-mono);color:var(--muted)}
+.choice .btn{align-self:flex-start}
+
+/* ---------- Email ---------- */
+.mail{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:540px}
+.mail-list{border-right:1px solid var(--line);background:var(--surface-2);display:flex;flex-direction:column}
+.mail-list .lbl{padding:12px 14px 8px}
+.mitem{padding:10px 14px;border-top:1px solid var(--line);font-size:12.5px;display:flex;flex-direction:column;gap:1px}
+.mitem b{font-weight:600;color:var(--ink)}
+.mitem span{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mitem.on{background:var(--surface);box-shadow:inset 3px 0 0 var(--c-em)}
+.mitem.read b{font-weight:500;color:var(--ink-2)}
+.mail-msg{padding:16px 18px 22px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.mail-msg h3{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.mail-from{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.mail-from b{color:var(--ink);font-weight:600}
+.em{width:100%;max-width:560px;margin:6px auto 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.em-top{background:var(--accent);color:var(--on-accent);padding:14px 20px;display:flex;align-items:center;gap:8px;font-weight:600}
+.em-top .dot{width:10px;height:10px;border-radius:50%;background:var(--on-accent);display:inline-block}
+.em-body{padding:20px;display:flex;flex-direction:column;gap:13px;font-size:14px;color:var(--ink-2)}
+.em-body h4{margin:0;font-family:var(--f-serif);font-weight:500;font-size:21px;color:var(--ink)}
+.em-body p{margin:0}
+.em-card{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--surface-2);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:baseline}
+.em-card b{color:var(--ink);font-weight:600}
+.em-card .tot{font:600 20px var(--f-sans);color:var(--ink);font-variant-numeric:tabular-nums}
+.em-card small{grid-column:1/-1;color:var(--muted);font-size:12.5px}
+.em-foot{padding:12px 20px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);background:var(--surface-2)}
+@container (max-width:640px){.mail{grid-template-columns:minmax(0,1fr)}.mail-list{display:none}}
+
+/* ---------- Proposal page ---------- */
+.prop{background:var(--ground)}
+.prop-in{max-width:780px;margin:0 auto;padding:22px 20px 40px;display:flex;flex-direction:column;gap:16px}
+.prop-hero{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.prop-band{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid var(--line);background:var(--surface-2);flex-wrap:wrap}
+.prop-hero-in{padding:18px 18px 18px;display:flex;flex-direction:column;gap:14px}
+.prop-title{font-family:var(--f-serif);font-size:30px;font-weight:500;margin:2px 0 0;letter-spacing:-.014em;line-height:1.15}
+.prop-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 16px;margin:0}
+.prop-meta dt{font:500 10px var(--f-mono);letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.prop-meta dd{margin:1px 0 0;font-size:13.5px}
+.prop-meta dd small{display:block;font-size:12px;color:var(--muted)}
+.glance{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 16px;align-items:center;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:11px;padding:14px 16px}
+.glance .tot{margin:2px 0 0;font:600 30px/1.1 var(--f-sans);font-variant-numeric:tabular-nums;color:var(--ink)}
+.glance .gsub{margin:4px 0 0;font-size:13px;color:var(--ink-2)}
+.pgroup{display:flex;align-items:center;gap:10px;margin-top:6px}
+.pgroup::after{content:"";flex:1;height:1px;background:var(--line-strong)}
+.psec{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.psec h3{font-family:var(--f-serif);font-weight:500;font-size:19px;margin:0;letter-spacing:-.008em}
+.psec p{margin:0;font-size:14px;color:var(--ink-2)}
+.psec h4{margin:0;font-size:13.5px;font-weight:600}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.cond{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--surface-2)}
+.cond .ph{aspect-ratio:16/9}
+.ticks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ticks li{display:flex;gap:9px;font-size:13.5px;color:var(--ink-2)}
+.ticks li::before{content:"✓";color:var(--ok);font-weight:700;flex:none}
+.ticks.x li::before{content:"–";color:var(--muted)}
+.ticks li.added{background:var(--warn-soft);border-radius:5px;padding:2px 6px;margin:0 -6px}
+.area{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:4px}
+.area:first-of-type{border-top:0;padding-top:0}
+.area-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.area .meas{font:12px var(--f-mono);color:var(--muted)}
+.ptable{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+.ptable td,.ptable th{padding:8px 0;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.ptable th{font-weight:500;color:var(--muted);font-size:12px;width:38%}
+.ptable td.num{text-align:right;white-space:nowrap}
+.ptable tr.tot td{font-weight:700;font-size:16px;border-bottom:0;padding-top:12px}
+.ptable small{display:block;color:var(--muted);font-size:12px}
+.adv{background:var(--accent);color:var(--on-accent);border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.adv h3{grid-column:1/-1;margin:0;font-family:var(--f-serif);font-weight:500;font-size:18px}
+.adv div b{display:block;font-size:13.5px}
+.adv div span{display:block;font-size:12.5px;opacity:.85;margin-top:2px}
+.approve{border:2px solid var(--accent)}
+.ap-tot{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0}
+.ap-tot b{font:600 24px var(--f-sans);font-variant-numeric:tabular-nums}
+.ap-acts{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.ap-next{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:13.5px;color:var(--ink-2)}
+.branch{border:1px dashed var(--line-strong);border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:5px;font-size:13px;background:var(--surface-2)}
+.branch b{color:var(--ink)}
+.branch .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.terms{font-size:12px !important;color:var(--muted) !important;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.reasons{display:flex;flex-direction:column;gap:6px}
+.reason{appearance:none;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:9px 12px;text-align:left;cursor:pointer;font-size:13.5px}
+.reason:hover{border-color:var(--muted)}
+.reason[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);font-weight:500}
+.approved{display:flex;gap:12px;align-items:flex-start;background:var(--ok-soft);border:1px solid var(--ok-line);border-radius:11px;padding:14px 16px}
+.approved .tick{width:34px;height:34px;border-radius:50%;background:var(--ok);color:var(--surface);display:grid;place-items:center;font-weight:700;flex:none}
+.approved h3{margin:0;font-family:var(--f-serif);font-weight:500;font-size:20px}
+.approved p{margin:2px 0 0;font-size:13.5px;color:var(--ink-2)}
+.track{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.track li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;padding-bottom:12px;position:relative}
+.track li::before{content:"";width:12px;height:12px;border-radius:50%;border:2px solid var(--line-strong);background:var(--surface);margin-top:4px;position:relative;z-index:1}
+.track li::after{content:"";position:absolute;left:6px;top:18px;bottom:0;width:2px;background:var(--line)}
+.track li:last-child::after{display:none}
+.track li.done::before{background:var(--ok);border-color:var(--ok)}
+.track li.cur::before{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.track b{display:block;font-size:14px;font-weight:600}
+.track span{display:block;font-size:12.5px;color:var(--muted)}
+@container (max-width:600px){.prop-meta{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:minmax(0,1fr)}.adv{grid-template-columns:minmax(0,1fr)}.glance{grid-template-columns:minmax(0,1fr)}.glance .btn{justify-self:start}.prop-title{font-size:25px}.prop-in{padding:16px 12px 30px}}
+
+/* ---------- Metabase ---------- */
+.mb{padding:16px 18px 20px;display:flex;flex-direction:column;gap:14px;background:var(--surface-2)}
+.mb-head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.mb-head h2{margin:2px 0 0;font-size:19px;font-weight:600;letter-spacing:-.01em}
+.mb-note{margin:0;font-size:12.5px;color:var(--warn);background:var(--warn-soft);border:1px solid var(--warn-line);border-radius:7px;padding:7px 10px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:12px 13px;display:flex;flex-direction:column;gap:2px}
+.kpi .k{font-size:12px;color:var(--muted)}
+.kpi .v{font:600 26px/1.15 var(--f-sans);font-variant-numeric:tabular-nums;color:var(--ink)}
+.kpi .s{font-size:12px;color:var(--ink-2)}
+.mb-card{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:13px 14px;display:flex;flex-direction:column;gap:10px}
+.mb-card h3{margin:0;font-size:14px;font-weight:600}
+.mb-card .sub{margin:-6px 0 0;font-size:12px;color:var(--muted)}
+.bars{display:flex;flex-direction:column;gap:9px}
+.brow,.baxis{display:grid;grid-template-columns:150px minmax(0,1fr) 70px;gap:10px;align-items:center;font-size:12.5px}
+.brow{position:relative;border-radius:5px;outline-offset:3px}
+.brow .bl{color:var(--ink-2)}
+.brow .bt{position:relative;height:18px;background-image:linear-gradient(to right,var(--line) 1px,transparent 1px);background-size:25% 100%}
+.brow .bt i{position:absolute;left:0;top:2px;bottom:2px;background:var(--series-1);border-radius:0 4px 4px 0}
+.brow .bv{font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.brow:hover .bt i,.brow:focus-visible .bt i{filter:brightness(1.12)}
+.brow .tip{position:absolute;left:160px;bottom:calc(100% + 4px);background:var(--ink);color:var(--surface);font-size:12px;padding:5px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s;z-index:2}
+.brow:hover .tip,.brow:focus-visible .tip{opacity:1}
+.baxis .tk{position:relative;height:14px;font-family:var(--f-mono);font-size:10.5px;color:var(--muted)}
+.baxis .tk span{position:absolute;transform:translateX(-50%)}
+.baxis .tk span:first-child{transform:none}
+.baxis .tk span:last-child{transform:translateX(-100%)}
+@container (max-width:520px){.brow,.baxis{grid-template-columns:96px minmax(0,1fr) 58px}.brow .tip{left:0}}
+.mb table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+.mb th,.mb td{padding:7px 8px;border-top:1px solid var(--line);text-align:left}
+.mb th{border-top:0;color:var(--muted);font-weight:500;font-size:11.5px}
+.mb td.num,.mb th.num{text-align:right}
+.mb .tbl{overflow-x:auto}
+
+/* ---------- bottom nav ---------- */
+.bottom{position:sticky;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -8px 24px -18px rgba(0,0,0,.25)}
+.bottom .in{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:center;padding-block:10px}
+.navbtn{appearance:none;border:1px solid var(--line-strong);background:var(--surface);border-radius:11px;padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left;min-width:0;max-width:100%;justify-self:start}
+.navbtn:hover{border-color:var(--muted)}
+.navbtn.next{justify-self:end;background:var(--accent);border-color:var(--accent);color:var(--on-accent);text-align:right}
+.navbtn.next:hover{background:var(--accent-ink);border-color:var(--accent-ink)}
+.navbtn[disabled]{opacity:.4;cursor:not-allowed}
+.navbtn .arrow{font-size:20px;line-height:1;flex:none}
+.navbtn .t{display:flex;flex-direction:column;min-width:0}
+.navbtn .t small{font:500 10px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;opacity:.8;display:flex;gap:6px;align-items:center}
+.navbtn.next .t small{justify-content:flex-end}
+.navbtn .t small i{width:8px;height:8px;border-radius:50%;background:var(--c);display:inline-block;box-shadow:0 0 0 1.5px var(--surface)}
+.navbtn .t span{font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog{display:flex;flex-direction:column;align-items:center;gap:5px}
+.dots{display:flex;gap:5px}
+.dots button{width:11px;height:11px;border-radius:50%;border:0;padding:0;background:var(--c);opacity:.3;cursor:pointer}
+.dots button.past{opacity:.7}
+.dots button.on{opacity:1;box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--ink)}
+.prog .count{font:500 11px var(--f-mono);color:var(--muted);letter-spacing:.06em}
+@media (max-width:760px){.dots{display:none}.navbtn .t span{display:none}.navbtn{padding:9px 14px}}
+
+.src{padding-block:6px 26px;font-size:12px;color:var(--muted)}
+.src p{margin:0;max-width:110ch}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+
+<header class="top">
+  <div class="in">
+    <div class="brand">
+      <span class="mk" aria-hidden="true"></span>
+      <div><b>Consultation → Proposal flow</b><p class="lbl">PreFix · Carpentry &amp; Painting · Clickable prototype v0.1</p></div>
+    </div>
+    <div class="ctrls">
+      <div class="ctl"><span class="lbl">Path</span>
+        <div class="seg" role="group" aria-label="Which path to walk" id="pathSeg"></div>
+      </div>
+      <button type="button" class="toggle" id="hotToggle" aria-pressed="true"><span class="box" aria-hidden="true"></span>Show click targets</button>
+      <button type="button" class="btn btn--ghost" id="resetBtn">Restart</button>
+    </div>
+  </div>
+</header>
+
+<section class="mapband" aria-label="Flow map: which system each step happens in">
+  <div class="in">
+    <div class="maphead">
+      <p><b>V1 scope:</b> a new Consultation service type, a proposal the specialist or Central Ops sends, and a member approval page, modeled on how Recommendations work. The estimator tool is Phase 2. Click any dot to jump to that step.</p>
+      <button type="button" class="btn btn--ghost" id="mapToggle" aria-expanded="true">Hide map</button>
+    </div>
+    <div class="mapscroll" id="map"></div>
+  </div>
+</section>
+
+<main class="in">
+  <div class="head" id="head"></div>
+  <div class="stage">
+    <div id="screen"></div>
+    <aside class="notes" id="notes" aria-label="Step notes"></aside>
+  </div>
+</main>
+
+<footer class="in src">
+  <p>Built from the Oct 16 meeting with Justin, James and Mark, Phong's notes, and the ChatGPT proposal requirements. Placeholders: rate card ($85/hr), record IDs, status names, decline reasons, email copy and all KPI numbers. Member and home match the earlier HomeHub prototypes.</p>
+</footer>
+
+<nav class="bottom" aria-label="Step navigation">
+  <div class="in" id="bottom"></div>
+</nav>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= reference data ================= */
+var RATE = 85; /* placeholder rate card */
+var SYS = {
+  hh:{name:"HomeHub", long:"Member Portal", where:"member.prefixinc.com", who:"Member"},
+  em:{name:"Email", long:"Member's inbox", where:"Email", who:"Member"},
+  pr:{name:"Proposal page", long:"Standalone web page", where:"Opened from email or HomeHub", who:"Member"},
+  zd:{name:"Zendesk", long:"Central Ops tickets", where:"Agent workspace", who:"PreFix team"},
+  op:{name:"Ops Portal", long:"Django Admin", where:"Bookings, proposals, calendar", who:"PreFix team"},
+  hm:{name:"HM Portal", long:"Home Manager Portal", where:"iPad, on site", who:"PreFix team"},
+  mb:{name:"Metabase", long:"Reporting", where:"Dashboards", who:"Leadership"}
+};
+var LANES = [
+  {sys:"hh", group:"Member"}, {sys:"em"}, {sys:"pr"},
+  {sys:"zd", group:"PreFix team"}, {sys:"op"}, {sys:"hm"},
+  {sys:"mb", group:"Reporting"}
+];
+var DESC = "We'd like to repaint the living room and the hallway. Walls only, and the same color is fine, maybe a little lighter. The baseboard in the hallway by the bathroom door has water damage and a couple of pieces are coming loose.";
+var NOTE = "Water staining behind the baseboard by the bath. Can you confirm the exclusion wording and whether we add stain-blocking primer?";
+var REASONS = ["The price is more than I expected","I'm going to do it myself","I'm using another company","It's not a priority right now","I want to change what's included","Something else"];
+var LINES = [
+  {id:"lr", area:"Living room walls", trade:"Painting", meas:"14 × 18 ft · 9 ft ceiling · ≈ 520 sq ft of wall",
+   scope:"Move and cover furniture, patch nail holes and small dings, sand and spot-prime the patches, then apply two coats to all walls. Ceiling and trim stay as they are.", hours:4, mat:150},
+  {id:"hall", area:"Hallway walls", trade:"Painting", meas:"4 × 22 ft · 9 ft ceiling · ≈ 380 sq ft of wall",
+   scope:"Patch and sand the scuffs along both walls, spot-prime, then two coats in the same color as the living room so the two spaces read as one.", hours:2, mat:95},
+  {id:"base", area:"Hallway baseboard by the bathroom", trade:"Carpentry", meas:"2 sections · ≈ 12 linear ft · moisture 12% (dry)",
+   scope:"Remove the two water-damaged baseboard sections by the bathroom door, install new primed baseboard matched to the existing profile, then caulk, prime and paint to match.", hours:2, mat:60}
+];
+var RECLBL = {sr:"SR-58214 · request", tk1:"Zendesk #91347", bk1:"Booking #48213 · consult", prp:"Proposal PF-2026-00148", tk2:"Zendesk #91502 · review", tk3:"Zendesk #91655 · accepted", bk2:"Booking #48390 · project"};
+var RECORD = ["sr","tk1","bk1","prp","tk2","tk3","bk2"];
+
+/* ================= state ================= */
+function fresh(){
+  return {path:"B", idx:0, hot:true, map:true,
+    lines:LINES.map(function(l){ var c={}; for(var k in l) c[k]=l[k]; return c; }),
+    note:NOTE, decline:false, reason:null, declined:false, later:false};
+}
+var S = fresh();
+try{ var saved = JSON.parse(localStorage.getItem("pfx-consult-proto")||"{}");
+  if(saved.path==="A"||saved.path==="B") S.path = saved.path;
+  if(typeof saved.hot==="boolean") S.hot = saved.hot;
+  if(typeof saved.map==="boolean") S.map = saved.map;
+}catch(e){}
+function persist(){ try{ localStorage.setItem("pfx-consult-proto", JSON.stringify({path:S.path,hot:S.hot,map:S.map})); }catch(e){} }
+
+/* ================= helpers ================= */
+function $(s){ return document.querySelector(s); }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function money(n){ return "$" + Math.round(n).toLocaleString("en-US"); }
+function hot(){ return " hot"; }
+function steps(){ return STEPS.filter(function(s){ return !s.only || s.only===S.path; }); }
+function cur(){ return steps()[S.idx]; }
+function reviewed(){
+  if(S.path!=="B") return false;
+  var st = steps(), r = st.findIndex(function(s){ return s.id==="op-review"; });
+  return S.idx >= r;
+}
+function calc(rv){
+  var ls = S.lines.map(function(l){ var c={}; for(var k in l) c[k]=l[k]; if(rv && l.id==="base") c.mat = l.mat + 25; c.total = c.hours*RATE + c.mat; return c; });
+  var t = {ls:ls, hours:0, labor:0, mat:0};
+  ls.forEach(function(l){ t.hours+=l.hours; t.labor+=l.hours*RATE; t.mat+=l.mat; });
+  t.total = t.labor + t.mat; t.days = Math.max(1, Math.ceil(t.hours/8));
+  return t;
+}
+function T(){ return calc(reviewed()); }
+function dur(t){ t = t||T(); return t.days===1 ? "1 day on site (about " + t.hours + " hours)" : t.days + " days on site (about " + t.hours + " hours)"; }
+function projDate(){ var d=T().days; return d===1 ? "Tue, Nov 3" : d===2 ? "Tue–Wed, Nov 3–4" : "Tue, Nov 3, for " + d + " days"; }
+function DT(){
+  return S.path==="A"
+    ? {sent:"Thu, Oct 22, 10:01 AM", sentS:"Oct 22", accepted:"Thu, Oct 22, 7:45 PM", prepared:"October 22, 2026", valid:"November 21, 2026", r2p:"3 days"}
+    : {sent:"Fri, Oct 23, 11:20 AM", sentS:"Oct 23", accepted:"Fri, Oct 23, 6:30 PM", prepared:"October 23, 2026", valid:"November 22, 2026", r2p:"4 days"};
+}
+function sw(sys){ return 'style="--c:var(--c-' + sys + ')"'; }
+
+/* ================= frames + shells ================= */
+function browser(sys, url, inner, scroll){
+  return '<div class="frame" ' + sw(sys) + '>' +
+    '<div class="fbar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>' +
+    '<span class="url">' + esc(url) + '</span>' +
+    '<span class="fsys"><i></i><span>' + SYS[sys].name + '</span></span></div>' +
+    '<div class="fbody">' + (scroll ? '<div class="fscroll" id="fscroll">' + inner + '</div>' : inner) + '</div></div>';
+}
+function tablet(inner, overlay){
+  return '<div class="tablet" ' + sw("hm") + '><div class="tcap"><span><i></i>iPad · HM Portal</span><span>hm.prefixinc.com</span></div>' +
+    '<div class="tscreen"><div class="tscroll" id="tscroll">' + inner + '</div>' + (overlay||"") + '</div></div>';
+}
+function hhChrome(crumb){
+  return '<div class="chrome"><span class="mark"><span class="dot"></span>PreFix<small>HomeHub</small></span>' +
+    '<nav class="crumbs" aria-label="Breadcrumb"><span>1420 Cedar Hollow</span><span aria-hidden="true">/</span><b>' + crumb + '</b></nav>' +
+    '<span class="who">Marisol Alvarez <span class="avatar" aria-hidden="true">MA</span></span></div>';
+}
+function hmChrome(last){
+  return '<div class="chrome"><span class="mark"><span class="dot"></span>PreFix<small>Home Manager Portal</small></span>' +
+    '<nav class="crumbs" aria-label="Breadcrumb"><span>Bookings</span><span aria-hidden="true">/</span><span>Alvarez · 1420 Cedar Hollow</span><span aria-hidden="true">/</span><b>' + last + '</b></nav>' +
+    '<span class="who">Mario · Specialty Painter <span class="avatar" aria-hidden="true">M</span></span></div>';
+}
+function zdShell(main){
+  var V = [["Intake",12],["Main View – Member Requested",31],["Main View – HM Followups",18],["HVAC",9],["Contractor Requested",14],["Carpentry/Painting – Specialty",27],["Parts Request",6]];
+  return '<div class="zd"><nav class="zd-rail" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></nav>' +
+    '<nav class="zd-views" aria-label="Zendesk views"><p class="lbl">Views</p>' +
+    V.map(function(v){ return '<div class="zv' + (v[0].indexOf("Carpentry")===0?" on":"") + '"><span>' + v[0] + '</span><span>' + v[1] + '</span></div>'; }).join("") +
+    '</nav><div class="zd-wrap"><p class="zd-viewchip">View: Carpentry/Painting – Specialty</p>' + main + '</div></div>';
+}
+function zf(k, v){ return '<div class="zf"><span class="lbl">' + k + '</span><div class="vf">' + v + '</div></div>'; }
+function djShell(user, crumbs, inner){
+  return '<div class="dj"><div class="dj-head"><b>PreFix administration</b><span>Welcome, <strong>' + user + '</strong>. View site / Change password / Log out</span></div>' +
+    '<div class="dj-crumb">' + crumbs + '</div><div class="dj-content">' + inner + '</div></div>';
+}
+function djr(label, value, opts){
+  opts = opts||{};
+  return '<div class="djr' + (opts.req?" req":"") + '"><span class="djl">' + label + '</span><div>' +
+    '<div class="vf' + (opts.sel?" sel":"") + (opts.ro?" ro":"") + (opts.chg?" chg":"") + '">' + value + '</div>' +
+    (opts.extra||"") + (opts.help ? '<p class="help">' + opts.help + '</p>' : '') + '</div></div>';
+}
+function rail(extra){
+  return '<aside class="prail"><div><p class="addr">1420 Cedar Hollow Ln</p><p class="addr-meta">Round Rock, TX 78665 · Marisol Alvarez</p></div>' +
+    '<dl class="facts">' +
+    '<div class="fact"><dt>Booking</dt><dd>Consultation – Painting <span class="newtag">New</span><small>Thu, Oct 22 · 9:00–10:00 AM · #48213</small></dd></div>' +
+    '<div class="fact"><dt>Member</dt><dd>Marisol Alvarez<small>Home for the walkthrough</small></dd></div>' +
+    '<div class="fact"><dt>Home</dt><dd>1998 build · 2,410 sq ft<small>Home Manager: Ruben Ortiz</small></dd></div>' +
+    '</dl><p class="lbl">Member\'s request · SR-58214</p><p class="quote" style="margin-top:-8px">' + esc(DESC) + '</p>' + (extra||"") + '</aside>';
+}
+
+/* ================= screens ================= */
+function scrRequest(){
+  var body = hhChrome("New request") +
+  '<div class="hh-body">' +
+    '<div><h2>What can we help with?</h2></div><p>Describe the work. Central Ops reads every request and books the right visit for it.</p>' +
+    '<div class="fld"><span class="flabel">Type of work</span><div class="chips">' +
+      '<span class="chip">Repairs</span><span class="chip">Plumbing</span><span class="chip">Electrical</span><span class="chip on">Painting &amp; drywall</span><span class="chip on">Carpentry</span><span class="chip">HVAC</span><span class="chip">Something else</span></div></div>' +
+    '<div class="fld"><label for="hh-desc">What\'s going on?</label><textarea id="hh-desc" class="inp grow" rows="3">' + esc(DESC) + '</textarea></div>' +
+    '<div class="fld"><span class="flabel">Photos</span><div class="phs"><div class="ph"><span>Living room</span></div><div class="ph"><span>Baseboard by bath</span></div><div class="ph add" aria-hidden="true">+</div></div></div>' +
+    '<div class="fld"><span class="flabel">How soon?</span><div class="chips"><span class="chip">Whenever works</span><span class="chip on">In the next few weeks</span><span class="chip">It\'s urgent</span></div></div>' +
+    '<div class="hh-note">Painting and carpentry usually start with a free consultation, so a specialist can see the work and price it accurately.</div>' +
+    '<div class="hh-acts"><button type="button" class="btn">Save draft</button><button type="button" class="btn btn--pri' + hot() + '" data-act="next">Submit request</button></div>' +
+  '</div>';
+  return browser("hh", "member.prefixinc.com/requests/new", body);
+}
+
+function scrTriage(){
+  var main = '<div class="zd-main"><div class="zd-ticket">' +
+    '<div class="zd-tabs"><span class="zd-tab">#91347 Painting + baseboard repair</span></div>' +
+    '<div><p class="zd-subj">Painting + baseboard repair — 1420 Cedar Hollow</p><p class="zd-meta">#91347 · via HomeHub request form · Mon, Oct 19, 8:42 AM</p></div>' +
+    '<article class="msg"><header><span class="avatar">MA</span><b>Marisol Alvarez</b><span class="t">Oct 19, 8:42 AM</span></header><p>' + esc(DESC) + '</p><p class="att">2 photos · Service request SR-58214</p></article>' +
+    '<article class="msg note"><header><span class="avatar">CO</span><b>Central Ops</b><span class="pill">Internal note</span><span class="t">10:12 AM</span></header><p>Two rooms of paint plus a carpentry repair, and the photos don\'t show how far the baseboard damage goes. Booking a free consultation with Mario rather than a ballpark quote.</p></article>' +
+    '<div class="zd-next"><span class="flabel">Next step for this request</span>' +
+      '<div class="opt"><span class="radio"></span><span><b>Ballpark quote</b><small>Send the scope to Sales for a rough price. Available today.</small></span></div>' +
+      '<div class="opt on"><span class="radio"></span><span><b>Consultation <span class="newtag">New service type</span></b><small>Book a specialist visit. The specialist can price the job on site.</small></span></div>' +
+      '<button type="button" class="btn btn--pri' + hot() + '" data-act="next" style="align-self:flex-start">Create consultation booking in Admin</button>' +
+    '</div></div>' +
+    '<aside class="zd-side">' + zf("Requester","Marisol Alvarez") + zf("Group","Central Ops – Specialty") + zf("Type","Specialty request") + zf("Priority","Normal") + zf("Service request","SR-58214") + zf("Home Manager","Ruben Ortiz") + '</aside></div>';
+  return browser("zd", "prefix.zendesk.com/agent/tickets/91347", zdShell(main));
+}
+
+function scrBook(){
+  var opts = '<div class="optlist" aria-hidden="true">' +
+    '<div>Preventive Maintenance</div><div>Home Enrollment</div><div>Service</div><div>Specialty – Carpentry</div><div>Specialty – Painting</div><div>Contractor</div>' +
+    '<div class="sep">Consultation – Carpentry <span class="newtag">New</span></div><div class="sel">Consultation – Painting <span class="newtag">New</span></div><div>Consultation – Insulation <span class="newtag">New</span></div></div>';
+  var inner = '<div class="dj-title"><h2>Add booking</h2></div>' +
+    '<div class="dj-fs"><div class="dj-cap">Booking</div>' +
+      djr("Service type", "Consultation – Painting", {sel:1, req:1, extra:opts, help:"Consultations are their own service type, so they report separately and open the proposal flow in the HM Portal."}) +
+      djr("Job requested", "Painting + baseboard repair", {req:1}) +
+      djr("Subscription", "1420 Cedar Hollow Ln — Marisol Alvarez (Active)", {sel:1, req:1}) +
+      djr("Service request", "SR-58214", {sel:1}) +
+      djr("Zendesk ticket", "91347") +
+      djr("Assigned Home Manager", "Mario · Specialty Painter", {sel:1}) +
+      djr("Duration (minutes)", "60", {help:"Default for consultations."}) +
+      djr("Price", "$0.00", {help:"Consultations are free to members. No invoice is created."}) +
+    '</div>' +
+    '<div class="dj-fs"><div class="dj-cap">Scheduling</div>' +
+      djr("Status", "Booked", {sel:1}) +
+      djr("Scheduled start", "2026-10-22 &nbsp; 09:00", {help:"V1: Central Ops picks the slot on the Ops Calendar by hand. Consultations have dedicated slots, but self-scheduling waits for specialty scheduling logic."}) +
+    '</div>' +
+    '<div class="dj-fs"><div class="dj-cap">Booking tasks</div><div class="tbl"><table><thead><tr><th>#</th><th>Task</th><th class="num">Minutes</th></tr></thead><tbody>' +
+      '<tr><td>1</td><td>Painting consultation — living room and hallway walls</td><td class="num">40</td></tr>' +
+      '<tr><td>2</td><td>Carpentry consultation — hallway baseboard by bathroom</td><td class="num">20</td></tr>' +
+    '</tbody></table></div></div>' +
+    '<div class="submit-row"><button type="button" class="djbtn alt">Save and add another</button><button type="button" class="djbtn alt">Save and continue editing</button><button type="button" class="djbtn def' + hot() + '" data-act="next">SAVE</button></div>';
+  return browser("op", "…/admin/bookings/booking/add/", djShell("central-ops", "Home › Bookings › Bookings › Add booking", inner));
+}
+
+function scrConfirm(){
+  var body = hhChrome("Home") +
+  '<div class="hh-body wide"><div><h2>Good morning, Marisol</h2></div>' +
+  '<div class="hh-grid"><div class="appt focus">' +
+    '<div class="appt-top"><span class="pill pill--ok">Confirmed</span><span class="pill">Free</span></div>' +
+    '<h3>Painting consultation <span class="newtag">New type</span></h3>' +
+    '<p class="appt-when">Thu, Oct 22 · 9:00–10:00 AM arrival</p>' +
+    '<p class="appt-who">With Mario, Specialty Painter</p>' +
+    '<div class="appt-exp"><b>What happens at a consultation</b><ul>' +
+      '<li>Mario walks the rooms with you, measures and takes photos. It takes about an hour.</li>' +
+      '<li>You get a written proposal by email, often before Mario leaves and otherwise within 1–2 business days.</li>' +
+      '<li>You approve, decline or ask us a question online. Nothing is booked until you approve.</li></ul></div>' +
+    '<div class="appt-acts"><button type="button" class="btn">Reschedule</button><button type="button" class="btn btn--pri' + hot() + '" data-act="next">Add to calendar</button></div>' +
+  '</div>' +
+  '<div class="side-card"><h4>Your requests</h4>' +
+    '<div class="lrow"><span><b>Painting + baseboard repair</b><small>SR-58214 · Oct 19</small></span><span class="pill pill--acc">Consultation booked</span></div>' +
+    '<div class="lrow"><span><b>Kitchen GFCI won\'t reset</b><small>SR-57730 · Aug 25</small></span><span class="pill">Closed</span></div>' +
+    '<h4 style="margin-top:6px">Your Home Manager</h4><div class="lrow"><span><b>Ruben Ortiz</b><small>Next preventive maintenance: February</small></span></div>' +
+  '</div></div></div>';
+  return browser("hh", "member.prefixinc.com/", body);
+}
+
+function hmForm(){
+  var t = T();
+  var cards = S.lines.map(function(l){
+    return '<article class="wa"><div class="wa-top"><h4>' + esc(l.area) + '</h4><span class="chip">' + l.trade + '</span></div>' +
+      '<p class="wa-meas">' + esc(l.meas) + '</p>' +
+      '<div class="fld"><label for="sc-' + l.id + '">Scope of work <span class="memsees">Member sees</span></label>' +
+      '<textarea id="sc-' + l.id + '" class="inp grow" rows="2" data-bind="scope" data-line="' + l.id + '">' + esc(l.scope) + '</textarea></div>' +
+      '<div class="wa-grid">' +
+        '<div class="fld"><span class="flabel">Hours</span><div class="stepper"><button type="button" data-act="hrs" data-d="-1" data-line="' + l.id + '" aria-label="Fewer hours">−</button><output id="hr-' + l.id + '">' + l.hours + '</output><button type="button" data-act="hrs" data-d="1" data-line="' + l.id + '" aria-label="More hours">+</button></div></div>' +
+        '<div class="fld"><label for="mt-' + l.id + '">Materials</label><div class="money"><span>$</span><input id="mt-' + l.id + '" class="inp" inputmode="numeric" value="' + l.mat + '" data-bind="mat" data-line="' + l.id + '"></div></div>' +
+        '<div class="fld"><span class="flabel">Line total</span><output class="lt" id="lt-' + l.id + '">' + money(l.hours*RATE + l.mat) + '</output></div>' +
+      '</div></article>';
+  }).join("");
+  return hmChrome("Consultation – Painting · Oct 22") +
+  '<div class="pbody">' + rail() +
+  '<div class="pmain">' +
+    '<div class="hm-head"><div><h2>Build the proposal <span class="newtag">New</span></h2><p>Marisol reads everything marked <span class="memsees">Member sees</span>. The boxes grow as you type, so you can proof the whole thing on the iPad.</p></div><span class="pill pill--acc">In Progress · since 9:04 AM</span></div>' +
+    cards +
+    '<div class="addwa">+ Add a work area</div>' +
+    '<section class="hm-sec"><h3>Photos · 4</h3><div class="phs"><div class="ph"><span>Living room, north wall</span></div><div class="ph"><span>Living room, dings</span></div><div class="ph"><span>Hallway scuffs</span></div><div class="ph"><span>Baseboard, water damage</span></div></div></section>' +
+    '<section class="hm-sec"><h3>Consultation questions</h3><div class="qa">' +
+      '<div><span>Paint color</span><span>Match existing. Member confirms before we start.</span></div>' +
+      '<div><span>Furniture</span><span>We move standard furniture. Piano stays.</span></div>' +
+      '<div><span>Pets</span><span>One dog, kept in the yard on work days.</span></div>' +
+      '<div><span>Moisture reading</span><span>12% at the baseboard. Dry today.</span></div>' +
+    '</div></section>' +
+    '<div class="sumbar"><div class="sumk"><span><b id="s-hours">' + t.hours + '</b> hours</span><span><b id="s-days">' + t.days + '</b> day' + (t.days===1?"":"s") + ' on site</span><span>Labor <b id="s-labor">' + money(t.labor) + '</b></span><span>Materials <b id="s-mat">' + money(t.mat) + '</b></span><span class="big">Total <b id="s-total">' + money(t.total) + '</b></span></div>' +
+    '<button type="button" class="btn btn--pri' + hot() + '" data-act="next">Finish consultation</button></div>' +
+    '<p class="rate">Labor at $' + RATE + '/hr from the rate card (placeholder). Try changing hours or materials: the proposal and every later step update.</p>' +
+  '</div></div>';
+}
+function scrConsult(){ return tablet(hmForm()); }
+
+function scrFinish(){
+  var t = calc(false);
+  var overlay = '<div class="overlay"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="fin-t">' +
+    '<div class="mhead"><p class="lbl">End of consultation <span class="newtag">New</span></p><h3 id="fin-t">How should this proposal go out?</h3><p>Living Room &amp; Hallway Refresh · ' + t.hours + ' hours · ' + money(t.total) + '</p></div>' +
+    '<div class="mbody">' +
+      '<div class="choice"><h4>Send to Marisol now</h4><p>For work of about a day or less, priced from the rate card. She gets the proposal by email in a minute and can approve it on the spot or later.</p><p class="cmeta">Booking → Completed · Proposal → Sent</p>' +
+        '<button type="button" class="btn btn--pri' + hot() + '" data-act="choose" data-path="A">Send to member</button></div>' +
+      '<div class="choice"><h4>Send to Central Ops for review</h4><p>For bigger or uncertain jobs. Homer checks the scope and price, then sends it. Tell Marisol to expect it within 1–2 business days.</p>' +
+        '<div class="fld"><label for="rv-note">Note for the reviewer</label><textarea id="rv-note" class="inp grow" rows="2" data-bind="note">' + esc(S.note) + '</textarea></div>' +
+        '<p class="cmeta">Booking → Completed – Pending Review · Proposal → Pending review</p>' +
+        '<button type="button" class="btn btn--pri' + hot() + '" data-act="choose" data-path="B">Send for review</button></div>' +
+    '</div>' +
+    '<div class="mfoot"><span class="spacer">Either way, Marisol sees the same proposal page.</span><button type="button" class="btn">Save for later</button></div>' +
+  '</div></div>';
+  return tablet(hmForm().replace(/ hot"/g,'"'), overlay);
+}
+
+function lifecycle(on){
+  var all = ["Pending review","Sent","Accepted","Declined","Contact later"];
+  var idx = all.indexOf(on);
+  return '<div class="life" aria-label="Proposal statuses">' +
+    '<span class="' + (S.path==="A" ? "" : (idx>0?"done":(idx===0?"on":""))) + '">Pending review</span><i>→</i>' +
+    '<span class="' + (on==="Sent"?"on":(idx>1?"done":"")) + '">Sent</span><i>→</i>' +
+    '<span class="' + (on==="Accepted"?"on":"") + '">Accepted</span><span>Declined</span><span>Contact later <span class="newtag">Proposed</span></span></div>';
+}
+function scrProposalObj(){
+  var A = S.path==="A", t = calc(false);
+  var rows = [
+    ["PF-2026-00148","Alvarez · 1420 Cedar Hollow","#48213","Mario",money(t.total), A ? '<span class="pill pill--ok">Sent</span>' : '<span class="pill pill--warn">Pending review</span>',"Oct 22, 10:01 AM",true],
+    ["PF-2026-00147","Okafor · 3301 Lakeway Blvd","#48190","Mario","$640",'<span class="pill pill--ok">Accepted</span>',"Oct 21, 3:40 PM"],
+    ["PF-2026-00146","Chen · 640 Canyon Rim","#48177","Carpentry team","$2,380",'<span class="pill pill--warn">Pending review</span>',"Oct 21, 11:15 AM"],
+    ["PF-2026-00145","Reyes · 812 Sunset Trail","#48162","Mario","$415",'<span class="pill">Declined</span>',"Oct 20, 2:05 PM"],
+    ["PF-2026-00144","Patel · 1120 Oakmont Dr","#48150","Painting team","$1,150",'<span class="pill pill--acc">Contact later</span>',"Oct 19, 9:30 AM"]
+  ];
+  var table = '<div class="tbl"><table><thead><tr><th>Proposal</th><th>Member · home</th><th>Consultation</th><th>Prepared by</th><th class="num">Total</th><th>Status</th><th>Created</th></tr></thead><tbody>' +
+    rows.map(function(r){ return '<tr' + (r[7]?' class="hl"':'') + '><td>' + (r[7] ? '<button type="button" class="lnk' + hot() + '" data-act="next">' + r[0] + '</button>' : '<span class="lnk">' + r[0] + '</span>') + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td><td class="num">' + r[4] + '</td><td>' + r[5] + '</td><td>' + r[6] + '</td></tr>'; }).join("") +
+    '</tbody></table></div>';
+  var filter = '<div class="dj-filter"><h4>Filter</h4><p>By status</p><ul><li class="on">All</li><li>Pending review</li><li>Sent</li><li>Accepted</li><li>Declined</li><li>Contact later</li><li>Expired</li></ul><p>By trade</p><ul><li class="on">All</li><li>Carpentry</li><li>Painting</li><li>Insulation</li></ul></div>';
+  var inner = '<div class="dj-msg">' + (A
+      ? 'Consultation booking #48213 was set to “Completed”. Proposal PF-2026-00148 was created and emailed to Marisol Alvarez.'
+      : 'Consultation booking #48213 was set to “Completed – Pending Review”. Proposal PF-2026-00148 was created and Zendesk ticket #91502 was opened for review.') + '</div>' +
+    '<div class="dj-title"><h2>Select proposal to change</h2><span class="newtag">New model</span></div>' +
+    lifecycle(A ? "Sent" : "Pending review") +
+    '<div class="dj-split"><div style="min-width:0">' + table + '</div>' + filter + '</div>' +
+    '<div class="dj-fs"><div class="dj-cap">Linked consultation booking</div>' +
+      djr("Booking", "#48213 · Consultation – Painting", {ro:1}) +
+      djr("Status", A ? "Completed" : "Completed – Pending Review <span class=\"newtag\">New status</span>", {ro:1, help: A ? null : "A holding status, like “Completed – Pending Contractor Invoice”. It clears when someone sends the proposal."}) +
+    '</div>';
+  return browser("op", "…/admin/proposals/proposal/", djShell("system", "Home › Proposals › Proposals", inner));
+}
+
+function scrZdReview(){
+  var t = calc(false);
+  var list = '<div class="zlist">' +
+    '<div class="zrow hl"><span class="id">#91502</span><span class="s"><b>Proposal needs review — PF-2026-00148 · Alvarez</b></span><span class="pill pill--warn">New</span></div>' +
+    '<div class="zrow"><span class="id">#91488</span><span class="s">Cabinet door rehang — Okafor</span><span class="pill">Open</span></div>' +
+    '<div class="zrow"><span class="id">#91470</span><span class="s">Proposal needs review — PF-2026-00146 · Chen</span><span class="pill">Open</span></div></div>';
+  var tbl = '<table class="mini"><thead><tr><th>Work area</th><th>Hours</th><th>Total</th></tr></thead><tbody>' +
+    t.ls.map(function(l){ return '<tr><td>' + esc(l.area) + '</td><td>' + l.hours + '</td><td>' + money(l.total) + '</td></tr>'; }).join("") +
+    '<tr class="tot"><td>Total</td><td>' + t.hours + '</td><td>' + money(t.total) + '</td></tr></tbody></table>';
+  var main = '<div class="zd-main"><div class="zd-ticket">' + list +
+    '<div><p class="zd-subj">Proposal needs review — PF-2026-00148 · Alvarez</p><p class="zd-meta">#91502 · created automatically · Thu, Oct 22, 10:01 AM</p></div>' +
+    '<article class="msg sys"><header><span class="avatar">PF</span><b>PreFix system</b><span class="pill">Automation <span class="newtag">New</span></span><span class="t">10:01 AM</span></header>' +
+      '<p>Mario finished the consultation at 1420 Cedar Hollow and sent the proposal for review instead of to the member.</p>' + tbl + '</article>' +
+    '<article class="msg note"><header><span class="avatar">M</span><b>Mario</b><span class="pill">Note for the reviewer</span><span class="t">10:01 AM</span></header><p>' + esc(S.note) + '</p></article>' +
+    '<button type="button" class="btn btn--pri' + hot() + '" data-act="next" style="align-self:flex-start">Open proposal in Admin</button>' +
+    '</div><aside class="zd-side">' + zf("Group","Central Ops – Specialty") + zf("Assignee","Homer") + zf("Proposal","PF-2026-00148") + zf("Booking","#48213 · Completed – Pending Review") + zf("Review due","Fri, Oct 23 (1 business day)") + zf("Tags","proposal_review · painting") + '</aside></div>';
+  return browser("zd", "prefix.zendesk.com/agent/tickets/91502", zdShell(main));
+}
+
+function scrReview(){
+  var before = calc(false), after = calc(true);
+  var tbl = '<div class="tbl"><table><thead><tr><th>Work area</th><th>Trade</th><th class="num">Hours</th><th class="num">Materials</th><th class="num">Line total</th></tr></thead><tbody>' +
+    after.ls.map(function(l, i){
+      var b = before.ls[i], changed = b.mat !== l.mat;
+      return '<tr' + (changed?' class="hl"':'') + '><td>' + esc(l.area) + '</td><td>' + l.trade + '</td><td class="num">' + l.hours + '</td><td class="num">' + (changed ? '<s>' + money(b.mat) + '</s> ' + money(l.mat) : money(l.mat)) + '</td><td class="num">' + money(l.total) + '</td></tr>';
+    }).join("") + '</tbody></table></div>';
+  var inner = '<div class="dj-title"><h2>Change proposal</h2><span class="pill pill--warn">Pending review</span></div>' +
+    '<div class="dj-fs"><div class="dj-cap">Proposal</div>' +
+      djr("Number", "PF-2026-00148", {ro:1}) +
+      djr("Title", "Living Room &amp; Hallway Refresh", {help:"Member sees this."}) +
+      djr("Member · home", "Marisol Alvarez · 1420 Cedar Hollow Ln", {ro:1}) +
+      djr("Consultation booking", "#48213 · Consultation – Painting · Completed – Pending Review", {ro:1}) +
+      djr("Prepared by", "Mario · Specialty Painter", {ro:1}) +
+      djr("Valid through", "2026-11-22") +
+    '</div>' +
+    '<div class="dj-fs"><div class="dj-cap">Work areas</div>' + tbl + '</div>' +
+    '<div class="dj-fs"><div class="dj-cap">Not included · member sees</div>' +
+      djr("Exclusions", 'Ceiling, doors and trim, except the new baseboard<br>Large items such as the piano<br>Repairs to unrelated existing conditions<br><mark>Hidden water damage behind the baseboard or wall. If we find any, we stop and send you a change order first.</mark>', {chg:1}) +
+    '</div>' +
+    '<div class="dj-fs"><div class="dj-cap">Review</div>' +
+      djr("Reviewer note (internal)", "Added stain-blocking primer for the water marks (+$25) and a hidden-damage exclusion. Hours hold. — Homer", {}) +
+      djr("Total", money(before.total) + " → <b>" + money(after.total) + "</b>", {ro:1}) +
+    '</div>' +
+    '<div class="submit-row"><button type="button" class="djbtn alt">Save</button><button type="button" class="djbtn alt">Hand off to Sales (HubSpot)</button><button type="button" class="djbtn def' + hot() + '" data-act="next">Send to member</button></div>';
+  return browser("op", "…/admin/proposals/proposal/148/change/", djShell("homer", "Home › Proposals › Proposals › PF-2026-00148", inner));
+}
+
+function scrEmail(){
+  var t = T(), d = DT(), rv = reviewed();
+  var body = '<div class="mail"><nav class="mail-list" aria-label="Inbox"><p class="lbl">Inbox</p>' +
+    '<div class="mitem on"><b>PreFix</b><span>Your proposal is ready</span><span>' + d.sentS + '</span></div>' +
+    '<div class="mitem read"><b>PreFix</b><span>Your painting consultation is confirmed</span><span>Oct 19</span></div>' +
+    '<div class="mitem read"><b>PreFix</b><span>Your Aug 25 visit summary</span><span>Aug 25</span></div>' +
+    '<div class="mitem read"><b>Round Rock Library</b><span>Holds ready for pickup</span><span>Aug 21</span></div>' +
+  '</nav><div class="mail-msg">' +
+    '<h3>Your proposal for Living Room &amp; Hallway Refresh is ready</h3>' +
+    '<div class="mail-from"><span class="avatar">PF</span><span><b>PreFix</b> to Marisol Alvarez</span><span>· ' + d.sent + '</span><span class="newtag">New template</span></div>' +
+    '<div class="em"><div class="em-top"><span class="dot"></span>PreFix</div><div class="em-body">' +
+      '<h4>Hi Marisol,</h4>' +
+      '<p>' + (rv ? 'Mario and our specialty team finished the proposal from Thursday\'s consultation.' : 'Here\'s the proposal Mario put together during this morning\'s consultation.') + ' It covers what we\'ll do, what\'s included, the price and how long it takes.</p>' +
+      '<div class="em-card"><b>Living Room &amp; Hallway Refresh</b><span class="tot">' + money(t.total) + '</span><small>' + dur(t) + ' · Valid through ' + d.valid + '</small></div>' +
+      '<button type="button" class="btn btn--pri btn--lg' + hot() + '" data-act="next" style="align-self:flex-start">Review your proposal</button>' +
+      '<p style="font-size:13px">You can approve it, decline it or ask us to get back to you, all from the proposal page.</p>' +
+    '</div><div class="em-foot">Questions? Reply to this email or message us in HomeHub. PreFix · Austin, TX</div></div>' +
+  '</div></div>';
+  return browser("em", "Mail · Inbox", body);
+}
+
+function propHero(state){
+  var t = T(), d = DT(), rv = reviewed();
+  var top = state==="approved"
+    ? '<div class="approved"><span class="tick" aria-hidden="true">✓</span><div><h3>You approved this project</h3><p>Approved ' + d.accepted + ' · ' + money(t.total) + '. We emailed you a copy.</p></div></div>'
+    : '<div class="glance"><div><p class="lbl">Total project investment</p><p class="tot">' + money(t.total) + '</p><p class="gsub">' + dur(t) + ' · Due when the work is complete</p></div>' +
+      '<button type="button" class="btn btn--pri btn--lg' + hot() + '" data-act="next">Approve project</button></div>';
+  return '<div class="prop-hero"><div class="prop-band"><span class="mark"><span class="dot"></span>PreFix</span><span class="lbl">Specialty project proposal</span></div>' +
+    '<div class="prop-hero-in"><div><p class="lbl">Painting &amp; carpentry</p><h2 class="prop-title">Living Room &amp; Hallway Refresh</h2></div>' +
+    '<dl class="prop-meta">' +
+      '<div><dt>Prepared for</dt><dd>Marisol Alvarez</dd></div>' +
+      '<div><dt>Property</dt><dd>1420 Cedar Hollow Ln<small>Round Rock, TX</small></dd></div>' +
+      '<div><dt>Proposal</dt><dd>PF-2026-00148</dd></div>' +
+      '<div><dt>Prepared</dt><dd>' + d.prepared + '</dd></div>' +
+      '<div><dt>Valid through</dt><dd>' + d.valid + '</dd></div>' +
+      '<div><dt>Prepared by</dt><dd>Mario, Specialty Painter' + (rv ? '<small>Reviewed by Homer, Central Ops</small>' : '') + '</dd></div>' +
+    '</dl>' + top + '</div></div>';
+}
+function propScope(){
+  var t = T();
+  return '<section class="psec"><h3>Scope of work</h3><p style="font-size:12.5px;color:var(--muted)">Written by Mario on site. Each area comes straight from the consultation form.</p>' +
+    t.ls.map(function(l){ return '<div class="area"><div class="area-h"><h4>' + esc(l.area) + '</h4><span class="meas">' + l.hours + ' h · ' + l.trade + '</span></div><span class="meas">' + esc(l.meas) + '</span><p>' + esc(l.scope) + '</p></div>'; }).join("") + '</section>';
+}
+function propInvest(){
+  var t = T();
+  return '<section class="psec"><h3>Your project investment</h3><table class="ptable"><tbody>' +
+    t.ls.map(function(l){ return '<tr><td>' + esc(l.area) + '<small>Labor and materials</small></td><td class="num">' + money(l.total) + '</td></tr>'; }).join("") +
+    '<tr class="tot"><td>Total project investment</td><td class="num">' + money(t.total) + '</td></tr></tbody></table>' +
+    '<p style="font-size:13px">Payment is due when the work is complete. No deposit for a project this size. Any extra work needs your approval before we start it.</p></section>';
+}
+function scrProposal(){
+  var t = T(), rv = reviewed();
+  var excl = ['Ceiling, doors and trim, except the new baseboard','Moving large items such as the piano','Repairs to unrelated existing conditions','Work not described in this proposal'];
+  var html = '<div class="prop"><div class="prop-in">' + propHero("review") +
+    '<p class="lbl pgroup">Your project</p>' +
+    '<section class="psec"><h3>What we recommend</h3><p>Repaint the living room and hallway walls, and replace the two water-damaged baseboard sections by the bathroom door, so both spaces look fresh and finished.</p>' +
+      '<h4>What you get</h4><ul class="ticks"><li>Clean, even walls in your two most-used spaces</li><li>Damaged baseboard replaced before it crumbles further</li><li>Done in ' + (t.days===1 ? 'one day' : t.days + ' days') + ', with furniture moved and floors protected</li></ul></section>' +
+    '<section class="psec"><h3>What we found</h3><div class="two">' +
+      '<div class="cond"><div class="ph"><span>Baseboard by bathroom door</span></div><span class="pill pill--warn" style="align-self:flex-start">Cause for Concern</span><p>Swollen and soft along the bottom edge, with water staining. The moisture reading is normal today (12%), so the leak appears to have stopped.</p></div>' +
+      '<div class="cond"><div class="ph"><span>Living room, north wall</span></div><span class="pill pill--ok" style="align-self:flex-start">No Concern</span><p>Nail holes, dings and scuffs, and the paint has dulled. Cosmetic only.</p></div>' +
+    '</div></section>' +
+    '<p class="lbl pgroup">The details</p>' + propScope() +
+    '<section class="psec"><h3>Materials</h3><table class="ptable"><tbody>' +
+      '<tr><th>Paint</th><td>Premium interior latex, eggshell finish</td></tr>' +
+      '<tr><th>Color</th><td>Matched to your current walls. You confirm the sample before we start.</td></tr>' +
+      '<tr><th>Coverage</th><td>≈ 900 sq ft of wall, two coats</td></tr>' +
+      '<tr><th>Baseboard</th><td>Primed MDF, matched to your existing profile</td></tr>' +
+      '<tr><th>Primer</th><td>Spot primer for patches' + (rv ? ', plus stain-blocking primer over the water marks' : '') + '</td></tr>' +
+    '</tbody></table></section>' +
+    '<section class="psec"><h3>What\'s included</h3><div class="two"><div><h4 style="margin-bottom:6px">Included</h4><ul class="ticks"><li>Moving standard furniture and protecting floors</li><li>Patching small holes and dings</li><li>All paint and materials listed above</li><li>Cleanup and a final walkthrough with you</li><li>PreFix workmanship warranty</li></ul></div>' +
+      '<div><h4 style="margin-bottom:6px">Not included</h4><ul class="ticks x">' + excl.map(function(x){ return '<li>' + x + '</li>'; }).join("") +
+      (rv ? '<li class="added">Hidden water damage behind the baseboard or wall. If we find any, we stop and send you a change order first.</li>' : '') + '</ul></div></div></section>' +
+    '<section class="psec"><h3>Timeline</h3><table class="ptable"><tbody><tr><th>Time on site</th><td>' + dur(t) + '</td></tr><tr><th>Scheduling</th><td>Usually within 1–2 weeks of approval</td></tr><tr><th>Before we arrive</th><td>Clear small items off shelves and surfaces in both rooms, and keep pets out of the work area.</td></tr></tbody></table>' +
+      '<p style="font-size:12.5px;color:var(--muted)">Timelines are estimates. We confirm your date when we call to schedule.</p></section>' +
+    '<p class="lbl pgroup">Your investment</p>' + propInvest() +
+    '<section class="psec"><h3>Quality and warranty</h3><table class="ptable"><tbody><tr><th>Workmanship</th><td>Covered by PreFix warranty terms</td></tr><tr><th>Paint and materials</th><td>Covered by the manufacturer\'s warranty</td></tr><tr><th>Help afterwards</th><td>Message us in HomeHub</td></tr></tbody></table></section>' +
+    '<div class="adv"><h3>Why PreFix</h3><div><b>A team that knows your home</b><span>Ruben and Mario share your home\'s history.</span></div><div><b>One point of contact</b><span>We coordinate from scheduling to cleanup.</span></div><div><b>It stays on record</b><span>The finished work joins your service history in HomeHub.</span></div></div>' +
+    '<section class="psec approve" id="approve"><h3>Ready to move forward?</h3><p>Approve the proposal and we\'ll take it from there.</p>' +
+      '<div class="ap-tot"><span>Total project investment</span><b>' + money(t.total) + '</b></div>' +
+      (S.declined
+        ? '<div class="branch"><b>You declined this proposal · “' + esc(S.reason) + '”</b><span>Proposal → Declined. The reason is recorded the same way as a declined recommendation, and Central Ops gets a follow-up ticket only if the reason calls for one.</span><div class="row"><button type="button" class="btn" data-act="undo">Undo, I want to decide again</button></div></div>'
+        : S.later
+        ? '<div class="branch"><b>We\'ll get back to you</b><span>Proposal → Contact later (proposed status). Central Ops or Sales follows up in about 2 weeks; this may live in HubSpot instead.</span><div class="row"><button type="button" class="btn" data-act="undo">Undo</button></div></div>'
+        : '<div class="ap-acts"><button type="button" class="btn btn--pri btn--lg' + hot() + '" data-act="next">Approve project</button><button type="button" class="btn" data-act="decline-open">Decline</button><button type="button" class="btn" data-act="later">Contact me later <span class="newtag">Proposed</span></button></div>') +
+      '<h4>Once you approve</h4><ol class="ap-next"><li>We confirm the project details with you.</li><li>Central Ops calls or texts you to set the date.</li><li>Mario does the work, and it\'s added to your home\'s service history.</li></ol>' +
+      '<p class="terms">Approving accepts the project terms: validity, payment, change orders, hidden conditions and cancellation. <span class="pill pill--warn">Terms pending legal review</span></p>' +
+    '</section></div></div>';
+  var overlay = S.decline
+    ? '<div class="overlay"><div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="dc-t"><div class="mhead"><h3 id="dc-t">Decline this proposal?</h3><p>Tell us why so we can do better. These are the same reasons you see when declining a recommendation.</p></div>' +
+      '<div class="mbody"><div class="reasons">' + REASONS.map(function(r){ return '<button type="button" class="reason" data-act="reason" data-r="' + esc(r) + '" aria-pressed="' + (S.reason===r) + '">' + esc(r) + '</button>'; }).join("") + '</div></div>' +
+      '<div class="mfoot"><button type="button" class="btn" data-act="decline-close">Keep the proposal</button><button type="button" class="btn btn--pri" data-act="decline-submit"' + (S.reason ? '' : ' disabled') + '>Decline proposal</button></div></div></div>'
+    : '';
+  return '<div class="frame" ' + sw("pr") + '><div class="fbar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span class="url">member.prefixinc.com/proposals/PF-2026-00148</span><span class="fsys"><i></i><span>Proposal page</span></span></div>' +
+    '<div class="fbody"><div class="fscroll" id="fscroll">' + html + '</div>' + overlay + '</div></div>';
+}
+
+function scrApproved(){
+  var t = T(), d = DT();
+  var html = '<div class="prop"><div class="prop-in">' + propHero("approved") +
+    '<section class="psec"><h3>What happens next</h3><ol class="track">' +
+      '<li class="done"><div><b>You approved the proposal</b><span>' + d.accepted + '</span></div></li>' +
+      '<li class="cur"><div><b>Central Ops sets up your project</b><span>Usually within 1 business day</span></div></li>' +
+      '<li><div><b>We call or text you to pick a date</b><span>Most projects start within 1–2 weeks</span></div></li>' +
+      '<li><div><b>Mario does the work</b><span>' + dur(t) + '</span></div></li>' +
+      '<li><div><b>It joins your service history</b><span>With before and after photos in HomeHub</span></div></li>' +
+    '</ol><button type="button" class="btn btn--pri' + hot() + '" data-act="next" style="align-self:flex-start">Back to HomeHub</button></section>' +
+    propInvest() + propScope() +
+  '</div></div>';
+  return browser("pr", "member.prefixinc.com/proposals/PF-2026-00148", html, true);
+}
+
+function scrZdAccepted(){
+  var t = T(), d = DT();
+  var list = '<div class="zlist">' +
+    '<div class="zrow hl"><span class="id">#91655</span><span class="s"><b>Proposal accepted — PF-2026-00148 · Alvarez</b></span><span class="pill pill--ok">New</span></div>' +
+    '<div class="zrow"><span class="id">#91640</span><span class="s">Proposal accepted — PF-2026-00147 · Okafor</span><span class="pill">Open</span></div>' +
+    '<div class="zrow"><span class="id">#91488</span><span class="s">Cabinet door rehang — Okafor</span><span class="pill">Open</span></div></div>';
+  var main = '<div class="zd-main"><div class="zd-ticket">' + list +
+    '<div><p class="zd-subj">Proposal accepted — PF-2026-00148 · Alvarez</p><p class="zd-meta">#91655 · created automatically · ' + d.accepted + '</p></div>' +
+    '<article class="msg sys"><header><span class="avatar">PF</span><b>PreFix system</b><span class="pill">Automation <span class="newtag">New</span></span><span class="t">' + d.accepted.split(", ").pop() + '</span></header>' +
+      '<p>Marisol Alvarez approved PF-2026-00148 for <b>' + money(t.total) + '</b> (' + t.hours + ' hours). Booking #48390 was created as Pending from the proposal, with its tasks, hours and price. Check it and schedule Mario.</p></article>' +
+    '<button type="button" class="btn btn--pri' + hot() + '" data-act="next" style="align-self:flex-start">Open booking #48390 in Admin</button>' +
+    '</div><aside class="zd-side">' + zf("Group","Central Ops – Specialty") + zf("Assignee","Central Ops") + zf("Proposal","PF-2026-00148 · Accepted") + zf("Booking","#48390 · Pending") + zf("Tags","proposal_accepted · painting") + '</aside></div>';
+  return browser("zd", "prefix.zendesk.com/agent/tickets/91655", zdShell(main));
+}
+
+function scrSchedule(){
+  var t = T();
+  var tasks = '<div class="tbl"><table><thead><tr><th>#</th><th>Task (from proposal)</th><th class="num">Minutes</th></tr></thead><tbody>' +
+    t.ls.map(function(l, i){ return '<tr><td>' + (i+1) + '</td><td>' + esc(l.area) + ' — ' + l.trade.toLowerCase() + '</td><td class="num">' + (l.hours*60) + '</td></tr>'; }).join("") +
+    '<tr><td></td><td><b>Total</b></td><td class="num"><b>' + (t.hours*60) + '</b></td></tr></tbody></table></div>';
+  var endH = Math.min(17, 8 + Math.min(t.hours, 8) + 0.5);
+  var pct = function(h){ return ((h-8)/9*100).toFixed(2) + "%"; };
+  var cal = '<div class="cal" aria-label="Ops Calendar, Tue Nov 3"><span class="lbl">Ops Calendar · Tue, Nov 3</span>' +
+    '<div class="cal-axis"><span></span><div class="tk">' + [8,10,12,14,16].map(function(h){ return '<span style="left:' + pct(h) + '">' + (h>12?h-12:h) + (h>=12?"p":"a") + '</span>'; }).join("") + '</div></div>' +
+    '<div class="cal-lane"><span>Mario</span><div class="tr"><span class="blk new" style="left:0;width:' + ((endH-8)/9*100).toFixed(2) + '%">Alvarez · Refresh</span></div></div>' +
+    '<div class="cal-lane"><span>Carpentry team</span><div class="tr"><span class="blk busy" style="left:' + pct(9) + ';width:' + ((3)/9*100).toFixed(2) + '%">Chen · cabinets</span><span class="blk busy" style="left:' + pct(13) + ';width:' + ((2)/9*100).toFixed(2) + '%">Consult</span></div></div>' +
+    (t.days>1 ? '<p class="help" style="margin:0">Runs ' + t.days + ' days: the calendar books Mario on ' + projDate() + '.</p>' : '') + '</div>';
+  var inner = '<div class="dj-title"><h2>Change booking</h2><span class="pill">#48390</span></div>' +
+    '<div class="dj-fs"><div class="dj-cap">Booking</div>' +
+      djr("Service type", "Specialty – Painting", {sel:1}) +
+      djr("Created from", "Proposal PF-2026-00148 · Accepted <span class=\"newtag\">New link</span>", {ro:1, help:"Tasks, minutes and price came from the proposal. Ops checks them and schedules."}) +
+      djr("Subscription", "1420 Cedar Hollow Ln — Marisol Alvarez (Active)", {sel:1}) +
+      djr("Assigned Home Manager", "Mario · Specialty Painter", {sel:1}) +
+      djr("Duration (minutes)", String(t.hours*60), {ro:1}) +
+      djr("Price", money(t.total) + ".00", {ro:1, help:"Charged on completion, as on the proposal."}) +
+    '</div>' +
+    '<div class="dj-fs"><div class="dj-cap">Booking tasks</div>' + tasks + '</div>' +
+    '<div class="dj-fs"><div class="dj-cap">Scheduling</div>' +
+      djr("Status", "Booked", {sel:1, chg:1, help:"Was Pending. Later this could go to Ready so Marisol picks the date in HomeHub."}) +
+      djr("Scheduled start", "2026-11-03 &nbsp; 08:00", {chg:1}) +
+      '<div style="padding:0 12px 12px">' + cal + '</div>' +
+    '</div>' +
+    '<div class="submit-row"><button type="button" class="djbtn alt">Save and continue editing</button><button type="button" class="djbtn def' + hot() + '" data-act="next">SAVE</button></div>';
+  return browser("op", "…/admin/bookings/booking/48390/change/", djShell("central-ops", "Home › Bookings › Bookings › #48390", inner));
+}
+
+function scrBooked(){
+  var t = T();
+  var body = hhChrome("Home") +
+  '<div class="hh-body wide"><div><h2>Good evening, Marisol</h2></div>' +
+  '<div class="hh-grid"><div class="appt focus">' +
+    '<div class="appt-top"><span class="pill pill--ok">Confirmed</span><span class="pill">' + money(t.total) + ' · due when complete</span></div>' +
+    '<h3>Living Room &amp; Hallway Refresh</h3>' +
+    '<p class="appt-when">' + projDate() + ' · 8:00 AM arrival</p>' +
+    '<p class="appt-who">With Mario, Specialty Painter · ' + dur(t) + '</p>' +
+    '<div class="appt-exp"><b>Approved proposal PF-2026-00148 <span class="newtag">Linked</span></b><ul><li>Scope, materials and what\'s not included stay attached to this visit.</li><li>Clear small items off shelves before Mario arrives.</li></ul></div>' +
+    '<div class="appt-acts"><button type="button" class="btn">View approved proposal</button><button type="button" class="btn btn--pri' + hot() + '" data-act="next">Add to calendar</button></div>' +
+  '</div>' +
+  '<div class="side-card"><h4>Recent</h4>' +
+    '<div class="lrow"><span><b>Painting consultation</b><small>Thu, Oct 22 · Mario</small></span><span class="pill">Completed</span></div>' +
+    '<div class="lrow"><span><b>Painting + baseboard repair</b><small>SR-58214 · Oct 19</small></span><span class="pill pill--ok">Booked</span></div>' +
+    '<h4 style="margin-top:6px">Your Home Manager</h4><div class="lrow"><span><b>Ruben Ortiz</b><small>Next preventive maintenance: February</small></span></div>' +
+  '</div></div></div>';
+  return browser("hh", "member.prefixinc.com/", body);
+}
+
+function scrKpi(){
+  var bars = [
+    {l:"Today, before V1", v:20, txt:"up to 20", tip:"Today: up to 20 days from request to a quote the member sees"},
+    {l:"Sent after review", v:6, txt:"6", tip:"Median 6 days when the proposal goes through Central Ops review"},
+    {l:"Sent on site", v:4, txt:"4", tip:"Median 4 days when the specialist sends it from the consultation"}
+  ];
+  var chart = '<div class="bars" role="list">' + bars.map(function(b){
+      return '<div class="brow" role="listitem" tabindex="0" aria-label="' + esc(b.tip) + '"><span class="bl">' + b.l + '</span><span class="bt"><i style="width:' + (b.v/20*100) + '%"></i></span><span class="bv">' + b.txt + '</span><span class="tip" aria-hidden="true">' + esc(b.tip) + '</span></div>';
+    }).join("") +
+    '<div class="baxis" aria-hidden="true"><span></span><div class="tk"><span style="left:0">0</span><span style="left:25%">5</span><span style="left:50%">10</span><span style="left:75%">15</span><span style="left:100%">20 days</span></div><span></span></div></div>';
+  var html = '<div class="mb"><div class="mb-head"><div><p class="lbl">Metabase · Field Operations</p><h2>Consultations &amp; proposals</h2></div><div class="chips"><span class="chip on">October 2026</span><span class="chip">Austin</span><span class="chip">Carpentry &amp; Painting</span></div></div>' +
+    '<p class="mb-note">Illustrative numbers. This dashboard doesn\'t exist yet. It shows what the new service type and proposal statuses make possible.</p>' +
+    '<div class="kpis">' +
+      '<div class="kpi"><span class="k">Consultations completed</span><span class="v">42</span><span class="s">14 per specialist</span></div>' +
+      '<div class="kpi"><span class="k">Priced on site</span><span class="v">61%</span><span class="s">Sent straight to the member</span></div>' +
+      '<div class="kpi"><span class="k">Sent for review</span><span class="v">39%</span><span class="s">Top reason: hidden damage</span></div>' +
+      '<div class="kpi"><span class="k">Proposals accepted</span><span class="v">54%</span><span class="s">Of proposals sent</span></div>' +
+    '</div>' +
+    '<div class="mb-card"><h3>Request to proposal, median days</h3><p class="sub">From the member\'s request to a price they can approve. One series.</p>' + chart + '</div>' +
+    '<div class="mb-card"><h3>By specialist</h3><div class="tbl"><table><thead><tr><th>Specialist</th><th class="num">Consultations</th><th class="num">Priced on site</th><th class="num">Accepted</th></tr></thead><tbody>' +
+      '<tr><td>Mario</td><td class="num">16</td><td class="num">75%</td><td class="num">58%</td></tr>' +
+      '<tr><td>Carpentry specialist</td><td class="num">14</td><td class="num">50%</td><td class="num">52%</td></tr>' +
+      '<tr><td>Painting specialist</td><td class="num">12</td><td class="num">58%</td><td class="num">50%</td></tr>' +
+    '</tbody></table></div></div></div>';
+  return browser("mb", "metabase · Consultations & proposals", html);
+}
+
+/* ================= steps ================= */
+var STEPS = [
+  {id:"hh-request", sys:"hh", actor:"Marisol Alvarez · Member", av:"MA",
+   title:function(){ return "Marisol asks for painting and a baseboard repair"; },
+   summary:function(){ return "She uses the normal HomeHub service request form. Painting and carpentry can't be booked through Fast Fix, so the request goes to Central Ops as it does today."; },
+   changes:function(){ return [["sr","New"],["tk1","New · Intake"]]; },
+   v1:[], v1none:"Nothing new here. This is today's service request flow.",
+   later:["v1.1: a “Request a quote” option in Fast Fix lets members start a painting or carpentry quote themselves."],
+   qs:[], screen:scrRequest},
+
+  {id:"zd-triage", sys:"zd", actor:"Central Ops associate · Specialty view", av:"CO",
+   title:function(){ return "Central Ops decides this needs a consultation"; },
+   summary:function(){ return "The ticket moves from Intake to the Carpentry/Painting – Specialty view. The photos don't show the full scope, so instead of a ballpark quote Ops picks the new Consultation option."; },
+   changes:function(){ return [["tk1","Open · Specialty view"],["sr","Processing"]]; },
+   v1:["Consultation becomes a choice here, next to the ballpark quote"],
+   later:[],
+   qs:["When the member gets to choose between a ballpark quote and a consultation, where do they choose: HomeHub or the Ops call?"], screen:scrTriage},
+
+  {id:"op-book", sys:"op", actor:"Central Ops associate · Django Admin", av:"CO",
+   title:function(){ return "Ops books it as a Consultation booking"; },
+   summary:function(){ return "Ops creates the booking with the new Consultation – Painting service type, assigns Mario and books the slot by hand. A separate service type lets us count consultations, give them their own end-of-booking flow, and keep the proposal form off normal service bookings."; },
+   changes:function(){ return [["bk1","Booked · Oct 22, 9 AM"],["sr","Processed"],["tk1","Solved"]]; },
+   v1:["Service types: Consultation – Carpentry, Painting and Insulation","Free, 60-minute default, no invoice"],
+   later:["Ready status and self-scheduling into the dedicated consultation slots, once specialty scheduling logic exists"],
+   qs:["Does each consultation type need its own default tasks and questions per trade?"], screen:scrBook},
+
+  {id:"hh-confirm", sys:"hh", actor:"Marisol Alvarez · Member", av:"MA",
+   title:function(){ return "Marisol sees the consultation confirmed"; },
+   summary:function(){ return "The appointment card explains what a consultation is and sets the expectation: a written proposal by email, often before Mario leaves."; },
+   changes:function(){ return []; },
+   v1:["Consultation appointment copy that tells the member a proposal is coming"],
+   later:[],
+   qs:["Reuse the standard confirmation email, or send a consultation-specific one?"], screen:scrConfirm},
+
+  {id:"hm-consult", sys:"hm", actor:"Mario · Specialty Painter, on an iPad", av:"M",
+   title:function(){ return "Mario builds the proposal during the walkthrough"; },
+   summary:function(){ return "A consultation booking opens a proposal form instead of a normal task list. Mario enters each work area with the scope Marisol will read, plus hours and materials. The text boxes grow as he types, so he can proof the wording on the iPad. In Phase 1 this is manual entry with the standard rate card."; },
+   changes:function(){ return [["bk1","In Progress"]]; },
+   v1:["Proposal fields on consultation bookings: work areas, member-facing scope, hours, materials","Text boxes that expand as you type, so specialists can check what members will read"],
+   later:["Phase 2: the estimator and proposal-builder skills fill these fields from photos and dictation"],
+   qs:["Which existing subtask fields do specialists use today, and which one or two do we add?","Who owns the rate card? Is it time and materials only?","Do consultation hours round up to whole hours like Fast Fix?"], screen:scrConsult},
+
+  {id:"hm-finish", sys:"hm", actor:"Mario · Specialty Painter, on an iPad", av:"M",
+   title:function(){ return "Mario chooses how the proposal goes out"; },
+   summary:function(){ return "Ending a consultation offers two ways to send, like the end of a visit with recommendations. Pick one to walk that path: send it to Marisol now, or send it to Central Ops for review. The path switch at the top does the same."; },
+   changes:function(){ return []; },
+   v1:["Two send options at the end of a consultation, plus Save for later","A note for the reviewer when it goes to Central Ops"],
+   later:["Present the proposal on the iPad and capture approval on the spot"],
+   qs:["Is “about a day or less” the rule for sending directly?","Can every specialist send directly, or only approved ones?"], screen:scrFinish},
+
+  {id:"op-proposal", sys:"op", actor:"System · triggered by Mario's send", av:"PF",
+   title:function(p){ return p==="A" ? "The system creates the proposal and sends it" : "The system creates the proposal and queues it for review"; },
+   summary:function(p){ return p==="A"
+     ? "Completing the consultation creates a Proposal record linked to the booking, the request and the ticket. Mario sent it directly, so its status is Sent and the email goes out right away."
+     : "Completing the consultation creates a Proposal record linked to the booking, the request and the ticket. The booking waits in the new Completed – Pending Review status, the same kind of holding status as Completed – Pending Contractor Invoice, and a review ticket opens in Zendesk."; },
+   changes:function(p){ return p==="A" ? [["bk1","Completed"],["prp","Sent"]] : [["bk1","Completed – Pending Review"],["prp","Pending review"],["tk2","New · Specialty view"]]; },
+   v1:["Proposal record in the backend, linked to booking, request and ticket","Proposal statuses: Pending review, Sent, Accepted, Declined","Booking status: Completed – Pending Review"],
+   later:[],
+   qs:["Is Contact me later a proposal status, or does HubSpot handle it once Sales has the deal?","How long is a proposal valid? 30 days shown."], screen:scrProposalObj},
+
+  {id:"zd-review", sys:"zd", only:"B", actor:"Homer · Central Ops, Specialty", av:"H",
+   title:function(){ return "Homer gets the review ticket"; },
+   summary:function(){ return "The review ticket lands in the Specialty view Ops already works, with the proposal summary and Mario's note. Homer opens the proposal in Admin."; },
+   changes:function(){ return [["tk2","Open · Homer"]]; },
+   v1:["Automatic review ticket, so proposals needing review land in an existing queue"],
+   later:[],
+   qs:["Review SLA: 1 business day?","Which proposals go to Sales in HubSpot instead of Central Ops?"], screen:scrZdReview},
+
+  {id:"op-review", sys:"op", only:"B", actor:"Homer · Central Ops, Specialty", av:"H",
+   title:function(){ return "Homer adjusts the proposal and sends it"; },
+   summary:function(){ return "Homer edits the proposal record directly: he adds stain-blocking primer and a hidden-damage exclusion. Then he uses the same Send to member action Mario has, so Marisol's experience is the same whoever sends it. Bigger projects can be handed to Sales instead."; },
+   changes:function(){ return [["prp","Sent"],["bk1","Completed"],["tk2","Solved"]]; },
+   v1:["Review and edit proposals in Admin","Send to member from Admin, the same action as in the HM Portal"],
+   later:["Hand-off to Sales for projects over about a day"],
+   qs:["Does Sales work proposals in Admin too, or only in HubSpot?"], screen:scrReview},
+
+  {id:"em-ready", sys:"em", actor:"Marisol Alvarez · Member", av:"MA",
+   title:function(){ return "Marisol gets an email that her proposal is ready"; },
+   summary:function(){ return "Most members start from email, the same way they reach ready-to-schedule bookings today. The email shows the total and one button to the proposal page."; },
+   changes:function(){ return []; },
+   v1:["HTML email template for proposals"],
+   later:[],
+   qs:["Also send it by text, and remind at 24 and 72 hours like recommendations?"], screen:scrEmail},
+
+  {id:"pr-review", sys:"pr", actor:"Marisol Alvarez · Member", av:"MA",
+   title:function(){ return "Marisol reviews the proposal and approves it"; },
+   summary:function(){ return "The proposal is a standalone web page, like the Home Health Snapshot. It follows the proposal framework: recommendation, findings, scope, materials, what's included, timeline, price, warranty and approval, with the total at the top and again at the end. Try Decline and Contact me later too. Approve continues the flow."; },
+   changes:function(){ return []; },
+   v1:["Standalone proposal page","Approve, Decline with the recommendation decline reasons, and Contact me later"],
+   later:["PDF download","Good, better, best options for bigger projects","Deposits and online payment"],
+   qs:["Web page only, or a PDF as well?","The project terms need legal review for Texas home-improvement work before launch."], screen:scrProposal},
+
+  {id:"pr-approved", sys:"pr", actor:"Marisol · then the system", av:"MA",
+   title:function(){ return "PreFix confirms the approval"; },
+   summary:function(){ return "Approving records the scope, price and terms version, marks the proposal Accepted and builds a Pending project booking from it, the way an accepted specialty recommendation creates a Pending booking today. Marisol sees what happens next."; },
+   changes:function(){ return [["prp","Accepted"],["bk2","Pending · from proposal"],["tk3","New · Specialty view"]]; },
+   v1:["Approval record with scope, price and terms version","Project booking pre-built from the proposal"],
+   later:[],
+   qs:[], screen:scrApproved},
+
+  {id:"zd-accepted", sys:"zd", actor:"Central Ops associate · Specialty view", av:"CO",
+   title:function(){ return "Central Ops gets the accepted proposal"; },
+   summary:function(){ return "An automatic ticket in the Specialty view tells Ops the proposal was approved and links the Pending booking. Ops checks it and schedules it."; },
+   changes:function(){ return [["tk3","Open"]]; },
+   v1:["Automatic ticket when a member approves a proposal"],
+   later:[],
+   qs:[], screen:scrZdAccepted},
+
+  {id:"op-schedule", sys:"op", actor:"Central Ops associate · Django Admin", av:"CO",
+   title:function(){ return "Ops checks the booking and schedules Mario"; },
+   summary:function(){ return "The booking already carries the tasks, hours and price from the proposal. In V1 Ops picks the date on the Ops Calendar by hand."; },
+   changes:function(){ return [["bk2","Booked · Nov 3, 8 AM"],["tk3","Solved"]]; },
+   v1:["Booking created from a proposal, linked back to it"],
+   later:["Set the booking to Ready and let Marisol pick the date in HomeHub"],
+   qs:["Multi-day projects: one booking, or one per day?"], screen:scrSchedule},
+
+  {id:"hh-booked", sys:"hh", actor:"Marisol Alvarez · Member", av:"MA",
+   title:function(){ return "Marisol sees her project booked"; },
+   summary:function(){ return "The project shows in HomeHub with the approved proposal attached, so the scope stays visible from request to completion."; },
+   changes:function(){ return []; },
+   v1:["Approved proposal linked from the appointment"],
+   later:[],
+   qs:["After the work, should the service summary link back to the proposal, the way contractor invoices link today?"], screen:scrBooked},
+
+  {id:"mb-kpi", sys:"mb", actor:"Field Operations leadership", av:"FO",
+   title:function(){ return "Leadership tracks consultations and proposals"; },
+   summary:function(){ return "Consultations have their own service type and proposals have statuses, so we can answer the questions from the meeting: consultations per specialist, how often price is given on site, why proposals go to review, and how many get accepted. The numbers are illustrative."; },
+   changes:function(){ return []; },
+   v1:["Reporting comes from the consultation service type and proposal statuses. No new UI needed."],
+   later:[],
+   qs:["Which KPIs define success: acceptance rate, time to proposal, share priced on site?"], screen:scrKpi}
+];
+
+/* ================= rendering ================= */
+function renderTop(){
+  var a = STEPS.filter(function(s){ return !s.only || s.only==="A"; }).length;
+  var b = STEPS.filter(function(s){ return !s.only || s.only==="B"; }).length;
+  $("#pathSeg").innerHTML =
+    '<button type="button" data-act="path" data-path="A" aria-pressed="' + (S.path==="A") + '">Specialist sends directly<small>' + a + '</small></button>' +
+    '<button type="button" data-act="path" data-path="B" aria-pressed="' + (S.path==="B") + '">Needs Central Ops review<small>' + b + '</small></button>';
+  $("#hotToggle").setAttribute("aria-pressed", String(S.hot));
+  document.body.classList.toggle("nohot", !S.hot);
+  $("#mapToggle").textContent = S.map ? "Hide map" : "Show map";
+  $("#mapToggle").setAttribute("aria-expanded", String(S.map));
+  $("#map").hidden = !S.map;
+}
+
+function renderMap(){
+  if(!S.map) return;
+  var st = steps(), L = 216, CW = 44, LH = 25, TOP = 22, GAP = 7;
+  var ys = {}, y = TOP;
+  LANES.forEach(function(ln, i){
+    if(i>0 && ln.group) y += GAP;
+    ys[ln.sys] = y + LH/2; y += LH;
+  });
+  var W = L + st.length*CW + 10, H = y + 6;
+  var x = function(i){ return L + i*CW + CW/2; };
+  var s = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="group" aria-label="Flow map: ' + st.length + ' steps across 7 systems">';
+  /* lane stripes + labels */
+  LANES.forEach(function(ln, i){
+    var cy = ys[ln.sys];
+    s += '<rect x="' + (L-6) + '" y="' + (cy-LH/2+1) + '" width="' + (W-L) + '" height="' + (LH-2) + '" rx="5" style="fill:var(--surface-2)"/>';
+    if(ln.group) s += '<text x="0" y="' + (cy+3.5) + '" style="fill:var(--muted);font-size:9.5px;letter-spacing:.12em">' + ln.group.toUpperCase() + '</text>';
+    s += '<circle cx="96" cy="' + cy + '" r="5" style="fill:var(--c-' + ln.sys + ')"/>';
+    var on = cur().sys===ln.sys;
+    s += '<text x="108" y="' + (cy+4) + '" style="fill:' + (on?'var(--ink)':'var(--ink-2)') + ';font-size:11.5px;font-weight:' + (on?600:400) + '">' + SYS[ln.sys].name + '</text>';
+  });
+  /* current column */
+  s += '<rect x="' + (x(S.idx)-CW/2+2) + '" y="2" width="' + (CW-4) + '" height="' + (H-4) + '" rx="7" style="fill:var(--accent-soft)"/>';
+  /* step numbers */
+  st.forEach(function(stp, i){
+    s += '<text x="' + x(i) + '" y="14" text-anchor="middle" style="fill:' + (i===S.idx?'var(--accent-ink)':'var(--muted)') + ';font-size:10.5px;font-weight:' + (i===S.idx?600:400) + '">' + (i+1) + '</text>';
+  });
+  /* connectors */
+  for(var i=0;i<st.length-1;i++){
+    var x1=x(i), y1=ys[st[i].sys], x2=x(i+1), y2=ys[st[i+1].sys], mx=(x1+x2)/2;
+    var past = i < S.idx;
+    s += '<path d="M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ',' + mx + ' ' + y2 + ',' + x2 + ' ' + y2 + '" style="fill:none;stroke:' + (past?'var(--ink-2)':'var(--line-strong)') + ';stroke-width:' + (past?2:1.5) + (past?'':';stroke-dasharray:3 3') + '"/>';
+  }
+  /* nodes */
+  st.forEach(function(stp, i){
+    var cx = x(i), cy = ys[stp.sys], on = i===S.idx, fut = i > S.idx;
+    s += '<g class="mnode" tabindex="0" role="button" data-go="' + i + '" aria-label="Step ' + (i+1) + ': ' + esc(stp.title(S.path)) + ' (' + SYS[stp.sys].name + ')"' + (on?' aria-current="step"':'') + '>' +
+      '<title>' + (i+1) + '. ' + esc(stp.title(S.path)) + '</title>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="14" style="fill:transparent"/>' +
+      (on ? '<circle class="ring" cx="' + cx + '" cy="' + cy + '" r="10.5" style="fill:var(--surface);stroke:var(--ink);stroke-width:2"/>' : '<circle class="ring" cx="' + cx + '" cy="' + cy + '" r="8" style="fill:var(--surface);stroke:transparent;stroke-width:2"/>') +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + (on?7:6) + '" style="fill:var(--c-' + stp.sys + ');opacity:' + (fut?0.45:1) + '"/>' +
+    '</g>';
+  });
+  s += '</svg>';
+  $("#map").innerHTML = s;
+  var node = $("#map").querySelector('[aria-current="step"]');
+  if(node){ var m = $("#map"), nx = x(S.idx); if(nx < m.scrollLeft + L || nx > m.scrollLeft + m.clientWidth - 40) m.scrollLeft = Math.max(0, nx - m.clientWidth/2); }
+}
+
+function renderHead(stp){
+  var st = steps(), prev = st[S.idx-1], sys = SYS[stp.sys];
+  var pathNote = stp.only ? '<span class="pill pill--warn">Review path only</span>' : (stp.id==="op-proposal" ? '<span class="pill pill--acc">Differs by path</span>' : '');
+  $("#head").innerHTML =
+    '<div class="sysline">' +
+      '<span class="sysbadge" ' + sw(stp.sys) + '><span class="sw" aria-hidden="true"></span><b>' + sys.name + '</b><span>' + sys.long + ' · ' + sys.where + '</span></span>' +
+      (prev && prev.sys===stp.sys ? '<span class="handoff"><i ' + sw(stp.sys) + '></i><span>Still in ' + sys.name + '</span></span>' :
+       prev ? '<span class="handoff"><span>from</span><i ' + sw(prev.sys) + '></i><span>' + SYS[prev.sys].name + '</span><span class="arr">→</span><i ' + sw(stp.sys) + '></i><span>' + sys.name + '</span></span>' : '<span class="handoff">Start of the flow</span>') +
+    '</div>' +
+    '<div class="stepno"><span class="lbl">Step ' + (S.idx+1) + ' of ' + st.length + ' · ' + sys.who + '</span>' + pathNote + '</div>' +
+    '<h1>' + esc(stp.title(S.path)) + '</h1>' +
+    '<p class="actor"><span class="avatar" aria-hidden="true">' + stp.av + '</span>' + esc(stp.actor) + '</p>' +
+    '<p class="summary">' + esc(stp.summary(S.path)) + '</p>';
+}
+
+function records(){
+  var st = steps(), state = {}, prev = {}, changed = {};
+  for(var k=0;k<=S.idx;k++){
+    (st[k].changes(S.path)||[]).forEach(function(c){
+      if(k===S.idx){ prev[c[0]] = state[c[0]] || null; changed[c[0]] = true; }
+      state[c[0]] = c[1];
+    });
+  }
+  return {state:state, prev:prev, changed:changed};
+}
+function renderNotes(stp){
+  var r = records();
+  var rows = RECORD.filter(function(k){ return r.state[k]; }).map(function(k){
+    var chg = r.changed[k];
+    return '<li' + (chg?' class="chg"':'') + '><span class="rk">' + RECLBL[k] + '</span><span class="rv">' + esc(r.state[k]) + '</span>' +
+      (chg ? '<span class="was">' + (r.prev[k] ? 'was <s>' + esc(r.prev[k]) + '</s>' : 'created at this step') + '</span>' : '') + '</li>';
+  }).join("");
+  var nothing = !Object.keys(r.changed).length;
+  var html = '<section class="nb"><h3>Records at this step</h3>' + (rows ? '<ul class="recs">' + rows + '</ul>' : '<p class="none">No records yet.</p>') +
+    (nothing && rows ? '<p class="none" style="margin-top:6px">Nothing changes status at this step.</p>' : '') + '</section>';
+  html += '<section class="nb"><h3>New in V1</h3>' + (stp.v1.length ? '<ul>' + stp.v1.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ul>' : '<p class="none">' + esc(stp.v1none||"Nothing new at this step.") + '</p>') + '</section>';
+  if(stp.later.length) html += '<section class="nb"><h3>Later, not V1</h3><ul>' + stp.later.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ul></section>';
+  if(stp.qs.length) html += '<section class="nb"><h3>Open questions</h3><ol>' + stp.qs.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ol></section>';
+  $("#notes").innerHTML = html;
+}
+
+function renderBottom(){
+  var st = steps(), p = st[S.idx-1], n = st[S.idx+1];
+  var nb = function(s, dir){
+    if(!s) return dir==="prev"
+      ? '<button type="button" class="navbtn" disabled><span class="arrow" aria-hidden="true">←</span><span class="t"><small>Start</small><span>First step</span></span></button>'
+      : '<button type="button" class="navbtn next" data-act="restart"><span class="t"><small>End of the flow</small><span>Start again</span></span><span class="arrow" aria-hidden="true">↺</span></button>';
+    var lab = '<span class="t"><small><i ' + sw(s.sys) + '></i>' + (dir==="prev"?"Back":"Next") + ' · ' + SYS[s.sys].name + '</small><span>' + esc(s.title(S.path)) + '</span></span>';
+    return dir==="prev"
+      ? '<button type="button" class="navbtn" data-act="prev" aria-label="Previous step"><span class="arrow" aria-hidden="true">←</span>' + lab + '</button>'
+      : '<button type="button" class="navbtn next" data-act="next" aria-label="Next step"><span class="sr">Next step: </span>' + lab + '<span class="arrow" aria-hidden="true">→</span></button>';
+  };
+  $("#bottom").innerHTML = nb(p,"prev") +
+    '<div class="prog"><div class="dots">' + st.map(function(s, i){ return '<button type="button" ' + sw(s.sys) + ' class="' + (i===S.idx?"on":(i<S.idx?"past":"")) + '" data-go="' + i + '" aria-label="Go to step ' + (i+1) + '"></button>'; }).join("") + '</div>' +
+    '<span class="count">' + (S.idx+1) + ' / ' + st.length + '</span></div>' + nb(n,"next");
+}
+
+function grow(el){ el.style.height = "auto"; el.style.height = (el.scrollHeight + 2) + "px"; }
+function growAll(){ Array.prototype.forEach.call(document.querySelectorAll("textarea.grow"), grow); }
+
+function render(scrollTop){
+  var st = steps();
+  S.idx = Math.max(0, Math.min(st.length-1, S.idx));
+  var stp = st[S.idx];
+  renderTop(); renderMap(); renderHead(stp);
+  $("#screen").innerHTML = stp.screen();
+  renderNotes(stp); renderBottom(); growAll();
+  try{ history.replaceState(null, "", "#" + stp.id); }catch(e){}
+  if(scrollTop){
+    var h = $("#head"), r = h.getBoundingClientRect();
+    if(r.top < 0 || r.top > window.innerHeight*0.6) h.scrollIntoView({block:"start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+    var fs = $("#fscroll"); if(fs) fs.scrollTop = 0;
+    var ts = $("#tscroll"); if(ts) ts.scrollTop = 0;
+  }
+}
+
+function go(i){ S.idx = i; S.decline = false; render(true); }
+function setPath(p){
+  if(p===S.path) return;
+  var id = cur().id;
+  S.path = p; persist();
+  var st = steps(), j = st.findIndex(function(s){ return s.id===id; });
+  if(j < 0){ j = st.findIndex(function(s){ return s.id==="em-ready"; }) - 1; }
+  S.idx = Math.max(0, j);
+  render(false);
+}
+
+function updateTotals(){
+  var t = T();
+  S.lines.forEach(function(l){
+    var o = document.getElementById("lt-" + l.id); if(o) o.textContent = money(l.hours*RATE + l.mat);
+    var h = document.getElementById("hr-" + l.id); if(h) h.textContent = l.hours;
+  });
+  var set = function(id, v){ var e = document.getElementById(id); if(e) e.textContent = v; };
+  set("s-hours", t.hours); set("s-days", t.days); set("s-labor", money(t.labor)); set("s-mat", money(t.mat)); set("s-total", money(t.total));
+}
+function line(id){ return S.lines.filter(function(l){ return l.id===id; })[0]; }
+
+/* ================= events ================= */
+document.addEventListener("click", function(e){
+  var g = e.target.closest("[data-go]");
+  if(g){ go(+g.getAttribute("data-go")); return; }
+  var b = e.target.closest("[data-act]"); if(!b || b.disabled) return;
+  var a = b.getAttribute("data-act");
+  if(a==="next"){ if(S.idx < steps().length-1) go(S.idx+1); }
+  else if(a==="prev"){ if(S.idx > 0) go(S.idx-1); }
+  else if(a==="restart"){ var keep = {path:S.path, hot:S.hot, map:S.map}; S = fresh(); S.path = keep.path; S.hot = keep.hot; S.map = keep.map; render(true); }
+  else if(a==="path"){ setPath(b.getAttribute("data-path")); }
+  else if(a==="choose"){ var p = b.getAttribute("data-path"); S.path = p; persist(); var st = steps(); S.idx = st.findIndex(function(s){ return s.id==="hm-finish"; }) + 1; S.decline=false; render(true); }
+  else if(a==="hrs"){ var l = line(b.getAttribute("data-line")); l.hours = Math.max(1, Math.min(24, l.hours + (+b.getAttribute("data-d")))); updateTotals(); }
+  else if(a==="decline-open"){ S.decline = true; S.reason = null; render(false); }
+  else if(a==="decline-close"){ S.decline = false; render(false); }
+  else if(a==="reason"){ S.reason = b.getAttribute("data-r"); var fs = $("#fscroll"), top = fs ? fs.scrollTop : 0; render(false); fs = $("#fscroll"); if(fs) fs.scrollTop = top; }
+  else if(a==="decline-submit"){ S.decline = false; S.declined = true; var fs2 = $("#fscroll"), t2 = fs2 ? fs2.scrollTop : 0; render(false); fs2 = $("#fscroll"); if(fs2) fs2.scrollTop = t2; }
+  else if(a==="later"){ S.later = true; var fs3 = $("#fscroll"), t3 = fs3 ? fs3.scrollTop : 0; render(false); fs3 = $("#fscroll"); if(fs3) fs3.scrollTop = t3; }
+  else if(a==="undo"){ S.declined = false; S.later = false; S.reason = null; var fs4 = $("#fscroll"), t4 = fs4 ? fs4.scrollTop : 0; render(false); fs4 = $("#fscroll"); if(fs4) fs4.scrollTop = t4; }
+});
+document.addEventListener("keydown", function(e){
+  var n = e.target.closest && e.target.closest(".mnode");
+  if(n && (e.key==="Enter" || e.key===" ")){ e.preventDefault(); go(+n.getAttribute("data-go")); return; }
+  if(e.altKey || e.ctrlKey || e.metaKey) return;
+  var tag = (e.target.tagName||"").toLowerCase();
+  if(tag==="input" || tag==="textarea" || tag==="select") return;
+  if(e.key==="Escape" && S.decline){ S.decline=false; render(false); return; }
+  if(e.key==="ArrowRight"){ if(S.idx < steps().length-1){ e.preventDefault(); go(S.idx+1); } }
+  if(e.key==="ArrowLeft"){ if(S.idx > 0){ e.preventDefault(); go(S.idx-1); } }
+});
+document.addEventListener("input", function(e){
+  var el = e.target;
+  if(el.classList && el.classList.contains("grow")) grow(el);
+  var bind = el.getAttribute && el.getAttribute("data-bind"); if(!bind) return;
+  if(bind==="note"){ S.note = el.value; return; }
+  var l = line(el.getAttribute("data-line")); if(!l) return;
+  if(bind==="scope") l.scope = el.value;
+  if(bind==="mat"){ var v = parseInt(el.value.replace(/[^0-9]/g,""), 10); l.mat = isNaN(v) ? 0 : Math.min(v, 99999); updateTotals(); }
+});
+window.addEventListener("resize", function(){ growAll(); });
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(growAll);
+$("#hotToggle").addEventListener("click", function(){ S.hot = !S.hot; persist(); renderTop(); });
+$("#mapToggle").addEventListener("click", function(){ S.map = !S.map; persist(); renderTop(); renderMap(); });
+$("#resetBtn").addEventListener("click", function(){ var keep = {hot:S.hot, map:S.map}; S = fresh(); S.hot = keep.hot; S.map = keep.map; persist(); render(true); });
+
+/* deep link: #<step id> */
+(function(){
+  var h = (location.hash||"").replace("#","");
+  if(h){
+    var j = steps().findIndex(function(s){ return s.id===h; });
+    if(j < 0 && STEPS.some(function(s){ return s.id===h; })){ S.path = "B"; j = steps().findIndex(function(s){ return s.id===h; }); }
+    if(j >= 0) S.idx = j;
+  }
+})();
+render(false);
+})();
+</script>
