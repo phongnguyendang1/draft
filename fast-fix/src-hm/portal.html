@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HM Portal: Fast Fix tasks</title>
+<style>
+/* Tokens sampled from the staging screenshot (colors approximate; font and spacing are NOT verified against the live portal). */
+:root {
+  --page: #e0e5ed; --white: #fff; --ink: #1c1c1c; --head: #333c4e;
+  --blue: #3b5edf; --blue-d: #2d4ac9; --blue-tint: #e8edfc; --blue-dis: #a8b9f2;
+  --slate: #424b5c; --label: #5e697e; --line: #dae0ea; --field: #cfd6e2;
+  --link: #007a9e; --err-bg: #faf0f0; --err: #810000; --err-line: #e07b86;
+  --font: "Source Sans 3", "Source Sans Pro", "Nunito Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 16px; }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.5; }
+h1, h2, h3, p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+.i { width: 1.1em; height: 1.1em; fill: currentColor; flex: none; vertical-align: -0.15em; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Page chrome */
+.band { height: 125px; border-top: 4px solid #25398f; background: linear-gradient(90deg, #2d4ac9 0%, #3256c0 45%, #4a82a8 100%); }
+.sheet { position: relative; margin: -105px auto 0; width: calc(100% - 2 * clamp(12px, 5.4vw, 106px)); max-width: 1811px; background: var(--white); padding: 24px 38px 56px; }
+
+/* Header block */
+.top { display: grid; grid-template-columns: 1fr auto; gap: 24px; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.top h1 { font-size: 28px; font-weight: 400; line-height: 40px; color: var(--head); }
+.member { display: inline-flex; align-items: center; gap: 4px; color: var(--link); font-size: 20px; text-decoration: none; background: none; border: 0; padding: 0; }
+.plan { font-size: 20px; color: var(--label); margin-top: 6px; }
+.row { margin-top: 14px; }
+.addr { margin-top: 36px; line-height: 30px; }
+.pillbtn { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; padding: 3px 10px; border: 0; border-radius: 6px; background: #e9ecf1; color: var(--head); font-size: 14px; line-height: 22px; }
+.edit { display: inline-grid; place-items: center; width: 28px; height: 28px; border: 0; background: none; color: var(--head); vertical-align: middle; border-radius: 4px; }
+.top__r { text-align: right; }
+.top__r .svc { font-size: 22px; line-height: 30px; color: var(--head); }
+.top__r p { line-height: 32px; }
+.top__r .gap { margin-top: 14px; }
+
+/* Two columns */
+.cols { display: grid; grid-template-columns: 1fr 1fr; margin-top: 44px; }
+.left { padding-right: 38px; }
+.right { padding-left: 50px; border-left: 1px solid var(--line); min-height: 560px; }
+.req { padding: 12px 16px 28px; border-bottom: 1px solid var(--line); line-height: 26px; white-space: pre-line; overflow-wrap: anywhere; }
+.req__h { font-size: 14px; line-height: 20px; color: var(--label); padding: 0 16px; margin-top: 8px; }
+
+/* Time and charges table */
+.tbl { width: 100%; max-width: 680px; margin: 70px auto 0; border-collapse: collapse; border: 1px solid var(--line); }
+.tbl th, .tbl td { height: 44px; padding: 0 24px; border-top: 1px solid var(--line); font-weight: 400; }
+.tbl th { width: 38%; text-align: center; border-right: 1px solid var(--line); }
+.tbl tr.hl th { background: var(--label); color: #fff; }
+.tbl input { width: 190px; height: 40px; border: 1px solid var(--field); border-radius: 6px; padding: 0 22px; font-size: 15px; text-transform: uppercase; background: #fff; }
+.tbl input::placeholder { color: var(--label); opacity: 1; }
+.actions { display: flex; justify-content: center; gap: 18px; margin-top: 60px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 24px; border: 0; border-radius: 6px; font-size: 16px; font-weight: 600; color: #fff; }
+.btn--dark { background: var(--slate); }
+.btn--blue { background: var(--blue); border-radius: 4px; }
+.btn--blue:hover { background: var(--blue-d); }
+.btn--dark:hover { background: #343c4b; }
+.btn[aria-disabled="true"] { background: var(--blue-dis); cursor: not-allowed; }
+.btn--line { background: #fff; color: var(--ink); border: 1px solid var(--line); font-weight: 400; font-size: 15px; border-radius: 4px; height: 40px; padding: 0 18px; }
+.btn--line:hover { background: #f4f6fa; }
+.status { display: block; width: fit-content; max-width: 100%; margin: 28px auto 0; padding: 12px 18px; border-radius: 6px; background: var(--err-bg); color: var(--err); font-size: 15px; line-height: 22px; text-align: center; }
+.status:empty { display: none; }
+.status--ok { background: #eaf6ee; color: #14532d; }
+
+/* Tasks column */
+.tasks__bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 18px; }
+.tasks__bar h2 { font-size: 26px; font-weight: 400; line-height: 36px; color: var(--head); }
+.tasks__bar h2:focus { outline: none; }
+.tasks__bar .btn { width: 208px; height: 41px; }
+.rec { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; padding: 6px 16px 6px 18px; background: #fff; border: 1px solid var(--line); border-bottom: 0; border-radius: 4px 4px 0 0; color: var(--blue-d); font-size: 15px; font-weight: 600; }
+.card { border: 1px solid var(--line); border-radius: 4px; padding: 22px 20px 26px; background: #fff; }
+.card + .card { margin-top: 20px; }
+.card--attn { border-color: var(--err-line); box-shadow: inset 0 0 0 1px var(--err-line); }
+.card__head { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); position: relative; }
+.card__title { flex: 1; min-width: 0; font-size: 22px; line-height: 30px; font-weight: 500; color: var(--ink); overflow-wrap: anywhere; }
+.card__title:focus { outline: none; }
+.tag { flex: none; padding: 1px 10px; border-radius: 12px; background: var(--blue-tint); color: var(--blue-d); font-size: 13px; font-weight: 600; line-height: 22px; }
+.kebab { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 50%; background: none; color: var(--head); font-size: 20px; }
+.kebab:hover, .kebab[aria-expanded="true"] { box-shadow: inset 0 0 0 2px var(--blue); color: var(--blue-d); }
+.menu { position: absolute; right: 0; top: calc(100% - 4px); z-index: 20; min-width: 224px; margin: 0; padding: 6px 0; list-style: none; background: #fff; border-radius: 6px; box-shadow: 0 2px 14px rgba(40, 52, 80, .22); }
+.menu button { display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px 22px; border: 0; background: none; text-align: left; font-size: 16px; }
+.menu button:hover, .menu button:focus-visible { background: #f1f4f9; outline-offset: -2px; }
+.menu .i { color: var(--label); font-size: 18px; }
+.desc { margin-top: 36px; line-height: 26px; }
+.from { margin-top: 14px; font-size: 14px; line-height: 20px; color: var(--label); overflow-wrap: anywhere; }
+.sub { margin-top: 22px; font-weight: 700; }
+.sub__row { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; align-items: center; margin-top: 8px; }
+.chk { display: inline-flex; align-items: center; gap: 12px; padding: 6px 8px; cursor: pointer; }
+.chk input { width: 20px; height: 20px; margin: 0; accent-color: var(--blue); }
+.sel { position: relative; }
+.sel select { appearance: none; width: 100%; height: 46px; padding: 0 44px 0 14px; border: 1px solid var(--field); border-radius: 4px; background: #fff; }
+.sel select.bad { border-color: var(--err-line); }
+.sel select:disabled { background: #f3f5f9; color: var(--label); }
+.sel .i { position: absolute; right: 12px; top: 13px; font-size: 20px; pointer-events: none; }
+.field { margin-top: 28px; }
+.field > label { display: block; margin-bottom: 6px; }
+.field textarea { display: block; width: 100%; min-height: 124px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px; resize: vertical; }
+.field input[type=text] { width: 100%; height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 28px; }
+.two .field { margin-top: 0; }
+.money { position: relative; }
+.money span { position: absolute; left: 8px; top: 9px; font-size: 15px; color: var(--ink); }
+.money input { padding-left: 20px !important; }
+.files { margin-top: 28px; }
+.note { margin-top: 20px; }
+.note__t { color: var(--label); font-size: 14px; line-height: 20px; }
+.note__b { margin-top: 2px; overflow-wrap: anywhere; }
+.call { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin-top: 24px; padding: 16px 18px; border-radius: 6px; background: var(--blue-tint); }
+.call p { flex: 1 1 260px; }
+.empty { padding: 28px 8px; color: var(--label); }
+
+/* Prototype states strip (not part of the portal) */
+.proto { margin: 24px auto 40px; width: calc(100% - 2 * clamp(12px, 5.4vw, 106px)); max-width: 1811px; padding: 14px 20px; border: 1px dashed var(--label); border-radius: 6px; font-size: 15px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; color: var(--head); }
+.proto strong { margin-right: 4px; }
+.proto button { height: 36px; padding: 0 14px; border: 1px solid var(--label); border-radius: 4px; background: #fff; font-size: 14px; }
+.proto button[aria-pressed="true"] { background: var(--slate); color: #fff; border-color: var(--slate); }
+
+/* Dialogs */
+body.is-modal { overflow: hidden; }
+.modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; }
+.modal__scrim { position: absolute; inset: 0; background: rgba(28, 28, 28, .5); }
+.modal__box { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 640px; max-height: calc(100vh - 32px); background: #fff; border-radius: 8px; box-shadow: 0 6px 28px rgba(28, 28, 28, .28); }
+.modal__top { padding: 22px 24px 0; }
+.modal__top h2 { font-size: 22px; font-weight: 500; line-height: 30px; }
+.modal__top h2:focus { outline: none; }
+.modal__sub { margin-top: 6px; font-size: 15px; line-height: 22px; color: var(--label); overflow-wrap: anywhere; }
+.search { position: relative; margin-top: 16px; }
+.search .i { position: absolute; left: 12px; top: 12px; font-size: 20px; color: var(--label); }
+.search input { width: 100%; height: 44px; padding: 0 12px 0 40px; border: 1px solid var(--field); border-radius: 4px; }
+.modal__body { flex: 1; min-height: 120px; overflow: auto; padding: 8px 24px 8px; }
+.grp { margin: 14px 0 6px; font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--label); }
+.opt { display: grid; grid-template-columns: 24px 1fr; gap: 12px; padding: 12px 12px; margin: 0 -12px; border-radius: 6px; cursor: pointer; }
+.opt:hover { background: #f4f6fa; }
+.opt:has(input:checked) { background: var(--blue-tint); }
+.opt:has(input:focus-visible) { outline: 2px solid var(--blue); outline-offset: -2px; }
+.opt input { width: 20px; height: 20px; margin: 3px 0 0; accent-color: var(--blue); }
+.opt b { display: block; font-weight: 600; }
+.opt span { display: block; font-size: 14px; line-height: 20px; color: var(--label); }
+.modal__foot { display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px 20px; border-top: 1px solid var(--line); }
+.modal__foot .btn { height: 42px; }
+.modal__foot .btn:disabled { background: var(--blue-dis); cursor: not-allowed; }
+.modal__text { padding: 8px 24px 18px; }
+.toast { position: fixed; left: 50%; bottom: 20px; z-index: 80; transform: translateX(-50%); max-width: calc(100% - 32px); padding: 12px 20px; border-radius: 6px; background: var(--slate); color: #fff; font-size: 15px; }
+
+@media (max-width: 900px) {
+  body { font-size: 16px; }
+  .sheet { padding: 18px 16px 40px; }
+  .top { grid-template-columns: 1fr; }
+  .top__r { text-align: left; }
+  .top h1 { font-size: 24px; line-height: 34px; }
+  .plan, .member { font-size: 18px; }
+  .addr { margin-top: 22px; }
+  .cols { grid-template-columns: 1fr; margin-top: 28px; }
+  .left { padding-right: 0; }
+  .right { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); margin-top: 36px; min-height: 0; }
+  .tbl { margin-top: 32px; }
+  .tbl th, .tbl td { padding: 0 10px; font-size: 16px; }
+  .tbl th { width: 46%; }
+  .tbl input { width: 100%; max-width: 190px; padding: 0 12px; }
+  .actions { margin-top: 32px; }
+  .tasks__bar .btn { width: auto; }
+  .sub__row, .two { grid-template-columns: 1fr; gap: 14px; }
+  .two .field + .field { margin-top: 0; }
+  .card { padding: 18px 14px 22px; }
+  .card__title { font-size: 20px; line-height: 28px; }
+  .desc { margin-top: 24px; }
+  .menu { min-width: 200px; }
+}
+</style>
+</head>
+<body>
+<!--SPRITE-->
+<div class="band" aria-hidden="true"></div>
+<main class="sheet">
+  <header class="top">
+    <div>
+      <h1>Job # <span id="job-no">2-2-190001</span></h1>
+      <h1>Ticket # <span id="ticket-no">510001</span></h1>
+      <p><button class="member" type="button" data-stub>Jordan Ellis <svg class="i" aria-hidden="true"><use href="#ri-arrow-right-s-line"/></svg></button></p>
+      <p class="plan">PreFix Membership - $49 / Month [RC2026]</p>
+      <p class="row">HVAC Condenser Count: <span>&nbsp;1&nbsp;</span> <button class="edit" type="button" data-stub aria-label="Edit HVAC condenser count"><svg class="i" aria-hidden="true"><use href="#ri-pencil-fill"/></svg></button></p>
+      <div class="addr">
+        <p>123 SAMPLE LN AUSTIN 78701</p>
+        <p>+15125550100</p>
+        <p>member@example.com</p>
+        <button class="pillbtn" type="button" data-stub><svg class="i" aria-hidden="true"><use href="#ri-mail-line"/></svg> Send HomeHub Login Email</button>
+      </div>
+    </div>
+    <div class="top__r">
+      <p class="svc" id="svc">Fast Fix</p>
+      <p id="svc-min">120 minutes</p>
+      <p>October 16th, 2026 @ 8:00 AM</p>
+      <p class="gap">Time Started: &nbsp;08:19 AM <button class="edit" type="button" data-stub aria-label="Edit time started"><svg class="i" aria-hidden="true"><use href="#ri-pencil-fill"/></svg></button></p>
+      <p>Time Ended: &nbsp;09:22 AM <button class="edit" type="button" data-stub aria-label="Edit time ended"><svg class="i" aria-hidden="true"><use href="#ri-pencil-fill"/></svg></button></p>
+    </div>
+  </header>
+
+  <div class="cols">
+    <section class="left" aria-label="Summary">
+      <p class="req__h" id="req-h">Job requested</p>
+      <div class="req" id="job-requested" aria-labelledby="req-h"></div>
+
+      <table class="tbl">
+        <caption class="sr">Time and charges</caption>
+        <tbody>
+          <tr><th scope="row">Time Spent</th><td id="t-time">0 minutes</td></tr>
+          <tr><th scope="row">Parts Charge</th><td id="t-parts">$0.00</td></tr>
+          <tr class="hl"><th scope="row">Labor Charge</th><td id="t-labor">$55.00</td></tr>
+          <tr><th scope="row">Expected Total</th><td id="t-total">$55.00</td></tr>
+          <tr><th scope="row"><label for="adj">Adjusted Total</label></th><td><input id="adj" type="text" placeholder="None" autocomplete="off"></td></tr>
+        </tbody>
+      </table>
+
+      <div class="actions">
+        <button class="btn btn--dark" type="button" id="send-later">Send Later</button>
+        <button class="btn btn--blue" type="button" id="send-now" aria-disabled="true">Send Now</button>
+      </div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="right" aria-label="Tasks">
+      <div class="tasks__bar">
+        <h2 id="tasks-h" tabindex="-1">Tasks:</h2>
+        <button class="btn btn--blue" type="button" id="add-task">Add Task</button>
+      </div>
+      <button class="rec" type="button" data-stub><svg class="i" aria-hidden="true"><use href="#ri-sparkling-2-fill"/></svg> Create a Recommendation</button>
+      <div id="task-list"></div>
+    </section>
+  </div>
+</main>
+
+<div class="proto" id="proto" role="group" aria-label="Prototype states">
+  <strong>Prototype states</strong>
+  <button type="button" data-scn="fresh" aria-pressed="true">New Fast Fix booking</button>
+  <button type="button" data-scn="partly" aria-pressed="false">One task replaced</button>
+  <button type="button" data-scn="ready" aria-pressed="false">Ready to send</button>
+  <button type="button" data-scn="regular" aria-pressed="false">Regular booking (no Fast Fix)</button>
+</div>
+
+<div id="modal-root"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function h(tag, props) {
+    var el = document.createElement(tag); props = props || {};
+    for (var k in props) {
+      var v = props[k]; if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'text') el.textContent = v;
+      else if (k === 'value') el.value = v;
+      else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : v);
+    }
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i]; if (c == null || c === false) continue;
+      el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+    }
+    return el;
+  }
+  function icon(n) {
+    var ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg'), u = document.createElementNS(ns, 'use');
+    s.setAttribute('class', 'i'); s.setAttribute('aria-hidden', 'true'); u.setAttribute('href', '#ri-' + n); s.appendChild(u); return s;
+  }
+
+  /* ---------- Demo taxonomy: "Task (Category)", same naming as "Troubleshoot (Dryer)" ---------- */
+  var DIAG = 'Diagnose and identify the issue. Create a follow up task for the repair. Create a parts order for all possible parts associated with the repair. We can always send parts back we do not need.';
+  var TAX = [
+    { id: 'ts-toilet', name: 'Troubleshoot', cat: 'Toilet', kw: 'toilet leak running flush rock wobble clog', desc: DIAG },
+    { id: 'rp-toilet', name: 'Repair', cat: 'Toilet', kw: 'toilet flapper fill valve running hissing weak flush supply line', desc: 'Repair a running, hissing or weak-flushing toilet. Includes flapper, fill valve, chain and supply line.' },
+    { id: 'rs-toilet', name: 'Reset', cat: 'Toilet', kw: 'toilet rock rocks wobble wax ring base leak water floor seal', desc: 'Remove the toilet, replace the wax ring and reset it level to stop rocking or leaks at the base.' },
+    { id: 'rl-seat', name: 'Replace', cat: 'Toilet seat', kw: 'toilet seat cracked loose hinge', desc: 'Remove the old seat and install a new one, member supplied.' },
+    { id: 'rp-faucet', name: 'Repair', cat: 'Faucet', kw: 'faucet drip dripping leak cartridge aerator sink', desc: 'Repair a dripping or weak faucet. Includes cartridge, aerator and handle.' },
+    { id: 'rl-faucet', name: 'Replace', cat: 'Faucet', kw: 'faucet kitchen bathroom sink install new', desc: 'Remove the old faucet and install a new member supplied faucet.' },
+    { id: 'rl-showerhead', name: 'Replace', cat: 'Showerhead', kw: 'shower head showerhead install new', desc: 'Swap the showerhead and seal the threads.' },
+    { id: 'cl-drain', name: 'Clear', cat: 'Drain', kw: 'drain clog clogged slow sink shower tub snake', desc: 'Clear a slow or clogged sink, tub or shower drain by hand. No power equipment.' },
+    { id: 'rp-sink', name: 'Repair', cat: 'Under-sink plumbing', kw: 'sink leak under cabinet trap supply line p-trap', desc: 'Tighten or replace the trap, slip nuts or supply lines under a sink.' },
+    { id: 'rg-tile', name: 'Regrout', cat: 'Tile', kw: 'grout cracked missing tile shower floor wall regrout', desc: 'Remove loose grout and regrout up to 10 square feet. Includes cleanup.' },
+    { id: 'ck-tub', name: 'Caulk', cat: 'Tub & shower', kw: 'caulk caulking tub shower seal sealant mold', desc: 'Remove old caulk, clean and apply new caulk around a tub, shower or sink.' },
+    { id: 'pt-drywall', name: 'Patch', cat: 'Drywall', kw: 'drywall hole patch wall crack repair anchor', desc: 'Patch a hole up to 6 inches. Sand and prime. Painting is not included.' },
+    { id: 'rp-trim', name: 'Repair', cat: 'Trim', kw: 'baseboard trim loose damaged molding', desc: 'Re-secure or replace a short run of baseboard or trim.' },
+    { id: 'mt-mirror', name: 'Mount', cat: 'Mirror', kw: 'mirror heavy hang mount wall vanity', desc: 'Locate studs or set anchors and mount a mirror up to 60 lb.' },
+    { id: 'mt-tv', name: 'Mount', cat: 'TV', kw: 'tv television mount bracket wall', desc: 'Mount a TV on a drywall or wood wall with the member supplied bracket.' },
+    { id: 'hg-shelf', name: 'Hang', cat: 'Shelves', kw: 'shelf shelves hang mount floating wall', desc: 'Hang up to three shelves with the right anchors.' },
+    { id: 'hg-art', name: 'Hang', cat: 'Wall art', kw: 'picture art frame hang wall gallery', desc: 'Hang pictures or frames. Includes leveling and layout.' },
+    { id: 'in-rod', name: 'Install', cat: 'Closet rod', kw: 'closet rod shelf install bracket', desc: 'Install a closet rod or shelf with brackets.' },
+    { id: 'ad-door', name: 'Adjust', cat: 'Door', kw: 'door stick sticking rub loose hinge latch align', desc: 'Adjust hinges, strike plate or latch so the door closes freely.' },
+    { id: 'rl-lock', name: 'Replace', cat: 'Door lock', kw: 'door lock deadbolt knob handle replace key', desc: 'Replace a door knob, handle or deadbolt with a member supplied one.' },
+    { id: 'ts-dryer', name: 'Troubleshoot', cat: 'Dryer', kw: 'dryer belt heat drum appliance', desc: DIAG },
+    { id: 'ts-dish', name: 'Troubleshoot', cat: 'Dishwasher', kw: 'dishwasher drain leak appliance rack', desc: DIAG },
+    { id: 'ts-washer', name: 'Troubleshoot', cat: 'Washer', kw: 'washer washing machine drain leak appliance', desc: DIAG },
+    { id: 'rl-light', name: 'Replace', cat: 'Light fixture', kw: 'light fixture lamp ceiling install swap', desc: 'Swap an existing light fixture for a member supplied one.' },
+    { id: 'rl-smoke', name: 'Replace', cat: 'Smoke detector', kw: 'smoke detector alarm battery carbon', desc: 'Replace batteries or the unit for smoke and CO alarms.' },
+    { id: 'in-blinds', name: 'Install', cat: 'Blinds', kw: 'blinds curtains rod shade window install', desc: 'Install blinds, shades or a curtain rod.' },
+    { id: 'as-furn', name: 'Assemble', cat: 'Furniture', kw: 'furniture assemble build bed dresser desk', desc: 'Assemble flat-pack furniture. Includes anchoring to the wall.' }
+  ];
+  function taxById(id) { for (var i = 0; i < TAX.length; i++) if (TAX[i].id === id) return TAX[i]; return null; }
+  function taxName(t) { return t.name + ' (' + t.cat + ')'; }
+
+  /* ---------- Member's Fast Fix tasks (symptoms) ---------- */
+  var MEMBER = [
+    { symptom: 'Toilet rocks or leaks at the base', group: 'Plumbing', comment: 'Water pools around the base after every flush.' },
+    { symptom: 'Cracked or missing grout', group: 'Walls, Paint & Tile', comment: 'Two cracked tiles by the shower door, and grout missing along the bottom row.' },
+    { symptom: 'Hang a heavy mirror', group: 'Mounting & Hanging', comment: 'About 40 lb, going over the bathroom vanity. Drywall wall.' }
+  ];
+  var seq = 0;
+  function fast(m) { return { id: 't' + (++seq), kind: 'fast', from: m, tax: null, done: false, reason: '', notes: '', minutes: '', parts: '' }; }
+  function real(taxId, over, from) {
+    var t = { id: 't' + (++seq), kind: 'real', from: from || null, tax: taxId, done: false, reason: '', notes: '', minutes: '', parts: '' };
+    for (var k in over) t[k] = over[k]; return t;
+  }
+  var SCN = {
+    fresh: function () { return { svc: 'Fast Fix', min: 120, requested: null, tasks: MEMBER.map(fast) }; },
+    partly: function () {
+      var a = fast(MEMBER[0]); a = real('rs-toilet', { done: true, minutes: '45', parts: '18.50', notes: 'Replaced wax ring. Toilet reset level.' }, MEMBER[0]);
+      return { svc: 'Fast Fix', min: 120, requested: null, tasks: [a, fast(MEMBER[1]), fast(MEMBER[2])] };
+    },
+    ready: function () {
+      return { svc: 'Fast Fix', min: 120, requested: null, tasks: [
+        real('rs-toilet', { done: true, minutes: '45', parts: '18.50' }, MEMBER[0]),
+        real('rg-tile', { done: false, reason: 'Ran out of time', minutes: '40', notes: 'Grout needs 24 hours to cure. Needs a second visit for sealing.' }, MEMBER[1]),
+        real('mt-mirror', { done: true, minutes: '30' }, MEMBER[2])
+      ] };
+    },
+    regular: function () {
+      return { svc: 'Service', min: 60, requested: 'Troubleshoot members dryer. The belt popped off per the member. Kenmore dryer, member believes it is the belt and advises to bring one.', tasks: [real('ts-dryer', {})] };
+    }
+  };
+
+  var S = null, scenario = 'fresh', LABOR = 55;
+
+  function compiled() {
+    if (S.requested) return S.requested;
+    return MEMBER.map(function (m, i) { return '- Task' + (i + 1) + ': ' + m.symptom + ' (' + m.group + '): ' + m.comment; }).join('\n');
+  }
+  function load(name) {
+    scenario = name; seq = 0; S = SCN[name](); S.sent = false; S.attn = false;
+    $$('#proto button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.scn === name ? 'true' : 'false'); });
+    $('#svc').textContent = S.svc; $('#svc-min').textContent = S.min + ' minutes';
+    $('#job-requested').textContent = compiled();
+    renderTasks(); refresh();
+  }
+
+  function taskBy(id) { for (var i = 0; i < S.tasks.length; i++) if (S.tasks[i].id === id) return S.tasks[i]; return null; }
+  function updated(t) { return t.kind === 'real' && (t.done || !!t.reason); }
+  function money(n) { return '$' + n.toFixed(2); }
+  function num(s) { var n = parseFloat(String(s).replace(/[^0-9.]/g, '')); return isNaN(n) ? 0 : n; }
+
+  /* ---------- Derived summary: table, status line, Send Now ---------- */
+  function refresh() {
+    var mins = 0, parts = 0;
+    S.tasks.forEach(function (t) { if (t.kind === 'real') { mins += Math.round(num(t.minutes)); parts += num(t.parts); } });
+    $('#t-time').textContent = mins + ' minutes';
+    $('#t-parts').textContent = money(parts);
+    $('#t-labor').textContent = money(LABOR);
+    $('#t-total').textContent = money(LABOR + parts);
+    var fastLeft = S.tasks.filter(function (t) { return t.kind === 'fast'; }).length;
+    var notUp = S.tasks.filter(function (t) { return t.kind === 'real' && !updated(t); }).length;
+    var msg = '';
+    if (S.sent) msg = '';
+    else if (!S.tasks.length) msg = 'Add at least one task before you can send your summary.';
+    else if (fastLeft) msg = 'Replace ' + (fastLeft === 1 ? 'the Fast Fix task' : 'all ' + fastLeft + ' Fast Fix tasks') + ' with a task from the list before you can send your summary.';
+    else if (notUp) msg = 'All tasks need to be updated before you can send your summary.';
+    var st = $('#status'), ok = !msg && !S.sent;
+    st.className = 'status' + (S.sent ? ' status--ok' : '');
+    st.textContent = S.sent ? 'Summary sent.' : msg;
+    var sn = $('#send-now');
+    sn.setAttribute('aria-disabled', ok ? 'false' : 'true');
+    $('#send-later').disabled = S.sent; sn.disabled = S.sent;
+    if (ok) S.attn = false;
+    $$('.card[data-id]').forEach(function (c) {
+      var t = taskBy(c.dataset.id);
+      c.classList.toggle('card--attn', !!S.attn && (t.kind === 'fast' || !updated(t)));
+    });
+  }
+
+  /* ---------- Task cards ---------- */
+  var focusKey = null;
+  function renderTasks() {
+    var list = $('#task-list'); list.textContent = '';
+    if (!S.tasks.length) list.appendChild(h('p', { class: 'empty', text: 'No tasks yet. Use Add Task.' }));
+    S.tasks.forEach(function (t) { list.appendChild(t.kind === 'fast' ? fastCard(t) : realCard(t)); });
+    if (focusKey) { var el = $('[data-fk="' + focusKey + '"]'); if (el) el.focus(); focusKey = null; }
+  }
+
+  function kebab(t, label) {
+    var menu = h('ul', { class: 'menu', role: 'menu', 'aria-label': 'Options for ' + label, hidden: true });
+    var btn = h('button', { class: 'kebab', type: 'button', 'aria-label': 'Task options', 'aria-haspopup': 'menu', 'aria-expanded': 'false', 'data-fk': t.id + ':menu' }, icon('more-2-fill'));
+    function item(txt, ic, fn) {
+      var b = h('button', { type: 'button', role: 'menuitem', onclick: function () { closeMenus(); fn(b); } }, icon(ic), txt);
+      return h('li', { role: 'none' }, b);
+    }
+    menu.appendChild(item('Replace', 'arrow-left-right-line', function () { openPicker('replace', t, btn); }));
+    menu.appendChild(item('Delete', 'delete-bin-line', function () { openDelete(t, btn); }));
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = menu.hidden; closeMenus();
+      if (open) { menu.hidden = false; btn.setAttribute('aria-expanded', 'true'); $('button', menu).focus(); }
+    });
+    menu.addEventListener('keydown', function (e) {
+      var items = $$('button', menu), i = items.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+      else if (e.key === 'Escape') { e.stopPropagation(); closeMenus(); btn.focus(); }
+      else if (e.key === 'Tab') closeMenus();
+    });
+    return [btn, menu];
+  }
+  function closeMenus() {
+    $$('.menu').forEach(function (m) { m.hidden = true; });
+    $$('.kebab').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+  }
+  document.addEventListener('click', function (e) { if (!e.target.closest('.menu')) closeMenus(); });
+
+  function fastCard(t) {
+    var title = t.from.symptom + ' (' + t.from.group + ')', k = kebab(t, title);
+    var head = h('div', { class: 'card__head' },
+      h('h3', { class: 'card__title', id: 'h-' + t.id, tabindex: '-1', 'data-fk': t.id + ':title' }, title),
+      h('span', { class: 'tag' }, 'Fast Fix'), k[0], k[1]);
+    return h('article', { class: 'card card--fast', 'data-id': t.id, 'aria-labelledby': 'h-' + t.id },
+      head,
+      h('div', { class: 'note' }, h('p', { class: 'note__t' }, 'Member’s note'), h('p', { class: 'note__b' }, t.from.comment)),
+      h('div', { class: 'call' },
+        h('p', null, 'This is what the member asked for. Replace it with the task you are doing to start updating your work.'),
+        h('button', { class: 'btn btn--blue', type: 'button', 'data-fk': t.id + ':replace', onclick: function (e) { openPicker('replace', t, e.currentTarget); } }, 'Replace task')));
+  }
+
+  function realCard(t) {
+    var tx = taxById(t.tax), title = taxName(tx), k = kebab(t, title), id = t.id;
+    var needReason = !t.done && !t.reason && S.attn;
+    var sel = h('select', { id: 'r-' + id, 'aria-label': 'Reason this task is not complete', 'data-fk': id + ':reason', disabled: t.done, 'aria-invalid': (!t.done && !t.reason) ? 'true' : null,
+      onchange: function (e) { t.reason = e.target.value; focusKey = id + ':reason'; renderTasks(); refresh(); } },
+      h('option', { value: '' }, '-- select an option --'));
+    ['Add-on', 'Needs parts', 'Out of scope or access', 'Ran out of time'].forEach(function (r) {
+      sel.appendChild(h('option', { value: r, selected: t.reason === r }, r));
+    });
+    if (!t.done && !t.reason) sel.className = 'bad';
+    var cb = h('input', { type: 'checkbox', id: 'c-' + id, checked: t.done, 'data-fk': id + ':done',
+      onchange: function (e) { t.done = e.target.checked; if (t.done) t.reason = ''; focusKey = id + ':done'; renderTasks(); refresh(); } });
+    var mins = h('input', { type: 'text', id: 'm-' + id, inputmode: 'numeric', value: t.minutes, autocomplete: 'off',
+      oninput: function (e) { t.minutes = e.target.value; refresh(); } });
+    var parts = h('input', { type: 'text', id: 'p-' + id, inputmode: 'decimal', value: t.parts, placeholder: '0.00', autocomplete: 'off',
+      oninput: function (e) { t.parts = e.target.value; refresh(); } });
+    var notes = h('textarea', { id: 'n-' + id, value: t.notes, oninput: function (e) { t.notes = e.target.value; } });
+    return h('article', { class: 'card card--real', 'data-id': id, 'aria-labelledby': 'h-' + id },
+      h('div', { class: 'card__head' },
+        h('h3', { class: 'card__title', id: 'h-' + id, tabindex: '-1', 'data-fk': id + ':title' }, title), k[0], k[1]),
+      h('p', { class: 'desc' }, tx.desc),
+      t.from ? h('p', { class: 'from' }, 'Member asked for: ' + t.from.symptom + ' (' + t.from.group + ')') : null,
+      h('p', { class: 'sub' }, 'Sub-tasks'),
+      h('div', { class: 'sub__row' },
+        h('label', { class: 'chk', for: 'c-' + id }, cb, 'Completed'),
+        h('div', { class: 'sel' }, sel, icon('arrow-down-s-line'))),
+      h('div', { class: 'field' }, h('label', { for: 'n-' + id }, 'Notes for Ops Support (Private)'), notes),
+      h('div', { class: 'files' }, h('button', { class: 'btn btn--line', type: 'button', 'data-stub': '' }, 'Add File(s)')),
+      h('div', { class: 'two' },
+        h('div', { class: 'field' }, h('label', { for: 'm-' + id }, 'Minutes spent'), mins),
+        h('div', { class: 'field' }, h('label', { for: 'p-' + id }, 'Parts Cost'), h('div', { class: 'money' }, h('span', { 'aria-hidden': 'true' }, '$'), parts))));
+  }
+
+  /* ---------- Dialogs ---------- */
+  var openerEl = null, modalEl = null;
+  function openModal(box, opener, labelledby) {
+    closeModal(true);
+    openerEl = opener;
+    var scrim = h('div', { class: 'modal__scrim', onclick: function () { closeModal(); } });
+    modalEl = h('div', { class: 'modal' }, scrim, box);
+    box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-labelledby', labelledby);
+    $('#modal-root').appendChild(modalEl);
+    document.body.classList.add('is-modal');
+    modalEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.stopPropagation(); closeModal(); return; }
+      if (e.key !== 'Tab') return;
+      var f = $$('button:not([disabled]), input, [tabindex="0"]', box).filter(function (x) { return x.offsetParent !== null; });
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === $('h2', box))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+  }
+  function closeModal(silent) {
+    if (!modalEl) return;
+    modalEl.remove(); modalEl = null; document.body.classList.remove('is-modal');
+    if (!silent && openerEl && document.body.contains(openerEl)) openerEl.focus();
+    if (!silent) openerEl = null;
+  }
+
+  function rankFor(t) {
+    var src = ((t.from ? t.from.symptom + ' ' + t.from.group + ' ' + t.from.comment : '')).toLowerCase();
+    var stop = { the: 1, and: 1, for: 1, with: 1, that: 1, this: 1, after: 1, every: 1, about: 1, over: 1, are: 1, going: 1, near: 1, not: 1, but: 1 };
+    var words = src.split(/[^a-z]+/).filter(function (w) { return w.length > 2 && !stop[w]; });
+    return TAX.map(function (x) {
+      var hay = (x.name + ' ' + x.cat + ' ' + x.kw).toLowerCase(), s = 0;
+      words.forEach(function (w) { if (new RegExp('\\b' + w.replace(/(s|es)$/, '')).test(hay)) s++; });
+      return { x: x, s: s };
+    });
+  }
+  function matches(x, q) {
+    var hay = (x.name + ' ' + x.cat + ' ' + x.kw).toLowerCase();
+    return q.toLowerCase().split(/\s+/).filter(Boolean).every(function (w) { return new RegExp('\\b' + w.replace(/[^a-z0-9]/gi, '')).test(hay); });
+  }
+
+  function openPicker(mode, t, opener) {
+    closeMenus();
+    var sel = (t && t.tax) || null, q = '';
+    var ranked = t ? rankFor(t) : [];
+    var title = mode === 'add' ? 'Add task' : 'Replace task';
+    var list = h('div', { role: 'radiogroup', 'aria-labelledby': 'pk-title' });
+    var count = h('p', { class: 'sr', role: 'status', 'aria-live': 'polite' });
+    var go = h('button', { class: 'btn btn--blue', type: 'button', disabled: !sel, onclick: confirm }, mode === 'add' ? 'Add task' : 'Replace task');
+    function row(x) {
+      var r = h('input', { type: 'radio', name: 'tax', value: x.id, checked: sel === x.id, onchange: function () { sel = x.id; go.disabled = false; } });
+      return h('label', { class: 'opt' }, r, h('div', null, h('b', null, taxName(x)), h('span', null, x.desc)));
+    }
+    function draw() {
+      list.textContent = '';
+      var shown = TAX.filter(function (x) { return !q || matches(x, q); });
+      var sugg = [];
+      if (!q && mode === 'replace') {
+        sugg = ranked.filter(function (r) { return r.s > 0; }).sort(function (a, b) { return b.s - a.s; }).slice(0, 3).map(function (r) { return r.x; });
+        if (sugg.length) { list.appendChild(h('p', { class: 'grp' }, 'Suggested for this request')); sugg.forEach(function (x) { list.appendChild(row(x)); }); }
+      }
+      var rest = shown.filter(function (x) { return sugg.indexOf(x) < 0; }).sort(function (a, b) { return taxName(a) < taxName(b) ? -1 : 1; });
+      if (rest.length) { list.appendChild(h('p', { class: 'grp' }, q ? 'Results' : 'All tasks')); rest.forEach(function (x) { list.appendChild(row(x)); }); }
+      if (!shown.length) list.appendChild(h('p', { class: 'empty', text: 'No tasks match that. Try another word.' }));
+      count.textContent = shown.length + (shown.length === 1 ? ' task' : ' tasks');
+    }
+    function confirm() {
+      if (!sel) return;
+      var x = taxById(sel), msg;
+      if (mode === 'add') {
+        var n = real(sel, {}, null); S.tasks.push(n); focusKey = n.id + ':title'; msg = 'Added ' + taxName(x) + '.';
+      } else {
+        t.kind = 'real'; t.tax = sel; focusKey = t.id + ':title'; msg = 'Replaced with ' + taxName(x) + '.';
+      }
+      closeModal(true); openerEl = null; renderTasks(); refresh(); toast(msg);
+    }
+    var input = h('input', { type: 'text', id: 'pk-q', autocomplete: 'off', 'aria-label': 'Search tasks by action or item', placeholder: 'Search by task or item, for example "toilet" or "mount"',
+      oninput: function (e) { q = e.target.value.trim(); draw(); } });
+    var sub = mode === 'replace' && t.from ? h('p', { class: 'modal__sub' }, (t.kind === 'fast' ? 'Member asked for: ' : 'Currently: ') + (t.kind === 'fast' ? t.from.symptom + ' (' + t.from.group + '). “' + t.from.comment + '”' : taxName(taxById(t.tax)))) :
+      (mode === 'replace' ? h('p', { class: 'modal__sub' }, 'Currently: ' + taxName(taxById(t.tax))) : null);
+    var box = h('div', { class: 'modal__box' },
+      h('div', { class: 'modal__top' }, h('h2', { id: 'pk-title', tabindex: '-1' }, title), sub,
+        h('div', { class: 'search' }, icon('search-line'), input)),
+      h('div', { class: 'modal__body' }, list, count),
+      h('div', { class: 'modal__foot' }, h('button', { class: 'btn btn--line', type: 'button', onclick: function () { closeModal(); } }, 'Cancel'), go));
+    openModal(box, opener, 'pk-title');
+    draw(); input.focus();
+  }
+
+  function openDelete(t, opener) {
+    var name = t.kind === 'fast' ? t.from.symptom + ' (' + t.from.group + ')' : taxName(taxById(t.tax));
+    var del = h('button', { class: 'btn btn--dark', type: 'button', onclick: function () {
+      S.tasks = S.tasks.filter(function (x) { return x !== t; });
+      closeModal(true); openerEl = null; focusKey = null; renderTasks(); refresh(); toast('Task deleted.');
+      var hd = $('#tasks-h'); if (hd) hd.focus();
+    } }, 'Delete task');
+    var txt = t.kind === 'fast' ? 'This removes the member’s request from your summary. Their original request stays in Job requested.' : 'This removes the task and its notes, minutes and parts cost from your summary.';
+    var box = h('div', { class: 'modal__box', style: 'max-width:480px' },
+      h('div', { class: 'modal__top' }, h('h2', { id: 'dl-title', tabindex: '-1' }, 'Delete ' + name + '?')),
+      h('p', { class: 'modal__text' }, txt),
+      h('div', { class: 'modal__foot' }, h('button', { class: 'btn btn--line', type: 'button', onclick: function () { closeModal(); } }, 'Cancel'), del));
+    openModal(box, opener, 'dl-title'); $('#dl-title').focus();
+  }
+
+  var toastT = null;
+  function toast(msg) {
+    var el = $('#toast'); el.hidden = false; el.textContent = msg;
+    clearTimeout(toastT); toastT = setTimeout(function () { el.hidden = true; }, 3200);
+  }
+
+  /* ---------- Wiring ---------- */
+  $('#add-task').addEventListener('click', function (e) { openPicker('add', null, e.currentTarget); });
+  $('#send-later').addEventListener('click', function () { toast('Saved. You can send your summary later.'); });
+  $('#send-now').addEventListener('click', function () {
+    if ($('#send-now').getAttribute('aria-disabled') === 'true') {
+      S.attn = true; renderTasks(); refresh();
+      var first = S.tasks.filter(function (t) { return t.kind === 'fast' || !updated(t); })[0];
+      if (first) { var el = $('[data-id="' + first.id + '"] ' + (first.kind === 'fast' ? '.card__head' : '.card__head')); if (el) el.scrollIntoView({ block: 'center' }); var f = $('[data-fk="' + first.id + (first.kind === 'fast' ? ':replace' : ':reason') + '"]'); if (f) f.focus({ preventScroll: true }); }
+      return;
+    }
+    S.sent = true; refresh(); toast('Summary sent to the member.');
+  });
+  document.addEventListener('click', function (e) {
+    var s = e.target.closest('[data-stub]'); if (s) toast('Existing portal control. Unchanged in this prototype.');
+  });
+  $$('#proto button').forEach(function (b) { b.addEventListener('click', function () { load(b.dataset.scn); }); });
+  var m = /scn=(\w+)/.exec(location.hash); load(m && SCN[m[1]] ? m[1] : 'fresh');
+})();
+</script>
+</body>
+</html>
