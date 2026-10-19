@@ -139,7 +139,7 @@ body.nomark .anno{display:none !important}
 .h-list.l .i{color:var(--text-2)}
 
 /* frames */
-.fr{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-inner);overflow:hidden;min-width:0}
+.fr{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-inner);overflow:hidden;overflow:clip;min-width:0}
 .fr-bar{display:flex;align-items:center;gap:12px;height:44px;padding:0 14px;background:#eef1f3;border-bottom:1px solid var(--border)}
 .fr-dots{display:flex;gap:6px;flex:none}
 .fr-dots i{width:10px;height:10px;border-radius:50%;background:var(--dot)}
@@ -643,6 +643,116 @@ body.nomark .anno{display:none !important}
 .mb .tbl{overflow-x:auto}
 @container app (max-width:560px){.brow,.baxis{grid-template-columns:100px minmax(0,1fr) 60px}.brow .tip{left:0}}
 
+/* ================= v3 additions ================= */
+/* shell */
+.h-proto{display:inline-flex;align-items:center;gap:10px;min-width:0;font-size:16px;line-height:24px;font-weight:600;color:var(--ink)}
+.h-proto .pill{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;background:var(--proto);color:#fff;font-size:12px;line-height:16px;font-weight:600;flex:none}
+.h-seglab{font-size:13px;line-height:20px;font-weight:600;color:var(--text-2)}
+.h-segwrap{display:inline-flex;align-items:center;gap:8px}
+.h-map{display:flex;align-items:flex-start;margin-top:12px;flex-wrap:wrap}
+.h-map[hidden]{display:none}
+.h-maplab{flex:none;background:var(--surface);position:relative;z-index:1}
+.h-maplab svg{display:block}
+.h-map .h-mapscroll{flex:1;min-width:0;margin:0;padding:0 0 8px}
+.h-legend{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px 16px;margin:8px 0 0;font-size:12px;line-height:16px;color:var(--text-2)}
+.h-legend span{display:inline-flex;align-items:center;gap:6px}
+.h-legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.lg-past{background:var(--ink)}
+.lg-now{background:var(--blue);box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--blue)}
+.lg-split{border-radius:2px !important;width:9px !important;height:9px !important;transform:rotate(45deg);background:var(--dot)}
+.lg-off{background:var(--surface);border:1.5px dashed var(--slate)}
+#mapHint[hidden]{display:none}
+@media (max-width:560px){.h-maplab svg{width:120px}}
+.h-tabs{display:flex;gap:4px;flex-wrap:wrap;margin:-4px -4px 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.h-tabs button{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:0;border-radius:var(--r-pill);background:none;color:var(--text-2);font-size:14px;line-height:20px;font-weight:600}
+.h-tabs button:hover{color:var(--ink);background:var(--page)}
+.h-tabs button[aria-selected="true"]{background:var(--ink);color:#fff}
+.h-tabs .n{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--blue-tint);color:var(--blue-text);font-size:12px;line-height:16px}
+.h-tabs button[aria-selected="true"] .n{background:#fff;color:var(--ink)}
+.h-tabbody{min-height:80px}
+.h-now{display:inline-flex;align-items:center;gap:6px;font-size:13px;line-height:20px;color:var(--ink)}
+.h-now .i{width:16px;height:16px;color:var(--blue-text)}
+.h-now b{font-weight:600}
+.h-dots i{display:block;width:8px;height:8px;border-radius:50%;background:var(--dot)}
+.h-dots i.past{background:var(--ink)}
+.h-dots i.on{background:var(--blue);box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--blue)}
+.h-toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:40;max-width:calc(100% - 32px);padding:10px 16px;border-radius:var(--r-inner);background:var(--proto);color:#fff;font-size:14px;line-height:20px;font-weight:600}
+.h-toast[hidden]{display:none}
+#screen{scroll-margin-top:96px}
+.hot:focus-visible{outline:2px solid var(--blue-text) !important;outline-offset:3px}
+body.nomark .tile--pm .hot,body.nomark .h-rec.chg{outline:none}
+@media (max-width:760px){.h-count{font-size:11px}.h-segwrap{flex-wrap:wrap}}
+
+/* HomeHub */
+.mp .tile__head{display:flex;align-items:flex-start;gap:12px}
+.mp .tile__actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto}
+.mp .tile__more{display:inline-flex;align-items:center;gap:2px;color:var(--slate);font-size:14px;line-height:20px;font-weight:600}
+.mp .tile__more .i{width:20px;height:20px}
+.mp .tile--pm{background:var(--blue-tint)}
+.mp .tile--critical{background:var(--red-tint)}
+.mp .tile .m-photo{max-width:none}
+.mp .d-done{width:40px;height:40px;flex:none;color:var(--blue-text);padding:6px}
+.mp .t-ink{color:var(--ink)}
+.mp .d-sev--ok{background:var(--blue-tint);color:var(--blue-text)}
+.mp .d-sev--critical{background:var(--red);color:#fff}
+.mp .d-sev .i,.mp .d-icon .i,.mp .hist .i{width:20px;height:20px}
+.mp .d-risk{margin:4px 0 0;font-size:14px;line-height:20px;color:var(--ink)}
+.mp .hist{width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:12px;background:var(--page);color:var(--slate)}
+.mp .visit{display:flex;align-items:flex-start;gap:16px}
+.mp .visit__main{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.mp .svc__cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+.mp .svc__label{margin:0 0 8px;font-size:14px;line-height:20px;font-weight:600;color:var(--text-2)}
+.mp .svc__todo .i-box{color:var(--text-2)}
+.mp .feature.is-done .i-box{color:var(--blue)}
+.mp .done-row{display:flex;align-items:center;gap:8px;margin-top:20px;padding:12px;border-radius:var(--r-inner);background:var(--blue-tint)}
+.mp .done-row .d-done{width:24px;height:24px;padding:0}
+.mp .done-row.decl{background:var(--page)}
+.mp .done-row.decl .d-done{color:var(--slate)}
+.mp .m-only{display:none}
+.mp .layout--prop .rail{position:sticky;top:96px}
+@container app (max-width:767px){
+  .mp .layout--prop .rail{position:static;order:-1}
+  .mp .layout--prop .rail .ledger,.mp .layout--prop .rail .ledger + .divider{display:none}
+  .mp .m-only{display:block}
+  .mp .svc__cols{grid-template-columns:minmax(0,1fr);gap:16px}
+  .mp .visit{flex-direction:column;gap:12px}
+}
+
+/* HM Portal */
+.hp .jh{font-size:15px;line-height:22px;color:var(--hp-label)}
+.hp .jh + .jh{margin-bottom:8px}
+.hp .tasks__bar h3{font-size:26px;font-weight:400;line-height:36px;color:var(--hp-head)}
+.hp .files .cnt{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 8px;border-radius:12px;background:var(--hp-blue-tint);color:var(--hp-blue-d);font-size:13px;font-weight:600}
+.hp .free{max-width:680px;margin:10px auto 0;font-size:14px;line-height:20px;color:var(--hp-label)}
+.hp .tbl--prop{margin-top:36px}
+.hp .tbl--prop caption{font-weight:600;color:var(--hp-ink);font-size:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hp .pcard{max-width:680px;margin:28px auto 0;padding:18px 20px 22px;border:1px solid var(--hp-line);border-radius:4px}
+.hp .sub--prop{padding-top:22px;border-top:1px solid var(--hp-line)}
+.hp .pline{margin-top:14px;padding:4px 16px 18px;border:1px solid var(--hp-line);border-left:3px solid var(--hp-blue);border-radius:4px;background:#fbfcfe}
+.hp .pline .field{margin-top:14px}
+.hp .pline .two{margin-top:14px}
+.hp .pline--bad{border-color:var(--hp-err-line);border-left-color:var(--hp-err);background:var(--hp-err-bg)}
+.hp .sub__row{display:flex;align-items:center;gap:16px;margin-top:10px;flex-wrap:wrap}
+.hp .chk{display:inline-flex;align-items:center;gap:8px;cursor:pointer;line-height:24px}
+.hp .chk input{width:18px;height:18px;margin:0;accent-color:var(--hp-blue);flex:none}
+.hp .sel{position:relative;flex:1;min-width:180px}
+.hp .sel select{width:100%;height:42px;padding:0 36px 0 12px;border:1px solid var(--hp-line);border-radius:4px;background:#fff;color:var(--hp-ink);font:inherit;font-size:16px;appearance:none;-webkit-appearance:none}
+.hp .sel select:disabled{background:#f4f6fa;color:var(--hp-label)}
+.hp .sel select:focus{outline:2px solid var(--hp-blue);outline-offset:0}
+.hp .sel .i{position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--hp-label)}
+.hp .excl{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.hp .flabel{display:block;margin-bottom:6px}
+.hp .flabel small{display:block;font-size:14px;line-height:20px;color:var(--hp-label)}
+.hp .addline{margin-top:14px}
+.hp .files .btn,.hp .addline{cursor:pointer}
+.hp .btn--blue[aria-disabled="true"]{background:var(--hp-blue-dis)}
+.hp .modal__box{position:sticky;top:96px;max-height:calc(100vh - 120px);overflow:auto}
+.hp.ovl{padding-top:32px}
+@container app (max-width:900px){
+  .hp .pline{padding:2px 12px 14px}
+  .hp .pcard{padding:14px 12px 18px}
+}
+
 @media (prefers-reduced-motion:reduce){*{transition:none !important;scroll-behavior:auto !important}}
 </style>
 
@@ -651,9 +761,9 @@ body.nomark .anno{display:none !important}
 
 <header class="h-top">
   <div class="h-in">
-    <span class="h-brand"><span class="h-mark"><svg class="i"><use href="#ri-home-4-fill"/></svg></span><b>PreFix</b><span class="p">Consultation → Proposal · clickable prototype</span></span>
+    <span class="h-proto"><span class="pill">Prototype</span>Consultation → proposal flow</span>
     <div class="h-ctrls">
-      <div class="h-seg" role="group" aria-label="Which path to walk" id="pathSeg"></div>
+      <span class="h-segwrap"><span class="h-seglab" id="pathLab">Path</span><div class="h-seg" role="group" aria-labelledby="pathLab" id="pathSeg"></div></span>
       <label class="h-switch"><span class="sw"><input type="checkbox" id="markToggle" checked><span class="tr"></span></span>Show click targets and what's new</label>
       <button type="button" class="h-link" id="resetBtn">Restart</button>
     </div>
@@ -663,10 +773,10 @@ body.nomark .anno{display:none !important}
 <main class="h-in h-main">
   <section class="h-card" aria-label="Flow map">
     <div class="h-maphead">
-      <p><b>V1 scope:</b> a Consultation service type, a proposal the specialist or Central Ops sends, and a member approval page that works like Recommendations. The estimator tool is Phase 2. Each row is a system; click a dot to jump to that step.</p>
+      <p><b>V1 scope:</b> a Consultation service type, a proposal the specialist or Central Ops sends, and a member approval page that works like Recommendations. The estimator tool is Phase 2. <span id="mapHint">Each row is a system; click a dot to jump to that step.</span></p>
       <button type="button" class="h-link" id="mapToggle" aria-expanded="true">Hide map</button>
     </div>
-    <div class="h-mapscroll" id="map"></div>
+    <div class="h-map" id="map"></div>
   </section>
 
   <div class="h-headrow">
@@ -674,13 +784,15 @@ body.nomark .anno{display:none !important}
     <section class="h-card" id="records" aria-label="Records at this step"></section>
   </div>
 
-  <div id="screen"></div>
-  <div class="h-notes" id="notes"></div>
+  <section id="screen" role="region" aria-label="Screen"></section>
 </main>
 
 <footer class="h-in h-src">
   <p>Built from the Oct 16 meeting (Justin, James, Mark, Phong), Phong's notes and the ChatGPT proposal requirements. Screens use the HomeHub and HM Portal design files. Placeholders: the $85/hr rate, record IDs, status names, decline reasons, email copy and every dashboard number. Ops Portal, Zendesk, mail and Metabase are plain stand-ins for those tools.</p>
 </footer>
+
+<p class="sr" id="live" aria-live="polite"></p>
+<div id="toast" class="h-toast" role="status" hidden></div>
 
 <nav class="h-bottom" aria-label="Step navigation"><div class="h-in" id="bottom"></div></nav>
 
@@ -689,11 +801,11 @@ body.nomark .anno{display:none !important}
 "use strict";
 
 /* ================= reference data ================= */
-var RATE = 85; /* placeholder rate card */
+var RATE = 85; /* placeholder until the rate card exists */
 var SYS = {
   hh:{name:"HomeHub", where:"Member Portal", icon:"home-4-line", who:"Member"},
   em:{name:"Email", where:"Member's inbox", icon:"mail-line", who:"Member"},
-  pr:{name:"Proposal page", where:"Opened from email or HomeHub", icon:"file-text-line", who:"Member"},
+  pr:{name:"Proposal page", where:"HomeHub page, opened from email", icon:"file-text-line", who:"Member"},
   zd:{name:"Zendesk", where:"Central Ops tickets", icon:"customer-service-2-line", who:"PreFix team"},
   op:{name:"Ops Portal", where:"Django Admin", icon:"settings-3-line", who:"PreFix team"},
   hm:{name:"HM Portal", where:"On Mario's iPad", icon:"tablet-line", who:"PreFix team"},
@@ -705,69 +817,87 @@ var LANES = [
   {sys:"mb", group:"Reporting"}
 ];
 var DESC = "We'd like to repaint the living room and the hallway. Walls only, and the same color is fine, maybe a little lighter. The baseboard in the hallway by the bathroom door has water damage and a couple of pieces are coming loose.";
+var JOB = "Free consultation. Repaint living room and hallway walls; replace the water-damaged hallway baseboard by the bathroom door.\n\nMember's note: " + DESC;
 var NOTE = "Water staining behind the baseboard by the bath. Can you confirm the exclusion wording and whether we add stain-blocking primer?";
+var RV_REASONS = ["Hidden or uncertain damage","Bigger than about a day","Unusual materials or access","Something else"];
 var REASONS = ["The price is higher than I expected","I'll do it myself","I'm using another company","Not a priority right now","I want to change what's included","Something else"];
+var TASKS = [
+  {id:"pt", name:"Consultation (Interior painting)", booked:"Painting consultation — living room and hallway walls", min:40, notes:"", photos:"3 photos"},
+  {id:"cp", name:"Consultation (Baseboard)", booked:"Carpentry consultation — hallway baseboard by the bathroom", min:14, notes:"Moisture meter read 12% at the baseboard. Staining looks old.", photos:"2 photos"}
+];
 var LINES = [
-  {id:"lr", task:"Paint interior walls (Living room)", area:"Living room walls", trade:"Painting", icon:"paint-brush-line",
-   desc:"Patch, prime and paint interior walls. Two coats. Ceilings and trim are separate tasks.",
+  {id:"lr", task:"pt", area:"Living room walls", trade:"Painting", icon:"paint-brush-line", cond:"No Concern",
+   note:"Nail holes, dings and scuffs, and the paint has dulled. Cosmetic only.",
    meas:"14 × 18 ft, 9 ft ceiling, about 520 sq ft of wall",
    scope:"Move and cover furniture, patch nail holes and small dings, sand and spot-prime the patches, then apply two coats to all walls. Ceiling and trim stay as they are.", hours:4, mat:150},
-  {id:"hall", task:"Paint interior walls (Hallway)", area:"Hallway walls", trade:"Painting", icon:"paint-brush-line",
-   desc:"Patch, prime and paint interior walls. Two coats. Ceilings and trim are separate tasks.",
+  {id:"hall", task:"pt", area:"Hallway walls", trade:"Painting", icon:"paint-brush-line", cond:"No Concern", note:"",
    meas:"4 × 22 ft, 9 ft ceiling, about 380 sq ft of wall",
-   scope:"Patch and sand the scuffs along both walls, spot-prime, then two coats in the same color as the living room so the two spaces read as one.", hours:2, mat:95},
-  {id:"base", task:"Replace baseboard (Hallway)", area:"Hallway baseboard by the bathroom", trade:"Carpentry", icon:"hammer-line",
-   desc:"Remove damaged baseboard and install new baseboard to match the existing profile. Caulk, prime and paint.",
-   meas:"2 sections, about 12 linear ft. Moisture 12% (dry)",
+   scope:"Patch and sand the scuffs along both walls, spot-prime, then apply two coats in the same color as the living room so the two spaces read as one.", hours:2, mat:95},
+  {id:"base", task:"cp", area:"Hallway baseboard by the bathroom", trade:"Carpentry", icon:"hammer-line", cond:"Cause for Concern",
+   note:"Swollen and soft along the bottom edge, with water staining. Moisture reads normal today (12%), so the leak appears to have stopped.",
+   meas:"2 sections, about 12 linear ft",
    scope:"Remove the two water-damaged baseboard sections by the bathroom door, install new primed baseboard matched to the existing profile, then caulk, prime and paint to match.", hours:2, mat:60}
 ];
+var EXCL = [
+  {id:"ceil", t:"Ceiling, doors and trim, except the new baseboard", on:true},
+  {id:"large", t:"Moving large items such as a piano", on:true},
+  {id:"unrel", t:"Repairs to unrelated existing conditions", on:true},
+  {id:"hidden", t:"Hidden water damage behind the baseboard or wall. If we find any, we stop and ask you before doing more.", on:false}
+];
+var INCL = ["Moving standard furniture and protecting floors","Patching small holes and dings","All paint and materials listed","Cleanup and a final walkthrough with you","PreFix workmanship warranty"];
 var RECLBL = {sr:"SR-58214 · request", tk1:"Zendesk #91347", bk1:"Booking #48213 · consult", prp:"Proposal PF-2026-00148", tk2:"Zendesk #91502 · review", tk3:"Zendesk #91655 · accepted", bk2:"Booking #48390 · project"};
 var RECORD = ["sr","tk1","bk1","prp","tk2","tk3","bk2"];
 
 /* ================= state ================= */
 function fresh(){
-  return {path:"B", idx:0, mark:true, map:true,
+  return {path:"A", idx:0, mark:true, map:window.innerWidth > 760, tab:"rec", pick:null,
     lines:LINES.map(function(l){ var c={}; for(var k in l) c[k]=l[k]; return c; }),
-    note:NOTE, declining:false, reason:null, declined:false, later:false};
+    title:"Living room and hallway refresh",
+    summary:"Repaint the living room and hallway walls, and replace the two water-damaged baseboard sections by the bathroom door, so both rooms look fresh and finished.",
+    materials:"Premium interior latex, eggshell, matched to your current color. Primed MDF baseboard matched to your existing profile.",
+    excl:EXCL.reduce(function(o,e){ o[e.id]=e.on; return o; },{}),
+    note:NOTE, rvReason:RV_REASONS[0], declining:false, reason:null, declined:false, later:false, sendTried:false};
 }
 var S = fresh();
-try{ var saved = JSON.parse(localStorage.getItem("pfx-consult-proto")||"{}");
+try{ var saved = JSON.parse(localStorage.getItem("pfx-consult-proto3")||"{}");
   if(saved.path==="A"||saved.path==="B") S.path = saved.path;
   if(typeof saved.mark==="boolean") S.mark = saved.mark;
   if(typeof saved.map==="boolean") S.map = saved.map;
 }catch(e){}
-function persist(){ try{ localStorage.setItem("pfx-consult-proto", JSON.stringify({path:S.path,mark:S.mark,map:S.map})); }catch(e){} }
+function persist(){ try{ localStorage.setItem("pfx-consult-proto3", JSON.stringify({path:S.path,mark:S.mark,map:S.map})); }catch(e){} }
 
 /* ================= helpers ================= */
 function $(s){ return document.querySelector(s); }
 function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
-function money(n){ return "$" + Math.round(n).toLocaleString("en-US"); }
-function money2(n){ return "$" + n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function r2(n){ return Math.round(n*100)/100; }
+function money(n){ n = r2(n); return "$" + (n % 1 ? n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}) : n.toLocaleString("en-US")); }
+function money2(n){ return "$" + r2(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function hrs(n){ n = Math.round(n*10)/10; return n + (n===1 ? " hour" : " hours"); }
 function ic(n, cls){ return '<svg class="i' + (cls?' '+cls:'') + '" aria-hidden="true"><use href="#ri-' + n + '"/></svg>'; }
 function anno(t){ return '<span class="anno">' + esc(t||"New") + '</span>'; }
 var HOT = " hot";
 function steps(){ return STEPS.filter(function(s){ return !s.only || s.only===S.path; }); }
 function cur(){ return steps()[S.idx]; }
-function reviewed(){
-  if(S.path!=="B") return false;
-  var st = steps(), r = st.findIndex(function(s){ return s.id==="op-review"; });
-  return S.idx >= r;
-}
+function idxOf(id){ return steps().findIndex(function(s){ return s.id===id; }); }
+function reviewed(){ return S.path==="B" && S.idx >= idxOf("op-review"); }
 function calc(rv){
-  var ls = S.lines.map(function(l){ var c={}; for(var k in l) c[k]=l[k]; if(rv && l.id==="base") c.mat = l.mat + 25; c.total = c.hours*RATE + c.mat; return c; });
+  var ls = S.lines.map(function(l){ var c={}; for(var k in l) c[k]=l[k]; if(rv && l.id==="base") c.mat = l.mat + 25; c.total = r2(c.hours*RATE + c.mat); return c; });
   var t = {ls:ls, hours:0, labor:0, mat:0};
   ls.forEach(function(l){ t.hours+=l.hours; t.labor+=l.hours*RATE; t.mat+=l.mat; });
-  t.total = t.labor + t.mat; t.days = Math.max(1, Math.ceil(t.hours/8));
+  t.total = r2(t.labor + t.mat); t.days = Math.max(1, Math.ceil(t.hours/8));
   return t;
 }
 function T(){ return calc(reviewed()); }
-function dur(t){ t = t||T(); return (t.days===1 ? "1 day" : t.days + " days") + " on site, about " + t.hours + " hours"; }
+function dur(t){ t = t||T(); return (t.days===1 ? "1 day" : t.days + " days") + " on site, about " + hrs(t.hours); }
 function projDate(){ var d=T().days; return d===1 ? "Tue, Nov 3" : d===2 ? "Tue–Wed, Nov 3–4" : "From Tue, Nov 3, " + d + " days"; }
 function DT(){
   return S.path==="A"
-    ? {sent:"Thu, Oct 22, 10:01 AM", sentS:"Oct 22", accepted:"Thu, Oct 22 at 7:45 PM", acceptedS:"Oct 22", prepared:"October 22, 2026", valid:"November 21, 2026", time:"10:01 AM"}
-    : {sent:"Fri, Oct 23, 11:20 AM", sentS:"Oct 23", accepted:"Fri, Oct 23 at 6:30 PM", acceptedS:"Oct 23", prepared:"October 23, 2026", valid:"November 22, 2026", time:"11:20 AM"};
+    ? {sent:"Thu, Oct 22, 10:01 AM", sentS:"Oct 22", accepted:"Thu, Oct 22, 7:45 PM", acceptedS:"Oct 22", prepared:"Oct 22", valid:"Nov 21", time:"10:01 AM"}
+    : {sent:"Fri, Oct 23, 11:20 AM", sentS:"Oct 23", accepted:"Fri, Oct 23, 6:30 PM", acceptedS:"Oct 23", prepared:"Oct 23", valid:"Nov 22", time:"11:20 AM"};
 }
+function exclList(){ var rv = reviewed(); return EXCL.filter(function(e){ return S.excl[e.id] || (rv && e.id==="hidden"); }); }
+function problems(){ return S.lines.filter(function(l){ return !l.area.trim() || !l.scope.trim() || !(l.hours > 0); }); }
+function branchEnded(){ return cur().id==="pr-review" && (S.declined || S.later); }
 
 /* ================= frames ================= */
 function frame(sys, url, inner, overlay){
@@ -777,13 +907,12 @@ function frame(sys, url, inner, overlay){
 }
 
 /* ---------- HomeHub pieces ---------- */
-function mpTop(active, bare){
+function mpTop(active){
   var nav = ["Dashboard","Appointments","Recommendations","Appliances","Timeline"];
   return '<header class="topbar"><div class="topbar__inner">' +
     '<span class="brand"><span class="brand__mark">' + ic("home-4-fill") + '</span><span class="brand__name">PreFix</span><span class="brand__product">HomeHub</span></span>' +
-    (bare ? '<span class="nav"></span>' :
-      '<nav class="nav" aria-label="Main">' + nav.map(function(n){ return '<span class="nav__link' + (n===active?' is-active':'') + '">' + n + (n==="Recommendations" ? ' <span class="count count--red">2</span>' : '') + '</span>'; }).join("") + '</nav>') +
-    '<div class="topbar__actions">' + (bare ? '<span class="link">Get help</span>' : '') + '<span class="avatar-btn" aria-hidden="true">SM</span></div>' +
+    '<nav class="nav" aria-label="Main">' + nav.map(function(n){ return '<span class="nav__link' + (n===active?' is-active':'') + '" data-stub>' + n + (n==="Recommendations" ? ' <span class="count count--red">2</span>' : '') + '</span>'; }).join("") + '</nav>' +
+    '<div class="topbar__actions"><span class="avatar-btn" aria-hidden="true">SM</span></div>' +
     '<div class="topbar__mobile"><span class="icon-btn" aria-hidden="true">' + ic("menu-line") + '</span></div>' +
   '</div></header>';
 }
@@ -792,24 +921,38 @@ function mpFoot(){
     '<nav class="footer__links" aria-label="Footer"><span class="link">Help center</span><span class="link">Privacy</span><span class="link">Terms</span></nav></div></footer>';
 }
 function mpTeam(extra){
-  return '<section class="card"><div class="d-head"><h2 class="t-title">Your PreFix team</h2></div><ul class="d-list">' +
+  return '<section class="card"><div class="d-head"><h3 class="t-title">Your PreFix team</h3></div><ul class="d-list">' +
     '<li class="d-row"><span class="pro" aria-hidden="true">MR<span class="pro__badge">' + ic("home-4-fill") + '</span></span><div class="d-main"><p class="d-role">Home Manager</p><p class="d-meta">Marcus Reyes</p></div></li>' +
-    '<li class="d-row"><span class="pro" aria-hidden="true">M<span class="pro__badge">' + ic("home-4-fill") + '</span></span><div class="d-main"><p class="d-role">Specialty painter ' + (extra||"") + '</p><p class="d-meta">Mario &middot; Living room &amp; hallway</p></div></li>' +
+    '<li class="d-row"><span class="pro" aria-hidden="true">M<span class="pro__badge">' + ic("home-4-fill") + '</span></span><div class="d-main"><p class="d-role">Specialty painter ' + (extra||"") + '</p><p class="d-meta">Mario &middot; Living room and hallway</p></div></li>' +
   '</ul></section>';
+}
+function mpRecs(){
+  return '<section class="card"><div class="d-head"><h3 class="t-title">Recommendations</h3><span class="count count--red">2</span><span class="d-head__link" data-stub>See all' + ic("arrow-right-s-line") + '</span></div><ul class="tiles">' +
+    '<li class="tile"><div class="tile__head"><span class="d-sev d-sev--high">' + ic("alert-line") + '</span><div class="d-main"><span class="d-title">Dryer vent blocked with lint</span><p class="d-meta">High &middot; Home Manager</p><p class="d-meta">From Preventive maintenance, Apr 14</p></div></div><div class="tile__actions"><span class="btn btn--secondary btn--sm" data-stub>Send</span></div></li>' +
+    '<li class="tile"><div class="tile__head"><span class="d-sev">' + ic("information-line") + '</span><div class="d-main"><span class="d-title">Kitchen window caulk cracked</span><p class="d-meta">Normal &middot; Specialty carpentry</p><p class="d-meta">From Preventive maintenance, Apr 14</p></div></div><div class="tile__actions"><span class="btn btn--secondary btn--sm" data-stub>Send</span></div></li>' +
+  '</ul></section>';
+}
+function mpProposals(state){
+  var t = T(), d = DT();
+  var tile = state==="open"
+    ? '<li class="tile tile--pm"><div class="tile__head"><span class="d-icon d-icon--white">' + ic("file-text-line") + '</span><div class="d-main"><span class="d-title">' + esc(S.title) + '</span><p class="d-meta"><span class="t-blue">' + money(t.total) + '</span> &middot; ' + (t.days===1?'1 day':t.days+' days') + ' &middot; Painting, carpentry</p><p class="d-meta">From your consultation, Oct 22</p></div></div>' +
+      '<div class="tile__actions"><button type="button" class="btn btn--secondary btn--sm' + HOT + '" data-act="next">Review</button><span class="tile__more" aria-hidden="true">Details' + ic("arrow-right-s-line") + '</span></div></li>'
+    : '<li class="tile"><div class="tile__head">' + ic("checkbox-circle-fill","d-done") + '<div class="d-main"><span class="d-title">' + esc(S.title) + '</span><p class="d-meta t-ink">Approved ' + d.acceptedS + ' &middot; ' + money(t.total) + '. Booked for ' + projDate() + '.</p></div></div><div class="tile__actions"><span class="link" data-stub>View proposal</span></div></li>';
+  return '<section class="card"><div class="d-head"><h3 class="t-title">Proposals</h3>' + (state==="open" ? '<span class="count">1</span>' : '') + anno("New module") + '<span class="d-head__link" data-stub>See all' + ic("arrow-right-s-line") + '</span></div><ul class="tiles">' + tile + '</ul></section>';
 }
 
 /* ---------- HM Portal pieces ---------- */
 function hpHeader(o){
   return '<div class="band" aria-hidden="true"></div><div class="sheet"><header class="top"><div>' +
-    '<h1>Job # ' + o.job + '</h1><h1>Ticket # ' + o.ticket + '</h1>' +
-    '<p><span class="member">Sarah Mitchell ' + ic("arrow-right-s-line") + '</span></p>' +
+    '<p class="jh">Job # ' + o.job + '</p><p class="jh">Ticket # ' + o.ticket + '</p>' +
+    '<p><span class="member" data-stub>Sarah Mitchell ' + ic("arrow-right-s-line") + '</span></p>' +
     '<p class="plan">PreFix Membership - $49 / Month [RC2026]</p>' +
-    '<p class="row">HVAC Condenser Count: &nbsp;1&nbsp; <span class="edit" aria-hidden="true">' + ic("pencil-fill") + '</span></p>' +
-    '<div class="addr"><p>4817 MUELLER BLVD AUSTIN 78723</p><p>+15125550148</p><p>sarah.mitchell@example.com</p><span class="pillbtn">' + ic("mail-line") + ' Send HomeHub Login Email</span></div>' +
+    '<p class="row">HVAC Condenser Count: &nbsp;1&nbsp; <span class="edit" data-stub aria-hidden="true">' + ic("pencil-fill") + '</span></p>' +
+    '<div class="addr"><p>4817 MUELLER BLVD AUSTIN 78723</p><p>+15125550148</p><p>sarah.mitchell@example.com</p><span class="pillbtn" data-stub>' + ic("mail-line") + ' Send HomeHub Login Email</span></div>' +
   '</div><div class="top__r">' +
     '<p class="svc">' + o.svc + '</p><p>' + o.min + '</p><p>' + o.when + '</p>' +
-    '<p class="gap">Time Started: &nbsp;' + o.start + ' <span class="edit" aria-hidden="true">' + ic("pencil-fill") + '</span></p>' +
-    '<p>Time Ended: &nbsp;' + o.end + ' <span class="edit" aria-hidden="true">' + ic("pencil-fill") + '</span></p>' +
+    '<p class="gap">Time Started: &nbsp;' + o.start + ' <span class="edit" data-stub aria-hidden="true">' + ic("pencil-fill") + '</span></p>' +
+    '<p>Time Ended: &nbsp;' + o.end + ' <span class="edit" data-stub aria-hidden="true">' + ic("pencil-fill") + '</span></p>' +
   '</div></header>';
 }
 
@@ -817,51 +960,51 @@ function hpHeader(o){
 function scrRequest(){
   var html = '<div class="mp">' + mpTop("Dashboard") +
   '<div class="page">' +
-    '<div class="intro"><div class="intro__text"><span class="crumb">' + ic("arrow-left-s-line") + 'Dashboard</span><h1 class="t-display">Request service</h1><p class="t-desc">4817 Mueller Blvd &middot; Austin, TX 78723</p></div></div>' +
+    '<div class="intro"><div class="intro__text"><span class="crumb" data-stub>' + ic("arrow-left-s-line") + 'Dashboard</span><h2 class="t-display">Request service</h2><p class="t-desc">4817 Mueller Blvd &middot; Austin, TX 78723</p></div></div>' +
+    '<div class="message"><span class="message__icon">' + ic("information-line") + '</span><p class="message__text"><strong>Painting and carpentry jobs get a ballpark quote or a free consultation.</strong> We\'ll tell you which once we\'ve read your request. ' + anno() + '</p></div>' +
     '<div class="layout"><div class="main"><section class="card">' +
-      '<div class="m-q"><h2 class="t-title">What kind of work is it?</h2><div class="chips">' +
-        ["Repairs","Plumbing","Electrical","Painting & drywall","Carpentry","Appliances","HVAC","Something else"].map(function(c){ var on = c==="Painting & drywall" || c==="Carpentry"; return '<button type="button" class="chip" aria-pressed="' + on + '">' + esc(c) + '</button>'; }).join("") +
+      '<div class="m-q"><h3 class="t-strong">What kind of work is it?</h3><div class="chips">' +
+        ["Repairs","Carpentry","Painting","Specialty HVAC","Garage doors","Insulation","Irrigation","Something else"].map(function(c){ var on = c==="Painting" || c==="Carpentry"; return '<button type="button" class="chip" aria-pressed="' + on + '" data-stub>' + esc(c) + '</button>'; }).join("") +
       '</div></div>' +
-      '<div class="m-q"><label class="t-title" for="hh-desc">What do you need?</label><textarea id="hh-desc" class="m-input grow">' + esc(DESC) + '</textarea></div>' +
-      '<div class="m-q"><h2 class="t-title">Photos</h2><p class="t-meta" style="margin-top:-8px">Optional. Photos help us send the right specialist.</p><div class="m-photos"><div class="m-photo">' + ic("image-line") + '<span>Living room</span></div><div class="m-photo">' + ic("image-line") + '<span>Baseboard</span></div><div class="m-photo m-photo--add">' + ic("add-line") + '</div></div></div>' +
-      '<div class="m-q"><h2 class="t-title">When works for you?</h2><div class="chips">' +
-        ["Weekday mornings","Weekday afternoons","Weekends","Any time"].map(function(c){ return '<button type="button" class="chip" aria-pressed="' + (c==="Weekday mornings") + '">' + c + '</button>'; }).join("") +
+      '<div class="m-q"><label class="t-strong" for="hh-desc">What do you need?</label><textarea id="hh-desc" class="m-input grow">' + esc(DESC) + '</textarea></div>' +
+      '<div class="m-q"><h3 class="t-strong">Photos <span class="t-meta">(optional)</span></h3><div class="m-photos"><div class="m-photo">' + ic("image-line") + '<span>Living room</span></div><div class="m-photo">' + ic("image-line") + '<span>Baseboard</span></div><div class="m-photo m-photo--add" data-stub>' + ic("add-line") + '</div></div></div>' +
+      '<div class="m-q"><h3 class="t-strong">Is it urgent?</h3><div class="chips"><button type="button" class="chip" aria-pressed="true" data-stub>No</button><button type="button" class="chip" aria-pressed="false" data-stub>Yes, it\'s an emergency</button></div></div>' +
+      '<div class="m-q"><h3 class="t-strong">When works for you?</h3><div class="chips">' +
+        ["Weekday mornings","Weekday afternoons","Weekends","Any time"].map(function(c){ return '<button type="button" class="chip" aria-pressed="' + (c==="Weekday mornings") + '" data-stub>' + c + '</button>'; }).join("") +
       '</div></div>' +
-      '<div class="m-actions"><button type="button" class="btn btn--secondary">Cancel</button><button type="button" class="btn btn--primary btn--lg' + HOT + '" data-act="next">' + ic("send-plane-line") + 'Submit request</button></div>' +
+      '<div class="m-actions"><span class="link" data-stub>Cancel</span><button type="button" class="btn btn--primary btn--lg' + HOT + '" data-act="next">' + ic("send-plane-line") + 'Submit request</button></div>' +
     '</section></div>' +
-    '<aside class="rail"><section class="card"><div class="d-head"><h2 class="t-title">What happens next</h2></div>' +
-      '<div class="message" style="margin:8px 0 16px">' + '<span class="message__icon">' + ic("information-line") + '</span><p class="message__text"><strong>Painting and carpentry start with a free consultation.</strong> ' + anno() + '</p></div>' +
-      '<ol class="steps">' +
-        '<li class="step"><span class="step__n">1</span><div class="step__main"><p class="t-strong">We review your request</p><p class="t-meta">Usually within 1 business day</p></div></li>' +
-        '<li class="step"><span class="step__n">2</span><div class="step__main"><p class="t-strong">A specialist visits</p><p class="t-meta">Free. About an hour to measure and take photos.</p></div></li>' +
-        '<li class="step"><span class="step__n">3</span><div class="step__main"><p class="t-strong">You get a price to approve</p><p class="t-meta">By email, often before the specialist leaves</p></div></li>' +
-      '</ol></section></aside>' +
+    '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">What happens next</h3></div><ul class="d-list">' +
+      '<li class="d-row"><span class="hist">' + ic("customer-service-2-line") + '</span><div class="d-main"><p class="t-strong">We read your request</p><p class="d-meta">Usually within 1 business day</p></div></li>' +
+      '<li class="d-row"><span class="hist">' + ic("calendar-check-line") + '</span><div class="d-main"><p class="t-strong">We call to book a visit or send a ballpark quote</p><p class="d-meta">Consultations are free</p></div></li>' +
+      '<li class="d-row"><span class="hist">' + ic("file-text-line") + '</span><div class="d-main"><p class="t-strong">You get a proposal to approve</p><p class="d-meta">By email and in HomeHub</p></div></li>' +
+    '</ul></section></aside>' +
     '</div></div>' + mpFoot() + '</div>';
   return frame("hh", "member.prefixinc.com/request", html);
 }
 
-function scrTriage(){
+function zdShell(main){
   var V = [["Intake",12],["Main View – Member Requested",31],["Main View – HM Followups",18],["HVAC",9],["Contractor Requested",14],["Carpentry/Painting – Specialty",27],["Parts Request",6]];
-  var main = '<div class="zd-main"><div class="zd-ticket">' +
-    '<div><p class="zd-subj">Painting + baseboard repair — 4817 Mueller Blvd</p><p class="zd-meta">#91347 &middot; via HomeHub request &middot; Mon, Oct 19, 8:42 AM &middot; Sarah Mitchell</p></div>' +
-    '<article class="msg"><header><span class="zav">SM</span><b>Sarah Mitchell</b><span class="t">Oct 19, 8:42 AM</span></header><p>' + esc(DESC) + '</p><p style="color:var(--zd-muted);font-size:12px">2 photos &middot; Service request SR-58214</p></article>' +
-    '<article class="msg note"><header><span class="zav">CO</span><b>Central Ops</b><span class="k">Internal note</span><span class="t">10:12 AM</span></header><p>Two rooms of paint plus a carpentry repair, and the photos don\'t show how far the baseboard damage goes. Booking a free consultation with Mario rather than a ballpark quote.</p></article>' +
-    '<div class="zd-next"><b>Next step for this request</b>' +
-      '<div class="zopt"><span class="r"></span><span><b>Ballpark quote</b><small>Send the scope to Sales for a rough price. Available today.</small></span></div>' +
-      '<div class="zopt on"><span class="r"></span><span><b>Consultation ' + anno("New service type") + '</b><small>Book a free specialist visit. The specialist can price the job on site.</small></span></div>' +
-      '<button type="button" class="zbtn' + HOT + '" data-act="next">Create consultation booking in Admin</button>' +
-    '</div></div>' +
-    '<aside class="zd-side">' + zf("Requester","Sarah Mitchell") + zf("Group","Central Ops – Specialty") + zf("Type","Specialty request") + zf("Priority","Normal") + zf("Service request","SR-58214") + zf("Home Manager","Marcus Reyes") + '</aside></div>';
-  return frame("zd", "prefix.zendesk.com/agent/tickets/91347", zdShell(V, main));
-}
-function zdShell(V, main){
   return '<div class="zd"><nav class="zd-rail" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></nav>' +
     '<nav class="zd-views" aria-label="Views"><h3>Views</h3>' +
     V.map(function(v){ return '<div class="zv' + (v[0].indexOf("Carpentry")===0?" on":"") + '"><span>' + v[0] + '</span><span>' + v[1] + '</span></div>'; }).join("") +
     '</nav><div class="zd-wrap"><p class="zd-viewchip">View: Carpentry/Painting – Specialty</p>' + main + '</div></div>';
 }
 function zf(k, v){ return '<div class="zf"><span>' + k + '</span><div>' + v + '</div></div>'; }
-var ZV = [["Intake",12],["Main View – Member Requested",31],["Main View – HM Followups",18],["HVAC",9],["Contractor Requested",14],["Carpentry/Painting – Specialty",28],["Parts Request",6]];
+
+function scrTriage(){
+  var main = '<div class="zd-main"><div class="zd-ticket">' +
+    '<div><p class="zd-subj">Painting + baseboard repair — 4817 Mueller Blvd</p><p class="zd-meta">#91347 &middot; via HomeHub request &middot; Mon, Oct 19, 8:42 AM &middot; Sarah Mitchell</p></div>' +
+    '<article class="msg"><header><span class="zav">SM</span><b>Sarah Mitchell</b><span class="t">Oct 19, 8:42 AM</span></header><p>' + esc(DESC) + '</p><p style="color:var(--zd-muted);font-size:12px">2 photos &middot; Service request SR-58214</p></article>' +
+    '<article class="msg note"><header><span class="zav">CO</span><b>Central Ops</b><span class="k">Internal note</span><span class="t">10:12 AM</span></header><p>Two rooms of paint plus a carpentry repair, and the photos don\'t show how far the baseboard damage goes. Called Sarah: she\'d like a consultation. Booking Mario for Thu, Oct 22, 9 AM.</p></article>' +
+    '<div class="zd-next"><b>Next step for this request</b>' +
+      '<div class="zopt"><span class="r"></span><span><b>Ballpark quote</b><small>Our team prices the scope from the request and photos, then sends it. Bigger jobs go to Sales.</small></span></div>' +
+      '<div class="zopt on"><span class="r"></span><span><b>Consultation ' + anno("New service type") + '</b><small>Book a free specialist visit. The specialist can price the job on site.</small></span></div>' +
+      '<button type="button" class="zbtn' + HOT + '" data-act="next">Create consultation booking in Admin</button>' +
+    '</div></div>' +
+    '<aside class="zd-side">' + zf("Requester","Sarah Mitchell") + zf("Group","Central Ops – Specialty") + zf("Type","Specialty request") + zf("Priority","Normal") + zf("Service request","SR-58214") + zf("Home Manager","Marcus Reyes") + '</aside></div>';
+  return frame("zd", "prefix.zendesk.com/agent/tickets/91347", zdShell(main));
+}
 
 function djShell(user, crumbs, inner){
   return '<div class="dj"><div class="dj-head"><b>PreFix administration</b><span>Welcome, <strong>' + user + '</strong>. View site / Change password / Log out</span></div>' +
@@ -877,11 +1020,12 @@ function djr(label, value, o){
 function scrBook(){
   var opts = '<div class="optlist" aria-hidden="true">' +
     '<div>Preventive Maintenance</div><div>Home Enrollment</div><div>Service</div><div>Specialty – Carpentry</div><div>Specialty – Painting</div><div>Contractor</div>' +
-    '<div class="sep">Consultation – Carpentry</div><div class="sel">Consultation – Painting</div><div>Consultation – Insulation</div></div>';
+    '<div class="sep sel">Consultation</div></div>';
   var inner = '<div class="dj-title"><h2>Add booking</h2></div>' +
     '<div class="dj-fs"><div class="dj-cap">Booking</div>' +
-      djr("Service type:", "Consultation – Painting", {sel:1, req:1, extra:opts, help:anno("New service types") + " Consultation – Carpentry, Painting and Insulation. They report separately and open the proposal fields in the HM Portal."}) +
-      djr("Job requested:", "Painting + baseboard repair", {req:1}) +
+      djr("Service type:", "Consultation", {sel:1, req:1, extra:opts, help:anno("New service type") + " Consultations report separately and turn on the proposal fields in the HM Portal."}) +
+      djr("Trades:", "Painting, Carpentry", {sel:1, help:anno("New field") + " One consultation can cover more than one trade."}) +
+      djr("Job requested:", esc(JOB).replace(/\n/g,"<br>"), {req:1}) +
       djr("Subscription:", "4817 Mueller Blvd — Sarah Mitchell (Active)", {sel:1, req:1}) +
       djr("Service request:", "SR-58214", {sel:1}) +
       djr("Zendesk ticket:", "91347") +
@@ -891,90 +1035,117 @@ function scrBook(){
     '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Scheduling</div>' +
       djr("Status:", "Booked", {sel:1}) +
-      djr("Scheduled start:", "2026-10-22 &nbsp; 09:00", {help:"V1: Central Ops picks the slot on the Ops Calendar by hand. Consultations have dedicated slots, but self-scheduling waits for specialty scheduling logic."}) +
+      djr("Scheduled start:", "2026-10-22 &nbsp; 09:00", {help:"V1: Central Ops agrees a time with the member and books it on the Ops Calendar by hand."}) +
     '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Booking tasks</div><div class="tbl"><table><thead><tr><th>#</th><th>Task</th><th class="num">Minutes</th></tr></thead><tbody>' +
-      '<tr><td>1</td><td>Painting consultation — living room and hallway walls</td><td class="num">40</td></tr>' +
-      '<tr><td>2</td><td>Carpentry consultation — hallway baseboard by the bathroom</td><td class="num">20</td></tr>' +
+      TASKS.map(function(t, i){ return '<tr><td>' + (i+1) + '</td><td>' + t.booked + '</td><td class="num">' + (i===0?40:20) + '</td></tr>'; }).join("") +
     '</tbody></table></div></div>' +
-    '<div class="submit-row"><button type="button" class="djbtn alt">Save and add another</button><button type="button" class="djbtn alt">Save and continue editing</button><button type="button" class="djbtn def' + HOT + '" data-act="next">SAVE</button></div>';
-  return frame("op", "…/admin/bookings/booking/add/", djShell("central-ops", "Home › Bookings › Bookings › Add booking", inner));
+    '<div class="submit-row"><button type="button" class="djbtn alt" data-stub>Save and add another</button><button type="button" class="djbtn alt" data-stub>Save and continue editing</button><button type="button" class="djbtn def' + HOT + '" data-act="next">SAVE</button></div>';
+  return frame("op", "Django Admin · /admin/bookings/booking/add/", djShell("central-ops", "Home › Bookings › Bookings › Add booking", inner));
 }
 
 function scrConfirm(){
   var html = '<div class="mp">' + mpTop("Appointments") +
   '<div class="page">' +
-    '<div class="intro"><div class="intro__text"><h1 class="t-display">Appointments</h1><p class="t-desc">4817 Mueller Blvd &middot; Austin, TX 78723</p></div></div>' +
+    '<div class="intro"><div class="intro__text"><h2 class="t-display">Appointments</h2><p class="t-desc">4817 Mueller Blvd &middot; Austin, TX 78723</p></div></div>' +
     '<div class="message"><span class="message__icon">' + ic("checkbox-circle-line") + '</span><p class="message__text"><strong>Your consultation is booked.</strong> We emailed the details to sarah.mitchell@example.com.</p></div>' +
     '<div class="layout"><div class="main"><section class="card">' +
-      '<div class="d-head" style="align-items:flex-start;gap:16px;margin-bottom:0">' +
-        '<span class="date-tile"><span class="date-tile__m">Oct</span><span class="date-tile__d">22</span></span>' +
-        '<div class="d-main" style="gap:4px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="badge badge--included">Free</span><span class="badge badge--status">' + ic("checkbox-circle-fill") + 'Confirmed</span>' + anno("New visit type") + '</div>' +
-        '<h2 class="t-title">Painting &amp; carpentry consultation</h2>' +
-        '<ul class="visit__meta"><li>' + ic("calendar-line") + 'Thu, Oct 22 &middot; 9&ndash;10 AM arrival</li><li>' + ic("user-line") + 'Mario &middot; Specialty painter</li><li>' + ic("map-pin-line") + '4817 Mueller Blvd</li></ul></div>' +
+      '<div class="visit"><span class="date-tile"><span class="date-tile__m">Oct</span><span class="date-tile__d">22</span></span>' +
+        '<div class="visit__main"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="badge badge--included">Free</span><span class="badge badge--status">' + ic("checkbox-circle-fill") + 'Confirmed</span>' + anno("New visit type") + '</div>' +
+        '<h3 class="t-title">Painting and carpentry consultation</h3>' +
+        '<ul class="visit__meta"><li>' + ic("calendar-line") + 'Thu, Oct 22 &middot; 9&ndash;10 AM</li><li>' + ic("user-line") + 'Mario &middot; Specialty painter</li><li>' + ic("map-pin-line") + '4817 Mueller Blvd</li></ul></div>' +
       '</div>' +
       '<hr class="divider">' +
-      '<h3 class="t-strong" style="margin-bottom:12px">What happens at your consultation ' + anno() + '</h3>' +
+      '<h4 class="t-strong" style="margin-bottom:12px">What happens at your consultation ' + anno() + '</h4>' +
       '<ul class="features">' +
-        '<li class="feature feature--check"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">Mario walks the rooms with you, measures and takes photos.<span class="feature__sub">About an hour.</span></span></li>' +
-        '<li class="feature feature--check"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">You get a written proposal by email.<span class="feature__sub">Often before Mario leaves, otherwise within 1–2 business days.</span></span></li>' +
-        '<li class="feature feature--check"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">You approve, decline or ask us to contact you later.<span class="feature__sub">Nothing is booked until you approve.</span></span></li>' +
+        '<li class="feature feature--check is-done"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">Mario walks the rooms with you, measures and takes photos.<span class="feature__sub">About an hour.</span></span></li>' +
+        '<li class="feature feature--check is-done"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">You get a written proposal by email and in HomeHub.<span class="feature__sub">Often the same day. Bigger jobs can take 1–2 business days.</span></span></li>' +
+        '<li class="feature feature--check is-done"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">You approve it, decline it or ask us to check back later.<span class="feature__sub">Nothing is booked until you approve.</span></span></li>' +
       '</ul>' +
-      '<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:24px"><button type="button" class="btn btn--secondary' + HOT + '" data-act="next">' + ic("calendar-check-line") + 'Add to calendar</button><span class="link">Reschedule</span></div>' +
+      '<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:24px"><button type="button" class="btn btn--secondary' + HOT + '" data-act="next">' + ic("calendar-check-line") + 'Add to calendar</button><span class="link" data-stub>Reschedule</span></div>' +
     '</section></div>' +
-    '<aside class="rail"><section class="card"><div class="d-head"><h2 class="t-title">Upcoming visits</h2></div><ul class="d-list">' +
+    '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">Upcoming visits</h3></div><ul class="d-list">' +
       '<li class="d-row d-row--sel"><span class="d-date"><span class="d-date__m">Oct</span><span class="d-date__d">22</span></span><div class="d-main"><span class="d-title">Consultation</span><p class="d-tasks">Painting and baseboard repair</p><p class="d-meta">Thu, 9&ndash;10 AM</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
       '<li class="d-row"><span class="d-date d-date--pm"><span class="d-date__m">Nov</span><span class="d-date__d">12</span></span><div class="d-main"><span class="d-title">Preventive maintenance</span><p class="d-meta">Thu, 9&ndash;11 AM</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
     '</ul></section>' + mpTeam(anno()) + '</aside></div></div>' + mpFoot() + '</div>';
   return frame("hh", "member.prefixinc.com/appointments", html);
 }
 
-function hpConsult(overlayMode){
-  var t = calc(false);
-  var cards = S.lines.map(function(l){
-    return '<article class="card"><div class="card__head"><h3 class="card__title">' + esc(l.task) + '</h3><span class="tag">Proposal</span><span class="kebab" aria-hidden="true">' + ic("more-2-fill") + '</span></div>' +
-      '<p class="desc">' + esc(l.desc) + '</p>' +
-      '<p class="from">Member asked for: Repaint the living room and hallway, fix the hallway baseboard (Painting &amp; drywall, Carpentry)</p>' +
-      '<p class="sub">Proposal details ' + anno() + '</p>' +
+function hpConsult(dialogOpen){
+  var t = calc(false), bad = problems();
+  var badIds = {}; bad.forEach(function(l){ badIds[l.id] = 1; });
+  var showErr = bad.length && S.sendTried;
+  var lineHTML = function(l){
+    var err = showErr && badIds[l.id];
+    return '<div class="pline' + (err?' pline--bad':'') + '" data-line-box="' + l.id + '">' +
+      '<div class="field"><label for="ar-' + l.id + '">Area<small>Sarah sees this.</small></label><input type="text" id="ar-' + l.id + '" value="' + esc(l.area) + '" data-bind="area" data-line="' + l.id + '"></div>' +
+      '<div class="two"><div class="field"><label for="cd-' + l.id + '">Condition</label><div class="sel"><select id="cd-' + l.id + '" data-bind="cond" data-line="' + l.id + '">' + ["No Concern","Cause for Concern","Critical Condition"].map(function(c){ return '<option' + (l.cond===c?' selected':'') + '>' + c + '</option>'; }).join("") + '</select>' + ic("arrow-down-s-line") + '</div></div>' +
+        '<div class="field"><label for="ms-' + l.id + '">Measurements</label><textarea id="ms-' + l.id + '" class="grow" rows="1" data-bind="meas" data-line="' + l.id + '">' + esc(l.meas) + '</textarea></div></div>' +
+      '<div class="field"><label for="cn-' + l.id + '">What you found<small>Sarah sees this. Leave blank if there\'s nothing to report.</small></label><textarea id="cn-' + l.id + '" class="grow" rows="1" data-bind="note" data-line="' + l.id + '">' + esc(l.note) + '</textarea></div>' +
       '<div class="field"><label for="sc-' + l.id + '">Scope of work<small>Sarah sees this. The box grows as you type.</small></label><textarea id="sc-' + l.id + '" class="grow" rows="2" data-bind="scope" data-line="' + l.id + '">' + esc(l.scope) + '</textarea></div>' +
-      '<div class="field"><label for="ms-' + l.id + '">Measurements</label><input type="text" id="ms-' + l.id + '" value="' + esc(l.meas) + '" data-bind="meas" data-line="' + l.id + '"></div>' +
-      '<div class="two"><div class="field"><label for="hr-' + l.id + '">Hours</label><input type="text" inputmode="numeric" id="hr-' + l.id + '" value="' + l.hours + '" data-bind="hours" data-line="' + l.id + '"></div>' +
-        '<div class="field"><label for="mt-' + l.id + '">Materials Cost</label><div class="money"><span aria-hidden="true">$</span><input type="text" inputmode="decimal" id="mt-' + l.id + '" value="' + l.mat.toFixed(2) + '" data-bind="mat" data-line="' + l.id + '"></div></div></div>' +
-      '<div class="field"><label for="nt-' + l.id + '">Notes for Ops Support (Private)</label><textarea id="nt-' + l.id + '" rows="2">' + (l.id==="base" ? "Moisture meter read 12% at the baseboard. Staining looks old." : "") + '</textarea></div>' +
-      '<div class="files"><span class="btn btn--line">Add File(s)</span><span>' + (l.id==="base" ? "2 photos" : "1 photo") + '</span></div>' +
+      '<div class="two"><div class="field"><label for="hr-' + l.id + '">Estimated hours</label><input type="text" inputmode="decimal" id="hr-' + l.id + '" value="' + l.hours + '" data-bind="hours" data-line="' + l.id + '"></div>' +
+        '<div class="field"><label for="mt-' + l.id + '">Materials estimate</label><div class="money"><span aria-hidden="true">$</span><input type="text" inputmode="decimal" id="mt-' + l.id + '" value="' + l.mat.toFixed(2) + '" data-bind="mat" data-line="' + l.id + '"></div></div></div>' +
+    '</div>';
+  };
+  var cards = TASKS.map(function(tk){
+    var ls = S.lines.filter(function(l){ return l.task===tk.id; });
+    return '<article class="card"><div class="card__head"><h3 class="card__title">' + esc(tk.name) + '</h3><span class="tag">Consultation</span><span class="kebab" data-stub aria-hidden="true">' + ic("more-2-fill") + '</span></div>' +
+      '<p class="desc">Walk the area with the member, measure, photograph and price the work. Add a proposal line for each area.</p>' +
+      '<p class="sub">Sub-tasks</p><div class="sub__row"><label class="chk"><input type="checkbox" checked> Completed</label><div class="sel"><select disabled aria-label="Reason this task is not complete"><option>-- select an option --</option></select>' + ic("arrow-down-s-line") + '</div></div>' +
+      '<div class="field"><label for="nt-' + tk.id + '">Notes for Ops Support (Private)</label><textarea id="nt-' + tk.id + '" rows="2">' + esc(tk.notes) + '</textarea></div>' +
+      '<div class="files"><span class="btn btn--line" data-stub>Add File(s)</span><span class="cnt">' + tk.photos + '</span></div>' +
+      '<div class="two"><div class="field"><label for="mn-' + tk.id + '">Minutes spent</label><input type="text" id="mn-' + tk.id + '" value="' + tk.min + '"></div><div class="field"><label for="pc-' + tk.id + '">Parts Cost</label><div class="money"><span aria-hidden="true">$</span><input type="text" id="pc-' + tk.id + '" placeholder="0.00"></div></div></div>' +
+      '<p class="sub sub--prop">Proposal lines ' + anno() + '</p>' + ls.map(lineHTML).join("") +
+      '<span class="btn btn--line addline" data-stub>+ Add proposal line</span>' +
     '</article>';
   }).join("");
-  var html = '<div class="hp">' + hpHeader({job:"2-2-190482", ticket:"91347", svc:"Consultation – Painting " + anno("New"), min:"60 minutes", when:"October 22nd, 2026 @ 9:00 AM", start:"09:04 AM", end:"09:58 AM"}) +
+  var exclHTML = EXCL.map(function(e){ return '<label class="chk"><input type="checkbox" data-bind="excl" data-ex="' + e.id + '"' + (S.excl[e.id]?' checked':'') + '> ' + esc(e.t) + '</label>'; }).join("");
+  var html = '<div class="hp">' + hpHeader({job:"2-2-190482", ticket:"91347", svc:"Consultation " + anno("New"), min:"60 minutes", when:"October 22nd, 2026 @ 9:00 AM", start:"09:04 AM", end:"09:58 AM"}) +
     '<div class="cols"><section class="left" aria-label="Summary">' +
-      '<p class="req__h">Job requested</p><div class="req">' + esc(DESC) + '</div>' +
-      '<table class="tbl"><caption>Proposal summary ' + anno("New rows for consultations") + '</caption><tbody>' +
+      '<p class="req__h">Job requested</p><div class="req">' + esc(JOB) + '</div>' +
+      '<table class="tbl"><caption class="sr">Time and charges</caption><tbody>' +
         '<tr><th scope="row">Time Spent</th><td>54 minutes</td></tr>' +
-        '<tr class="new"><th scope="row">Proposal Hours</th><td id="s-hours">' + t.hours + ' hours</td></tr>' +
-        '<tr class="new"><th scope="row">Labor (' + money(RATE) + '/hr)</th><td id="s-labor">' + money2(t.labor) + '</td></tr>' +
-        '<tr class="new"><th scope="row">Materials</th><td id="s-mat">' + money2(t.mat) + '</td></tr>' +
-        '<tr class="hl new"><th scope="row">Proposal Total</th><td id="s-total">' + money2(t.total) + '</td></tr>' +
+        '<tr><th scope="row">Parts Charge</th><td>$0.00</td></tr>' +
+        '<tr class="hl"><th scope="row">Labor Charge</th><td>$0.00</td></tr>' +
+        '<tr><th scope="row">Expected Total</th><td>$0.00</td></tr>' +
         '<tr><th scope="row"><label for="adj">Adjusted Total</label></th><td><input id="adj" type="text" placeholder="None" autocomplete="off"></td></tr>' +
       '</tbody></table>' +
-      '<div class="actions"><button type="button" class="btn btn--dark">Send Later</button><button type="button" class="btn btn--blue' + (overlayMode ? '' : HOT) + '" data-act="next">Send Now</button></div>' +
-      '<p class="status status--ok">All work areas have hours. You can send this proposal.</p>' +
+      '<p class="free">Consultations are free. The member is not charged for this visit.</p>' +
+      '<table class="tbl tbl--prop"><caption>Proposal for Sarah ' + anno("New") + '</caption><tbody>' +
+        '<tr><th scope="row">Estimated Hours</th><td id="s-hours">' + hrs(t.hours) + '</td></tr>' +
+        '<tr><th scope="row">Labor ($' + RATE + '/hr)</th><td id="s-labor">' + money2(t.labor) + '</td></tr>' +
+        '<tr><th scope="row">Materials</th><td id="s-mat">' + money2(t.mat) + '</td></tr>' +
+        '<tr class="hl"><th scope="row">Proposal Total</th><td id="s-total">' + money2(t.total) + '</td></tr>' +
+      '</tbody></table>' +
+      '<p class="free">$' + RATE + '/hr is a placeholder until the rate card is set.</p>' +
+      '<div class="pcard"><p class="sub" style="margin-top:0">Proposal details ' + anno() + '</p>' +
+        '<div class="field"><label for="p-title">Proposal title<small>Sarah sees this.</small></label><input type="text" id="p-title" value="' + esc(S.title) + '" data-bind="title"></div>' +
+        '<div class="field"><label for="p-sum">Summary for Sarah<small>One or two sentences: what you recommend and why.</small></label><textarea id="p-sum" class="grow" rows="2" data-bind="summary">' + esc(S.summary) + '</textarea></div>' +
+        '<div class="field"><label for="p-mat">Paint and materials<small>Sarah sees this.</small></label><textarea id="p-mat" class="grow" rows="2" data-bind="materials">' + esc(S.materials) + '</textarea></div>' +
+        '<div class="field"><span class="flabel">Not included<small>Standard list for painting and carpentry. Check what applies.</small></span><div class="excl">' + exclHTML + '</div></div>' +
+      '</div>' +
+      '<div class="actions"><button type="button" class="btn btn--dark" data-stub>Send Later</button><button type="button" class="btn btn--blue' + (dialogOpen ? '' : HOT) + '" data-act="send-now" aria-disabled="' + (bad.length ? 'true' : 'false') + '">Send Now</button></div>' +
+      (showErr ? '<p class="status" role="status">Add an area, scope and hours to every proposal line before you can send.</p>' : '') +
     '</section>' +
-    '<section class="right" aria-label="Tasks"><div class="tasks__bar"><h2>Tasks:</h2><span class="btn btn--blue">Add Task</span></div>' +
-      '<span class="rec">' + ic("sparkling-2-fill") + ' Create a Recommendation</span>' + cards +
+    '<section class="right" aria-label="Tasks"><div class="tasks__bar"><h3>Tasks:</h3><span class="btn btn--blue" data-stub>Add Task</span></div>' +
+      '<span class="rec" data-stub>' + ic("sparkling-2-fill") + ' Create a Recommendation</span>' + cards +
     '</section></div></div></div>';
   return html;
 }
 function scrConsult(){ return frame("hm", "hm.prefixinc.com/bookings/48213", hpConsult(false)); }
 
 function scrFinish(){
-  var t = calc(false), A = S.path==="A";
-  var ovl = '<div class="ovl hp"><div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="sd-t">' +
-    '<div class="modal__top"><h2 id="sd-t">Send this proposal ' + anno("New") + '</h2><p class="modal__sub">Living Room &amp; Hallway Refresh &middot; ' + t.hours + ' hours &middot; ' + money(t.total) + '</p></div>' +
+  var t = calc(false), pick = S.pick || S.path, A = pick==="A";
+  var ovl = '<div class="ovl hp" data-act="dlg-cancel"><div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="sd-t" data-dlg>' +
+    '<div class="modal__top"><h2 id="sd-t" tabindex="-1">Send this proposal ' + anno("New") + '</h2><p class="modal__sub">' + esc(S.title) + ' &middot; ' + hrs(t.hours) + ' &middot; ' + money2(t.total) + '</p></div>' +
     '<div class="modal__body" role="radiogroup" aria-labelledby="sd-t">' +
-      '<label class="opt"><input type="radio" name="sendto" value="A" data-act="pick" data-path="A"' + (A?' checked':'') + '><div><b>Send to Sarah now</b><span>For work of about a day or less, priced from the rate card. Sarah gets the proposal by email and can approve it online.</span></div></label>' +
-      '<label class="opt"><input type="radio" name="sendto" value="B" data-act="pick" data-path="B"' + (A?'':' checked') + '><div><b>Send to Central Ops for review</b><span>For bigger or uncertain jobs. Homer checks the scope and price, then sends it. Tell Sarah to expect it in 1–2 business days.</span></div></label>' +
-      (A ? '' : '<div class="field"><label for="rv-note">Note for the reviewer</label><textarea id="rv-note" class="grow" rows="2" data-bind="note">' + esc(S.note) + '</textarea></div>') +
+      '<label class="opt"><input type="radio" name="sendto" value="A" data-act="pick" data-path="A"' + (A?' checked':'') + '><div><b>Send to Sarah now</b><span>For work of about a day or less. Sarah gets the proposal by email and in HomeHub and can approve it online.</span></div></label>' +
+      '<label class="opt"><input type="radio" name="sendto" value="B" data-act="pick" data-path="B"' + (A?'':' checked') + '><div><b>Send to Central Ops for review</b><span>For bigger or uncertain jobs. Homer checks the scope and price, then sends it.</span></div></label>' +
+      (A ? '' :
+        '<div class="field"><label for="rv-why">Why does it need review?</label><div class="sel"><select id="rv-why" data-bind="rvReason">' + RV_REASONS.map(function(r){ return '<option' + (S.rvReason===r?' selected':'') + '>' + r + '</option>'; }).join("") + '</select>' + ic("arrow-down-s-line") + '</div></div>' +
+        '<div class="field"><label for="rv-note">Note for the reviewer</label><textarea id="rv-note" class="grow" rows="2" data-bind="rvnote">' + esc(S.note) + '</textarea></div>') +
     '</div>' +
-    '<div class="modal__foot"><span class="btn btn--line">Cancel</span><button type="button" class="btn btn--blue' + HOT + '" data-act="choose">' + (A ? 'Send to Sarah' : 'Send for review') + '</button></div>' +
+    '<div class="modal__foot"><button type="button" class="btn btn--line" data-act="dlg-cancel">Cancel</button><button type="button" class="btn btn--blue' + HOT + '" data-act="send">' + (A ? 'Send to Sarah' : 'Send for review') + '</button></div>' +
   '</div></div>';
   return frame("hm", "hm.prefixinc.com/bookings/48213", hpConsult(true), ovl);
 }
@@ -998,14 +1169,14 @@ function scrProposalObj(){
   var filter = '<div class="dj-filter"><h4>Filter</h4><p>By status</p><ul><li class="on">All</li><li>Pending review</li><li>Sent</li><li>Accepted</li><li>Declined</li><li>Contact later</li><li>Expired</li></ul><p>By trade</p><ul><li class="on">All</li><li>Carpentry</li><li>Painting</li><li>Insulation</li></ul></div>';
   var inner = '<div class="dj-msg">' + (A
       ? 'Consultation booking #48213 was set to “Completed”. Proposal PF-2026-00148 was created and emailed to Sarah Mitchell.'
-      : 'Consultation booking #48213 was set to “Completed – Pending Review”. Proposal PF-2026-00148 was created and Zendesk ticket #91502 was opened for review.') + '</div>' +
+      : 'Consultation booking #48213 was set to “Completed – Pending Review”. Proposal PF-2026-00148 was created and Zendesk ticket #91502 was opened for review (reason: ' + esc(S.rvReason.toLowerCase()) + ').') + '</div>' +
     '<div class="dj-title"><h2>Select proposal to change</h2>' + anno("New model") + '</div>' + lifecycle(A ? "Sent" : "Pending review") +
     '<div class="dj-split"><div style="min-width:0">' + table + '</div>' + filter + '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Linked consultation booking</div>' +
-      djr("Booking:", "#48213 · Consultation – Painting", {ro:1}) +
+      djr("Booking:", "#48213 · Consultation · Painting, Carpentry", {ro:1}) +
       djr("Status:", A ? "Completed" : "Completed – Pending Review " + anno("New status"), {ro:1, help: A ? null : "A holding status, like “Completed – Pending Contractor Invoice”. It clears when someone sends the proposal."}) +
     '</div>';
-  return frame("op", "…/admin/proposals/proposal/", djShell("system", "Home › Proposals › Proposals", inner));
+  return frame("op", "Django Admin · /admin/proposals/proposal/", djShell("system", "Home › Proposals › Proposals", inner));
 }
 
 function scrZdReview(){
@@ -1014,45 +1185,46 @@ function scrZdReview(){
     '<div class="zrow hl"><span class="id">#91502</span><span class="s"><b>Proposal needs review — PF-2026-00148 · Mitchell</b></span><span class="zst new">New</span></div>' +
     '<div class="zrow"><span class="id">#91488</span><span class="s">Cabinet door rehang — Okafor</span><span class="zst open">Open</span></div>' +
     '<div class="zrow"><span class="id">#91470</span><span class="s">Proposal needs review — PF-2026-00146 · Chen</span><span class="zst open">Open</span></div></div>';
-  var tbl = '<table class="zmini"><thead><tr><th>Work area</th><th>Hours</th><th>Total</th></tr></thead><tbody>' +
-    t.ls.map(function(l){ return '<tr><td>' + esc(l.area) + '</td><td>' + l.hours + '</td><td>' + money(l.total) + '</td></tr>'; }).join("") +
-    '<tr class="tot"><td>Total</td><td>' + t.hours + '</td><td>' + money(t.total) + '</td></tr></tbody></table>';
+  var tbl = '<table class="zmini"><thead><tr><th>Area</th><th>Hours</th><th>Total</th></tr></thead><tbody>' +
+    t.ls.map(function(l){ return '<tr><td>' + esc(l.area) + '</td><td>' + (Math.round(l.hours*10)/10) + '</td><td>' + money(l.total) + '</td></tr>'; }).join("") +
+    '<tr class="tot"><td>Total</td><td>' + (Math.round(t.hours*10)/10) + '</td><td>' + money(t.total) + '</td></tr></tbody></table>';
   var main = '<div class="zd-main"><div class="zd-ticket">' + list +
     '<div><p class="zd-subj">Proposal needs review — PF-2026-00148 · Mitchell</p><p class="zd-meta">#91502 &middot; created automatically &middot; Thu, Oct 22, 10:01 AM</p></div>' +
     '<article class="msg sys"><header><span class="zav">PF</span><b>PreFix system</b><span class="k">Automation</span>' + anno() + '<span class="t">10:01 AM</span></header>' +
-      '<p>Mario finished the consultation at 4817 Mueller Blvd and sent the proposal for review instead of to the member.</p>' + tbl + '</article>' +
+      '<p>Mario finished the consultation at 4817 Mueller Blvd and sent the proposal for review. Reason: <b>' + esc(S.rvReason) + '</b>.</p>' + tbl + '</article>' +
     '<article class="msg note"><header><span class="zav">M</span><b>Mario</b><span class="k">Note for the reviewer</span><span class="t">10:01 AM</span></header><p>' + esc(S.note) + '</p></article>' +
     '<button type="button" class="zbtn' + HOT + '" data-act="next">Open proposal in Admin</button>' +
     '</div><aside class="zd-side">' + zf("Group","Central Ops – Specialty") + zf("Assignee","Homer") + zf("Proposal","PF-2026-00148") + zf("Booking","#48213 · Completed – Pending Review") + zf("Review due","Fri, Oct 23 (1 business day)") + zf("Tags","proposal_review painting") + '</aside></div>';
-  return frame("zd", "prefix.zendesk.com/agent/tickets/91502", zdShell(ZV, main));
+  return frame("zd", "prefix.zendesk.com/agent/tickets/91502", zdShell(main));
 }
 
 function scrReview(){
   var before = calc(false), after = calc(true);
-  var tbl = '<div class="tbl"><table><thead><tr><th>Work area</th><th>Trade</th><th class="num">Hours</th><th class="num">Materials</th><th class="num">Line total</th></tr></thead><tbody>' +
+  var tbl = '<div class="tbl"><table><thead><tr><th>Area</th><th>Trade</th><th class="num">Hours</th><th class="num">Materials</th><th class="num">Line total</th></tr></thead><tbody>' +
     after.ls.map(function(l, i){
       var b = before.ls[i], changed = b.mat !== l.mat;
-      return '<tr' + (changed?' class="hl"':'') + '><td>' + esc(l.area) + '</td><td>' + l.trade + '</td><td class="num">' + l.hours + '</td><td class="num">' + (changed ? '<s>' + money(b.mat) + '</s> ' + money(l.mat) : money(l.mat)) + '</td><td class="num">' + money(l.total) + '</td></tr>';
+      return '<tr' + (changed?' class="hl"':'') + '><td>' + esc(l.area) + '</td><td>' + l.trade + '</td><td class="num">' + (Math.round(l.hours*10)/10) + '</td><td class="num">' + (changed ? '<s>' + money(b.mat) + '</s> ' + money(l.mat) : money(l.mat)) + '</td><td class="num">' + money(l.total) + '</td></tr>';
     }).join("") + '</tbody></table></div>';
+  var ex = EXCL.filter(function(e){ return S.excl[e.id]; }).map(function(e){ return esc(e.t); });
+  if(!S.excl.hidden) ex.push('<mark>' + esc(EXCL[3].t) + '</mark>');
   var inner = '<div class="dj-title"><h2>Change proposal</h2><span class="dst pend">Pending review</span></div>' +
     '<div class="dj-fs"><div class="dj-cap">Proposal</div>' +
       djr("Number:", "PF-2026-00148", {ro:1}) +
-      djr("Title:", "Living Room &amp; Hallway Refresh", {help:"Member sees this."}) +
+      djr("Title:", esc(S.title), {help:"Member sees this."}) +
       djr("Member · home:", "Sarah Mitchell · 4817 Mueller Blvd", {ro:1}) +
-      djr("Consultation booking:", "#48213 · Consultation – Painting · Completed – Pending Review", {ro:1}) +
+      djr("Consultation booking:", "#48213 · Consultation · Completed – Pending Review", {ro:1}) +
       djr("Prepared by:", "Mario · Specialty Painter", {ro:1}) +
+      djr("Review reason:", esc(S.rvReason), {ro:1}) +
       djr("Valid through:", "2026-11-22") +
     '</div>' +
-    '<div class="dj-fs"><div class="dj-cap">Work areas</div>' + tbl + '</div>' +
-    '<div class="dj-fs"><div class="dj-cap">Not included (member sees this)</div>' +
-      djr("Exclusions:", 'Ceiling, doors and trim, except the new baseboard<br>Moving large items such as a piano<br>Repairs to unrelated existing conditions<br><mark>Hidden water damage behind the baseboard or wall. If we find any, we stop and send you a change order first.</mark>', {chg:1}) +
-    '</div>' +
+    '<div class="dj-fs"><div class="dj-cap">Proposal lines</div>' + tbl + '</div>' +
+    '<div class="dj-fs"><div class="dj-cap">Not included (member sees this)</div>' + djr("Exclusions:", ex.join("<br>"), {chg:1}) + '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Review</div>' +
-      djr("Reviewer note (internal):", "Added stain-blocking primer for the water marks (+$25) and a hidden-damage exclusion. Hours hold. — Homer") +
+      djr("Reviewer note (internal):", "Added stain-blocking primer for the water marks (+$25) and the hidden-damage exclusion. Hours hold. — Homer") +
       djr("Total:", money(before.total) + " → <b>" + money(after.total) + "</b>", {ro:1}) +
     '</div>' +
-    '<div class="submit-row"><button type="button" class="djbtn alt">Save</button><button type="button" class="djbtn alt">Hand off to Sales (HubSpot)</button><button type="button" class="djbtn def' + HOT + '" data-act="next">Send to member</button>' + anno("New actions") + '</div>';
-  return frame("op", "…/admin/proposals/proposal/148/change/", djShell("homer", "Home › Proposals › Proposals › PF-2026-00148", inner));
+    '<div class="submit-row"><button type="button" class="djbtn alt" data-stub>Save</button><button type="button" class="djbtn alt" data-stub>Hand off to Sales (HubSpot)</button><button type="button" class="djbtn def' + HOT + '" data-act="next">Send to member</button>' + anno("New actions") + '</div>';
+  return frame("op", "Django Admin · /admin/proposals/proposal/148/change/", djShell("homer", "Home › Proposals › Proposals › PF-2026-00148", inner));
 }
 
 function scrEmail(){
@@ -1063,59 +1235,73 @@ function scrEmail(){
     '<div class="mitem read"><b>PreFix</b><span>Your Apr 14 visit summary</span><span>Apr 14</span></div>' +
     '<div class="mitem read"><b>Austin Energy</b><span>Your October bill</span><span>Oct 2</span></div>' +
   '</nav><div class="mail-msg">' +
-    '<h3>Your proposal for Living Room &amp; Hallway Refresh is ready ' + anno("New email template") + '</h3>' +
+    '<h3>Your proposal is ready: ' + esc(S.title.toLowerCase()) + ' ' + anno("New email template") + '</h3>' +
     '<div class="mail-from"><span class="mail-av">' + ic("home-4-fill") + '</span><span><b>PreFix</b> to Sarah Mitchell</span><span>&middot; ' + d.sent + '</span></div>' +
     '<div class="em"><div class="em-head"><span class="m">' + ic("home-4-fill") + '</span><b>PreFix</b></div><div class="em-body">' +
       '<h4>Your proposal is ready</h4>' +
       '<p>Hi Sarah, ' + (rv ? 'Mario and our specialty team finished the proposal from Thursday\'s consultation.' : 'here\'s the proposal Mario put together during this morning\'s consultation.') + ' It covers the work, what\'s included, the price and how long it takes.</p>' +
-      '<div class="em-card"><span style="font-weight:600">Living Room &amp; Hallway Refresh</span><span class="tot">' + money(t.total) + '</span><span class="m2">' + dur(t) + ' &middot; Valid through ' + d.valid + '</span></div>' +
+      '<div class="em-card"><span style="font-weight:600">' + esc(S.title) + '</span><span class="tot">' + money(t.total) + '</span><span class="m2">' + dur(t) + ' &middot; Valid through ' + d.valid + '</span></div>' +
       '<button type="button" class="em-btn' + HOT + '" data-act="next">Review your proposal</button>' +
-      '<p style="font-size:14px;line-height:20px;color:var(--text-2)">From the proposal page you can approve it, decline it, or ask us to contact you later.</p>' +
+      '<p style="font-size:14px;line-height:20px;color:var(--text-2)">You can approve it, decline it or ask us to check back later. It\'s also on your HomeHub dashboard.</p>' +
     '</div><div class="em-foot">Questions? Reply to this email or message us in HomeHub.<br>&copy; 2026 PreFix, Inc. &middot; <u>Help center</u> &middot; <u>Unsubscribe</u></div></div>' +
   '</div></div>';
   return frame("em", "Mail · Inbox", html);
 }
 
+function scrDashOpen(){
+  var t = T();
+  var html = '<div class="mp">' + mpTop("Dashboard") +
+  '<div class="page">' +
+    '<div class="intro"><div class="intro__text"><h2 class="t-display">4817 Mueller Blvd</h2><p class="t-desc">Austin, TX 78723</p></div><span class="btn btn--primary btn--lg" data-stub>' + ic("add-line") + 'Request service</span></div>' +
+    '<div class="message"><span class="message__icon">' + ic("file-text-line") + '</span><p class="message__text"><strong>Your proposal is ready.</strong> ' + esc(S.title) + ', ' + money(t.total) + '.</p></div>' +
+    '<div class="layout"><div class="main">' +
+      '<section class="card"><div class="d-head"><h3 class="t-title">Ready to schedule</h3></div><p class="d-empty">' + ic("checkbox-circle-line") + 'You\'re all caught up.</p></section>' +
+      mpProposals("open") + mpRecs() +
+    '</div>' +
+    '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">Upcoming visits</h3><span class="d-head__link" data-stub>Appointments' + ic("arrow-right-s-line") + '</span></div><ul class="d-list">' +
+      '<li class="d-row"><span class="d-date d-date--pm"><span class="d-date__m">Nov</span><span class="d-date__d">12</span></span><div class="d-main"><span class="d-title">Preventive maintenance</span><p class="d-meta">Thu, 9&ndash;11 AM</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
+    '</ul></section>' + mpTeam() + '</aside></div></div>' + mpFoot() + '</div>';
+  return frame("hh", "member.prefixinc.com/", html);
+}
+
 /* ---------- proposal page ---------- */
-function propMain(){
-  var t = T(), rv = reviewed();
-  var excl = ["Ceiling, doors and trim, except the new baseboard","Moving large items such as a piano","Repairs to unrelated existing conditions","Work not described in this proposal"];
+function propMain(state){
+  var t = T(), rv = reviewed(), finds = t.ls.filter(function(l){ return l.note.trim(); });
+  var condMeta = function(l){
+    if(l.cond==="Critical Condition") return '<span class="t-red">Critical</span> &middot; ' + l.trade;
+    if(l.cond==="Cause for Concern") return '<b class="t-ink">Concern</b> &middot; ' + l.trade;
+    return '<span class="t-blue">No concern</span> &middot; ' + l.trade;
+  };
+  var condIcon = function(l){
+    if(l.cond==="Critical Condition") return '<span class="d-sev d-sev--critical">' + ic("error-warning-fill") + '</span>';
+    if(l.cond==="Cause for Concern") return '<span class="d-sev">' + ic("alert-line") + '</span>';
+    return '<span class="d-sev d-sev--ok">' + ic("checkbox-circle-line") + '</span>';
+  };
   return '<div class="main">' +
-    '<section class="card"><div class="d-head"><h2 class="t-title">What we recommend</h2></div>' +
-      '<p>Repaint the living room and hallway walls, and replace the two water-damaged baseboard sections by the bathroom door, so both spaces look fresh and finished.</p>' +
-      '<ul class="features" style="margin-top:16px">' +
-        '<li class="feature feature--check"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">Clean, even walls in your two most-used rooms</span></li>' +
-        '<li class="feature feature--check"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">Damaged baseboard replaced before it crumbles further</span></li>' +
-        '<li class="feature feature--check"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">Done in ' + (t.days===1 ? 'one day' : t.days + ' days') + ', with furniture moved and floors protected</span></li>' +
-      '</ul></section>' +
-    '<section class="card"><div class="d-head"><h2 class="t-title">What we found</h2><span class="t-meta" style="margin-left:auto">From your consultation, Oct 22</span></div><ul class="tiles">' +
-      '<li class="tile tile--concern"><div class="m-photo m-photo--wide">' + ic("image-line") + '<span>Baseboard by the bathroom door</span></div><span class="badge badge--high" style="align-self:flex-start">' + ic("alert-line") + 'Concern</span><p class="t-strong">Water damage at the baseboard</p><p class="d-meta">Swollen and soft along the bottom edge, with staining. Moisture reads normal today (12%), so the leak appears to have stopped.</p></li>' +
-      '<li class="tile"><div class="m-photo m-photo--wide">' + ic("image-line") + '<span>Living room, north wall</span></div><span class="badge badge--normal" style="align-self:flex-start">No concern</span><p class="t-strong">Worn paint</p><p class="d-meta">Nail holes, dings and scuffs, and the paint has dulled. Cosmetic only.</p></li>' +
+    '<section class="card"><div class="d-head"><h3 class="t-title">What we recommend</h3></div><p>' + esc(S.summary) + '</p></section>' +
+    (finds.length ? '<section class="card"><div class="d-head"><h3 class="t-title">What we found</h3></div><p class="t-meta">From your consultation on Oct 22</p><ul class="tiles">' +
+      finds.map(function(l){ return '<li class="tile' + (l.cond==="Critical Condition"?' tile--critical':'') + '"><div class="m-photo m-photo--wide">' + ic("image-line") + '<span>' + esc(l.area) + '</span></div><div class="tile__head">' + condIcon(l) + '<div class="d-main"><span class="d-title">' + esc(l.area) + '</span><p class="d-meta">' + condMeta(l) + '</p><p class="d-risk">' + esc(l.note) + '</p></div></div></li>'; }).join("") +
+    '</ul></section>' : '') +
+    '<section class="card"><div class="d-head"><h3 class="t-title">Scope of work</h3></div><p class="t-meta">Written by Mario during your consultation</p><ul class="d-list" style="margin-top:8px">' +
+      t.ls.map(function(l){ return '<li class="scope"><span class="d-icon">' + ic(l.icon) + '</span><div class="scope__main"><div class="scope__top"><p class="t-strong">' + esc(l.area) + '</p><span class="t-meta">' + hrs(l.hours) + ' &middot; ' + l.trade + '</span></div><p>' + esc(l.scope) + '</p><p class="d-meta">' + esc(l.meas) + '</p></div></li>'; }).join("") +
+      '<li class="scope"><span class="d-icon">' + ic("brush-line") + '</span><div class="scope__main"><p class="t-strong">Paint and materials</p><p>' + esc(S.materials) + (rv ? ' Stain-blocking primer over the water marks.' : '') + '</p></div></li>' +
     '</ul></section>' +
-    '<section class="card"><div class="d-head"><h2 class="t-title">Scope of work</h2></div><p class="t-meta" style="margin-bottom:8px">Written by Mario during your consultation.</p><ul>' +
-      t.ls.map(function(l){ return '<li class="scope"><span class="d-icon">' + ic(l.icon) + '</span><div class="scope__main"><div class="scope__top"><p class="t-strong">' + esc(l.area) + '</p><span class="t-meta">' + l.hours + ' hr &middot; ' + l.trade + '</span></div><p>' + esc(l.scope) + '</p><p class="d-meta">' + esc(l.meas) + '</p></div></li>'; }).join("") +
-    '</ul></section>' +
-    '<section class="card"><div class="d-head"><h2 class="t-title">Materials</h2></div><dl class="ledger">' +
-      '<div class="ledger__row"><dt>Paint</dt><dd>Premium interior latex, eggshell</dd></div>' +
-      '<div class="ledger__row"><dt>Color</dt><dd>Matched to your walls. You confirm the sample first.</dd></div>' +
-      '<div class="ledger__row"><dt>Coverage</dt><dd>About 900 sq ft of wall, two coats</dd></div>' +
-      '<div class="ledger__row"><dt>Baseboard</dt><dd>Primed MDF, matched to your profile</dd></div>' +
-      '<div class="ledger__row"><dt>Primer</dt><dd>Spot primer' + (rv ? ' and stain-blocking primer' : '') + '</dd></div>' +
-    '</dl></section>' +
-    '<section class="card"><div class="d-head"><h2 class="t-title">What\'s included</h2></div><div class="two-col" style="margin-top:8px">' +
-      '<div><p class="t-strong" style="margin-bottom:8px">Included</p><ul class="features">' +
-        ["Moving standard furniture and protecting floors","Patching small holes and dings","All paint and materials listed","Cleanup and a final walkthrough with you","PreFix workmanship warranty"].map(function(x){ return '<li class="feature feature--check"><span class="i-box">' + ic("check-line") + '</span><span class="feature__text">' + x + '</span></li>'; }).join("") +
-      '</ul></div><div><p class="t-strong" style="margin-bottom:8px">Not included</p><ul class="features">' +
-        excl.map(function(x){ return '<li class="feature feature--cross"><span class="i-box">' + ic("close-line") + '</span><span class="feature__text">' + x + '</span></li>'; }).join("") +
-        (rv ? '<li class="feature feature--cross is-added"><span class="i-box">' + ic("close-line") + '</span><span class="feature__text">Hidden water damage behind the baseboard or wall. If we find any, we stop and send you a change order first. ' + anno("Added in review") + '</span></li>' : '') +
-      '</ul></div></div></section>' +
-    '<section class="card"><div class="d-head"><h2 class="t-title">Timeline and warranty</h2></div><dl class="ledger">' +
-      '<div class="ledger__row"><dt>Time on site</dt><dd>' + dur(t) + '</dd></div>' +
-      '<div class="ledger__row"><dt>Scheduling</dt><dd>Usually within 1–2 weeks of approval</dd></div>' +
-      '<div class="ledger__row"><dt>Before we arrive</dt><dd>Clear small items off shelves; keep pets out of the work area</dd></div>' +
-      '<div class="ledger__row"><dt>Workmanship</dt><dd>PreFix warranty terms</dd></div>' +
-      '<div class="ledger__row"><dt>Paint and materials</dt><dd>Manufacturer\'s warranty</dd></div>' +
-    '</dl><p class="t-meta" style="margin-top:12px">Timelines are estimates. Approving accepts the project terms: validity, payment, change orders, hidden conditions and cancellation. ' + anno("Terms need legal review") + '</p></section>' +
+    '<section class="card"><div class="d-head"><h3 class="t-title">What\'s included</h3></div><div class="svc__cols" style="margin-top:8px">' +
+      '<div><p class="svc__label">Included</p><ul class="features">' + INCL.map(function(x){ return '<li class="feature feature--check is-done"><span class="i-box">' + ic("check-line") + '</span><span class="feature__text">' + x + '</span></li>'; }).join("") + '</ul></div>' +
+      '<div><p class="svc__label">Not included</p><ul class="features">' + exclList().map(function(e){ var added = e.id==="hidden" && rv && !S.excl.hidden; return '<li class="feature svc__todo' + (added?' is-added':'') + '"><span class="i-box">' + ic("close-line") + '</span><span class="feature__text">' + esc(e.t) + (added ? ' ' + anno("Added in review") : '') + '</span></li>'; }).join("") + '</ul></div>' +
+    '</div></section>' +
+    '<section class="card"><div class="d-head"><h3 class="t-title">Timeline and warranty</h3></div><ul class="features" style="margin-top:8px">' +
+      '<li class="feature"><span class="i-box">' + ic("time-line") + '</span><span class="feature__text">' + dur(t) + '<span class="feature__sub">Usually scheduled within 1–2 weeks of approval</span></span></li>' +
+      '<li class="feature"><span class="i-box">' + ic("home-4-line") + '</span><span class="feature__text">Before we arrive<span class="feature__sub">Clear small items off shelves and keep pets out of the work area</span></span></li>' +
+      '<li class="feature"><span class="i-box">' + ic("hand-coin-line") + '</span><span class="feature__text">No surprises<span class="feature__sub">Any extra work needs your approval before we start it</span></span></li>' +
+      '<li class="feature"><span class="i-box">' + ic("shield-check-line") + '</span><span class="feature__text">Warranty<span class="feature__sub">PreFix workmanship warranty; paint and materials carry the manufacturer\'s warranty</span></span></li>' +
+    '</ul><p class="t-meta" style="margin-top:16px">Approving accepts the project terms: payment, change orders, hidden conditions and cancellation. ' + anno("Terms need legal review") + '</p></section>' +
+    (state==="approved" ? '' : '<section class="card"><div class="d-head"><h3 class="t-title">Once you approve</h3></div><ul class="d-list">' +
+      '<li class="d-row"><span class="hist">' + ic("check-line") + '</span><div class="d-main"><p class="t-strong">We confirm the details with you</p></div></li>' +
+      '<li class="d-row"><span class="hist">' + ic("calendar-check-line") + '</span><div class="d-main"><p class="t-strong">We call or text you to set the date</p></div></li>' +
+      '<li class="d-row"><span class="hist">' + ic("paint-brush-line") + '</span><div class="d-main"><p class="t-strong">Mario does the work</p><p class="d-meta">It\'s added to your Timeline in HomeHub</p></div></li></ul></section>') +
+    mpTeam() +
+    (state==="approved" || S.declined || S.later ? '' : '<section class="card m-only"><div class="d-head"><h3 class="t-title">Ready to move forward?</h3></div><p class="t-hero t-num" style="margin:8px 0">' + money(t.total) + '</p><button type="button" class="btn btn--primary btn--lg btn--block" data-act="next">Approve project</button></section>') +
   '</div>';
 }
 function investLedger(t){
@@ -1123,44 +1309,40 @@ function investLedger(t){
     '<div class="ledger__row ledger__row--total"><dt>Total</dt><dd>' + money(t.total) + '</dd></div></dl>';
 }
 function propRail(state){
-  var t = T(), d = DT();
-  var top;
+  var t = T(), d = DT(), body;
   if(state==="approved"){
-    top = '<section class="card"><div class="done-head">' + ic("checkbox-circle-fill") + '<div><h2 class="t-title">You approved this project</h2><p class="t-meta">' + d.accepted + ' &middot; ' + money(t.total) + '</p></div></div>' +
-      '<hr class="divider"><h3 class="t-strong" style="margin-bottom:8px">What happens next</h3><ol class="steps">' +
-        '<li class="step step--done"><span class="step__n">' + ic("check-line") + '</span><div class="step__main"><p class="t-strong">You approved the proposal</p><p class="t-meta">' + d.accepted + '</p></div></li>' +
-        '<li class="step step--cur"><span class="step__n">2</span><div class="step__main"><p class="t-strong">Central Ops sets up your project</p><p class="t-meta">Usually within 1 business day</p></div></li>' +
-        '<li class="step"><span class="step__n">3</span><div class="step__main"><p class="t-strong">We call or text you to pick a date</p><p class="t-meta">Most projects start within 1–2 weeks</p></div></li>' +
-        '<li class="step"><span class="step__n">4</span><div class="step__main"><p class="t-strong">Mario does the work</p><p class="t-meta">It\'s added to your Timeline in HomeHub</p></div></li>' +
-      '</ol><button type="button" class="btn btn--secondary btn--block' + HOT + '" data-act="next" style="margin-top:16px">Back to HomeHub</button></section>';
-  } else if(S.declining){
-    top = '<section class="card"><h2 class="t-title">Why are you declining?</h2><p class="t-meta" style="margin:4px 0 16px">This helps us improve. It\'s the same list you see when you decline a recommendation.</p>' +
-      '<div class="chips">' + REASONS.map(function(r){ return '<button type="button" class="chip" data-act="reason" data-r="' + esc(r) + '" aria-pressed="' + (S.reason===r) + '">' + esc(r) + '</button>'; }).join("") + '</div>' +
-      '<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:20px"><button type="button" class="btn btn--secondary" data-act="decline-submit"' + (S.reason?'':' disabled') + '>Decline proposal</button><button type="button" class="link" data-act="decline-cancel">Keep the proposal</button></div></section>';
-  } else if(S.declined || S.later){
-    top = '<section class="card"><div class="done-head">' + ic("checkbox-circle-fill") + '<div><h2 class="t-title">' + (S.declined ? 'You declined this proposal' : 'We\'ll contact you later') + '</h2><p class="t-meta">' +
-      (S.declined ? 'Reason: ' + esc(S.reason) + '. Proposal status becomes Declined.' : 'Central Ops follows up in about 2 weeks. Proposal status becomes Contact later (proposed).') + '</p></div></div>' +
-      '<p class="t-meta" style="margin-top:16px">This branch ends here. Undo to approve and continue the main flow.</p><button type="button" class="link" data-act="undo" style="margin-top:8px">Undo</button></section>';
+    body = '<section class="card"><div class="d-head"><h3 class="t-title">You approved this project</h3></div><p class="t-meta">' + d.accepted + ' &middot; ' + money(t.total) + '</p>' +
+      '<hr class="divider" style="margin:16px 0 4px"><ul class="d-list">' +
+        '<li class="d-row">' + ic("checkbox-circle-fill","d-done") + '<div class="d-main"><p class="t-strong">You approved the proposal</p><p class="d-meta">' + d.accepted + '</p></div></li>' +
+        '<li class="d-row"><span class="hist">' + ic("settings-3-line") + '</span><div class="d-main"><p class="t-strong">We set up your project</p><p class="d-meta">Usually within 1 business day</p></div></li>' +
+        '<li class="d-row"><span class="hist">' + ic("calendar-check-line") + '</span><div class="d-main"><p class="t-strong">We call or text you to pick a date</p><p class="d-meta">Most projects start within 1–2 weeks</p></div></li>' +
+      '</ul><button type="button" class="btn btn--secondary btn--block' + HOT + '" data-act="next" style="margin-top:16px">Back to HomeHub</button></section>';
   } else {
-    top = '<section class="card"><p class="t-meta">Total project investment</p><p class="t-hero t-num" style="margin:8px 0 8px">' + money(t.total) + '</p><p class="d-meta">' + dur(t) + ' &middot; Due when the work is complete</p>' +
-      '<hr class="divider" style="margin:20px 0 8px">' + investLedger(t) +
-      '<div style="display:flex;flex-direction:column;gap:12px;margin-top:20px"><button type="button" class="btn btn--primary btn--lg btn--block' + HOT + '" data-act="next">Approve project</button><button type="button" class="btn btn--secondary btn--block" data-act="decline">Decline</button></div>' +
-      '<div style="display:flex;justify-content:center;gap:8px;align-items:center;flex-wrap:wrap;margin-top:16px"><button type="button" class="link" data-act="later">Contact me later</button>' + anno("Proposed") + '</div>' +
-      '<p class="t-meta" style="margin-top:16px;text-align:center">Valid through ' + d.valid + '</p></section>';
+    var decide;
+    if(S.declining){
+      decide = '<p class="t-strong" style="margin-top:20px">Why are you declining?</p><div class="chips" style="margin-top:8px">' + REASONS.map(function(r){ return '<button type="button" class="chip" data-act="reason" data-r="' + esc(r) + '" aria-pressed="' + (S.reason===r) + '">' + esc(r) + '</button>'; }).join("") + '</div>' +
+        '<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:16px"><button type="button" class="btn btn--secondary" data-act="decline-submit"' + (S.reason?'':' disabled') + '>Decline proposal</button><button type="button" class="link" data-act="decline-cancel">Keep the proposal</button></div>';
+    } else if(S.declined){
+      decide = '<div class="done-row decl">' + ic("checkbox-circle-fill","d-done") + '<p class="d-meta t-ink">Declined: ' + esc(S.reason) + '. You can reopen it anytime from your proposals.</p></div><button type="button" class="link" data-act="undo" style="margin-top:8px">Reopen</button>';
+    } else if(S.later){
+      decide = '<div class="done-row">' + ic("checkbox-circle-fill","d-done") + '<p class="d-meta t-ink">We\'ll check in with you in about two weeks.</p></div><button type="button" class="link" data-act="undo" style="margin-top:8px">I\'m ready to decide</button>';
+    } else {
+      decide = '<div style="display:flex;flex-direction:column;gap:12px;margin-top:20px"><button type="button" class="btn btn--primary btn--lg btn--block' + HOT + '" data-act="next">Approve project</button><button type="button" class="btn btn--secondary btn--block" data-act="decline">Decline</button></div>' +
+        '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:16px"><button type="button" class="link" data-act="later">Check back with me later</button>' + anno("Proposed") + '</div>';
+    }
+    body = '<section class="card"><div class="d-head"><h3 class="t-title">Your investment</h3></div><p class="t-hero t-num" style="margin:8px 0">' + money(t.total) + '</p><p class="d-meta">' + dur(t) + ' &middot; Due when the work is complete</p>' +
+      '<hr class="divider" style="margin:16px 0 4px">' + investLedger(t) + decide +
+      '<hr class="divider" style="margin:20px 0 16px"><p class="t-meta">Valid through ' + d.valid + '. Questions? <span class="link" data-stub>Message us</span></p></section>';
   }
-  var next = state==="approved" ? '' : '<section class="card"><div class="d-head"><h2 class="t-title">Once you approve</h2></div><ol class="steps">' +
-    '<li class="step"><span class="step__n">1</span><div class="step__main"><p class="t-strong">We confirm the details with you</p></div></li>' +
-    '<li class="step"><span class="step__n">2</span><div class="step__main"><p class="t-strong">Central Ops calls or texts to set the date</p></div></li>' +
-    '<li class="step"><span class="step__n">3</span><div class="step__main"><p class="t-strong">Mario does the work</p><p class="t-meta">It\'s added to your Timeline in HomeHub</p></div></li></ol></section>';
-  return '<aside class="rail">' + top + next + mpTeam() + '</aside>';
+  return '<aside class="rail">' + body + '</aside>';
 }
 function propPage(state){
   var d = DT(), rv = reviewed();
-  return '<div class="mp" style="position:relative">' + mpTop(null, true) + (state==="approved" ? '<div class="toast" role="status">' + ic("checkbox-circle-line") + 'Proposal approved</div>' : '') +
+  return '<div class="mp" style="position:relative">' + mpTop(null) + (state==="approved" ? '<div class="toast" role="status">' + ic("checkbox-circle-line") + 'Proposal approved</div>' : '') +
   '<div class="page">' +
-    '<div class="intro"><div class="intro__text"><p class="t-meta">Proposal PF-2026-00148 &middot; Painting &amp; carpentry ' + anno("New page") + '</p><h1 class="t-display">Living Room &amp; Hallway Refresh</h1>' +
-      '<p class="t-desc">4817 Mueller Blvd &middot; Prepared ' + d.prepared + ' for Sarah Mitchell by Mario, Specialty painter' + (rv ? ' &middot; Reviewed by Homer, Central Ops' : '') + '</p></div></div>' +
-    '<div class="layout">' + propMain() + propRail(state) + '</div>' +
+    '<div class="intro"><div class="intro__text"><h2 class="t-display">' + esc(S.title) + ' ' + anno("New page") + '</h2>' +
+      '<p class="t-desc">Proposal for 4817 Mueller Blvd &middot; From Mario, Specialty painter' + (rv ? ', reviewed by our specialty team' : '') + ' &middot; ' + d.prepared + '</p></div></div>' +
+    '<div class="layout layout--prop">' + propMain(state) + propRail(state) + '</div>' +
   '</div>' + mpFoot() + '</div>';
 }
 function scrProposal(){ return frame("pr", "member.prefixinc.com/proposals/PF-2026-00148", propPage("review")); }
@@ -1175,22 +1357,22 @@ function scrZdAccepted(){
   var main = '<div class="zd-main"><div class="zd-ticket">' + list +
     '<div><p class="zd-subj">Proposal accepted — PF-2026-00148 · Mitchell</p><p class="zd-meta">#91655 &middot; created automatically &middot; ' + d.accepted + '</p></div>' +
     '<article class="msg sys"><header><span class="zav">PF</span><b>PreFix system</b><span class="k">Automation</span>' + anno() + '</header>' +
-      '<p>Sarah Mitchell approved PF-2026-00148 for <b>' + money(t.total) + '</b> (' + t.hours + ' hours). Booking #48390 was created as Pending from the proposal, with its tasks, hours and price. Check it and schedule Mario.</p></article>' +
+      '<p>Sarah Mitchell approved PF-2026-00148 for <b>' + money(t.total) + '</b> (' + hrs(t.hours) + '). Booking #48390 was created as Pending from the proposal, with its tasks, hours and price. Check it, call Sarah to agree a date, and schedule Mario.</p></article>' +
     '<button type="button" class="zbtn' + HOT + '" data-act="next">Open booking #48390 in Admin</button>' +
     '</div><aside class="zd-side">' + zf("Group","Central Ops – Specialty") + zf("Assignee","Central Ops") + zf("Proposal","PF-2026-00148 · Accepted") + zf("Booking","#48390 · Pending") + zf("Tags","proposal_accepted painting") + '</aside></div>';
-  return frame("zd", "prefix.zendesk.com/agent/tickets/91655", zdShell(ZV, main));
+  return frame("zd", "prefix.zendesk.com/agent/tickets/91655", zdShell(main));
 }
 
 function scrSchedule(){
   var t = T();
   var tasks = '<div class="tbl"><table><thead><tr><th>#</th><th>Task (from proposal)</th><th class="num">Minutes</th></tr></thead><tbody>' +
-    t.ls.map(function(l, i){ return '<tr><td>' + (i+1) + '</td><td>' + esc(l.task) + '</td><td class="num">' + (l.hours*60) + '</td></tr>'; }).join("") +
-    '<tr><td></td><td><b>Total</b></td><td class="num"><b>' + (t.hours*60) + '</b></td></tr></tbody></table></div>';
+    t.ls.map(function(l, i){ return '<tr><td>' + (i+1) + '</td><td>' + esc(l.area) + ' (' + l.trade + ')</td><td class="num">' + Math.round(l.hours*60) + '</td></tr>'; }).join("") +
+    '<tr><td></td><td><b>Total</b></td><td class="num"><b>' + Math.round(t.hours*60) + '</b></td></tr></tbody></table></div>';
   var endH = Math.min(17, 8 + Math.min(t.hours, 8) + 0.5);
   var pct = function(h){ return ((h-8)/9*100).toFixed(2) + "%"; };
   var cal = '<div class="cal" aria-label="Ops Calendar, Tue Nov 3"><b style="font-size:12px;color:#666">Ops Calendar &middot; Tue, Nov 3</b>' +
     '<div class="cal-axis"><span></span><div class="tk">' + [8,10,12,14,16].map(function(h){ return '<span style="left:' + pct(h) + '">' + (h>12?h-12:h) + (h>=12?" PM":" AM") + '</span>'; }).join("") + '</div></div>' +
-    '<div class="cal-lane"><span>Mario</span><div class="tr"><span class="blk new" style="left:0;width:' + ((endH-8)/9*100).toFixed(2) + '%">Mitchell &middot; Refresh</span></div></div>' +
+    '<div class="cal-lane"><span>Mario</span><div class="tr"><span class="blk new" style="left:0;width:' + ((endH-8)/9*100).toFixed(2) + '%">Mitchell &middot; refresh</span></div></div>' +
     '<div class="cal-lane"><span>Carpentry team</span><div class="tr"><span class="blk busy" style="left:' + pct(9) + ';width:' + (3/9*100).toFixed(2) + '%">Chen &middot; cabinets</span><span class="blk busy" style="left:' + pct(13) + ';width:' + (2/9*100).toFixed(2) + '%">Consult</span></div></div>' +
     (t.days>1 ? '<p class="help" style="margin:0">Runs ' + t.days + ' days: Mario is booked ' + projDate() + '.</p>' : '') + '</div>';
   var inner = '<div class="dj-title"><h2>Change booking</h2><span style="color:#666">#48390</span></div>' +
@@ -1199,33 +1381,30 @@ function scrSchedule(){
       djr("Created from:", "Proposal PF-2026-00148 · Accepted " + anno("New link"), {ro:1, help:"Tasks, minutes and price came from the proposal. Ops checks them and schedules."}) +
       djr("Subscription:", "4817 Mueller Blvd — Sarah Mitchell (Active)", {sel:1}) +
       djr("Assigned Home Manager:", "Mario · Specialty Painter", {sel:1}) +
-      djr("Duration (minutes):", String(t.hours*60), {ro:1}) +
+      djr("Duration (minutes):", String(Math.round(t.hours*60)), {ro:1}) +
       djr("Price:", money2(t.total), {ro:1, help:"Charged on completion, as on the proposal."}) +
     '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Booking tasks</div>' + tasks + '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Scheduling</div>' +
       djr("Status:", "Booked", {sel:1, chg:1, help:"Was Pending. Later this could go to Ready so Sarah picks the date in HomeHub."}) +
-      djr("Scheduled start:", "2026-11-03 &nbsp; 08:00", {chg:1}) +
+      djr("Scheduled start:", "2026-11-03 &nbsp; 08:00", {chg:1, help:"Agreed with Sarah by phone."}) +
       '<div style="padding:0 12px 12px">' + cal + '</div>' +
     '</div>' +
-    '<div class="submit-row"><button type="button" class="djbtn alt">Save and continue editing</button><button type="button" class="djbtn def' + HOT + '" data-act="next">SAVE</button></div>';
-  return frame("op", "…/admin/bookings/booking/48390/change/", djShell("central-ops", "Home › Bookings › Bookings › #48390", inner));
+    '<div class="submit-row"><button type="button" class="djbtn alt" data-stub>Save and continue editing</button><button type="button" class="djbtn def' + HOT + '" data-act="next">SAVE</button></div>';
+  return frame("op", "Django Admin · /admin/bookings/booking/48390/change/", djShell("central-ops", "Home › Bookings › Bookings › #48390", inner));
 }
 
 function scrBooked(){
-  var t = T(), d = DT();
   var html = '<div class="mp">' + mpTop("Dashboard") +
   '<div class="page">' +
-    '<div class="intro"><div class="intro__text"><h1 class="t-display">4817 Mueller Blvd</h1><p class="t-desc">Austin, TX 78723</p></div><span class="btn btn--primary btn--lg">' + ic("add-line") + 'Request service</span></div>' +
-    '<div class="message"><span class="message__icon">' + ic("calendar-check-line") + '</span><p class="message__text"><strong>Your project is booked.</strong> Living Room &amp; Hallway Refresh, ' + projDate() + '.</p></div>' +
+    '<div class="intro"><div class="intro__text"><h2 class="t-display">4817 Mueller Blvd</h2><p class="t-desc">Austin, TX 78723</p></div><span class="btn btn--primary btn--lg" data-stub>' + ic("add-line") + 'Request service</span></div>' +
+    '<div class="message"><span class="message__icon">' + ic("calendar-check-line") + '</span><p class="message__text"><strong>Your project is booked.</strong> ' + esc(S.title) + ', ' + projDate() + '.</p></div>' +
     '<div class="layout"><div class="main">' +
-      '<section class="card"><div class="d-head"><h2 class="t-title">Proposals</h2>' + anno("New module") + '<span class="d-head__link">See all' + ic("arrow-right-s-line") + '</span></div><ul class="d-list">' +
-        '<li class="d-row"><span class="d-icon d-icon--tint">' + ic("file-text-line") + '</span><div class="d-main"><span class="d-title">Living Room &amp; Hallway Refresh</span><p class="d-meta">Approved ' + d.acceptedS + ' &middot; ' + money(t.total) + ' &middot; due when the work is complete</p></div><span class="badge badge--status">' + ic("checkbox-circle-fill") + 'Approved</span></li>' +
-      '</ul></section>' +
-      '<section class="card"><div class="d-head"><h2 class="t-title">Ready to schedule</h2></div><p class="d-empty">' + ic("checkbox-circle-line") + 'You\'re all caught up.</p></section>' +
+      '<section class="card"><div class="d-head"><h3 class="t-title">Ready to schedule</h3></div><p class="d-empty">' + ic("checkbox-circle-line") + 'You\'re all caught up.</p></section>' +
+      mpRecs() + mpProposals("done") +
     '</div>' +
-    '<aside class="rail"><section class="card"><div class="d-head"><h2 class="t-title">Upcoming visits</h2><span class="d-head__link">Appointments' + ic("arrow-right-s-line") + '</span></div><ul class="d-list">' +
-      '<li class="d-row d-row--sel' + HOT + '" data-act="next" role="button" tabindex="0"><span class="d-date"><span class="d-date__m">Nov</span><span class="d-date__d">3</span></span><div class="d-main"><span class="d-title">Specialty visit</span><p class="d-tasks">Living room &amp; hallway refresh</p><p class="d-meta">' + projDate().split(",")[0] + ', 8 AM arrival &middot; Mario</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
+    '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">Upcoming visits</h3><span class="d-head__link" data-stub>Appointments' + ic("arrow-right-s-line") + '</span></div><ul class="d-list">' +
+      '<li class="d-row d-row--sel' + HOT + '" data-act="next" role="button" tabindex="0"><span class="d-date"><span class="d-date__m">Nov</span><span class="d-date__d">3</span></span><div class="d-main"><span class="d-title">Specialty visit</span><p class="d-tasks">Living room and hallway refresh</p><p class="d-meta">Tue, 8 AM &middot; Mario</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
       '<li class="d-row"><span class="d-date d-date--pm"><span class="d-date__m">Nov</span><span class="d-date__d">12</span></span><div class="d-main"><span class="d-title">Preventive maintenance</span><p class="d-meta">Thu, 9&ndash;11 AM</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
     '</ul></section>' + mpTeam() + '</aside></div></div>' + mpFoot() + '</div>';
   return frame("hh", "member.prefixinc.com/", html);
@@ -1242,12 +1421,13 @@ function scrKpi(){
     }).join("") +
     '<div class="baxis" aria-hidden="true"><span></span><div class="tk"><span style="left:0">0</span><span style="left:25%">5</span><span style="left:50%">10</span><span style="left:75%">15</span><span style="left:100%">20 days</span></div><span></span></div></div>';
   var html = '<div class="mb"><div class="mb-head"><div><small>Field Operations</small><h2>Consultations &amp; proposals</h2></div><div class="mb-filters"><span class="on">October 2026</span><span>Austin</span><span>Carpentry &amp; Painting</span></div></div>' +
-    '<p class="mb-note">Illustrative numbers. This dashboard doesn\'t exist yet. It shows what the new service type and proposal statuses make possible.</p>' +
+    '<p class="mb-note">Illustrative numbers. This dashboard doesn\'t exist yet. It shows what the consultation service type and proposal statuses make possible.</p>' +
     '<div class="kpis">' +
-      '<div class="kpi"><span class="k">Consultations completed</span><span class="v">42</span><span class="s">14 per specialist</span></div>' +
+      '<div class="kpi"><span class="k">Requests</span><span class="v">96</span><span class="s">Painting and carpentry this month</span></div>' +
+      '<div class="kpi"><span class="k">Consultations per specialist</span><span class="v">14</span><span class="s">42 completed by 3 specialists</span></div>' +
       '<div class="kpi"><span class="k">Priced on site</span><span class="v">61%</span><span class="s">Sent straight to the member</span></div>' +
-      '<div class="kpi"><span class="k">Sent for review</span><span class="v">39%</span><span class="s">Top reason: hidden damage</span></div>' +
-      '<div class="kpi"><span class="k">Proposals accepted</span><span class="v">54%</span><span class="s">Of proposals sent</span></div>' +
+      '<div class="kpi"><span class="k">Sent for review</span><span class="v">39%</span><span class="s">Top reason: hidden or uncertain damage</span></div>' +
+      '<div class="kpi"><span class="k">Accepted</span><span class="v">54%</span><span class="s">Of proposals sent</span></div>' +
     '</div>' +
     '<div class="mb-card"><h3>Request to proposal, median days</h3><p class="sub">From the member\'s request to a price they can approve.</p>' + chart + '</div>' +
     '<div class="mb-card"><h3>By specialist</h3><div class="tbl"><table><thead><tr><th>Specialist</th><th class="num">Consultations</th><th class="num">Priced on site</th><th class="num">Accepted</th></tr></thead><tbody>' +
@@ -1264,13 +1444,13 @@ var STEPS = [
    title:function(){ return "Sarah asks for painting and a baseboard repair"; },
    summary:function(){ return "She uses Request service in HomeHub, as she would for any job. Painting and carpentry can't be booked through Fast Fix, so the request goes to Central Ops."; },
    changes:function(){ return [["sr","New"],["tk1","New · Intake"]]; },
-   v1:["A note that painting and carpentry start with a free consultation"],
-   later:["v1.1: a “Request a quote” option in Fast Fix lets members start a painting or carpentry quote themselves"],
+   v1:["A note that painting and carpentry start with a ballpark quote or a free consultation"],
+   later:["V1.1: “Request a quote” in Fast Fix, so members start a painting or carpentry quote themselves"],
    qs:[], screen:scrRequest},
 
   {id:"zd-triage", sys:"zd", actor:"Central Ops associate", role:"Specialty view", av:"CO",
    title:function(){ return "Central Ops decides this needs a consultation"; },
-   summary:function(){ return "The ticket moves from Intake to the Carpentry/Painting – Specialty view. The photos don't show the full scope, so instead of a ballpark quote Ops picks the new Consultation option."; },
+   summary:function(){ return "The ticket moves from Intake to the Carpentry/Painting – Specialty view. The photos don't show the full scope, so instead of a ballpark quote Ops calls Sarah and books a consultation."; },
    changes:function(){ return [["tk1","Open · Specialty view"],["sr","Processing"]]; },
    v1:["Consultation becomes an option next to the ballpark quote"],
    later:[],
@@ -1278,79 +1458,89 @@ var STEPS = [
 
   {id:"op-book", sys:"op", actor:"Central Ops associate", role:"Django Admin", av:"CO",
    title:function(){ return "Ops books it as a Consultation booking"; },
-   summary:function(){ return "Ops creates the booking with the new Consultation – Painting service type, assigns Mario and books the slot by hand. A separate service type lets us count consultations, give them their own end-of-visit flow, and keep proposal fields off normal service bookings."; },
+   summary:function(){ return "Ops creates the booking with the new Consultation service type, tags the trades, assigns Mario and books the agreed slot by hand. A separate service type lets us count consultations, give them their own end-of-visit flow, and keep proposal fields off normal service bookings."; },
    changes:function(){ return [["bk1","Booked · Oct 22, 9 AM"],["sr","Processed"],["tk1","Solved"]]; },
-   v1:["Service types: Consultation – Carpentry, Painting and Insulation","Free, 60-minute default, no invoice"],
+   v1:["Consultation service type, free, 60-minute default, no invoice","Trades field so one consultation covers painting and carpentry"],
    later:["Ready status and self-scheduling into the dedicated consultation slots, once specialty scheduling logic exists"],
-   qs:["Does each consultation type need its own default tasks and questions per trade?"], screen:scrBook},
+   qs:["One Consultation type with a trades field, or one type per trade (carpentry, painting, insulation)?"], screen:scrBook},
 
   {id:"hh-confirm", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM",
    title:function(){ return "Sarah sees the consultation confirmed"; },
-   summary:function(){ return "The appointment explains what a consultation is and sets the expectation: a written proposal by email, often before Mario leaves."; },
+   summary:function(){ return "The appointment explains what a consultation is and sets the expectation: a written proposal by email and in HomeHub, often the same day."; },
    changes:function(){ return []; },
-   v1:["Consultation appointment type and copy that tells the member a proposal is coming"],
+   v1:["Consultation appointment copy that tells the member a proposal is coming"],
    later:[],
    qs:["Reuse the standard confirmation email, or send a consultation-specific one?"], screen:scrConfirm},
 
   {id:"hm-consult", sys:"hm", actor:"Mario", role:"Specialty painter, on his iPad", av:"M",
    title:function(){ return "Mario builds the proposal during the walkthrough"; },
-   summary:function(){ return "The consultation booking keeps the HM Portal layout. Each work area is a task card with new proposal fields: the scope Sarah will read, measurements, hours and materials. The scope box grows as he types, so he can proof it on the iPad. The left column totals the proposal. Try changing hours or materials; every later step updates."; },
+   summary:function(){ return "The consultation booking keeps the HM Portal layout and the two tasks Ops booked. Under each task Mario adds proposal lines: area, condition, what he found, scope, measurements, hours and materials. Every member-facing box grows as he types. The visit itself stays free; a second table totals the proposal. Try editing hours, or clearing a field and pressing Send Now."; },
    changes:function(){ return [["bk1","In Progress"]]; },
-   v1:["Proposal fields on consultation tasks: scope (member sees), measurements, hours, materials","Proposal summary rows in the time and charges table","Scope boxes that grow as you type"],
+   v1:["Proposal lines on consultation tasks; every field the proposal page shows comes from here","Proposal summary table, title, summary, materials and exclusions","Member-facing boxes that grow as you type"],
    later:["Phase 2: the estimator and proposal-builder skills fill these fields from photos and dictation"],
-   qs:["Which existing subtask fields do specialists use today, and which one or two do we add?","Who owns the rate card? Is it time and materials only?","Do consultation hours round up to whole hours like Fast Fix?"], screen:scrConsult},
+   qs:["Which existing subtask fields do specialists use today, and which do we add?","Who owns the rate card? Mark suggested simple time and materials.","Do estimated hours round up to whole hours like Fast Fix?","Is the price fixed, or an estimate billed on actual time?"], screen:scrConsult},
 
-  {id:"hm-finish", sys:"hm", actor:"Mario", role:"Specialty painter, on his iPad", av:"M",
+  {id:"hm-finish", sys:"hm", actor:"Mario", role:"Specialty painter, on his iPad", av:"M", scrollScreen:true,
    title:function(){ return "Send Now asks where the proposal goes"; },
-   summary:function(){ return "Send Later and Send Now stay as they are today. On a consultation, Send Now opens one question: send to Sarah, or send to Central Ops for review. Pick an option and send to walk that path. The path switch at the top does the same."; },
+   summary:function(){ return "Send Later and Send Now stay as they are today. On a consultation, Send Now asks one question: send to Sarah, or send to Central Ops for review with a reason. Pick an option and press Send to walk that path; the path switch at the top does the same."; },
    changes:function(){ return []; },
-   v1:["Send Now on a consultation offers two destinations","A note for the reviewer when it goes to Central Ops"],
+   v1:["Send Now on a consultation offers two destinations","A review reason and note when it goes to Central Ops"],
    later:["Present the proposal on the iPad and capture approval on the spot"],
-   qs:["Is “about a day or less” the rule for sending directly?","Can every specialist send directly, or only approved ones?"], screen:scrFinish},
+   qs:["James suggested V1 sends every proposal to Ops review; Mark wants members to get the same proposal whoever sends it. Do we ship both paths in V1?","Is “about a day or less” the rule for sending directly, and can every specialist send directly?"], screen:scrFinish},
 
-  {id:"op-proposal", sys:"op", actor:"System", role:"Triggered by Mario's send", av:"PF",
+  {id:"op-proposal", sys:"op", actor:"System", role:"Triggered by Mario's send", av:"PF", differs:true,
    title:function(p){ return p==="A" ? "The system creates the proposal and sends it" : "The system creates the proposal and queues it for review"; },
    summary:function(p){ return p==="A"
      ? "Completing the consultation creates a Proposal record linked to the booking, the request and the ticket. Mario sent it directly, so its status is Sent and the email goes out right away."
      : "Completing the consultation creates a Proposal record linked to the booking, the request and the ticket. The booking waits in the new Completed – Pending Review status, like Completed – Pending Contractor Invoice, and a review ticket opens in Zendesk."; },
    changes:function(p){ return p==="A" ? [["bk1","Completed"],["prp","Sent"]] : [["bk1","Completed – Pending Review"],["prp","Pending review"],["tk2","New · Specialty view"]]; },
-   v1:["Proposal record in the backend, linked to booking, request and ticket","Proposal statuses: Pending review, Sent, Accepted, Declined","Booking status: Completed – Pending Review"],
+   v1:["Proposal record in the backend, linked to booking, request and ticket","Proposal statuses: Pending review, Sent, Accepted, Declined"],
    later:[],
-   qs:["Is Contact me later a proposal status, or does HubSpot handle it once Sales has the deal?","How long is a proposal valid? 30 days shown."], screen:scrProposalObj},
+   qs:["Track review on the booking (Completed – Pending Review) or only on the proposal? Both were suggested.","Is Contact later a proposal status (Mark), or handled in HubSpot once Sales has it (Justin)?","How long is a proposal valid? 30 days shown."], screen:scrProposalObj},
 
   {id:"zd-review", sys:"zd", only:"B", actor:"Homer", role:"Central Ops, Specialty", av:"H",
    title:function(){ return "Homer gets the review ticket"; },
-   summary:function(){ return "The review ticket lands in the Specialty view Ops already works, with the proposal summary and Mario's note. Homer opens the proposal in Admin."; },
+   summary:function(){ return "The review ticket lands in the Specialty view Ops already works, with the proposal summary, Mario's reason and note. Homer opens the proposal in Admin."; },
    changes:function(){ return [["tk2","Open · Homer"]]; },
    v1:["Automatic review ticket, so proposals needing review land in an existing queue"],
    later:[],
-   qs:["Review SLA: 1 business day?","Which proposals go to Sales in HubSpot instead of Central Ops?"], screen:scrZdReview},
+   qs:["Review SLA: 1 business day?"], screen:scrZdReview},
 
   {id:"op-review", sys:"op", only:"B", actor:"Homer", role:"Central Ops, Specialty", av:"H",
    title:function(){ return "Homer adjusts the proposal and sends it"; },
-   summary:function(){ return "Homer edits the proposal record directly: he adds stain-blocking primer and a hidden-damage exclusion. Then he uses Send to member, so Sarah gets the same email and page whoever sends it. Bigger projects can go to Sales instead."; },
+   summary:function(){ return "Homer edits the proposal record directly: he adds stain-blocking primer and the hidden-damage exclusion. Then he uses Send to member, so Sarah gets the same email and page whoever sends it. Larger projects go to Sales in HubSpot instead."; },
    changes:function(){ return [["prp","Sent"],["bk1","Completed"],["tk2","Solved"]]; },
    v1:["Review and edit proposals in Admin","Send to member from Admin"],
-   later:["Hand-off to Sales for projects over about a day"],
-   qs:["Does Sales work proposals in Admin too, or only in HubSpot?"], screen:scrReview},
+   later:["Sales works larger projects in HubSpot; the proposal record stays the source of the scope"],
+   qs:["Does Sales send proposals from Admin too, or only from HubSpot?"], screen:scrReview},
 
-  {id:"em-ready", sys:"em", actor:"Sarah Mitchell", role:"Member", av:"SM",
+  {id:"em-ready", sys:"em", actor:"Sarah Mitchell", role:"Member", av:"SM", differs:true,
    title:function(){ return "Sarah gets an email that her proposal is ready"; },
    summary:function(){ return "Most members start from email, the same way they reach ready-to-schedule bookings today. The email shows the total and one button to the proposal page."; },
    changes:function(){ return []; },
    v1:["PreFix-branded email template for proposals"],
    later:[],
-   qs:["Also send it by text, and remind at 24 and 72 hours like recommendations?"], screen:scrEmail},
+   qs:["Also send it by text, and remind at 24 and 72 hours like recommendations?","How does the email link sign Sarah in: the HomeHub magic link, or a link that works without signing in?"], screen:scrEmail},
 
-  {id:"pr-review", sys:"pr", actor:"Sarah Mitchell", role:"Member", av:"SM",
-   title:function(){ return "Sarah reviews the proposal and approves it"; },
-   summary:function(){ return "The proposal is a standalone HomeHub page, like the Home Health Snapshot, built from HomeHub cards. It follows the proposal framework: recommendation, findings, scope, materials, what's included, timeline and warranty, with the price and the decision in the right column. Try Decline and Contact me later too; Approve continues the flow."; },
+  {id:"hh-proposal", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM", differs:true,
+   title:function(){ return "The proposal also waits on her HomeHub dashboard"; },
+   summary:function(){ return "A Proposals module sits beside Recommendations and is built the same way: a tile with one action. Members who skip the email find it here."; },
    changes:function(){ return []; },
-   v1:["Standalone proposal page","Approve, Decline with the recommendation decline reasons, and Contact me later"],
+   v1:["Proposals module on the HomeHub dashboard, built like Recommendations"],
+   later:[],
+   qs:[], screen:scrDashOpen},
+
+  {id:"pr-review", sys:"pr", actor:"Sarah Mitchell", role:"Member", av:"SM", differs:true,
+   title:function(){ return S.declined ? "Sarah declines the proposal" : S.later ? "Sarah asks us to check back later" : "Sarah reviews the proposal and approves it"; },
+   summary:function(){ return S.declined ? "Declining records the reason, using the same list as recommendations, and she can reopen it anytime. This branch ends here: reopen it to continue the main flow."
+     : S.later ? "Check back later is Mark's proposed third status. Ops or Sales follows up in about two weeks. This branch ends here: undo it to continue the main flow."
+     : "The proposal is a HomeHub page, like the Home Health Snapshot. The price and the decision sit in the right column and stay in view; on a phone they come first. Every section comes from what Mario entered on the iPad. Try Decline and Check back with me later too; Approve continues the flow."; },
+   changes:function(){ return S.declined ? [["prp","Declined"]] : S.later ? [["prp","Contact later (proposed)"]] : []; },
+   v1:["Proposal page","Approve, Decline with the recommendation decline reasons, and Check back with me later"],
    later:["PDF download","Good, better, best options for bigger projects","Deposits and online payment"],
    qs:["Web page only, or a PDF as well?","The project terms need legal review for Texas home-improvement work before launch."], screen:scrProposal},
 
-  {id:"pr-approved", sys:"pr", actor:"Sarah, then the system", role:"Member", av:"SM",
+  {id:"pr-approved", sys:"pr", actor:"Sarah, then the system", role:"Member", av:"SM", differs:true,
    title:function(){ return "PreFix confirms the approval"; },
    summary:function(){ return "Approving records the scope, price and terms version, marks the proposal Accepted and builds a Pending project booking from it, the way an accepted specialty recommendation creates a Pending booking today. Sarah sees what happens next."; },
    changes:function(){ return [["prp","Accepted"],["bk2","Pending · from proposal"],["tk3","New · Specialty view"]]; },
@@ -1358,15 +1548,15 @@ var STEPS = [
    later:[],
    qs:[], screen:scrApproved},
 
-  {id:"zd-accepted", sys:"zd", actor:"Central Ops associate", role:"Specialty view", av:"CO",
+  {id:"zd-accepted", sys:"zd", actor:"Central Ops associate", role:"Specialty view", av:"CO", differs:true,
    title:function(){ return "Central Ops gets the accepted proposal"; },
-   summary:function(){ return "An automatic ticket in the Specialty view tells Ops the proposal was approved and links the Pending booking. Ops checks it and schedules it."; },
+   summary:function(){ return "An automatic ticket in the Specialty view tells Ops the proposal was approved and links the Pending booking. Ops checks it, calls Sarah to agree a date and schedules it."; },
    changes:function(){ return [["tk3","Open"]]; },
    v1:["Automatic ticket when a member approves a proposal"],
    later:[],
    qs:[], screen:scrZdAccepted},
 
-  {id:"op-schedule", sys:"op", actor:"Central Ops associate", role:"Django Admin", av:"CO",
+  {id:"op-schedule", sys:"op", actor:"Central Ops associate", role:"Django Admin", av:"CO", differs:true,
    title:function(){ return "Ops checks the booking and schedules Mario"; },
    summary:function(){ return "The booking already carries the tasks, hours and price from the proposal. In V1 Ops picks the date on the Ops Calendar by hand."; },
    changes:function(){ return [["bk2","Booked · Nov 3, 8 AM"],["tk3","Solved"]]; },
@@ -1374,21 +1564,21 @@ var STEPS = [
    later:["Set the booking to Ready and let Sarah pick the date in HomeHub"],
    qs:["Multi-day projects: one booking, or one per day?"], screen:scrSchedule},
 
-  {id:"hh-booked", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM",
+  {id:"hh-booked", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM", differs:true,
    title:function(){ return "Sarah sees her project booked"; },
-   summary:function(){ return "The project shows in Upcoming visits as a specialty visit, and the approved proposal stays on her dashboard, so the scope is visible from request to completion."; },
+   summary:function(){ return "The project shows in Upcoming visits as a specialty visit, and the approved proposal stays in the Proposals module, so the scope is visible from request to completion."; },
    changes:function(){ return []; },
-   v1:["Proposals on the dashboard, linked to the visit"],
-   later:[],
-   qs:["After the work, should the service summary link back to the proposal, the way contractor invoices link today?"], screen:scrBooked},
+   v1:["Approved proposals stay on the dashboard, linked to the visit"],
+   later:["After the work, the visit summary links back to the proposal, the way contractor invoices link today"],
+   qs:[], screen:scrBooked},
 
   {id:"mb-kpi", sys:"mb", actor:"Field Operations leadership", role:"Reporting", av:"FO",
    title:function(){ return "Leadership tracks consultations and proposals"; },
-   summary:function(){ return "Consultations have their own service type and proposals have statuses, so we can answer the questions from the meeting: consultations per specialist, how often price is given on site, why proposals go to review, and how many get accepted. The numbers are illustrative."; },
+   summary:function(){ return "Consultations have their own service type and proposals have statuses and review reasons, so we can answer Justin's questions: request volume, consultations per specialist, how often price is given on site, why proposals go to review, and acceptance rates. The numbers are illustrative."; },
    changes:function(){ return []; },
-   v1:["Reporting comes from the consultation service type and proposal statuses. No new UI needed."],
+   v1:["Reporting comes from the consultation service type, proposal statuses and review reasons. No new UI needed."],
    later:[],
-   qs:["Which KPIs define success: acceptance rate, time to proposal, share priced on site?"], screen:scrKpi}
+   qs:[], screen:scrKpi}
 ];
 
 /* ================= rendering ================= */
@@ -1403,56 +1593,73 @@ function renderTop(){
   $("#mapToggle").textContent = S.map ? "Hide map" : "Show map";
   $("#mapToggle").setAttribute("aria-expanded", String(S.map));
   $("#map").hidden = !S.map;
+  $("#mapHint").hidden = !S.map;
 }
 
 function renderMap(){
-  if(!S.map) return;
-  var st = steps(), L = 210, CW = 46, LH = 30, TOP = 26, GAP = 10;
+  if(!S.map){ $("#map").innerHTML = ""; return; }
+  var path = steps(), pos = {}; path.forEach(function(s, i){ pos[s.id] = i; });
+  var L = 196, CW = 44, LH = 30, TOP = 26, GAP = 10;
   var ys = {}, y = TOP;
   LANES.forEach(function(ln, i){ if(i>0 && ln.group) y += GAP; ys[ln.sys] = y + LH/2; y += LH; });
-  var W = L + st.length*CW + 8, H = y + 4;
-  var x = function(i){ return L + i*CW + CW/2; };
-  var now = cur().sys;
-  var s = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="group" aria-label="Flow map: ' + st.length + ' steps across 7 systems" style="font-family:var(--f-dm)">';
+  var H = y + 4, W = STEPS.length*CW + 12;
+  var x = function(j){ return j*CW + CW/2 + 6; };
+  var allIdx = {}; STEPS.forEach(function(s, j){ allIdx[s.id] = j; });
+  var now = cur();
+  var lab = '<svg width="' + L + '" height="' + H + '" viewBox="0 0 ' + L + ' ' + H + '" aria-hidden="true" style="font-family:var(--f-dm)">';
+  var s = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="group" aria-label="Flow map" style="font-family:var(--f-dm)">';
   LANES.forEach(function(ln){
-    var cy = ys[ln.sys], on = now===ln.sys;
-    s += '<rect x="' + (L-4) + '" y="' + (cy-LH/2+2) + '" width="' + (W-L) + '" height="' + (LH-4) + '" rx="12" style="fill:' + (on ? 'var(--blue-tint)' : 'var(--page)') + '"/>';
-    if(ln.group) s += '<text x="0" y="' + (cy+4) + '" style="fill:var(--text-2);font-size:12px;font-weight:600">' + ln.group + '</text>';
-    s += '<use href="#ri-' + SYS[ln.sys].icon + '" x="92" y="' + (cy-9) + '" width="18" height="18" style="fill:' + (on?'var(--blue-text)':'var(--slate)') + '"/>';
-    s += '<text x="116" y="' + (cy+5) + '" style="fill:var(--ink);font-size:14px;font-weight:' + (on?700:400) + '">' + SYS[ln.sys].name + '</text>';
+    var cy = ys[ln.sys], on = now.sys===ln.sys;
+    s += '<rect x="0" y="' + (cy-LH/2+2) + '" width="' + W + '" height="' + (LH-4) + '" rx="12" style="fill:' + (on ? 'var(--blue-tint)' : 'var(--page)') + '"/>';
+    if(ln.group) lab += '<text x="0" y="' + (cy+4) + '" style="fill:var(--text-2);font-size:12px;font-weight:600">' + ln.group + '</text>';
+    lab += '<use href="#ri-' + SYS[ln.sys].icon + '" x="88" y="' + (cy-9) + '" width="18" height="18" style="fill:' + (on?'var(--blue-text)':'var(--slate)') + '"/>';
+    lab += '<text x="112" y="' + (cy+5) + '" style="fill:var(--ink);font-size:14px;font-weight:' + (on?700:400) + '">' + SYS[ln.sys].name + '</text>';
   });
-  st.forEach(function(stp, i){
-    s += '<text x="' + x(i) + '" y="16" text-anchor="middle" style="fill:' + (i===S.idx?'var(--ink)':'var(--text-2)') + ';font-size:12px;font-weight:' + (i===S.idx?700:400) + '">' + (i+1) + '</text>';
+  lab += '</svg>';
+  STEPS.forEach(function(stp, j){
+    var inP = stp.id in pos, isNow = stp.id===now.id;
+    s += '<text x="' + x(j) + '" y="16" text-anchor="middle" style="fill:' + (isNow?'var(--ink)':'var(--text-2)') + ';font-size:12px;font-weight:' + (isNow?700:400) + '">' + (inP ? pos[stp.id]+1 : '·') + '</text>';
   });
-  for(var i=0;i<st.length-1;i++){
-    var x1=x(i), y1=ys[st[i].sys], x2=x(i+1), y2=ys[st[i+1].sys], mx=(x1+x2)/2, past = i < S.idx;
+  /* off-path review branch, drawn faint */
+  if(S.path==="A"){
+    var br = ["op-proposal","zd-review","op-review","em-ready"];
+    for(var b=0;b<br.length-1;b++){
+      var bx1=x(allIdx[br[b]]), by1=ys[STEPS[allIdx[br[b]]].sys], bx2=x(allIdx[br[b+1]]), by2=ys[STEPS[allIdx[br[b+1]]].sys], bm=(bx1+bx2)/2;
+      s += '<path d="M' + bx1 + ' ' + by1 + ' C' + bm + ' ' + by1 + ',' + bm + ' ' + by2 + ',' + bx2 + ' ' + by2 + '" style="fill:none;stroke:var(--dot);stroke-width:1.5;stroke-dasharray:2 4"/>';
+    }
+  }
+  for(var i=0;i<path.length-1;i++){
+    var x1=x(allIdx[path[i].id]), y1=ys[path[i].sys], x2=x(allIdx[path[i+1].id]), y2=ys[path[i+1].sys], mx=(x1+x2)/2, past = i < S.idx;
     s += '<path d="M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ',' + mx + ' ' + y2 + ',' + x2 + ' ' + y2 + '" style="fill:none;stroke:' + (past?'var(--ink)':'var(--border)') + ';stroke-width:2' + (past?'':';stroke-dasharray:4 4') + '"/>';
   }
-  st.forEach(function(stp, i){
-    var cx = x(i), cy = ys[stp.sys], on = i===S.idx, past = i < S.idx;
-    s += '<g class="mnode" tabindex="0" role="button" data-go="' + i + '" aria-label="Step ' + (i+1) + ': ' + esc(stp.title(S.path)) + ' (' + SYS[stp.sys].name + ')"' + (on?' aria-current="step"':'') + '>' +
-      '<title>' + (i+1) + '. ' + esc(stp.title(S.path)) + '</title>' +
-      '<circle cx="' + cx + '" cy="' + cy + '" r="15" style="fill:transparent"/>' +
-      '<circle class="ring" cx="' + cx + '" cy="' + cy + '" r="' + (on?12:8) + '" style="fill:var(--surface);stroke:' + (on?'var(--blue)':'transparent') + ';stroke-width:2"/>' +
-      '<circle cx="' + cx + '" cy="' + cy + '" r="' + (on?7:6) + '" style="fill:' + (on?'var(--blue)':past?'var(--ink)':'var(--dot)') + '"/>' +
-    '</g>';
+  STEPS.forEach(function(stp, j){
+    var cx = x(j), cy = ys[stp.sys], inP = stp.id in pos, isNow = stp.id===now.id, past = inP && pos[stp.id] < S.idx;
+    var label = (inP ? 'Step ' + (pos[stp.id]+1) + ': ' : 'Review path only: ') + stp.title(S.path) + ' (' + SYS[stp.sys].name + ')';
+    var dot = stp.id==="hm-finish"
+      ? '<rect x="' + (cx-6) + '" y="' + (cy-6) + '" width="12" height="12" transform="rotate(45 ' + cx + ' ' + cy + ')" style="fill:' + (isNow?'var(--blue)':past?'var(--ink)':'var(--dot)') + '"/>'
+      : inP ? '<circle cx="' + cx + '" cy="' + cy + '" r="' + (isNow?7:6) + '" style="fill:' + (isNow?'var(--blue)':past?'var(--ink)':'var(--dot)') + '"/>'
+      : '<circle cx="' + cx + '" cy="' + cy + '" r="5" style="fill:var(--surface);stroke:var(--slate);stroke-width:1.5;stroke-dasharray:2 2"/>';
+    s += '<g class="mnode" tabindex="' + (isNow?0:-1) + '" role="button" data-goid="' + stp.id + '" aria-label="' + esc(label) + '"' + (isNow?' aria-current="step"':'') + '>' +
+      '<title>' + esc(label) + '</title><circle cx="' + cx + '" cy="' + cy + '" r="15" style="fill:transparent"/>' +
+      '<circle class="ring" cx="' + cx + '" cy="' + cy + '" r="' + (isNow?12:8) + '" style="fill:var(--surface);stroke:' + (isNow?'var(--blue)':'transparent') + ';stroke-width:2"/>' + dot + '</g>';
   });
   s += '</svg>';
-  $("#map").innerHTML = s;
-  var m = $("#map"), nx = x(S.idx);
-  if(nx < m.scrollLeft + L || nx > m.scrollLeft + m.clientWidth - 40) m.scrollLeft = Math.max(0, nx - m.clientWidth/2);
+  $("#map").innerHTML = '<div class="h-maplab">' + lab + '</div><div class="h-mapscroll" id="mapScroll">' + s + '</div>' +
+    '<p class="h-legend"><span><i class="lg-past"></i>Done</span><span><i class="lg-now"></i>You are here</span><span><i class="lg-split"></i>Path splits</span><span><i class="lg-off"></i>Review path only</span></p>';
+  var m = $("#mapScroll"), nx = x(allIdx[now.id]);
+  if(nx < m.scrollLeft + 20 || nx > m.scrollLeft + m.clientWidth - 40) m.scrollLeft = Math.max(0, nx - m.clientWidth/2);
 }
 
 function renderHead(stp){
   var st = steps(), prev = st[S.idx-1], sys = SYS[stp.sys];
-  var tag = stp.only ? '<span class="h-tag">Review path only</span>' : (stp.id==="op-proposal" ? '<span class="h-tag">Differs by path</span>' : '');
+  var tag = stp.only ? '<span class="h-tag">Review path only</span>' : (stp.differs ? '<span class="h-tag">Differs by path</span>' : '');
   var hand = !prev ? '<span class="h-handoff">Start of the flow</span>'
     : prev.sys===stp.sys ? '<span class="h-handoff">Still in <b>' + sys.name + '</b></span>'
     : '<span class="h-handoff">From ' + ic(SYS[prev.sys].icon) + '<b>' + SYS[prev.sys].name + '</b>' + ic("arrow-right-line") + ic(sys.icon) + '<b>' + sys.name + '</b></span>';
   $("#head").innerHTML =
     '<div class="h-sysline"><span class="h-sys"><span class="ico">' + ic(sys.icon) + '</span><b>' + sys.name + '</b><span class="w">' + sys.where + '</span></span>' + hand + '</div>' +
     '<p class="h-stepno" style="margin:0">Step ' + (S.idx+1) + ' of ' + st.length + ' &middot; ' + sys.who + ' ' + tag + '</p>' +
-    '<h1>' + esc(stp.title(S.path)) + '</h1>' +
+    '<h1 tabindex="-1">' + esc(stp.title(S.path)) + '</h1>' +
     '<p class="h-actor"><span class="pro" aria-hidden="true">' + stp.av + '</span><span><b>' + esc(stp.actor) + '</b> &middot; <span>' + esc(stp.role) + '</span></span></p>' +
     '<p class="h-summary">' + esc(stp.summary(S.path)) + '</p>';
 }
@@ -1467,137 +1674,184 @@ function records(){
   }
   return {state:state, prev:prev, changed:changed};
 }
-function renderRecords(){
+function renderSide(stp){
   var r = records();
   var rows = RECORD.filter(function(k){ return r.state[k]; }).map(function(k){
     var chg = r.changed[k];
     return '<div class="h-rec' + (chg?' chg':'') + '"><dt>' + RECLBL[k] + '</dt><dd>' + esc(r.state[k]) +
       (chg ? '<small>' + (r.prev[k] ? 'was ' + esc(r.prev[k]) : 'created at this step') + '</small>' : '') + '</dd></div>';
   }).join("");
-  $("#records").innerHTML = '<h2 class="h-cardt">Records at this step</h2>' + (rows ? '<dl class="h-recs">' + rows + '</dl>' : '<p class="h-none">No records yet.</p>') +
-    (rows && !Object.keys(r.changed).length ? '<p class="h-none">Nothing changes status at this step.</p>' : '');
-}
-function renderNotes(stp){
-  var block = function(title, items, icon, cls, empty){
-    return '<section class="h-card"><h2 class="h-cardt">' + title + '</h2>' + (items.length
-      ? '<ul class="h-list ' + cls + '">' + items.map(function(x){ return '<li>' + ic(icon) + '<span>' + esc(x) + '</span></li>'; }).join("") + '</ul>'
-      : '<p class="h-none" style="margin:0">' + empty + '</p>') + '</section>';
+  var nChg = Object.keys(r.changed).length;
+  var list = function(items, icon, cls, empty){
+    return items.length ? '<ul class="h-list ' + cls + '">' + items.map(function(x){ return '<li>' + ic(icon) + '<span>' + esc(x) + '</span></li>'; }).join("") + '</ul>' : '<p class="h-none">' + empty + '</p>';
   };
-  $("#notes").innerHTML = block("New in V1", stp.v1, "checkbox-circle-fill", "", "Nothing new here. This is today's flow.") +
-    block("Later, not V1", stp.later, "time-line", "l", "Nothing deferred at this step.") +
-    block("Open questions", stp.qs, "question-line", "q", "No open questions at this step.");
+  var tabs = [
+    ["rec", "Records", nChg],
+    ["v1", "New in V1", stp.v1.length],
+    ["later", "Later", stp.later.length],
+    ["qs", "Questions", stp.qs.length]
+  ];
+  var body = S.tab==="rec" ? (rows ? '<dl class="h-recs">' + rows + '</dl>' : '<p class="h-none">No records yet.</p>') + (rows && !nChg ? '<p class="h-none">Nothing changes status at this step.</p>' : '')
+    : S.tab==="v1" ? list(stp.v1, "checkbox-circle-fill", "", "Nothing new here. This is today's flow.")
+    : S.tab==="later" ? list(stp.later, "time-line", "l", "Nothing deferred at this step.")
+    : list(stp.qs, "question-line", "q", "No open questions at this step.");
+  $("#records").innerHTML = '<div class="h-tabs" role="tablist" aria-label="Step notes">' + tabs.map(function(t){
+      return '<button type="button" role="tab" data-act="tab" data-tab="' + t[0] + '" aria-selected="' + (S.tab===t[0]) + '">' + t[1] + (t[2] ? ' <span class="n">' + t[2] + '</span>' : '') + '</button>'; }).join("") + '</div>' +
+    '<div class="h-tabbody" role="tabpanel">' + body + '</div>';
 }
 
 function renderBottom(){
-  var st = steps(), p = st[S.idx-1], n = st[S.idx+1];
+  var st = steps(), stp = st[S.idx], p = st[S.idx-1], n = st[S.idx+1];
   var nb = function(s, dir){
+    if(dir==="next" && branchEnded()) return '<button type="button" class="h-nav next" data-act="undo"><span class="t"><small>This branch ends here</small><span>Undo to continue</span></span>' + ic("restart-line") + '</button>';
     if(!s) return dir==="prev"
       ? '<button type="button" class="h-nav" disabled>' + ic("arrow-left-line") + '<span class="t"><small>Start</small><span>First step</span></span></button>'
       : '<button type="button" class="h-nav next" data-act="restart"><span class="t"><small>End of the flow</small><span>Start again</span></span>' + ic("restart-line") + '</button>';
     var lab = '<span class="t"><small>' + (dir==="prev"?"Back":"Next") + ' &middot; ' + SYS[s.sys].name + '</small><span>' + esc(s.title(S.path)) + '</span></span>';
     return dir==="prev"
-      ? '<button type="button" class="h-nav" data-act="prev" aria-label="Previous step: ' + esc(s.title(S.path)) + '">' + ic("arrow-left-line") + lab + '</button>'
-      : '<button type="button" class="h-nav next" data-act="next" aria-label="Next step: ' + esc(s.title(S.path)) + '">' + lab + ic("arrow-right-line") + '</button>';
+      ? '<button type="button" class="h-nav" data-act="prev" aria-label="Back: ' + esc(s.title(S.path)) + '">' + ic("arrow-left-line") + lab + '</button>'
+      : '<button type="button" class="h-nav next" data-act="next" aria-label="Next: ' + esc(s.title(S.path)) + '">' + lab + ic("arrow-right-line") + '</button>';
   };
   $("#bottom").innerHTML = nb(p,"prev") +
-    '<div class="h-prog"><div class="h-dots">' + st.map(function(s, i){ return '<button type="button" class="' + (i===S.idx?"on":(i<S.idx?"past":"")) + '" data-go="' + i + '" aria-label="Go to step ' + (i+1) + '"></button>'; }).join("") + '</div>' +
-    '<span class="h-count">' + (S.idx+1) + ' / ' + st.length + '</span></div>' + nb(n,"next");
+    '<div class="h-prog"><span class="h-now">' + ic(SYS[stp.sys].icon) + '<b>' + SYS[stp.sys].name + '</b></span>' +
+    '<div class="h-dots" aria-hidden="true">' + st.map(function(s, i){ return '<i class="' + (i===S.idx?"on":(i<S.idx?"past":"")) + '"></i>'; }).join("") + '</div>' +
+    '<span class="h-count">Step ' + (S.idx+1) + ' of ' + st.length + ' &middot; ← → keys work</span></div>' + nb(n,"next");
 }
 
 function grow(el){ el.style.height = "auto"; el.style.height = (el.scrollHeight + 2) + "px"; }
 function growAll(){ Array.prototype.forEach.call(document.querySelectorAll("textarea.grow"), grow); }
 
-function render(scrollTop){
+var pendingFocus = null;
+function render(scroll){
   var st = steps();
   S.idx = Math.max(0, Math.min(st.length-1, S.idx));
   var stp = st[S.idx];
-  renderTop(); renderMap(); renderHead(stp); renderRecords();
+  renderTop(); renderMap(); renderHead(stp); renderSide(stp);
   $("#screen").innerHTML = stp.screen();
-  renderNotes(stp); renderBottom(); growAll();
-  try{ history.replaceState(null, "", "#" + stp.id); }catch(e){}
-  if(scrollTop){
-    var h = $("#head"), r = h.getBoundingClientRect();
-    if(r.top < 0 || r.top > window.innerHeight*0.6) h.scrollIntoView({block:"start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+  $("#screen").setAttribute("aria-label", SYS[stp.sys].name + " screen");
+  renderBottom(); growAll();
+  try{ history.replaceState(null, "", "#" + stp.id + "." + (S.path==="A" ? "direct" : "review")); }catch(e){}
+  if(scroll){
+    var target = stp.scrollScreen ? $("#screen") : $("#head");
+    var top = $(".h-top"), off = (getComputedStyle(top).position==="sticky" ? top.offsetHeight : 0) + 12;
+    var y = target.getBoundingClientRect().top + window.scrollY - off;
+    if(Math.abs(y - window.scrollY) > 40) window.scrollTo({top:Math.max(0,y), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
   }
+  if(pendingFocus){ var f = document.querySelector(pendingFocus); if(f) f.focus({preventScroll:true}); pendingFocus = null; }
 }
 function keepScroll(fn){ var y = window.scrollY; fn(); window.scrollTo(0, y); }
+function announce(){ var stp = cur(); $("#live").textContent = "Step " + (S.idx+1) + " of " + steps().length + ", " + SYS[stp.sys].name + ": " + stp.title(S.path); }
 
-function go(i){ S.idx = i; S.declining = false; render(true); }
+function go(i, focusSel){
+  if(i > S.idx && branchEnded()) return;
+  S.idx = i; S.declining = false; S.pick = null; S.sendTried = false;
+  pendingFocus = focusSel || "#head h1";
+  render(true); announce();
+}
+function goId(id){
+  if(!STEPS.some(function(s){ return s.id===id; })) return;
+  if(idxOf(id) < 0){ S.path = "B"; persist(); }
+  go(idxOf(id), "#map [aria-current=step]");
+}
 function setPath(p){
   if(p===S.path) return;
   var id = cur().id;
   S.path = p; persist();
-  var st = steps(), j = st.findIndex(function(s){ return s.id===id; });
-  if(j < 0){ j = st.findIndex(function(s){ return s.id==="em-ready"; }) - 1; }
+  var j = idxOf(id);
+  if(j < 0) j = idxOf("em-ready") - 1;
   S.idx = Math.max(0, j);
+  pendingFocus = '#pathSeg [data-path="' + p + '"]';
   keepScroll(function(){ render(false); });
 }
 
 function updateTotals(){
   var t = calc(false);
   var set = function(id, v){ var e = document.getElementById(id); if(e) e.textContent = v; };
-  set("s-hours", t.hours + " hours"); set("s-labor", money2(t.labor)); set("s-mat", money2(t.mat)); set("s-total", money2(t.total));
+  set("s-hours", hrs(t.hours)); set("s-labor", money2(t.labor)); set("s-mat", money2(t.mat)); set("s-total", money2(t.total));
+  var sn = document.querySelector('[data-act="send-now"]'); if(sn) sn.setAttribute("aria-disabled", problems().length ? "true" : "false");
 }
 function line(id){ return S.lines.filter(function(l){ return l.id===id; })[0]; }
+var toastT;
+function toast(msg){ var t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function(){ t.hidden = true; }, 2600); }
 
 /* ================= events ================= */
 document.addEventListener("click", function(e){
-  var g = e.target.closest("[data-go]");
-  if(g){ go(+g.getAttribute("data-go")); return; }
-  var b = e.target.closest("[data-act]"); if(!b || b.disabled) return;
+  var g = e.target.closest("[data-goid]");
+  if(g){ goId(g.getAttribute("data-goid")); return; }
+  var b = e.target.closest("[data-act]");
+  if(!b){ var stub = e.target.closest("[data-stub]"); if(stub) toast("Existing control. Unchanged in this prototype."); return; }
+  if(b.disabled) return;
   var a = b.getAttribute("data-act");
-  if(a==="next"){ if(S.idx < steps().length-1) go(S.idx+1); }
-  else if(a==="prev"){ if(S.idx > 0) go(S.idx-1); }
-  else if(a==="restart"){ var keep = {path:S.path, mark:S.mark, map:S.map}; S = fresh(); S.path = keep.path; S.mark = keep.mark; S.map = keep.map; render(true); }
+  var fromBottom = !!b.closest("#bottom");
+  if(a==="dlg-cancel"){ if(e.target.closest("[data-dlg]") && b.classList.contains("ovl")) return; go(S.idx-1, '[data-act="send-now"]'); return; }
+  if(a==="next"){ if(S.idx < steps().length-1) go(S.idx+1, fromBottom ? '#bottom [data-act="next"]' : null); }
+  else if(a==="prev"){ if(S.idx > 0) go(S.idx-1, '#bottom [data-act="prev"]'); }
+  else if(a==="restart"){ var keep = {path:S.path, mark:S.mark, map:S.map}; S = fresh(); S.path = keep.path; S.mark = keep.mark; S.map = keep.map; pendingFocus = "#head h1"; render(true); announce(); }
   else if(a==="path"){ setPath(b.getAttribute("data-path")); }
-  else if(a==="pick"){ if(b.getAttribute("data-path")!==S.path){ S.path = b.getAttribute("data-path"); persist(); keepScroll(function(){ render(false); }); } }
-  else if(a==="choose"){ var st = steps(); S.idx = st.findIndex(function(s){ return s.id==="hm-finish"; }) + 1; render(true); }
-  else if(a==="decline"){ S.declining = true; S.reason = null; keepScroll(function(){ render(false); }); }
-  else if(a==="decline-cancel"){ S.declining = false; keepScroll(function(){ render(false); }); }
-  else if(a==="reason"){ S.reason = b.getAttribute("data-r"); keepScroll(function(){ render(false); }); }
-  else if(a==="decline-submit"){ S.declining = false; S.declined = true; keepScroll(function(){ render(false); }); }
-  else if(a==="later"){ S.later = true; keepScroll(function(){ render(false); }); }
-  else if(a==="undo"){ S.declined = false; S.later = false; S.reason = null; keepScroll(function(){ render(false); }); }
+  else if(a==="tab"){ S.tab = b.getAttribute("data-tab"); pendingFocus = '#records [data-tab="' + S.tab + '"]'; keepScroll(function(){ renderSide(cur()); if(pendingFocus){ var f=$(pendingFocus); if(f) f.focus({preventScroll:true}); pendingFocus=null; } }); }
+  else if(a==="send-now"){
+    if(problems().length){ S.sendTried = true; keepScroll(function(){ render(false); }); var bad = document.querySelector(".pline--bad"); if(bad) bad.scrollIntoView({block:"center"}); return; }
+    go(S.idx+1, "#sd-t");
+  }
+  else if(a==="pick"){ S.pick = b.getAttribute("data-path"); pendingFocus = 'input[name="sendto"][value="' + S.pick + '"]'; keepScroll(function(){ render(false); }); }
+  else if(a==="send"){ S.path = S.pick || S.path; persist(); var j = idxOf("hm-finish") + 1; S.pick = null; go(j); }
+  else if(a==="decline"){ S.declining = true; S.reason = null; pendingFocus = '[data-act="reason"]'; keepScroll(function(){ render(false); }); }
+  else if(a==="decline-cancel"){ S.declining = false; pendingFocus = '[data-act="decline"]'; keepScroll(function(){ render(false); }); }
+  else if(a==="reason"){ S.reason = b.getAttribute("data-r"); pendingFocus = '[data-act="reason"][data-r="' + S.reason.replace(/"/g,'\\"') + '"]'; keepScroll(function(){ render(false); }); }
+  else if(a==="decline-submit"){ S.declining = false; S.declined = true; pendingFocus = '[data-act="undo"]'; keepScroll(function(){ render(false); }); announce(); }
+  else if(a==="later"){ S.later = true; pendingFocus = '[data-act="undo"]'; keepScroll(function(){ render(false); }); announce(); }
+  else if(a==="undo"){ S.declined = false; S.later = false; S.reason = null; pendingFocus = '[data-act="next"]'; keepScroll(function(){ render(false); }); announce(); }
 });
 document.addEventListener("keydown", function(e){
   var n = e.target.closest && e.target.closest(".mnode,[role=button][data-act]");
   if(n && (e.key==="Enter" || e.key===" ")){
     e.preventDefault();
-    if(n.classList.contains("mnode")) go(+n.getAttribute("data-go"));
+    if(n.classList.contains("mnode")) goId(n.getAttribute("data-goid"));
     else n.dispatchEvent(new MouseEvent("click", {bubbles:true}));
     return;
   }
+  if(e.key==="Escape" && cur().id==="hm-finish"){ go(S.idx-1, '[data-act="send-now"]'); return; }
   if(e.altKey || e.ctrlKey || e.metaKey) return;
   var tag = (e.target.tagName||"").toLowerCase();
   if(tag==="input" || tag==="textarea" || tag==="select") return;
-  if(e.key==="ArrowRight"){ if(S.idx < steps().length-1){ e.preventDefault(); go(S.idx+1); } }
-  if(e.key==="ArrowLeft"){ if(S.idx > 0){ e.preventDefault(); go(S.idx-1); } }
+  var inMap = !!(e.target.closest && e.target.closest("#map"));
+  if(e.key==="ArrowRight"){ if(S.idx < steps().length-1 && !branchEnded()){ e.preventDefault(); go(S.idx+1, inMap ? "#map [aria-current=step]" : '#bottom [data-act="next"]'); } }
+  if(e.key==="ArrowLeft"){ if(S.idx > 0){ e.preventDefault(); go(S.idx-1, inMap ? "#map [aria-current=step]" : '#bottom [data-act="prev"]'); } }
 });
 document.addEventListener("input", function(e){
   var el = e.target;
   if(el.classList && el.classList.contains("grow")) grow(el);
   var bind = el.getAttribute && el.getAttribute("data-bind"); if(!bind) return;
-  if(bind==="note"){ S.note = el.value; return; }
+  if(bind==="rvnote"){ S.note = el.value; return; }
+  if(bind==="title" || bind==="summary" || bind==="materials"){ S[bind] = el.value; return; }
   var l = line(el.getAttribute("data-line")); if(!l) return;
-  if(bind==="scope") l.scope = el.value;
-  if(bind==="meas") l.meas = el.value;
-  if(bind==="hours"){ var h = parseInt(el.value.replace(/[^0-9]/g,""), 10); l.hours = isNaN(h) ? 0 : Math.min(h, 99); updateTotals(); }
-  if(bind==="mat"){ var v = parseFloat(el.value.replace(/[^0-9.]/g,"")); l.mat = isNaN(v) ? 0 : Math.min(v, 99999); updateTotals(); }
+  if(bind==="scope" || bind==="meas" || bind==="area" || bind==="note") l[bind] = el.value;
+  if(bind==="hours"){ var h = parseFloat(el.value.replace(/[^0-9.]/g,"")); l.hours = isNaN(h) ? 0 : Math.min(Math.round(h*10)/10, 99); updateTotals(); }
+  if(bind==="mat"){ var v = parseFloat(el.value.replace(/[^0-9.]/g,"")); l.mat = isNaN(v) ? 0 : Math.min(r2(v), 99999); updateTotals(); }
+  if(S.sendTried && !problems().length){ S.sendTried = false; var st = document.querySelector(".hp .status"); if(st) st.remove(); Array.prototype.forEach.call(document.querySelectorAll(".pline--bad"), function(x){ x.classList.remove("pline--bad"); }); }
+});
+document.addEventListener("change", function(e){
+  var el = e.target, bind = el.getAttribute && el.getAttribute("data-bind"); if(!bind) return;
+  if(bind==="excl"){ S.excl[el.getAttribute("data-ex")] = el.checked; return; }
+  if(bind==="rvReason"){ S.rvReason = el.value; return; }
+  if(bind==="cond"){ var l = line(el.getAttribute("data-line")); if(l) l.cond = el.value; }
 });
 window.addEventListener("resize", growAll);
+window.addEventListener("hashchange", function(){ fromHash(); render(true); });
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(growAll);
 $("#markToggle").addEventListener("change", function(){ S.mark = this.checked; persist(); renderTop(); });
 $("#mapToggle").addEventListener("click", function(){ S.map = !S.map; persist(); renderTop(); renderMap(); });
-$("#resetBtn").addEventListener("click", function(){ var keep = {mark:S.mark, map:S.map}; S = fresh(); S.mark = keep.mark; S.map = keep.map; persist(); render(true); });
+$("#resetBtn").addEventListener("click", function(){ var keep = {path:S.path, mark:S.mark, map:S.map}; S = fresh(); S.path = keep.path; S.mark = keep.mark; S.map = keep.map; persist(); pendingFocus = "#head h1"; render(true); announce(); });
 
-(function(){
-  var h = (location.hash||"").replace("#","");
-  if(h){
-    var j = steps().findIndex(function(s){ return s.id===h; });
-    if(j < 0 && STEPS.some(function(s){ return s.id===h; })){ S.path = "B"; j = steps().findIndex(function(s){ return s.id===h; }); }
-    if(j >= 0) S.idx = j;
-  }
-})();
+function fromHash(){
+  var h = (location.hash||"").replace("#",""); if(!h) return;
+  var parts = h.split("."), id = parts[0], p = parts[1];
+  if(p==="direct") S.path = "A"; else if(p==="review") S.path = "B";
+  if(!STEPS.some(function(s){ return s.id===id; })) return;
+  if(idxOf(id) < 0) S.path = "B";
+  S.idx = idxOf(id);
+}
+fromHash();
 render(false);
 })();
 </script>
