@@ -753,6 +753,20 @@ body.nomark .tile--pm .hot,body.nomark .h-rec.chg{outline:none}
   .hp .pcard{padding:14px 12px 18px}
 }
 
+/* calendar flow (stand-in for the HomeHub calendar; built from HomeHub chips and date tiles) */
+.mp .cal-month{margin:16px 0 8px;font-size:14px;line-height:20px;font-weight:600;color:var(--text-2)}
+.mp .cdays{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.mp .cday{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;padding:10px 4px;border:1px solid var(--border);border-radius:var(--r-inner);background:var(--surface);color:var(--ink);cursor:pointer;font:inherit;letter-spacing:var(--track)}
+.mp .cday:hover{border-color:var(--blue);background:var(--blue-tint)}
+.mp .cday[aria-pressed="true"]{border:2px solid var(--blue);padding:9px 3px;background:var(--blue-tint)}
+.mp .cday:disabled{cursor:not-allowed;background:var(--page);border-color:var(--page);color:var(--text-2)}
+.mp .cday:focus-visible{outline:2px solid var(--blue-text);outline-offset:2px}
+.mp .cday__w{font-size:12px;line-height:16px;color:var(--text-2)}
+.mp .cday__d{font-size:24px;line-height:28px;font-weight:600;font-variant-numeric:tabular-nums}
+.mp .cday__n{font-size:12px;line-height:16px;font-weight:600;color:var(--blue-text);white-space:nowrap}
+.mp .cday:disabled .cday__d,.mp .cday:disabled .cday__n{color:var(--text-2);font-weight:400}
+.mp .btn--primary[aria-disabled="true"]{background:var(--page);color:var(--text-2);cursor:not-allowed}
+@container app (max-width:767px){.mp .cdays{gap:6px}.mp .cday{padding:8px 2px}.mp .cday[aria-pressed="true"]{padding:7px 1px}.mp .cday__d{font-size:20px;line-height:24px}}
 @media (prefers-reduced-motion:reduce){*{transition:none !important;scroll-behavior:auto !important}}
 </style>
 
@@ -773,7 +787,7 @@ body.nomark .tile--pm .hot,body.nomark .h-rec.chg{outline:none}
 <main class="h-in h-main">
   <section class="h-card" aria-label="Flow map">
     <div class="h-maphead">
-      <p><b>V1 scope:</b> a Consultation service type, a proposal the specialist or Central Ops sends, and a member approval page that works like Recommendations. The estimator tool is Phase 2. <span id="mapHint">Each row is a system; click a dot to jump to that step.</span></p>
+      <p><b>V1 scope:</b> a Consultation service type, a proposal the specialist or Central Ops sends, and a member approval page that works like Recommendations. Nothing is booked until the member picks a time from Ready to schedule. The estimator tool is Phase 2. <span id="mapHint">Each row is a system; click a dot to jump to that step.</span></p>
       <button type="button" class="h-link" id="mapToggle" aria-expanded="true">Hide map</button>
     </div>
     <div class="h-map" id="map"></div>
@@ -788,7 +802,7 @@ body.nomark .tile--pm .hot,body.nomark .h-rec.chg{outline:none}
 </main>
 
 <footer class="h-in h-src">
-  <p>Built from the Oct 16 meeting (Justin, James, Mark, Phong), Phong's notes and the ChatGPT proposal requirements. Screens use the HomeHub and HM Portal design files. Placeholders: the $85/hr rate, record IDs, status names, decline reasons, email copy and every dashboard number. Ops Portal, Zendesk, mail and Metabase are plain stand-ins for those tools.</p>
+  <p>Built from the Oct 16 meeting (Justin, James, Mark, Phong), Phong's notes and the ChatGPT proposal requirements. Screens use the HomeHub and HM Portal design files. Placeholders: the $85/hr rate, record IDs, status names, decline reasons, open times, email copy and every dashboard number. The calendar screens stand in for the HomeHub calendar flow, which wasn't in the design files. Ops Portal, Zendesk, mail and Metabase are plain stand-ins for those tools.</p>
 </footer>
 
 <p class="sr" id="live" aria-live="polite"></p>
@@ -856,7 +870,8 @@ function fresh(){
     summary:"Repaint the living room and hallway walls, and replace the two water-damaged baseboard sections by the bathroom door, so both rooms look fresh and finished.",
     materials:"Premium interior latex, eggshell, matched to your current color. Primed MDF baseboard matched to your existing profile.",
     excl:EXCL.reduce(function(o,e){ o[e.id]=e.on; return o; },{}),
-    note:NOTE, rvReason:RV_REASONS[0], declining:false, reason:null, declined:false, later:false, sendTried:false};
+    note:NOTE, rvReason:RV_REASONS[0], declining:false, reason:null, declined:false, later:false, sendTried:false,
+    cDay:null, cSlot:null, pDay:null, pSlot:null, calErr:false};
 }
 var S = fresh();
 try{ var saved = JSON.parse(localStorage.getItem("pfx-consult-proto3")||"{}");
@@ -889,11 +904,50 @@ function calc(rv){
 }
 function T(){ return calc(reviewed()); }
 function dur(t){ t = t||T(); return (t.days===1 ? "1 day" : t.days + " days") + " on site, about " + hrs(t.hours); }
-function projDate(){ var d=T().days; return d===1 ? "Tue, Nov 3" : d===2 ? "Tue–Wed, Nov 3–4" : "From Tue, Nov 3, " + d + " days"; }
+/* ---------- calendar: the open times a member can pick ---------- */
+var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var MONL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+var DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+/* consultation: open start hours over the two working weeks after Ops sets it up (Mon, Oct 19) */
+var CDAYS = [["10-19",[]],["10-20",[13]],["10-21",[]],["10-22",[9,11,14]],["10-23",[8,15]],["10-26",[9,13]],["10-27",[10]],["10-28",[9,14]],["10-29",[]],["10-30",[11]]];
+/* project: Mario's free working days; a start date is open only if the job's days in a row are all free */
+var PKEYS = ["11-2","11-3","11-4","11-5","11-6","11-9","11-10","11-11","11-12","11-13"];
+var PFREE = {"11-3":1,"11-4":1,"11-5":1,"11-9":1,"11-10":1,"11-13":1};
+function kd(k){ var p = k.split("-"); return new Date(2026, +p[0]-1, +p[1]); }
+function dfmt(dt){ return DOW[dt.getDay()] + ", " + MON[dt.getMonth()] + " " + dt.getDate(); }
+function dshort(dt){ return MON[dt.getMonth()] + " " + dt.getDate(); }
+function addBiz(dt, n){ var x = new Date(dt.getTime()); while(n > 0){ x.setDate(x.getDate()+1); if(x.getDay()!==0 && x.getDay()!==6) n--; } return x; }
+function h12(h, m){ return (h%12||12) + (m!=null ? ":" + (m<10?"0":"") + m : "") + " " + (h>=12?"PM":"AM"); }
+function win(h){ var a = h>=12?"PM":"AM", b = (h+1)>=12?"PM":"AM"; return (h%12||12) + (a===b ? "" : " " + a) + "–" + ((h+1)%12||12) + " " + b; }
+function pDays(){ var n = T().days; return PKEYS.map(function(k, i){ var ok = true; for(var j=0;j<n;j++){ if(!PFREE[PKEYS[i+j]]) ok = false; } return [k, ok ? [8,9] : []]; }); }
+function calDays(kind){ return kind==="c" ? CDAYS : pDays(); }
+function firstOpen(days){ for(var i=0;i<days.length;i++){ if(days[i][1].length) return days[i][0]; } return null; }
+function okSlot(days, s){ return !!s && days.some(function(x){ return x[0]===s.k && x[1].indexOf(s.h) >= 0; }); }
+function calView(kind){ var days = calDays(kind), v = S[kind+"Day"]; if(v && days.some(function(x){ return x[0]===v && x[1].length; })) return v; return kind==="c" ? "10-22" : (firstOpen(days) || days[0][0]); }
+function slotOf(kind){ var s = S[kind+"Slot"]; return okSlot(calDays(kind), s) ? s : null; }
+/* the consultation time Sarah picked, or the walk-through default */
+function CS(){
+  var s = slotOf("c") || {k:"10-22", h:9}, dt = kd(s.k), d = dt.getDate(), pad = function(n){ return (n<10?"0":"") + n; };
+  var ord = d + ((d%10===1 && d!==11) ? "st" : (d%10===2 && d!==12) ? "nd" : (d%10===3 && d!==13) ? "rd" : "th");
+  var clock = function(hr, m){ return pad(hr%12||12) + ":" + pad(m) + " " + (hr>=12?"PM":"AM"); };
+  return {k:s.k, h:s.h, dt:dt, m:MON[dt.getMonth()], d:d, dow:DOW[dt.getDay()], short:dshort(dt), long:dfmt(dt), win:win(s.h),
+    hmWhen:MONL[dt.getMonth()] + " " + ord + ", 2026 @ " + h12(s.h, 0), startT:clock(s.h, 4), endT:clock(s.h, 58), done:h12(s.h+1, 1)};
+}
+/* the project start Sarah picked, or the first open date */
+function PS(){ var s = slotOf("p"); if(s) return s; return {k:firstOpen(pDays()) || "11-3", h:8}; }
+function projDate(){
+  var p = PS(), n = T().days, s = kd(p.k), e = addBiz(s, n-1);
+  if(n===1) return dfmt(s);
+  if(n===2) return s.getMonth()===e.getMonth() ? DOW[s.getDay()] + "–" + DOW[e.getDay()] + ", " + MON[s.getMonth()] + " " + s.getDate() + "–" + e.getDate() : dfmt(s) + " – " + dfmt(e);
+  return "From " + dfmt(s) + ", " + n + " days";
+}
 function DT(){
-  return S.path==="A"
-    ? {sent:"Thu, Oct 22, 10:01 AM", sentS:"Oct 22", accepted:"Thu, Oct 22, 7:45 PM", acceptedS:"Oct 22", prepared:"Oct 22", valid:"Nov 21", time:"10:01 AM"}
-    : {sent:"Fri, Oct 23, 11:20 AM", sentS:"Oct 23", accepted:"Fri, Oct 23, 6:30 PM", acceptedS:"Oct 23", prepared:"Oct 23", valid:"Nov 22", time:"11:20 AM"};
+  var c = CS(), nb = addBiz(c.dt, 1), plus30 = function(x){ var y = new Date(x.getTime()); y.setDate(y.getDate()+30); return y; };
+  var o = S.path==="A"
+    ? {sent:c.long + ", " + c.done, sentS:c.short, accepted:c.long + ", 7:45 PM", acceptedS:c.short, prepared:c.short, valid:dshort(plus30(c.dt)), time:c.done}
+    : {sent:dfmt(nb) + ", 11:20 AM", sentS:dshort(nb), accepted:dfmt(nb) + ", 6:30 PM", acceptedS:dshort(nb), prepared:dshort(nb), valid:dshort(plus30(nb)), time:"11:20 AM"};
+  o.created = c.long + ", " + c.done; o.createdT = c.done; o.createdL = c.short + ", " + c.done.replace("AM","a.m.").replace("PM","p.m."); o.due = dfmt(nb);
+  return o;
 }
 function exclList(){ var rv = reviewed(); return EXCL.filter(function(e){ return S.excl[e.id] || (rv && e.id==="hidden"); }); }
 function problems(){ return S.lines.filter(function(l){ return !l.area.trim() || !l.scope.trim() || !(l.hours > 0); }); }
@@ -935,9 +989,9 @@ function mpRecs(){
 function mpProposals(state){
   var t = T(), d = DT();
   var tile = state==="open"
-    ? '<li class="tile tile--pm"><div class="tile__head"><span class="d-icon d-icon--white">' + ic("file-text-line") + '</span><div class="d-main"><span class="d-title">' + esc(S.title) + '</span><p class="d-meta"><span class="t-blue">' + money(t.total) + '</span> &middot; ' + (t.days===1?'1 day':t.days+' days') + ' &middot; Painting, carpentry</p><p class="d-meta">From your consultation, Oct 22</p></div></div>' +
+    ? '<li class="tile tile--pm"><div class="tile__head"><span class="d-icon d-icon--white">' + ic("file-text-line") + '</span><div class="d-main"><span class="d-title">' + esc(S.title) + '</span><p class="d-meta"><span class="t-blue">' + money(t.total) + '</span> &middot; ' + (t.days===1?'1 day':t.days+' days') + ' &middot; Painting, carpentry</p><p class="d-meta">From your consultation, ' + CS().short + '</p></div></div>' +
       '<div class="tile__actions"><button type="button" class="btn btn--secondary btn--sm' + HOT + '" data-act="next">Review</button><span class="tile__more" aria-hidden="true">Details' + ic("arrow-right-s-line") + '</span></div></li>'
-    : '<li class="tile"><div class="tile__head">' + ic("checkbox-circle-fill","d-done") + '<div class="d-main"><span class="d-title">' + esc(S.title) + '</span><p class="d-meta t-ink">Approved ' + d.acceptedS + ' &middot; ' + money(t.total) + '. Booked for ' + projDate() + '.</p></div></div><div class="tile__actions"><span class="link" data-stub>View proposal</span></div></li>';
+    : '<li class="tile"><div class="tile__head">' + ic("checkbox-circle-fill","d-done") + '<div class="d-main"><span class="d-title">' + esc(S.title) + '</span><p class="d-meta t-ink">Approved ' + d.acceptedS + ' &middot; ' + money(t.total) + (state==="ready" ? '. Ready to schedule.' : '. Booked for ' + projDate() + '.') + '</p></div></div><div class="tile__actions"><span class="link" data-stub>View proposal</span></div></li>';
   return '<section class="card"><div class="d-head"><h3 class="t-title">Proposals</h3>' + (state==="open" ? '<span class="count">1</span>' : '') + anno("New module") + '<span class="d-head__link" data-stub>See all' + ic("arrow-right-s-line") + '</span></div><ul class="tiles">' + tile + '</ul></section>';
 }
 
@@ -976,7 +1030,7 @@ function scrRequest(){
     '</section></div>' +
     '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">What happens next</h3></div><ul class="d-list">' +
       '<li class="d-row"><span class="hist">' + ic("customer-service-2-line") + '</span><div class="d-main"><p class="t-strong">We read your request</p><p class="d-meta">Usually within 1 business day</p></div></li>' +
-      '<li class="d-row"><span class="hist">' + ic("calendar-check-line") + '</span><div class="d-main"><p class="t-strong">We call to book a visit or send a ballpark quote</p><p class="d-meta">Consultations are free</p></div></li>' +
+      '<li class="d-row"><span class="hist">' + ic("calendar-check-line") + '</span><div class="d-main"><p class="t-strong">We send a ballpark quote or set up a free consultation</p><p class="d-meta">You pick the visit time in HomeHub</p></div></li>' +
       '<li class="d-row"><span class="hist">' + ic("file-text-line") + '</span><div class="d-main"><p class="t-strong">You get a proposal to approve</p><p class="d-meta">By email and in HomeHub</p></div></li>' +
     '</ul></section></aside>' +
     '</div></div>' + mpFoot() + '</div>';
@@ -996,10 +1050,10 @@ function scrTriage(){
   var main = '<div class="zd-main"><div class="zd-ticket">' +
     '<div><p class="zd-subj">Painting + baseboard repair — 4817 Mueller Blvd</p><p class="zd-meta">#91347 &middot; via HomeHub request &middot; Mon, Oct 19, 8:42 AM &middot; Sarah Mitchell</p></div>' +
     '<article class="msg"><header><span class="zav">SM</span><b>Sarah Mitchell</b><span class="t">Oct 19, 8:42 AM</span></header><p>' + esc(DESC) + '</p><p style="color:var(--zd-muted);font-size:12px">2 photos &middot; Service request SR-58214</p></article>' +
-    '<article class="msg note"><header><span class="zav">CO</span><b>Central Ops</b><span class="k">Internal note</span><span class="t">10:12 AM</span></header><p>Two rooms of paint plus a carpentry repair, and the photos don\'t show how far the baseboard damage goes. Called Sarah: she\'d like a consultation. Booking Mario for Thu, Oct 22, 9 AM.</p></article>' +
+    '<article class="msg note"><header><span class="zav">CO</span><b>Central Ops</b><span class="k">Internal note</span><span class="t">10:12 AM</span></header><p>Two rooms of paint plus a carpentry repair, and the photos don\'t show how far the baseboard damage goes. Called Sarah: she\'d like a consultation. Setting it up as Ready to schedule so she can pick a time in HomeHub.</p></article>' +
     '<div class="zd-next"><b>Next step for this request</b>' +
       '<div class="zopt"><span class="r"></span><span><b>Ballpark quote</b><small>Our team prices the scope from the request and photos, then sends it. Bigger jobs go to Sales.</small></span></div>' +
-      '<div class="zopt on"><span class="r"></span><span><b>Consultation ' + anno("New service type") + '</b><small>Book a free specialist visit. The specialist can price the job on site.</small></span></div>' +
+      '<div class="zopt on"><span class="r"></span><span><b>Consultation ' + anno("New service type") + '</b><small>A free specialist visit. The member picks the time in HomeHub, and the specialist can price the job on site.</small></span></div>' +
       '<button type="button" class="zbtn' + HOT + '" data-act="next">Create consultation booking in Admin</button>' +
     '</div></div>' +
     '<aside class="zd-side">' + zf("Requester","Sarah Mitchell") + zf("Group","Central Ops – Specialty") + zf("Type","Specialty request") + zf("Priority","Normal") + zf("Service request","SR-58214") + zf("Home Manager","Marcus Reyes") + '</aside></div>';
@@ -1029,13 +1083,13 @@ function scrBook(){
       djr("Subscription:", "4817 Mueller Blvd — Sarah Mitchell (Active)", {sel:1, req:1}) +
       djr("Service request:", "SR-58214", {sel:1}) +
       djr("Zendesk ticket:", "91347") +
-      djr("Assigned Home Manager:", "Mario · Specialty Painter", {sel:1}) +
+      djr("Assigned Home Manager:", "---------", {sel:1, help:"Filled in from the time Sarah books."}) +
       djr("Duration (minutes):", "60", {help:"Default for consultations."}) +
       djr("Price:", "0.00", {help:"Consultations are free to members. No invoice is created."}) +
     '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Scheduling</div>' +
-      djr("Status:", "Booked", {sel:1}) +
-      djr("Scheduled start:", "2026-10-22 &nbsp; 09:00", {help:"V1: Central Ops agrees a time with the member and books it on the Ops Calendar by hand."}) +
+      djr("Status:", "Ready", {sel:1, chg:1, help:anno("Ready to schedule") + " Puts the consultation in Ready to schedule on Sarah's HomeHub dashboard. Nothing is booked yet."}) +
+      djr("Scheduled start:", "&mdash;", {ro:1, help:"Set when Sarah picks a time in HomeHub."}) +
     '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Booking tasks</div><div class="tbl"><table><thead><tr><th>#</th><th>Task</th><th class="num">Minutes</th></tr></thead><tbody>' +
       TASKS.map(function(t, i){ return '<tr><td>' + (i+1) + '</td><td>' + t.booked + '</td><td class="num">' + (i===0?40:20) + '</td></tr>'; }).join("") +
@@ -1045,15 +1099,16 @@ function scrBook(){
 }
 
 function scrConfirm(){
+  var c = CS();
   var html = '<div class="mp">' + mpTop("Appointments") +
   '<div class="page">' +
     '<div class="intro"><div class="intro__text"><h2 class="t-display">Appointments</h2><p class="t-desc">4817 Mueller Blvd &middot; Austin, TX 78723</p></div></div>' +
     '<div class="message"><span class="message__icon">' + ic("checkbox-circle-line") + '</span><p class="message__text"><strong>Your consultation is booked.</strong> We emailed the details to sarah.mitchell@example.com.</p></div>' +
     '<div class="layout"><div class="main"><section class="card">' +
-      '<div class="visit"><span class="date-tile"><span class="date-tile__m">Oct</span><span class="date-tile__d">22</span></span>' +
+      '<div class="visit"><span class="date-tile"><span class="date-tile__m">' + c.m + '</span><span class="date-tile__d">' + c.d + '</span></span>' +
         '<div class="visit__main"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="badge badge--included">Free</span><span class="badge badge--status">' + ic("checkbox-circle-fill") + 'Confirmed</span>' + anno("New visit type") + '</div>' +
         '<h3 class="t-title">Painting and carpentry consultation</h3>' +
-        '<ul class="visit__meta"><li>' + ic("calendar-line") + 'Thu, Oct 22 &middot; 9&ndash;10 AM</li><li>' + ic("user-line") + 'Mario &middot; Specialty painter</li><li>' + ic("map-pin-line") + '4817 Mueller Blvd</li></ul></div>' +
+        '<ul class="visit__meta"><li>' + ic("calendar-line") + c.long + ' &middot; ' + c.win + '</li><li>' + ic("user-line") + 'Mario &middot; Specialty painter</li><li>' + ic("map-pin-line") + '4817 Mueller Blvd</li></ul></div>' +
       '</div>' +
       '<hr class="divider">' +
       '<h4 class="t-strong" style="margin-bottom:12px">What happens at your consultation ' + anno() + '</h4>' +
@@ -1065,7 +1120,7 @@ function scrConfirm(){
       '<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:24px"><button type="button" class="btn btn--secondary' + HOT + '" data-act="next">' + ic("calendar-check-line") + 'Add to calendar</button><span class="link" data-stub>Reschedule</span></div>' +
     '</section></div>' +
     '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">Upcoming visits</h3></div><ul class="d-list">' +
-      '<li class="d-row d-row--sel"><span class="d-date"><span class="d-date__m">Oct</span><span class="d-date__d">22</span></span><div class="d-main"><span class="d-title">Consultation</span><p class="d-tasks">Painting and baseboard repair</p><p class="d-meta">Thu, 9&ndash;10 AM</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
+      '<li class="d-row d-row--sel"><span class="d-date"><span class="d-date__m">' + c.m + '</span><span class="d-date__d">' + c.d + '</span></span><div class="d-main"><span class="d-title">Consultation</span><p class="d-tasks">Painting and baseboard repair</p><p class="d-meta">' + c.dow + ', ' + c.win + '</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
       '<li class="d-row"><span class="d-date d-date--pm"><span class="d-date__m">Nov</span><span class="d-date__d">12</span></span><div class="d-main"><span class="d-title">Preventive maintenance</span><p class="d-meta">Thu, 9&ndash;11 AM</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
     '</ul></section>' + mpTeam(anno()) + '</aside></div></div>' + mpFoot() + '</div>';
   return frame("hh", "member.prefixinc.com/appointments", html);
@@ -1100,7 +1155,7 @@ function hpConsult(dialogOpen){
     '</article>';
   }).join("");
   var exclHTML = EXCL.map(function(e){ return '<label class="chk"><input type="checkbox" data-bind="excl" data-ex="' + e.id + '"' + (S.excl[e.id]?' checked':'') + '> ' + esc(e.t) + '</label>'; }).join("");
-  var html = '<div class="hp">' + hpHeader({job:"2-2-190482", ticket:"91347", svc:"Consultation " + anno("New"), min:"60 minutes", when:"October 22nd, 2026 @ 9:00 AM", start:"09:04 AM", end:"09:58 AM"}) +
+  var html = '<div class="hp">' + hpHeader({job:"2-2-190482", ticket:"91347", svc:"Consultation " + anno("New"), min:"60 minutes", when:CS().hmWhen, start:CS().startT, end:CS().endT}) +
     '<div class="cols"><section class="left" aria-label="Summary">' +
       '<p class="req__h">Job requested</p><div class="req">' + esc(JOB) + '</div>' +
       '<table class="tbl"><caption class="sr">Time and charges</caption><tbody>' +
@@ -1157,7 +1212,7 @@ function lifecycle(on){
 function scrProposalObj(){
   var A = S.path==="A", t = calc(false);
   var rows = [
-    ["PF-2026-00148","Mitchell · 4817 Mueller Blvd","#48213","Mario",money(t.total), A ? '<span class="dst ok">Sent</span>' : '<span class="dst pend">Pending review</span>',"Oct 22, 10:01 a.m.",true],
+    ["PF-2026-00148","Mitchell · 4817 Mueller Blvd","#48213","Mario",money(t.total), A ? '<span class="dst ok">Sent</span>' : '<span class="dst pend">Pending review</span>',DT().createdL,true],
     ["PF-2026-00147","Okafor · 3301 Lakeway Blvd","#48190","Mario","$640",'<span class="dst ok">Accepted</span>',"Oct 21, 3:40 p.m."],
     ["PF-2026-00146","Chen · 640 Canyon Rim","#48177","Carpentry team","$2,380",'<span class="dst pend">Pending review</span>',"Oct 21, 11:15 a.m."],
     ["PF-2026-00145","Reyes · 812 Sunset Trail","#48162","Mario","$415","Declined","Oct 20, 2:05 p.m."],
@@ -1189,12 +1244,12 @@ function scrZdReview(){
     t.ls.map(function(l){ return '<tr><td>' + esc(l.area) + '</td><td>' + (Math.round(l.hours*10)/10) + '</td><td>' + money(l.total) + '</td></tr>'; }).join("") +
     '<tr class="tot"><td>Total</td><td>' + (Math.round(t.hours*10)/10) + '</td><td>' + money(t.total) + '</td></tr></tbody></table>';
   var main = '<div class="zd-main"><div class="zd-ticket">' + list +
-    '<div><p class="zd-subj">Proposal needs review — PF-2026-00148 · Mitchell</p><p class="zd-meta">#91502 &middot; created automatically &middot; Thu, Oct 22, 10:01 AM</p></div>' +
-    '<article class="msg sys"><header><span class="zav">PF</span><b>PreFix system</b><span class="k">Automation</span>' + anno() + '<span class="t">10:01 AM</span></header>' +
+    '<div><p class="zd-subj">Proposal needs review — PF-2026-00148 · Mitchell</p><p class="zd-meta">#91502 &middot; created automatically &middot; ' + DT().created + '</p></div>' +
+    '<article class="msg sys"><header><span class="zav">PF</span><b>PreFix system</b><span class="k">Automation</span>' + anno() + '<span class="t">' + DT().createdT + '</span></header>' +
       '<p>Mario finished the consultation at 4817 Mueller Blvd and sent the proposal for review. Reason: <b>' + esc(S.rvReason) + '</b>.</p>' + tbl + '</article>' +
-    '<article class="msg note"><header><span class="zav">M</span><b>Mario</b><span class="k">Note for the reviewer</span><span class="t">10:01 AM</span></header><p>' + esc(S.note) + '</p></article>' +
+    '<article class="msg note"><header><span class="zav">M</span><b>Mario</b><span class="k">Note for the reviewer</span><span class="t">' + DT().createdT + '</span></header><p>' + esc(S.note) + '</p></article>' +
     '<button type="button" class="zbtn' + HOT + '" data-act="next">Open proposal in Admin</button>' +
-    '</div><aside class="zd-side">' + zf("Group","Central Ops – Specialty") + zf("Assignee","Homer") + zf("Proposal","PF-2026-00148") + zf("Booking","#48213 · Completed – Pending Review") + zf("Review due","Fri, Oct 23 (1 business day)") + zf("Tags","proposal_review painting") + '</aside></div>';
+    '</div><aside class="zd-side">' + zf("Group","Central Ops – Specialty") + zf("Assignee","Homer") + zf("Proposal","PF-2026-00148") + zf("Booking","#48213 · Completed – Pending Review") + zf("Review due", DT().due + " (1 business day)") + zf("Tags","proposal_review painting") + '</aside></div>';
   return frame("zd", "prefix.zendesk.com/agent/tickets/91502", zdShell(main));
 }
 
@@ -1279,7 +1334,7 @@ function propMain(state){
   };
   return '<div class="main">' +
     '<section class="card"><div class="d-head"><h3 class="t-title">What we recommend</h3></div><p>' + esc(S.summary) + '</p></section>' +
-    (finds.length ? '<section class="card"><div class="d-head"><h3 class="t-title">What we found</h3></div><p class="t-meta">From your consultation on Oct 22</p><ul class="tiles">' +
+    (finds.length ? '<section class="card"><div class="d-head"><h3 class="t-title">What we found</h3></div><p class="t-meta">From your consultation on ' + CS().short + '</p><ul class="tiles">' +
       finds.map(function(l){ return '<li class="tile' + (l.cond==="Critical Condition"?' tile--critical':'') + '"><div class="m-photo m-photo--wide">' + ic("image-line") + '<span>' + esc(l.area) + '</span></div><div class="tile__head">' + condIcon(l) + '<div class="d-main"><span class="d-title">' + esc(l.area) + '</span><p class="d-meta">' + condMeta(l) + '</p><p class="d-risk">' + esc(l.note) + '</p></div></div></li>'; }).join("") +
     '</ul></section>' : '') +
     '<section class="card"><div class="d-head"><h3 class="t-title">Scope of work</h3></div><p class="t-meta">Written by Mario during your consultation</p><ul class="d-list" style="margin-top:8px">' +
@@ -1298,7 +1353,7 @@ function propMain(state){
     '</ul><p class="t-meta" style="margin-top:16px">Approving accepts the project terms: payment, change orders, hidden conditions and cancellation. ' + anno("Terms need legal review") + '</p></section>' +
     (state==="approved" ? '' : '<section class="card"><div class="d-head"><h3 class="t-title">Once you approve</h3></div><ul class="d-list">' +
       '<li class="d-row"><span class="hist">' + ic("check-line") + '</span><div class="d-main"><p class="t-strong">We confirm the details with you</p></div></li>' +
-      '<li class="d-row"><span class="hist">' + ic("calendar-check-line") + '</span><div class="d-main"><p class="t-strong">We call or text you to set the date</p></div></li>' +
+      '<li class="d-row"><span class="hist">' + ic("calendar-check-line") + '</span><div class="d-main"><p class="t-strong">You pick a start date in HomeHub</p><p class="d-meta">After we set up the project</p></div></li>' +
       '<li class="d-row"><span class="hist">' + ic("paint-brush-line") + '</span><div class="d-main"><p class="t-strong">Mario does the work</p><p class="d-meta">It\'s added to your Timeline in HomeHub</p></div></li></ul></section>') +
     mpTeam() +
     (state==="approved" || S.declined || S.later ? '' : '<section class="card m-only"><div class="d-head"><h3 class="t-title">Ready to move forward?</h3></div><p class="t-hero t-num" style="margin:8px 0">' + money(t.total) + '</p><button type="button" class="btn btn--primary btn--lg btn--block" data-act="next">Approve project</button></section>') +
@@ -1315,7 +1370,7 @@ function propRail(state){
       '<hr class="divider" style="margin:16px 0 4px"><ul class="d-list">' +
         '<li class="d-row">' + ic("checkbox-circle-fill","d-done") + '<div class="d-main"><p class="t-strong">You approved the proposal</p><p class="d-meta">' + d.accepted + '</p></div></li>' +
         '<li class="d-row"><span class="hist">' + ic("settings-3-line") + '</span><div class="d-main"><p class="t-strong">We set up your project</p><p class="d-meta">Usually within 1 business day</p></div></li>' +
-        '<li class="d-row"><span class="hist">' + ic("calendar-check-line") + '</span><div class="d-main"><p class="t-strong">We call or text you to pick a date</p><p class="d-meta">Most projects start within 1–2 weeks</p></div></li>' +
+        '<li class="d-row"><span class="hist">' + ic("calendar-check-line") + '</span><div class="d-main"><p class="t-strong">You pick a start date in HomeHub</p><p class="d-meta">It shows in Ready to schedule on your dashboard</p></div></li>' +
       '</ul><button type="button" class="btn btn--secondary btn--block' + HOT + '" data-act="next" style="margin-top:16px">Back to HomeHub</button></section>';
   } else {
     var decide;
@@ -1357,28 +1412,21 @@ function scrZdAccepted(){
   var main = '<div class="zd-main"><div class="zd-ticket">' + list +
     '<div><p class="zd-subj">Proposal accepted — PF-2026-00148 · Mitchell</p><p class="zd-meta">#91655 &middot; created automatically &middot; ' + d.accepted + '</p></div>' +
     '<article class="msg sys"><header><span class="zav">PF</span><b>PreFix system</b><span class="k">Automation</span>' + anno() + '</header>' +
-      '<p>Sarah Mitchell approved PF-2026-00148 for <b>' + money(t.total) + '</b> (' + hrs(t.hours) + '). Booking #48390 was created as Pending from the proposal, with its tasks, hours and price. Check it, call Sarah to agree a date, and schedule Mario.</p></article>' +
+      '<p>Sarah Mitchell approved PF-2026-00148 for <b>' + money(t.total) + '</b> (' + hrs(t.hours) + '). Booking #48390 was created as Pending from the proposal, with its tasks, hours and price. Check it, then set it to Ready so Sarah can pick a start date in HomeHub.</p></article>' +
     '<button type="button" class="zbtn' + HOT + '" data-act="next">Open booking #48390 in Admin</button>' +
     '</div><aside class="zd-side">' + zf("Group","Central Ops – Specialty") + zf("Assignee","Central Ops") + zf("Proposal","PF-2026-00148 · Accepted") + zf("Booking","#48390 · Pending") + zf("Tags","proposal_accepted painting") + '</aside></div>';
   return frame("zd", "prefix.zendesk.com/agent/tickets/91655", zdShell(main));
 }
 
 function scrSchedule(){
-  var t = T();
+  var t = T(), open = pDays().filter(function(x){ return x[1].length; }).map(function(x){ return dfmt(kd(x[0])); });
   var tasks = '<div class="tbl"><table><thead><tr><th>#</th><th>Task (from proposal)</th><th class="num">Minutes</th></tr></thead><tbody>' +
     t.ls.map(function(l, i){ return '<tr><td>' + (i+1) + '</td><td>' + esc(l.area) + ' (' + l.trade + ')</td><td class="num">' + Math.round(l.hours*60) + '</td></tr>'; }).join("") +
     '<tr><td></td><td><b>Total</b></td><td class="num"><b>' + Math.round(t.hours*60) + '</b></td></tr></tbody></table></div>';
-  var endH = Math.min(17, 8 + Math.min(t.hours, 8) + 0.5);
-  var pct = function(h){ return ((h-8)/9*100).toFixed(2) + "%"; };
-  var cal = '<div class="cal" aria-label="Ops Calendar, Tue Nov 3"><b style="font-size:12px;color:#666">Ops Calendar &middot; Tue, Nov 3</b>' +
-    '<div class="cal-axis"><span></span><div class="tk">' + [8,10,12,14,16].map(function(h){ return '<span style="left:' + pct(h) + '">' + (h>12?h-12:h) + (h>=12?" PM":" AM") + '</span>'; }).join("") + '</div></div>' +
-    '<div class="cal-lane"><span>Mario</span><div class="tr"><span class="blk new" style="left:0;width:' + ((endH-8)/9*100).toFixed(2) + '%">Mitchell &middot; refresh</span></div></div>' +
-    '<div class="cal-lane"><span>Carpentry team</span><div class="tr"><span class="blk busy" style="left:' + pct(9) + ';width:' + (3/9*100).toFixed(2) + '%">Chen &middot; cabinets</span><span class="blk busy" style="left:' + pct(13) + ';width:' + (2/9*100).toFixed(2) + '%">Consult</span></div></div>' +
-    (t.days>1 ? '<p class="help" style="margin:0">Runs ' + t.days + ' days: Mario is booked ' + projDate() + '.</p>' : '') + '</div>';
   var inner = '<div class="dj-title"><h2>Change booking</h2><span style="color:#666">#48390</span></div>' +
     '<div class="dj-fs"><div class="dj-cap">Booking</div>' +
       djr("Service type:", "Specialty – Painting", {sel:1}) +
-      djr("Created from:", "Proposal PF-2026-00148 · Accepted " + anno("New link"), {ro:1, help:"Tasks, minutes and price came from the proposal. Ops checks them and schedules."}) +
+      djr("Created from:", "Proposal PF-2026-00148 · Accepted " + anno("New link"), {ro:1, help:"Tasks, minutes and price came from the proposal. Ops checks them, then sets the booking to Ready."}) +
       djr("Subscription:", "4817 Mueller Blvd — Sarah Mitchell (Active)", {sel:1}) +
       djr("Assigned Home Manager:", "Mario · Specialty Painter", {sel:1}) +
       djr("Duration (minutes):", String(Math.round(t.hours*60)), {ro:1}) +
@@ -1386,15 +1434,16 @@ function scrSchedule(){
     '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Booking tasks</div>' + tasks + '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Scheduling</div>' +
-      djr("Status:", "Booked", {sel:1, chg:1, help:"Was Pending. Later this could go to Ready so Sarah picks the date in HomeHub."}) +
-      djr("Scheduled start:", "2026-11-03 &nbsp; 08:00", {chg:1, help:"Agreed with Sarah by phone."}) +
-      '<div style="padding:0 12px 12px">' + cal + '</div>' +
+      djr("Status:", "Ready", {sel:1, chg:1, help:"Was Pending. Ready puts the project in Ready to schedule on Sarah's HomeHub dashboard, the same as the consultation."}) +
+      djr("Scheduled start:", "&mdash;", {ro:1, help:"Set when Sarah picks a start date in HomeHub."}) +
+      djr("Start dates Sarah can pick:", open.length ? open.join("<br>") : "None in the next two weeks", {ro:1, help:"The job runs " + (t.days===1 ? "1 day" : t.days + " days in a row") + ", so HomeHub only offers dates where Mario is free for " + (t.days===1 ? "the whole day" : "all " + t.days + " days") + ". " + anno("Proposed rule")}) +
     '</div>' +
     '<div class="submit-row"><button type="button" class="djbtn alt" data-stub>Save and continue editing</button><button type="button" class="djbtn def' + HOT + '" data-act="next">SAVE</button></div>';
   return frame("op", "Django Admin · /admin/bookings/booking/48390/change/", djShell("central-ops", "Home › Bookings › Bookings › #48390", inner));
 }
 
 function scrBooked(){
+  var ps = PS(), pd = kd(ps.k);
   var html = '<div class="mp">' + mpTop("Dashboard") +
   '<div class="page">' +
     '<div class="intro"><div class="intro__text"><h2 class="t-display">4817 Mueller Blvd</h2><p class="t-desc">Austin, TX 78723</p></div><span class="btn btn--primary btn--lg" data-stub>' + ic("add-line") + 'Request service</span></div>' +
@@ -1404,7 +1453,7 @@ function scrBooked(){
       mpRecs() + mpProposals("done") +
     '</div>' +
     '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">Upcoming visits</h3><span class="d-head__link" data-stub>Appointments' + ic("arrow-right-s-line") + '</span></div><ul class="d-list">' +
-      '<li class="d-row d-row--sel' + HOT + '" data-act="next" role="button" tabindex="0"><span class="d-date"><span class="d-date__m">Nov</span><span class="d-date__d">3</span></span><div class="d-main"><span class="d-title">Specialty visit</span><p class="d-tasks">Living room and hallway refresh</p><p class="d-meta">Tue, 8 AM &middot; Mario</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
+      '<li class="d-row d-row--sel' + HOT + '" data-act="next" role="button" tabindex="0"><span class="d-date"><span class="d-date__m">' + MON[pd.getMonth()] + '</span><span class="d-date__d">' + pd.getDate() + '</span></span><div class="d-main"><span class="d-title">Specialty visit</span><p class="d-tasks">' + esc(S.title) + '</p><p class="d-meta">' + DOW[pd.getDay()] + ', ' + h12(ps.h) + ' &middot; Mario</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
       '<li class="d-row"><span class="d-date d-date--pm"><span class="d-date__m">Nov</span><span class="d-date__d">12</span></span><div class="d-main"><span class="d-title">Preventive maintenance</span><p class="d-meta">Thu, 9&ndash;11 AM</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
     '</ul></section>' + mpTeam() + '</aside></div></div>' + mpFoot() + '</div>';
   return frame("hh", "member.prefixinc.com/", html);
@@ -1439,6 +1488,76 @@ function scrKpi(){
 }
 
 /* ================= steps ================= */
+/* ---------- Ready to schedule and the calendar flow ---------- */
+function mpHM(){
+  return '<section class="card"><div class="d-head"><h3 class="t-title">Your PreFix team</h3></div><ul class="d-list">' +
+    '<li class="d-row"><span class="pro" aria-hidden="true">MR<span class="pro__badge">' + ic("home-4-fill") + '</span></span><div class="d-main"><p class="d-role">Home Manager</p><p class="d-meta">Marcus Reyes</p></div></li>' +
+  '</ul></section>';
+}
+function readyTile(kind){
+  var t = T(), C = kind==="c";
+  return '<li class="tile"><div class="tile__head"><span class="d-icon d-icon--white">' + ic(C ? "brush-line" : "paint-brush-line") + '</span><div class="d-main"><span class="d-title">' + (C ? 'Consultation' : 'Specialty visit') + '</span>' +
+    '<p class="d-tasks">' + (C ? 'Interior painting, baseboard' : esc(t.ls.map(function(l){ return l.area; }).join(", "))) + '</p>' +
+    '<p class="d-meta">' + (C ? '<span class="t-blue">Free</span> &middot; 1 hr' : '<span class="t-blue">' + money(t.total) + '</span> &middot; ' + (t.days===1 ? '1 day' : t.days + ' days')) + '</p></div></div>' +
+    '<div class="tile__actions"><button type="button" class="btn btn--secondary btn--sm' + HOT + '" data-act="next">Schedule</button><span class="tile__more" aria-hidden="true">Details' + ic("arrow-right-s-line") + '</span></div></li>';
+}
+function readyDash(kind){
+  var C = kind==="c";
+  var html = '<div class="mp">' + mpTop("Dashboard") +
+  '<div class="page">' +
+    '<div class="intro"><div class="intro__text"><h2 class="t-display">4817 Mueller Blvd</h2><p class="t-desc">Austin, TX 78723</p></div><span class="btn btn--primary btn--lg" data-stub>' + ic("add-line") + 'Request service</span></div>' +
+    '<div class="message"><span class="message__icon">' + ic("calendar-line") + '</span><p class="message__text"><strong>' + (C ? 'Your consultation is ready to schedule.' : 'Your project is ready to schedule.') + '</strong> ' + (C ? 'Pick a time that works for you.' : 'Pick a start date that works for you.') + '</p></div>' +
+    '<div class="layout"><div class="main">' +
+      '<section class="card"><div class="d-head"><h3 class="t-title">Ready to schedule</h3><span class="count">1</span>' + anno(C ? "Consultation added" : "Project added") + '<span class="d-head__link" data-stub>See all' + ic("arrow-right-s-line") + '</span></div><ul class="tiles">' + readyTile(kind) + '</ul></section>' +
+      (C ? '' : mpProposals("ready")) + mpRecs() +
+    '</div>' +
+    '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">Upcoming visits</h3><span class="d-head__link" data-stub>Appointments' + ic("arrow-right-s-line") + '</span></div><ul class="d-list">' +
+      '<li class="d-row"><span class="d-date d-date--pm"><span class="d-date__m">Nov</span><span class="d-date__d">12</span></span><div class="d-main"><span class="d-title">Preventive maintenance</span><p class="d-meta">Thu, 9&ndash;11 AM</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
+    '</ul></section>' + (C ? mpHM() : mpTeam()) + '</aside></div></div>' + mpFoot() + '</div>';
+  return frame("hh", "member.prefixinc.com/", html);
+}
+function calPage(kind){
+  var C = kind==="c", t = T(), days = calDays(kind), view = calView(kind), slot = slotOf(kind);
+  var vd = days.filter(function(x){ return x[0]===view; })[0] || days[0], vdt = kd(vd[0]), anyOpen = !!firstOpen(days);
+  var tiles = days.map(function(x){
+    var dt = kd(x[0]), n = x[1].length, on = anyOpen && x[0]===vd[0];
+    return '<button type="button" class="cday" data-act="cal-day" data-kind="' + kind + '" data-k="' + x[0] + '" aria-pressed="' + on + '"' + (n ? '' : ' disabled') +
+      ' aria-label="' + dfmt(dt) + ', ' + (n ? (C ? n + (n===1 ? ' open time' : ' open times') : 'open') : 'no open times') + '">' +
+      '<span class="cday__w">' + DOW[dt.getDay()] + '</span><span class="cday__d">' + dt.getDate() + '</span><span class="cday__n">' + (n ? (C ? n + (n===1 ? ' time' : ' times') : 'Open') : 'Full') + '</span></button>';
+  }).join("");
+  var times = vd[1].map(function(hr, i){
+    var on = !!slot && slot.k===vd[0] && slot.h===hr;
+    return '<button type="button" class="chip' + (!slot && i===0 ? HOT : '') + '" data-act="cal-time" data-kind="' + kind + '" data-k="' + vd[0] + '" data-h="' + hr + '" aria-pressed="' + on + '">' + win(hr) + '</button>';
+  }).join("");
+  var main = '<section class="card"><div class="d-head"><h3 class="t-title">Pick a day</h3></div>' +
+      '<p class="t-meta">' + (C ? 'Open times for specialists who cover painting and carpentry.' : (t.days===1 ? 'Days when Mario is free for the whole job.' : 'This job runs ' + t.days + ' days in a row, so you only see start dates when Mario is free for all ' + t.days + '.')) + '</p>' +
+      '<p class="cal-month">' + MONL[kd(days[0][0]).getMonth()] + ' 2026</p><div class="cdays">' + tiles + '</div>' +
+      (anyOpen
+        ? '<hr class="divider"><h4 class="t-strong">Pick ' + (C ? 'a time' : 'an arrival time') + ' &middot; ' + dfmt(vdt) + '</h4><p class="t-meta">' + (C ? 'The visit takes about an hour.' : 'Mario arrives in this window' + (t.days===1 ? '' : ' each day') + ' and works about 8 hours.') + '</p><div class="chips" style="margin-top:12px">' + times + '</div>'
+        : '<p class="d-empty">' + ic("information-line") + 'No start dates fit in the next two weeks. <span class="link" data-stub>Message us</span> and we\'ll find a time.</p>') +
+    '</section>';
+  var sd = slot ? kd(slot.k) : null;
+  var range = !slot ? '' : (C || t.days===1) ? dfmt(sd) : dfmt(sd) + ' – ' + dfmt(addBiz(sd, t.days-1));
+  var rail = '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">' + (C ? 'Your visit' : 'Your project') + '</h3></div>' +
+    (slot
+      ? '<div class="visit" style="margin-top:8px"><span class="date-tile"><span class="date-tile__m">' + MON[sd.getMonth()] + '</span><span class="date-tile__d">' + sd.getDate() + '</span></span><div class="visit__main"><p class="t-strong">' + range + '</p>' +
+          '<ul class="visit__meta"><li>' + ic("time-line") + win(slot.h) + (C ? '' : ' arrival' + (t.days===1 ? '' : ', each day')) + '</li><li>' + ic("user-line") + 'Mario &middot; Specialty painter</li><li>' + ic("map-pin-line") + '4817 Mueller Blvd</li></ul></div></div>'
+      : '<p class="d-empty">' + ic("calendar-line") + 'Pick a day and a time.</p>') +
+    '<p class="d-meta" style="margin-top:12px">' + (C ? '<span class="t-blue">Free</span> &middot; Painting and carpentry consultation' : '<span class="t-blue">' + money(t.total) + '</span> &middot; ' + esc(S.title)) + '</p>' +
+    '<button type="button" class="btn btn--primary btn--lg btn--block' + (slot ? HOT : '') + '" data-act="cal-confirm" data-kind="' + kind + '" aria-disabled="' + (!slot) + '" style="margin-top:16px">' + (C ? 'Confirm visit' : 'Confirm start date') + '</button>' +
+    (S.calErr && !slot ? '<p class="t-red" role="status" style="margin-top:8px;font-size:14px;line-height:20px">Pick a time first.</p>' : '') +
+    '<p class="t-meta" style="margin-top:12px">You can reschedule from Appointments.</p></section></aside>';
+  var html = '<div class="mp">' + mpTop("Dashboard") + '<div class="page">' +
+    '<div class="intro"><div class="intro__text"><span class="crumb" data-stub>' + ic("arrow-left-s-line") + 'Dashboard</span><h2 class="t-display">' + (C ? 'Schedule your consultation' : 'Schedule your project') + ' ' + anno("Stand-in layout") + '</h2>' +
+      '<p class="t-desc">' + (C ? 'Free &middot; About 1 hr &middot; 4817 Mueller Blvd' : esc(S.title) + ' &middot; ' + dur(t)) + '</p></div></div>' +
+    '<div class="layout"><div class="main">' + main + '</div>' + rail + '</div></div>' + mpFoot() + '</div>';
+  return frame("hh", "member.prefixinc.com/schedule/" + (C ? "48213" : "48390"), html);
+}
+function scrReadyConsult(){ return readyDash("c"); }
+function scrPickConsult(){ return calPage("c"); }
+function scrReadyProj(){ return readyDash("p"); }
+function scrPickProj(){ return calPage("p"); }
+
 var STEPS = [
   {id:"hh-request", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM",
    title:function(){ return "Sarah asks for painting and a baseboard repair"; },
@@ -1450,23 +1569,39 @@ var STEPS = [
 
   {id:"zd-triage", sys:"zd", actor:"Central Ops associate", role:"Specialty view", av:"CO",
    title:function(){ return "Central Ops decides this needs a consultation"; },
-   summary:function(){ return "The ticket moves from Intake to the Carpentry/Painting – Specialty view. The photos don't show the full scope, so instead of a ballpark quote Ops calls Sarah and books a consultation."; },
+   summary:function(){ return "The ticket moves from Intake to the Carpentry/Painting – Specialty view. The photos don't show the full scope, so instead of a ballpark quote Ops sets up a consultation for Sarah to schedule."; },
    changes:function(){ return [["tk1","Open · Specialty view"],["sr","Processing"]]; },
    v1:["Consultation becomes an option next to the ballpark quote"],
    later:[],
    qs:["When the member can choose between a ballpark quote and a consultation, where do they choose: HomeHub or the Ops call?"], screen:scrTriage},
 
   {id:"op-book", sys:"op", actor:"Central Ops associate", role:"Django Admin", av:"CO",
-   title:function(){ return "Ops books it as a Consultation booking"; },
-   summary:function(){ return "Ops creates the booking with the new Consultation service type, tags the trades, assigns Mario and books the agreed slot by hand. A separate service type lets us count consultations, give them their own end-of-visit flow, and keep proposal fields off normal service bookings."; },
-   changes:function(){ return [["bk1","Booked · Oct 22, 9 AM"],["sr","Processed"],["tk1","Solved"]]; },
-   v1:["Consultation service type, free, 60-minute default, no invoice","Trades field so one consultation covers painting and carpentry"],
-   later:["Ready status and self-scheduling into the dedicated consultation slots, once specialty scheduling logic exists"],
+   title:function(){ return "Ops creates the consultation as Ready to schedule"; },
+   summary:function(){ return "Ops creates the booking with the new Consultation service type and tags the trades, but doesn't pick a time. The status is Ready, which puts the consultation in Ready to schedule on Sarah's HomeHub dashboard. A separate service type lets us count consultations, give them their own end-of-visit flow, and keep proposal fields off normal service bookings."; },
+   changes:function(){ return [["bk1","Ready to schedule"],["sr","Processed"],["tk1","Solved"]]; },
+   v1:["Consultation service type, free, 60-minute default, no invoice","Trades field so one consultation covers painting and carpentry","Created as Ready, so Sarah picks the time herself"],
+   later:[],
    qs:["One Consultation type with a trades field, or one type per trade (carpentry, painting, insulation)?"], screen:scrBook},
 
+  {id:"hh-ready", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM",
+   title:function(){ return "The consultation shows in Ready to schedule"; },
+   summary:function(){ return "Sarah's HomeHub dashboard lists it in Ready to schedule, the same module as her other visits: titled by type, with the trades below and Free. Nothing is booked until she picks a time."; },
+   changes:function(){ return []; },
+   v1:["Consultations appear in Ready to schedule"],
+   later:[],
+   qs:["Do we also email or text Sarah that it's ready to schedule, and remind her if she hasn't booked?"], screen:scrReadyConsult},
+
+  {id:"hh-pick", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM",
+   title:function(){ return "Sarah picks a time that works"; },
+   summary:function(){ return "Schedule opens the calendar flow, which shows only open consultation times for specialists who cover painting and carpentry. She picks a day and a time and confirms, and the booking is scheduled for that time. Try another day or time: the rest of the flow follows what she picks."; },
+   changes:function(){ var c = CS(); return [["bk1","Booked · " + c.short + ", " + h12(c.h)]]; },
+   v1:["Calendar flow for consultations, showing only open times","The booking is scheduled for the time Sarah picks, with that time's specialist"],
+   later:[],
+   qs:["Which times do we offer: dedicated consultation slots per specialist, or any open hour?","How far ahead can members book, and how soon after the request?"], screen:scrPickConsult},
+
   {id:"hh-confirm", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM",
-   title:function(){ return "Sarah sees the consultation confirmed"; },
-   summary:function(){ return "The appointment explains what a consultation is and sets the expectation: a written proposal by email and in HomeHub, often the same day."; },
+   title:function(){ return "Sarah sees the consultation booked"; },
+   summary:function(){ return "The appointment shows the time she picked, explains what a consultation is and sets the expectation: a written proposal by email and in HomeHub, often the same day."; },
    changes:function(){ return []; },
    v1:["Consultation appointment copy that tells the member a proposal is coming"],
    later:[],
@@ -1542,7 +1677,7 @@ var STEPS = [
 
   {id:"pr-approved", sys:"pr", actor:"Sarah, then the system", role:"Member", av:"SM", differs:true,
    title:function(){ return "PreFix confirms the approval"; },
-   summary:function(){ return "Approving records the scope, price and terms version, marks the proposal Accepted and builds a Pending project booking from it, the way an accepted specialty recommendation creates a Pending booking today. Sarah sees what happens next."; },
+   summary:function(){ return "Approving records the scope, price and terms version, marks the proposal Accepted and builds a Pending project booking from it, the way an accepted specialty recommendation creates a Pending booking today. Sarah sees what happens next: once we set it up, she picks a start date in HomeHub."; },
    changes:function(){ return [["prp","Accepted"],["bk2","Pending · from proposal"],["tk3","New · Specialty view"]]; },
    v1:["Approval record with scope, price and terms version","Project booking pre-built from the proposal"],
    later:[],
@@ -1550,23 +1685,39 @@ var STEPS = [
 
   {id:"zd-accepted", sys:"zd", actor:"Central Ops associate", role:"Specialty view", av:"CO", differs:true,
    title:function(){ return "Central Ops gets the accepted proposal"; },
-   summary:function(){ return "An automatic ticket in the Specialty view tells Ops the proposal was approved and links the Pending booking. Ops checks it, calls Sarah to agree a date and schedules it."; },
+   summary:function(){ return "An automatic ticket in the Specialty view tells Ops the proposal was approved and links the Pending booking. Ops checks it and hands it to Sarah to schedule, instead of calling her to agree a date."; },
    changes:function(){ return [["tk3","Open"]]; },
    v1:["Automatic ticket when a member approves a proposal"],
    later:[],
    qs:[], screen:scrZdAccepted},
 
   {id:"op-schedule", sys:"op", actor:"Central Ops associate", role:"Django Admin", av:"CO", differs:true,
-   title:function(){ return "Ops checks the booking and schedules Mario"; },
-   summary:function(){ return "The booking already carries the tasks, hours and price from the proposal. In V1 Ops picks the date on the Ops Calendar by hand."; },
-   changes:function(){ return [["bk2","Booked · Nov 3, 8 AM"],["tk3","Solved"]]; },
-   v1:["Booking created from a proposal, linked back to it"],
-   later:["Set the booking to Ready and let Sarah pick the date in HomeHub"],
+   title:function(){ return "Ops checks the booking and sets it to Ready"; },
+   summary:function(){ return "The booking already carries the tasks, hours and price from the proposal. Ops checks them and sets the status to Ready, the same as the consultation, which puts the project in Ready to schedule on Sarah's dashboard. Ops doesn't pick the date."; },
+   changes:function(){ return [["bk2","Ready to schedule"],["tk3","Solved"]]; },
+   v1:["Booking created from a proposal, linked back to it","Projects go to Ready to schedule, the same as consultations"],
+   later:[],
    qs:["Multi-day projects: one booking, or one per day?"], screen:scrSchedule},
+
+  {id:"hh-ready-proj", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM", differs:true,
+   title:function(){ return "The project shows in Ready to schedule"; },
+   summary:function(){ return "The approved project sits in Ready to schedule on Sarah's dashboard, and the Proposals module shows it as approved. Nothing is booked until she picks a start date."; },
+   changes:function(){ return []; },
+   v1:["Approved projects appear in Ready to schedule"],
+   later:[],
+   qs:["Remind Sarah by email or text if the project sits unscheduled?"], screen:scrReadyProj},
+
+  {id:"hh-pick-proj", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM", differs:true,
+   title:function(){ return "Sarah picks a start date"; },
+   summary:function(){ var n = T().days; return "The calendar flow only offers start dates when Mario is free for " + (n===1 ? "the whole day" : "all " + n + " days in a row") + ", because the job runs " + (n===1 ? "1 day" : n + " days") + ". She picks a date and an arrival time and confirms, and the booking is scheduled for those days."; },
+   changes:function(){ var p = PS(); return [["bk2","Booked · " + dshort(kd(p.k)) + ", " + h12(p.h)]]; },
+   v1:["Calendar flow for projects, checking start dates against the job's length"],
+   later:[],
+   qs:["If no start date fits in the next two weeks, does Sarah see later dates, or does Ops call her?"], screen:scrPickProj},
 
   {id:"hh-booked", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM", differs:true,
    title:function(){ return "Sarah sees her project booked"; },
-   summary:function(){ return "The project shows in Upcoming visits as a specialty visit, and the approved proposal stays in the Proposals module, so the scope is visible from request to completion."; },
+   summary:function(){ return "The project shows in Upcoming visits for the dates she picked, and the approved proposal stays in the Proposals module, so the scope is visible from request to completion."; },
    changes:function(){ return []; },
    v1:["Approved proposals stay on the dashboard, linked to the visit"],
    later:["After the work, the visit summary links back to the proposal, the way contractor invoices link today"],
@@ -1744,7 +1895,7 @@ function announce(){ var stp = cur(); $("#live").textContent = "Step " + (S.idx+
 
 function go(i, focusSel){
   if(i > S.idx && branchEnded()) return;
-  S.idx = i; S.declining = false; S.pick = null; S.sendTried = false;
+  S.idx = i; S.declining = false; S.pick = null; S.sendTried = false; S.calErr = false;
   pendingFocus = focusSel || "#head h1";
   render(true); announce();
 }
@@ -1793,6 +1944,9 @@ document.addEventListener("click", function(e){
     if(problems().length){ S.sendTried = true; keepScroll(function(){ render(false); }); var bad = document.querySelector(".pline--bad"); if(bad) bad.scrollIntoView({block:"center"}); return; }
     go(S.idx+1, "#sd-t");
   }
+  else if(a==="cal-day"){ var ck = b.getAttribute("data-kind"); S[ck+"Day"] = b.getAttribute("data-k"); S.calErr = false; pendingFocus = '[data-act="cal-day"][data-k="' + S[ck+"Day"] + '"]'; keepScroll(function(){ render(false); }); }
+  else if(a==="cal-time"){ var ct = b.getAttribute("data-kind"); S[ct+"Day"] = b.getAttribute("data-k"); S[ct+"Slot"] = {k:b.getAttribute("data-k"), h:+b.getAttribute("data-h")}; S.calErr = false; pendingFocus = '[data-act="cal-time"][data-h="' + b.getAttribute("data-h") + '"]'; keepScroll(function(){ render(false); }); }
+  else if(a==="cal-confirm"){ var cc = b.getAttribute("data-kind"); if(!slotOf(cc)){ S.calErr = true; pendingFocus = '[data-act="cal-time"]'; keepScroll(function(){ render(false); }); return; } go(S.idx+1); }
   else if(a==="pick"){ S.pick = b.getAttribute("data-path"); pendingFocus = 'input[name="sendto"][value="' + S.pick + '"]'; keepScroll(function(){ render(false); }); }
   else if(a==="send"){ S.path = S.pick || S.path; persist(); var j = idxOf("hm-finish") + 1; S.pick = null; go(j); }
   else if(a==="decline"){ S.declining = true; S.reason = null; pendingFocus = '[data-act="reason"]'; keepScroll(function(){ render(false); }); }
