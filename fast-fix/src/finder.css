@@ -129,7 +129,22 @@ body.is-modal { overflow: hidden; }
 
 @container app (max-width: 767px) {
   .job__box--req { padding-left: var(--s-16); }
+  .qty { padding-left: var(--s-16); }
 }
 
 /* Error text sits on a white chip inside the blue-tint card so red keeps its contrast */
 .job__box--req .error { background: var(--surface); padding: var(--s-8) var(--s-12); border-radius: var(--r-inner); }
+
+/* "How many?" on tasks people repeat */
+.qty { display: flex; align-items: center; gap: var(--s-12); padding: 0 var(--s-16) var(--s-12) calc(var(--s-16) + 40px + var(--s-12)); }
+.qty__label { margin-right: var(--s-4); font-size: 14px; line-height: 20px; font-weight: 600; }
+.qty__btn { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--slate); border-radius: var(--r-pill); background: var(--surface); color: var(--ink); cursor: pointer; }
+.qty__btn:hover { border-color: var(--blue); color: var(--blue-text); }
+.qty__btn:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; }
+.qty__btn[aria-disabled="true"] { opacity: .4; cursor: default; }
+.qty__btn[aria-disabled="true"]:hover { border-color: var(--slate); color: var(--ink); }
+.qty__val { min-width: 32px; text-align: center; font-size: 16px; line-height: 24px; font-weight: 600; }
+.ko .note { margin-top: var(--s-12); }
+.ko .note .link { min-height: 44px; text-align: left; }
+#ko-removed { margin-bottom: var(--s-16); }
+#ko-removed:focus { outline: none; }

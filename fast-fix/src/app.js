@@ -90,7 +90,7 @@
   /* ---------- State ---------- */
   var state = {
     screen: "type", home: "mueller", jobs: {}, order: [], notes: {}, showAll: false, hours: 0, ladder: "", trade: "", part: "",
-    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false
+    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, qty: {}
   };
 
 
@@ -109,9 +109,14 @@
   function announce(msg) { var n = $("#finder-live"); n.textContent = ""; setTimeout(function () { n.textContent = msg; }, 30); }
   function setText(node, txt) { if (node && node.textContent !== txt) node.textContent = txt; }
   function resetPicks() { state.hours = 0; state.date = null; state.time = null; }
-  function selectJob(id) { if (!state.jobs[id]) { state.jobs[id] = true; state.order.push(id); } }
+  /* The "service request afterwards" pointer is on when the member chose it in the modal or dropped a task that did not qualify */
+  function syncSr() { state.srAfter = state.srModal || Object.keys(state.dropped).length > 0; }
+  function selectJob(id) {
+    if (!state.jobs[id]) { state.jobs[id] = true; state.order.push(id); }
+    if (state.dropped[id]) { delete state.dropped[id]; syncSr(); }
+  }
   function unselectJob(id) {
-    state.jobs[id] = false;
+    state.jobs[id] = false; delete state.qty[id];
     var at = state.order.indexOf(id); if (at > -1) state.order.splice(at, 1);
   }
   function icon(name) { var s = el("span", "d-icon"); s.setAttribute("aria-hidden", "true"); s.innerHTML = '<svg class="i"><use href="#' + name + '"/></svg>'; return s; }
@@ -158,6 +163,30 @@
     $("#fdock").hidden = !show;
   }
 
+  /* ----- Quantity: "How many?" for tasks people repeat (TVs, outlets, blinds, alarms) ----- */
+  function qtyRow(jb) {
+    var n = qtyOf(jb.id), row = el("div", "qty");
+    row.setAttribute("role", "group"); row.setAttribute("aria-labelledby", "qty-l-" + jb.id);
+    var lab = el("span", "qty__label", "How many?"); lab.id = "qty-l-" + jb.id;
+    function btn(dir, ic, name) {
+      var b = el("button", "qty__btn"); b.type = "button"; b.id = "qty-" + (dir > 0 ? "up-" : "dn-") + jb.id;
+      b.setAttribute("data-qty", jb.id + ":" + dir); b.setAttribute("aria-label", name + " " + jb.title);
+      if (dir > 0 ? n >= MAX_QTY : n <= 1) b.setAttribute("aria-disabled", "true");
+      b.innerHTML = '<svg class="i"><use href="#' + ic + '"/></svg>';
+      return b;
+    }
+    var val = el("span", "qty__val", String(n)); val.id = "qty-v-" + jb.id;
+    row.appendChild(lab); row.appendChild(btn(-1, "ri-subtract-line", "Fewer")); row.appendChild(val); row.appendChild(btn(1, "ri-add-line", "More"));
+    return row;
+  }
+  function stepQty(id, d) {
+    var cur = qtyOf(id), n = Math.max(1, Math.min(MAX_QTY, cur + d));
+    if (n === cur) return;
+    state.qty[id] = n; resetPicks(); renderSelected(); refresh();
+    var b = $("#qty-" + (d > 0 ? "up-" : "dn-") + id); if (b) b.focus({ preventScroll: true });
+    announce(JOB[id].title + ": " + n + ".");
+  }
+
   /* ----- Step 2: selected jobs (top) ----- */
   function renderSelected() {
     var jobs = selectedJobs(), list = $("#sel");
@@ -185,7 +214,9 @@
         re.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span></span>';
         re.lastChild.textContent = "Add a few words about this job so your Home Manager knows what to expect.";
         req.appendChild(rl); req.appendChild(rt); req.appendChild(re);
-        li.appendChild(top); li.appendChild(req);
+        li.appendChild(top);
+        if (REPEAT[jb.id]) li.appendChild(qtyRow(jb));
+        li.appendChild(req);
         list.appendChild(li);
         return;
       }
@@ -344,7 +375,15 @@
   function selectedJobs() {
     return state.order.filter(function (id) { return state.jobs[id]; }).map(function (id) { return JOB[id]; });
   }
-  function totalMin() { return selectedJobs().reduce(function (s, j) { return s + j.min; }, 0); }
+  /* Tasks people often need more than one of get a small "How many?" control. Minutes multiply; the 4-task cap counts tasks, the 3-hour cap counts everything. */
+  var MAX_QTY = 6;
+  var REPEAT = {};
+  ["mount-a-tv-on-a-drywall-or-wood-wall", "mount-a-tv-on-a-brick-or-stone-wall", "hang-a-heavy-mirror", "loose-cracked-or-worn-outlet", "broken-light-switch-or-add-a-dimmer",
+   "install-blinds-or-shades", "hang-curtain-rods-and-curtains", "smoke-or-co-alarm-is-10-years-old", "smoke-or-co-alarm-chirping-or-beeping",
+   "replace-a-broken-or-old-door-knob", "door-knob-loose-or-falling-off", "install-grab-bars", "secure-tall-furniture-or-a-tv-from-tipping", "assemble-a-desk"
+  ].forEach(function (id) { REPEAT[id] = true; });
+  function qtyOf(id) { return !FIND && REPEAT[id] ? Math.max(1, Math.min(MAX_QTY, state.qty[id] || 1)) : 1; }
+  function totalMin() { return selectedJobs().reduce(function (s, j) { return s + j.min * qtyOf(j.id); }, 0); }
   function overCount() { return !FIND && selectedJobs().length > MAX_TASKS; }
   function overLimit() { return overCount() || totalMin() > MAX_MIN; }
   function overReason() { return overCount() ? "count" : "time"; }
@@ -442,12 +481,12 @@
     if (now !== lastOver) { lastOver = now; if (now) announce("That is more than a Fast Fix covers. We will send this to our team."); }
   }
 
-  /* Step 3: the recommended length (members can not change it) */
+  /* Step 3: the visit length (worked out from the tasks; members can not change it, so it is labelled as a fact, not a recommendation) */
   function updateRec() {
     var h = hours();
     $("#rec-value").textContent = hoursText(h);
-    if (FIND) setText($(".rec__label"), "Visit length");
-    $("#rec-meta").textContent = (FIND ? "Based on the jobs you selected. " : "Based on the jobs you picked. ") + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
+    setText($(".rec__label"), "Visit length");
+    $("#rec-meta").textContent = (FIND ? "Based on the jobs you selected. " : "Based on the tasks you chose. ") + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
   }
 
   function updateChecksNotes() {
@@ -457,6 +496,20 @@
       $("#hint-" + q).textContent = (routed && !state[q] ? "Optional. " : "") + HINT[q];
     });
     koItems().forEach(function (k) { var n = $("#note-ko-" + k.key); if (n) n.hidden = state.ko[k.key] !== "no"; });
+    var dk = Object.keys(state.dropped), rm = $("#ko-removed");
+    if (rm) {
+      rm.hidden = !dk.length || state.screen !== "check";
+      if (dk.length) setText(rm.lastChild, "Removed " + dk.map(function (id) { return state.dropped[id]; }).join(", ") + ". After you book, we\u2019ll take you to a service request for " + (dk.length > 1 ? "them" : "it") + ".");
+    }
+  }
+  /* A task failed its knockout question: drop just that task, keep the rest, and point to a service request for it afterwards */
+  function removeFailed(id) {
+    var title = JOB[id].title, re = new RegExp("^" + id + "-\\d+$");
+    Object.keys(state.ko).forEach(function (k) { if (re.test(k)) delete state.ko[k]; });
+    unselectJob(id); state.dropped[id] = title; syncSr(); resetPicks();
+    renderKo(); refresh();
+    announce("Removed " + title + ". After you book, you can submit a service request for it.");
+    var rm = $("#ko-removed"); if (rm) { rm.setAttribute("tabindex", "-1"); rm.focus(); }
   }
   function renderKo() {
     var box = $("#ko-box"), items = koItems();
@@ -476,7 +529,16 @@
       var err = el("p", "error"); err.id = "err-ko-" + k.key; err.hidden = true; err.setAttribute("role", "alert");
       err.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes or no.</span>';
       var note = el("div", "note"); note.id = "note-ko-" + k.key; note.hidden = true; note.setAttribute("role", "status");
-      note.innerHTML = '<svg class="i"><use href="#ri-information-line"/></svg><span><strong>Thanks for flagging that.</strong> We will send this to our team as a service request. You will not need to enter anything again.</span>';
+      note.innerHTML = '<svg class="i"><use href="#ri-information-line"/></svg><span></span>';
+      var sp = note.lastChild;
+      sp.appendChild(el("strong", "", k.job.title + " needs our team. "));
+      if (selectedJobs().length > 1) {
+        sp.appendChild(document.createTextNode("It can\u2019t be done as a Fast Fix. Remove it to keep booking your other jobs, and we\u2019ll point you to a service request for it afterwards. Or continue to send everything to our team. "));
+        var rb = el("button", "link", "Remove this job and keep booking the others"); rb.type = "button"; rb.setAttribute("data-ko-remove", k.job.id);
+        sp.appendChild(rb);
+      } else {
+        sp.appendChild(document.createTextNode("We will send this to our team as a service request. You will not need to enter anything again."));
+      }
       fs.setAttribute("aria-describedby", "err-ko-" + k.key);
       fs.appendChild(lg); fs.appendChild(meta); fs.appendChild(opts); fs.appendChild(err); fs.appendChild(note);
       box.appendChild(fs);
@@ -529,7 +591,7 @@
       var li = document.createElement("li");
       var t = document.createElement("span");
       t.className = "sum__jobname";
-      t.textContent = j.title;
+      t.textContent = j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : "");
       li.appendChild(t);
       var note = (state.notes[j.id] || "").trim();
       if (note) {
@@ -672,7 +734,7 @@
       renderTimes();
     }
     if (screen === "booked") fillBooked();
-    if (screen === "sent") $("#sent-why").textContent = WHY[state.reason] || WHY.ladder;
+    if (screen === "sent") $("#sent-why").textContent = state.reason === "ko" && koBad().length ? koBad()[0].job.title + " can\u2019t be done as a Fast Fix, so our team will plan this visit." : (WHY[state.reason] || WHY.ladder);
 
     refresh();
     if (!firstRender) { window.scrollTo(0, 0); $("#h1").focus({ preventScroll: true }); }
@@ -874,8 +936,10 @@
         return;
       }
       if (t.closest("[data-sr-link]")) { srAction(); return; }
-      if (t.closest("[data-sr-confirm]")) { state.srAfter = true; closeModal(); updateSrFlag(); announce("After you book, you can submit a service request for your other job."); return; }
-      if (t.closest("[data-sr-undo]")) { state.srAfter = false; updateSrFlag(); return; }
+      var kr = t.closest("[data-ko-remove]"); if (kr) { removeFailed(kr.getAttribute("data-ko-remove")); return; }
+      var qb = t.closest("[data-qty]"); if (qb) { if (qb.getAttribute("aria-disabled") !== "true") { var qp = qb.getAttribute("data-qty").split(":"); stepQty(qp[0], +qp[1]); } return; }
+      if (t.closest("[data-sr-confirm]")) { state.srModal = true; syncSr(); closeModal(); updateSrFlag(); announce("After you book, you can submit a service request for your other job."); return; }
+      if (t.closest("[data-sr-undo]")) { state.srModal = false; state.dropped = {}; syncSr(); updateSrFlag(); return; }
       if (t.closest("[data-modal-close]")) { closeModal(); return; }
       if (t.closest("#search-clear")) { state.q = ""; state.sc = {}; $("#search").value = ""; syncTree(); $("#search").focus(); return; }
     }
