@@ -196,6 +196,7 @@ body.nomark .anno{display:none !important}
 .mp .btn--lg{height:52px;padding:0 32px;font-size:16px;line-height:24px}
 .mp .btn:disabled{cursor:not-allowed;background:var(--surface);border-color:var(--border);color:var(--text-2)}
 .mp .btn .i{width:16px;height:16px}
+.mp .btn--lg .i{width:20px;height:20px}
 .mp .link{display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;cursor:pointer;color:var(--slate);font-size:14px;line-height:20px;font-weight:600;letter-spacing:0;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 .mp .link:hover{color:var(--ink)}
 .mp .link .i{width:16px;height:16px}
@@ -270,7 +271,7 @@ body.nomark .anno{display:none !important}
 .mp .d-list > li.d-row--sel + li{border-top:0}
 .mp .d-main{flex:1;min-width:0;display:flex;flex-direction:column}
 .mp .d-title{color:var(--ink);font-size:16px;line-height:24px;font-weight:600}
-.mp .d-tasks{color:var(--ink);font-size:14px;line-height:20px}
+.mp .d-tasks{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--ink);font-size:14px;line-height:20px}
 .mp .d-meta{font-size:14px;line-height:20px;color:var(--text-2)}
 .mp .d-chev{width:20px;height:20px;flex:none;color:var(--text-2)}
 .mp .d-icon,.mp .d-sev{width:40px;height:40px;flex:none;display:grid;place-items:center;border-radius:12px;background:var(--page);color:var(--ink)}
@@ -285,8 +286,10 @@ body.nomark .anno{display:none !important}
 .mp .d-date--pm .d-date__m{color:var(--blue-text)}
 .mp .d-empty{display:flex;align-items:center;gap:8px;padding:8px 0 4px;font-size:14px;line-height:20px;color:var(--text-2)}
 .mp .d-empty .i{color:var(--blue)}
-.mp .date-tile{width:56px;height:64px;flex:none;border-radius:var(--r-inner);background:var(--blue-tint);display:flex;flex-direction:column;align-items:center;justify-content:center}
-.mp .date-tile__m{font-size:14px;line-height:20px;color:var(--blue-text)}
+.mp .date-tile{width:56px;height:64px;flex:none;border-radius:var(--r-inner);background:var(--page);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.mp .date-tile__m{font-size:14px;line-height:20px;color:var(--text-2)}
+.mp .date-tile--pm{background:var(--blue-tint)}
+.mp .date-tile--pm .date-tile__m{color:var(--blue-text)}
 .mp .date-tile__d{font-size:24px;line-height:28px;font-weight:600;font-variant-numeric:tabular-nums}
 .mp .visit__meta{display:flex;flex-direction:column;gap:4px;font-size:14px;line-height:20px;color:var(--text-2)}
 .mp .visit__meta li{display:flex;align-items:flex-start;gap:8px}
@@ -685,9 +688,16 @@ body.nomark .tile--pm .hot,body.nomark .h-rec.chg{outline:none}
 
 /* HomeHub */
 .mp .tile__head{display:flex;align-items:flex-start;gap:12px}
-.mp .tile__actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto}
+.mp .tile__actions{position:relative;z-index:1;display:flex;align-items:center;gap:16px;margin-top:auto;margin-left:52px;pointer-events:none}
+.mp .tile__actions .btn,.mp .tile__actions .link{pointer-events:auto}
+.mp .tile .d-title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.mp .d-ready .d-title::after{content:"";position:absolute;inset:0}
+.mp .d-ready .tile{cursor:pointer}
+.mp .d-ready .tile:hover{box-shadow:inset 0 0 0 1px var(--blue)}
+.mp .d-ready .tile:hover .d-title{color:var(--blue-text)}
+.mp .d-ready .tile:hover .tile__more{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .mp .tile__more{display:inline-flex;align-items:center;gap:2px;color:var(--slate);font-size:14px;line-height:20px;font-weight:600}
-.mp .tile__more .i{width:20px;height:20px}
+.mp .tile__more .i{width:18px;height:18px}
 .mp .tile--pm{background:var(--blue-tint)}
 .mp .tile--critical{background:var(--red-tint)}
 .mp .tile .m-photo{max-width:none}
@@ -711,6 +721,9 @@ body.nomark .tile--pm .hot,body.nomark .h-rec.chg{outline:none}
 .mp .m-only{display:none}
 .mp .layout--prop .rail{position:sticky;top:96px}
 @container app (max-width:767px){
+  .mp .tile .d-icon,.mp .tile .d-sev{display:none}
+  .mp .tile__actions{margin-left:0}
+  .mp .intro .btn--lg{height:48px}
   .mp .layout--prop .rail{position:static;order:-1}
   .mp .layout--prop .rail .ledger,.mp .layout--prop .rail .ledger + .divider{display:none}
   .mp .m-only{display:block}
@@ -765,7 +778,7 @@ body.nomark .tile--pm .hot,body.nomark .h-rec.chg{outline:none}
 .mp .cday__d{font-size:24px;line-height:28px;font-weight:600;font-variant-numeric:tabular-nums}
 .mp .cday__n{font-size:12px;line-height:16px;font-weight:600;color:var(--blue-text);white-space:nowrap}
 .mp .cday:disabled .cday__d,.mp .cday:disabled .cday__n{color:var(--text-2);font-weight:400}
-.mp .btn--primary[aria-disabled="true"]{background:var(--page);color:var(--text-2);cursor:not-allowed}
+.mp .btn[aria-disabled="true"],.mp .btn[aria-disabled="true"]:hover{cursor:not-allowed;background:var(--surface);border-color:var(--border);color:var(--text-2)}
 @container app (max-width:767px){.mp .cdays{gap:6px}.mp .cday{padding:8px 2px}.mp .cday[aria-pressed="true"]{padding:7px 1px}.mp .cday__d{font-size:20px;line-height:24px}}
 @media (prefers-reduced-motion:reduce){*{transition:none !important;scroll-behavior:auto !important}}
 </style>
@@ -916,7 +929,7 @@ var PFREE = {"11-3":1,"11-4":1,"11-5":1,"11-9":1,"11-10":1,"11-13":1};
 function kd(k){ var p = k.split("-"); return new Date(2026, +p[0]-1, +p[1]); }
 function dfmt(dt){ return DOW[dt.getDay()] + ", " + MON[dt.getMonth()] + " " + dt.getDate(); }
 function dshort(dt){ return MON[dt.getMonth()] + " " + dt.getDate(); }
-function addBiz(dt, n){ var x = new Date(dt.getTime()); while(n > 0){ x.setDate(x.getDate()+1); if(x.getDay()!==0 && x.getDay()!==6) n--; } return x; }
+function addBiz(dt, n){ var x = new Date(dt.getTime()), step = n < 0 ? -1 : 1; n = Math.abs(n); while(n > 0){ x.setDate(x.getDate()+step); if(x.getDay()!==0 && x.getDay()!==6) n--; } return x; }
 function h12(h, m){ return (h%12||12) + (m!=null ? ":" + (m<10?"0":"") + m : "") + " " + (h>=12?"PM":"AM"); }
 function win(h){ var a = h>=12?"PM":"AM", b = (h+1)>=12?"PM":"AM"; return (h%12||12) + (a===b ? "" : " " + a) + "–" + ((h+1)%12||12) + " " + b; }
 function pDays(){ var n = T().days; return PKEYS.map(function(k, i){ var ok = true; for(var j=0;j<n;j++){ if(!PFREE[PKEYS[i+j]]) ok = false; } return [k, ok ? [8,9] : []]; }); }
@@ -934,9 +947,10 @@ function CS(){
     hmWhen:MONL[dt.getMonth()] + " " + ord + ", 2026 @ " + h12(s.h, 0), startT:clock(s.h, 4), endT:clock(s.h, 58), done:h12(s.h+1, 1)};
 }
 /* the project start Sarah picked, or the first open date */
-function PS(){ var s = slotOf("p"); if(s) return s; return {k:firstOpen(pDays()) || "11-3", h:8}; }
+function PS(){ var s = slotOf("p"); if(s) return s; var f = firstOpen(pDays()); return f ? {k:f, h:8} : null; }
 function projDate(){
-  var p = PS(), n = T().days, s = kd(p.k), e = addBiz(s, n-1);
+  var p = PS(); if(!p) return "not scheduled yet";
+  var n = T().days, s = kd(p.k), e = addBiz(s, n-1);
   if(n===1) return dfmt(s);
   if(n===2) return s.getMonth()===e.getMonth() ? DOW[s.getDay()] + "–" + DOW[e.getDay()] + ", " + MON[s.getMonth()] + " " + s.getDate() + "–" + e.getDate() : dfmt(s) + " – " + dfmt(e);
   return "From " + dfmt(s) + ", " + n + " days";
@@ -946,6 +960,7 @@ function DT(){
   var o = S.path==="A"
     ? {sent:c.long + ", " + c.done, sentS:c.short, accepted:c.long + ", 7:45 PM", acceptedS:c.short, prepared:c.short, valid:dshort(plus30(c.dt)), time:c.done}
     : {sent:dfmt(nb) + ", 11:20 AM", sentS:dshort(nb), accepted:dfmt(nb) + ", 6:30 PM", acceptedS:dshort(nb), prepared:dshort(nb), valid:dshort(plus30(nb)), time:"11:20 AM"};
+  var vdt = plus30(S.path==="A" ? c.dt : nb); o.validISO = vdt.getFullYear() + "-" + ("0" + (vdt.getMonth()+1)).slice(-2) + "-" + ("0" + vdt.getDate()).slice(-2);
   o.created = c.long + ", " + c.done; o.createdT = c.done; o.createdL = c.short + ", " + c.done.replace("AM","a.m.").replace("PM","p.m."); o.due = dfmt(nb);
   return o;
 }
@@ -991,7 +1006,7 @@ function mpProposals(state){
   var tile = state==="open"
     ? '<li class="tile tile--pm"><div class="tile__head"><span class="d-icon d-icon--white">' + ic("file-text-line") + '</span><div class="d-main"><span class="d-title">' + esc(S.title) + '</span><p class="d-meta"><span class="t-blue">' + money(t.total) + '</span> &middot; ' + (t.days===1?'1 day':t.days+' days') + ' &middot; Painting, carpentry</p><p class="d-meta">From your consultation, ' + CS().short + '</p></div></div>' +
       '<div class="tile__actions"><button type="button" class="btn btn--secondary btn--sm' + HOT + '" data-act="next">Review</button><span class="tile__more" aria-hidden="true">Details' + ic("arrow-right-s-line") + '</span></div></li>'
-    : '<li class="tile"><div class="tile__head">' + ic("checkbox-circle-fill","d-done") + '<div class="d-main"><span class="d-title">' + esc(S.title) + '</span><p class="d-meta t-ink">Approved ' + d.acceptedS + ' &middot; ' + money(t.total) + (state==="ready" ? '. Ready to schedule.' : '. Booked for ' + projDate() + '.') + '</p></div></div><div class="tile__actions"><span class="link" data-stub>View proposal</span></div></li>';
+    : '<li class="tile"><div class="tile__head">' + ic("checkbox-circle-fill","d-done") + '<div class="d-main"><span class="d-title">' + esc(S.title) + '</span><p class="d-meta t-ink">Approved ' + d.acceptedS + ' &middot; ' + money(t.total) + (state==="ready" || !PS() ? '. Ready to schedule.' : '. Booked for ' + projDate() + '.') + '</p></div></div><div class="tile__actions"><span class="link" data-stub>View proposal</span></div></li>';
   return '<section class="card"><div class="d-head"><h3 class="t-title">Proposals</h3>' + (state==="open" ? '<span class="count">1</span>' : '') + anno("New module") + '<span class="d-head__link" data-stub>See all' + ic("arrow-right-s-line") + '</span></div><ul class="tiles">' + tile + '</ul></section>';
 }
 
@@ -1115,12 +1130,12 @@ function scrConfirm(){
       '<ul class="features">' +
         '<li class="feature feature--check is-done"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">Mario walks the rooms with you, measures and takes photos.<span class="feature__sub">About an hour.</span></span></li>' +
         '<li class="feature feature--check is-done"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">You get a written proposal by email and in HomeHub.<span class="feature__sub">Often the same day. Bigger jobs can take 1–2 business days.</span></span></li>' +
-        '<li class="feature feature--check is-done"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">You approve it, decline it or ask us to check back later.<span class="feature__sub">Nothing is booked until you approve.</span></span></li>' +
+        '<li class="feature feature--check is-done"><span class="i-box">' + ic("checkbox-circle-fill") + '</span><span class="feature__text">You approve it, decline it or ask us to check back later.<span class="feature__sub">Nothing is booked until you approve and pick a start date.</span></span></li>' +
       '</ul>' +
       '<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:24px"><button type="button" class="btn btn--secondary' + HOT + '" data-act="next">' + ic("calendar-check-line") + 'Add to calendar</button><span class="link" data-stub>Reschedule</span></div>' +
     '</section></div>' +
     '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">Upcoming visits</h3></div><ul class="d-list">' +
-      '<li class="d-row d-row--sel"><span class="d-date"><span class="d-date__m">' + c.m + '</span><span class="d-date__d">' + c.d + '</span></span><div class="d-main"><span class="d-title">Consultation</span><p class="d-tasks">Painting and baseboard repair</p><p class="d-meta">' + c.dow + ', ' + c.win + '</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
+      '<li class="d-row d-row--sel"><span class="d-date"><span class="d-date__m">' + c.m + '</span><span class="d-date__d">' + c.d + '</span></span><div class="d-main"><span class="d-title">Consultation</span><p class="d-tasks">Interior painting, baseboard</p><p class="d-meta">' + c.dow + ', ' + c.win + '</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
       '<li class="d-row"><span class="d-date d-date--pm"><span class="d-date__m">Nov</span><span class="d-date__d">12</span></span><div class="d-main"><span class="d-title">Preventive maintenance</span><p class="d-meta">Thu, 9&ndash;11 AM</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
     '</ul></section>' + mpTeam(anno()) + '</aside></div></div>' + mpFoot() + '</div>';
   return frame("hh", "member.prefixinc.com/appointments", html);
@@ -1213,10 +1228,10 @@ function scrProposalObj(){
   var A = S.path==="A", t = calc(false);
   var rows = [
     ["PF-2026-00148","Mitchell · 4817 Mueller Blvd","#48213","Mario",money(t.total), A ? '<span class="dst ok">Sent</span>' : '<span class="dst pend">Pending review</span>',DT().createdL,true],
-    ["PF-2026-00147","Okafor · 3301 Lakeway Blvd","#48190","Mario","$640",'<span class="dst ok">Accepted</span>',"Oct 21, 3:40 p.m."],
-    ["PF-2026-00146","Chen · 640 Canyon Rim","#48177","Carpentry team","$2,380",'<span class="dst pend">Pending review</span>',"Oct 21, 11:15 a.m."],
-    ["PF-2026-00145","Reyes · 812 Sunset Trail","#48162","Mario","$415","Declined","Oct 20, 2:05 p.m."],
-    ["PF-2026-00144","Patel · 1120 Oakmont Dr","#48150","Painting team","$1,150","Contact later","Oct 19, 9:30 a.m."]
+    ["PF-2026-00147","Okafor · 3301 Lakeway Blvd","#48190","Mario","$640",'<span class="dst ok">Accepted</span>',dshort(addBiz(CS().dt, -1)) + ", 3:40 p.m."],
+    ["PF-2026-00146","Chen · 640 Canyon Rim","#48177","Carpentry team","$2,380",'<span class="dst pend">Pending review</span>',dshort(addBiz(CS().dt, -1)) + ", 11:15 a.m."],
+    ["PF-2026-00145","Reyes · 812 Sunset Trail","#48162","Mario","$415","Declined",dshort(addBiz(CS().dt, -2)) + ", 2:05 p.m."],
+    ["PF-2026-00144","Patel · 1120 Oakmont Dr","#48150","Painting team","$1,150","Contact later",dshort(addBiz(CS().dt, -3)) + ", 9:30 a.m."]
   ];
   var table = '<div class="tbl"><table><thead><tr><th>Proposal</th><th>Member · home</th><th>Consultation</th><th>Prepared by</th><th class="num">Total</th><th>Status</th><th>Created</th></tr></thead><tbody>' +
     rows.map(function(r){ return '<tr' + (r[7]?' class="hl"':'') + '><td>' + (r[7] ? '<button type="button" class="lnk' + HOT + '" data-act="next">' + r[0] + '</button>' : '<span class="lnk">' + r[0] + '</span>') + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td><td class="num">' + r[4] + '</td><td>' + r[5] + '</td><td>' + r[6] + '</td></tr>'; }).join("") +
@@ -1270,7 +1285,7 @@ function scrReview(){
       djr("Consultation booking:", "#48213 · Consultation · Completed – Pending Review", {ro:1}) +
       djr("Prepared by:", "Mario · Specialty Painter", {ro:1}) +
       djr("Review reason:", esc(S.rvReason), {ro:1}) +
-      djr("Valid through:", "2026-11-22") +
+      djr("Valid through:", DT().validISO) +
     '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Proposal lines</div>' + tbl + '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Not included (member sees this)</div>' + djr("Exclusions:", ex.join("<br>"), {chg:1}) + '</div>' +
@@ -1294,7 +1309,7 @@ function scrEmail(){
     '<div class="mail-from"><span class="mail-av">' + ic("home-4-fill") + '</span><span><b>PreFix</b> to Sarah Mitchell</span><span>&middot; ' + d.sent + '</span></div>' +
     '<div class="em"><div class="em-head"><span class="m">' + ic("home-4-fill") + '</span><b>PreFix</b></div><div class="em-body">' +
       '<h4>Your proposal is ready</h4>' +
-      '<p>Hi Sarah, ' + (rv ? 'Mario and our specialty team finished the proposal from Thursday\'s consultation.' : 'here\'s the proposal Mario put together during this morning\'s consultation.') + ' It covers the work, what\'s included, the price and how long it takes.</p>' +
+      '<p>Hi Sarah, ' + (rv ? 'Mario and our specialty team finished the proposal from your consultation on ' + CS().long + '.' : 'here\'s the proposal Mario put together during today\'s consultation.') + ' It covers the work, what\'s included, the price and how long it takes.</p>' +
       '<div class="em-card"><span style="font-weight:600">' + esc(S.title) + '</span><span class="tot">' + money(t.total) + '</span><span class="m2">' + dur(t) + ' &middot; Valid through ' + d.valid + '</span></div>' +
       '<button type="button" class="em-btn' + HOT + '" data-act="next">Review your proposal</button>' +
       '<p style="font-size:14px;line-height:20px;color:var(--text-2)">You can approve it, decline it or ask us to check back later. It\'s also on your HomeHub dashboard.</p>' +
@@ -1346,13 +1361,13 @@ function propMain(state){
       '<div><p class="svc__label">Not included</p><ul class="features">' + exclList().map(function(e){ var added = e.id==="hidden" && rv && !S.excl.hidden; return '<li class="feature svc__todo' + (added?' is-added':'') + '"><span class="i-box">' + ic("close-line") + '</span><span class="feature__text">' + esc(e.t) + (added ? ' ' + anno("Added in review") : '') + '</span></li>'; }).join("") + '</ul></div>' +
     '</div></section>' +
     '<section class="card"><div class="d-head"><h3 class="t-title">Timeline and warranty</h3></div><ul class="features" style="margin-top:8px">' +
-      '<li class="feature"><span class="i-box">' + ic("time-line") + '</span><span class="feature__text">' + dur(t) + '<span class="feature__sub">Usually scheduled within 1–2 weeks of approval</span></span></li>' +
+      '<li class="feature"><span class="i-box">' + ic("time-line") + '</span><span class="feature__text">' + dur(t) + '<span class="feature__sub">You pick the start date in HomeHub, usually within 1–2 weeks of approval</span></span></li>' +
       '<li class="feature"><span class="i-box">' + ic("home-4-line") + '</span><span class="feature__text">Before we arrive<span class="feature__sub">Clear small items off shelves and keep pets out of the work area</span></span></li>' +
       '<li class="feature"><span class="i-box">' + ic("hand-coin-line") + '</span><span class="feature__text">No surprises<span class="feature__sub">Any extra work needs your approval before we start it</span></span></li>' +
       '<li class="feature"><span class="i-box">' + ic("shield-check-line") + '</span><span class="feature__text">Warranty<span class="feature__sub">PreFix workmanship warranty; paint and materials carry the manufacturer\'s warranty</span></span></li>' +
     '</ul><p class="t-meta" style="margin-top:16px">Approving accepts the project terms: payment, change orders, hidden conditions and cancellation. ' + anno("Terms need legal review") + '</p></section>' +
     (state==="approved" ? '' : '<section class="card"><div class="d-head"><h3 class="t-title">Once you approve</h3></div><ul class="d-list">' +
-      '<li class="d-row"><span class="hist">' + ic("check-line") + '</span><div class="d-main"><p class="t-strong">We confirm the details with you</p></div></li>' +
+      '<li class="d-row"><span class="hist">' + ic("check-line") + '</span><div class="d-main"><p class="t-strong">We set up your project</p><p class="d-meta">Usually within 1 business day</p></div></li>' +
       '<li class="d-row"><span class="hist">' + ic("calendar-check-line") + '</span><div class="d-main"><p class="t-strong">You pick a start date in HomeHub</p><p class="d-meta">After we set up the project</p></div></li>' +
       '<li class="d-row"><span class="hist">' + ic("paint-brush-line") + '</span><div class="d-main"><p class="t-strong">Mario does the work</p><p class="d-meta">It\'s added to your Timeline in HomeHub</p></div></li></ul></section>') +
     mpTeam() +
@@ -1443,18 +1458,21 @@ function scrSchedule(){
 }
 
 function scrBooked(){
-  var ps = PS(), pd = kd(ps.k);
+  var ps = PS(), pd = ps ? kd(ps.k) : null, areas = esc(T().ls.map(function(l){ return l.area; }).join(", "));
+  var pm = '<li class="d-row"><span class="d-date d-date--pm"><span class="d-date__m">Nov</span><span class="d-date__d">12</span></span><div class="d-main"><span class="d-title">Preventive maintenance</span><p class="d-meta">Thu, 9&ndash;11 AM</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>';
+  var proj = !ps ? '' : '<li class="d-row d-row--sel' + HOT + '" data-act="next" role="button" tabindex="0"><span class="d-date"><span class="d-date__m">' + MON[pd.getMonth()] + '</span><span class="d-date__d">' + pd.getDate() + '</span></span><div class="d-main"><span class="d-title">Specialty visit</span><p class="d-tasks">' + areas + '</p><p class="d-meta">' + DOW[pd.getDay()] + ', ' + win(ps.h) + ' arrival</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>';
+  var rows = ps && pd > kd("11-12") ? pm + proj : proj + pm;
   var html = '<div class="mp">' + mpTop("Dashboard") +
   '<div class="page">' +
     '<div class="intro"><div class="intro__text"><h2 class="t-display">4817 Mueller Blvd</h2><p class="t-desc">Austin, TX 78723</p></div><span class="btn btn--primary btn--lg" data-stub>' + ic("add-line") + 'Request service</span></div>' +
-    '<div class="message"><span class="message__icon">' + ic("calendar-check-line") + '</span><p class="message__text"><strong>Your project is booked.</strong> ' + esc(S.title) + ', ' + projDate() + '.</p></div>' +
+    (ps ? '<div class="message"><span class="message__icon">' + ic("calendar-check-line") + '</span><p class="message__text"><strong>Your project is booked.</strong> ' + esc(S.title) + ', ' + projDate() + '.</p></div>'
+        : '<div class="message"><span class="message__icon">' + ic("calendar-line") + '</span><p class="message__text"><strong>Your project isn\'t scheduled yet.</strong> No start dates fit in the next two weeks. We\'ll email you when more open up.</p></div>') +
     '<div class="layout"><div class="main">' +
-      '<section class="card"><div class="d-head"><h3 class="t-title">Ready to schedule</h3></div><p class="d-empty">' + ic("checkbox-circle-line") + 'You\'re all caught up.</p></section>' +
+      (ps ? '<section class="card"><div class="d-head"><h3 class="t-title">Ready to schedule</h3></div><p class="d-empty">' + ic("checkbox-circle-line") + 'You\'re all caught up.</p></section>'
+          : '<section class="card"><div class="d-head"><h3 class="t-title">Ready to schedule</h3><span class="count">1</span></div><ul class="tiles d-ready">' + readyTile("p") + '</ul></section>') +
       mpRecs() + mpProposals("done") +
     '</div>' +
-    '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">Upcoming visits</h3><span class="d-head__link" data-stub>Appointments' + ic("arrow-right-s-line") + '</span></div><ul class="d-list">' +
-      '<li class="d-row d-row--sel' + HOT + '" data-act="next" role="button" tabindex="0"><span class="d-date"><span class="d-date__m">' + MON[pd.getMonth()] + '</span><span class="d-date__d">' + pd.getDate() + '</span></span><div class="d-main"><span class="d-title">Specialty visit</span><p class="d-tasks">' + esc(S.title) + '</p><p class="d-meta">' + DOW[pd.getDay()] + ', ' + h12(ps.h) + ' &middot; Mario</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
-      '<li class="d-row"><span class="d-date d-date--pm"><span class="d-date__m">Nov</span><span class="d-date__d">12</span></span><div class="d-main"><span class="d-title">Preventive maintenance</span><p class="d-meta">Thu, 9&ndash;11 AM</p></div>' + ic("arrow-right-s-line","d-chev") + '</li>' +
+    '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">Upcoming visits</h3><span class="d-head__link" data-stub>Appointments' + ic("arrow-right-s-line") + '</span></div><ul class="d-list">' + rows +
     '</ul></section>' + mpTeam() + '</aside></div></div>' + mpFoot() + '</div>';
   return frame("hh", "member.prefixinc.com/", html);
 }
@@ -1496,7 +1514,7 @@ function mpHM(){
 }
 function readyTile(kind){
   var t = T(), C = kind==="c";
-  return '<li class="tile"><div class="tile__head"><span class="d-icon d-icon--white">' + ic(C ? "brush-line" : "paint-brush-line") + '</span><div class="d-main"><span class="d-title">' + (C ? 'Consultation' : 'Specialty visit') + '</span>' +
+  return '<li class="tile"><div class="tile__head"><span class="d-icon d-icon--white">' + ic(C ? "brush-line" : "paint-brush-line") + '</span><div class="d-main"><span class="d-title" data-stub>' + (C ? 'Consultation' : 'Specialty visit') + '</span>' +
     '<p class="d-tasks">' + (C ? 'Interior painting, baseboard' : esc(t.ls.map(function(l){ return l.area; }).join(", "))) + '</p>' +
     '<p class="d-meta">' + (C ? '<span class="t-blue">Free</span> &middot; 1 hr' : '<span class="t-blue">' + money(t.total) + '</span> &middot; ' + (t.days===1 ? '1 day' : t.days + ' days')) + '</p></div></div>' +
     '<div class="tile__actions"><button type="button" class="btn btn--secondary btn--sm' + HOT + '" data-act="next">Schedule</button><span class="tile__more" aria-hidden="true">Details' + ic("arrow-right-s-line") + '</span></div></li>';
@@ -1508,7 +1526,7 @@ function readyDash(kind){
     '<div class="intro"><div class="intro__text"><h2 class="t-display">4817 Mueller Blvd</h2><p class="t-desc">Austin, TX 78723</p></div><span class="btn btn--primary btn--lg" data-stub>' + ic("add-line") + 'Request service</span></div>' +
     '<div class="message"><span class="message__icon">' + ic("calendar-line") + '</span><p class="message__text"><strong>' + (C ? 'Your consultation is ready to schedule.' : 'Your project is ready to schedule.') + '</strong> ' + (C ? 'Pick a time that works for you.' : 'Pick a start date that works for you.') + '</p></div>' +
     '<div class="layout"><div class="main">' +
-      '<section class="card"><div class="d-head"><h3 class="t-title">Ready to schedule</h3><span class="count">1</span>' + anno(C ? "Consultation added" : "Project added") + '<span class="d-head__link" data-stub>See all' + ic("arrow-right-s-line") + '</span></div><ul class="tiles">' + readyTile(kind) + '</ul></section>' +
+      '<section class="card"><div class="d-head"><h3 class="t-title">Ready to schedule</h3><span class="count">1</span>' + anno(C ? "Consultation added" : "Project added") + '<span class="d-head__link" data-stub>See all' + ic("arrow-right-s-line") + '</span></div><ul class="tiles d-ready">' + readyTile(kind) + '</ul></section>' +
       (C ? '' : mpProposals("ready")) + mpRecs() +
     '</div>' +
     '<aside class="rail"><section class="card"><div class="d-head"><h3 class="t-title">Upcoming visits</h3><span class="d-head__link" data-stub>Appointments' + ic("arrow-right-s-line") + '</span></div><ul class="d-list">' +
@@ -1534,7 +1552,7 @@ function calPage(kind){
       '<p class="cal-month">' + MONL[kd(days[0][0]).getMonth()] + ' 2026</p><div class="cdays">' + tiles + '</div>' +
       (anyOpen
         ? '<hr class="divider"><h4 class="t-strong">Pick ' + (C ? 'a time' : 'an arrival time') + ' &middot; ' + dfmt(vdt) + '</h4><p class="t-meta">' + (C ? 'The visit takes about an hour.' : 'Mario arrives in this window' + (t.days===1 ? '' : ' each day') + ' and works about 8 hours.') + '</p><div class="chips" style="margin-top:12px">' + times + '</div>'
-        : '<p class="d-empty">' + ic("information-line") + 'No start dates fit in the next two weeks. <span class="link" data-stub>Message us</span> and we\'ll find a time.</p>') +
+        : '<p class="d-empty">' + ic("information-line") + '<span>No start dates fit in the next two weeks yet. We\'ll email you when more open up so you can pick one here.</span></p>') +
     '</section>';
   var sd = slot ? kd(slot.k) : null;
   var range = !slot ? '' : (C || t.days===1) ? dfmt(sd) : dfmt(sd) + ' – ' + dfmt(addBiz(sd, t.days-1));
@@ -1594,22 +1612,22 @@ var STEPS = [
   {id:"hh-pick", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM",
    title:function(){ return "Sarah picks a time that works"; },
    summary:function(){ return "Schedule opens the calendar flow, which shows only open consultation times for specialists who cover painting and carpentry. She picks a day and a time and confirms, and the booking is scheduled for that time. Try another day or time: the rest of the flow follows what she picks."; },
-   changes:function(){ var c = CS(); return [["bk1","Booked · " + c.short + ", " + h12(c.h)]]; },
+   changes:function(){ return []; },
    v1:["Calendar flow for consultations, showing only open times","The booking is scheduled for the time Sarah picks, with that time's specialist"],
    later:[],
    qs:["Which times do we offer: dedicated consultation slots per specialist, or any open hour?","How far ahead can members book, and how soon after the request?"], screen:scrPickConsult},
 
   {id:"hh-confirm", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM",
    title:function(){ return "Sarah sees the consultation booked"; },
-   summary:function(){ return "The appointment shows the time she picked, explains what a consultation is and sets the expectation: a written proposal by email and in HomeHub, often the same day."; },
-   changes:function(){ return []; },
+   summary:function(){ return "Confirming schedules the booking for the time she picked. The appointment shows that time, explains what a consultation is and sets the expectation: a written proposal by email and in HomeHub, often the same day."; },
+   changes:function(){ var c = CS(); return [["bk1","Booked · " + c.short + ", " + h12(c.h)]]; },
    v1:["Consultation appointment copy that tells the member a proposal is coming"],
    later:[],
    qs:["Reuse the standard confirmation email, or send a consultation-specific one?"], screen:scrConfirm},
 
   {id:"hm-consult", sys:"hm", actor:"Mario", role:"Specialty painter, on his iPad", av:"M",
    title:function(){ return "Mario builds the proposal during the walkthrough"; },
-   summary:function(){ return "The consultation booking keeps the HM Portal layout and the two tasks Ops booked. Under each task Mario adds proposal lines: area, condition, what he found, scope, measurements, hours and materials. Every member-facing box grows as he types. The visit itself stays free; a second table totals the proposal. Try editing hours, or clearing a field and pressing Send Now."; },
+   summary:function(){ return "The consultation booking keeps the HM Portal layout and the two tasks Ops added. Under each task Mario adds proposal lines: area, condition, what he found, scope, measurements, hours and materials. Every member-facing box grows as he types. The visit itself stays free; a second table totals the proposal. Try editing hours, or clearing a field and pressing Send Now."; },
    changes:function(){ return [["bk1","In Progress"]]; },
    v1:["Proposal lines on consultation tasks; every field the proposal page shows comes from here","Proposal summary table, title, summary, materials and exclusions","Member-facing boxes that grow as you type"],
    later:["Phase 2: the estimator and proposal-builder skills fill these fields from photos and dictation"],
@@ -1710,15 +1728,15 @@ var STEPS = [
   {id:"hh-pick-proj", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM", differs:true,
    title:function(){ return "Sarah picks a start date"; },
    summary:function(){ var n = T().days; return "The calendar flow only offers start dates when Mario is free for " + (n===1 ? "the whole day" : "all " + n + " days in a row") + ", because the job runs " + (n===1 ? "1 day" : n + " days") + ". She picks a date and an arrival time and confirms, and the booking is scheduled for those days."; },
-   changes:function(){ var p = PS(); return [["bk2","Booked · " + dshort(kd(p.k)) + ", " + h12(p.h)]]; },
+   changes:function(){ return []; },
    v1:["Calendar flow for projects, checking start dates against the job's length"],
    later:[],
-   qs:["If no start date fits in the next two weeks, does Sarah see later dates, or does Ops call her?"], screen:scrPickProj},
+   qs:["If no start date fits in the next two weeks, how far ahead does the calendar show dates, and do we tell Sarah when new ones open?"], screen:scrPickProj},
 
   {id:"hh-booked", sys:"hh", actor:"Sarah Mitchell", role:"Member", av:"SM", differs:true,
    title:function(){ return "Sarah sees her project booked"; },
-   summary:function(){ return "The project shows in Upcoming visits for the dates she picked, and the approved proposal stays in the Proposals module, so the scope is visible from request to completion."; },
-   changes:function(){ return []; },
+   summary:function(){ return "Confirming schedules the booking for the dates she picked. The project shows in Upcoming visits, and the approved proposal stays in the Proposals module, so the scope is visible from request to completion."; },
+   changes:function(){ var p = PS(); return p ? [["bk2","Booked · " + dshort(kd(p.k)) + ", " + h12(p.h)]] : []; },
    v1:["Approved proposals stay on the dashboard, linked to the visit"],
    later:["After the work, the visit summary links back to the proposal, the way contractor invoices link today"],
    qs:[], screen:scrBooked},
