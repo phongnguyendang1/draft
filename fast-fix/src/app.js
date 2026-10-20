@@ -169,7 +169,9 @@
   }
 
   function updateDock() {
-    var show = /^(describe|job|details|question|more|check|time)$/.test(state.screen);
+    var nocta = WIZ && (state.screen === "job" || (state.screen === "question" && !koAnswered()));
+    var show = /^(describe|job|details|question|more|check|time)$/.test(state.screen) && !nocta;
+    body.setAttribute("data-nocta", nocta ? "1" : "0");
     body.setAttribute("data-dock", show ? "on" : "off");
     $("#fdock").hidden = !show;
   }
@@ -311,10 +313,8 @@
         lab.appendChild(inp);
         var m = el("span", "opt__main"); m.appendChild(el("span", "opt__title", j.title)); lab.appendChild(m);
         var bx = el("span", "opt__box"); bx.setAttribute("aria-hidden", "true"); bx.innerHTML = '<svg class="i"><use href="#ri-check-line"/></svg>'; lab.appendChild(bx);
-        var ad = null;
-        if (WIZ) { ad = el("span", "opt__added", "Added"); ad.hidden = true; lab.appendChild(ad); }
         panel.appendChild(lab);
-        tiles.push({ job: j, el: lab, input: inp, added: ad });
+        tiles.push({ job: j, el: lab, input: inp });
       });
       root.appendChild(h); root.appendChild(panel); tree.appendChild(root);
       GROUPS.push({ id: g.id, title: g.title, titleHay: g.title.toLowerCase(), root: root, btn: btn, panel: panel, sel: sel, meta: meta, tiles: tiles });
@@ -329,6 +329,7 @@
   function hit(hay, tk) { return wordStart(hay, tk) || (tk.length > 3 && wordStart(hay, tk.replace(/(es|s)$/, ""))); }
   /* Search: a group name shows the whole group; otherwise job names; if neither hits, related words and the group's keywords */
   function syncTree() {
+    if (WIZ) { renderPick(); return; }
     var toks = state.q.toLowerCase().split(/[^a-z0-9']+/).filter(Boolean), total = 0, any = false;
     var byGroup = {}, byTitle = {};
     if (toks.length) {
@@ -343,7 +344,6 @@
         var on = !!state.jobs[t.job.id];
         if (on) n++;
         t.input.checked = on;
-        if (WIZ) { var done = on && !!state.committed[t.job.id]; t.input.disabled = done; t.el.classList.toggle("is-added", done); t.added.hidden = !done; }
         var show = !toks.length || byGroup[g.id] || byTitle[t.job.id];
         t.el.hidden = !show; if (show) shown++;
       });
@@ -383,19 +383,7 @@
   }
 
   /* ----- one place for every add / remove ----- */
-  function wizPick(id, on) {
-    var prev = state.cur;
-    if (on) {
-      if (prev && prev !== id && !state.committed[prev]) unselectJob(prev);
-      selectJob(id); state.cur = id;
-    } else if (!state.committed[id]) {
-      unselectJob(id); if (state.cur === id) state.cur = null;
-    }
-    resetPicks(); setError("sel", false); syncTree(); refresh();
-    announce(on ? JOB[id].title + " selected." : "Selection cleared.");
-  }
   function toggleJob(id, on, focusId) {
-    if (WIZ) { wizPick(id, on); return; }
     if (on) selectJob(id); else unselectJob(id);
     resetPicks();
     setError("sel", false); setError("note-other", false);
@@ -406,7 +394,7 @@
   }
 
   function renderJobsStep() {
-    if (WIZ) { syncTree(); return; }
+    if (WIZ) { renderPick(); return; }
     renderSelected(); syncTree();
   }
 
@@ -442,14 +430,14 @@
   }
   function backFor(s) {
     if (!WIZ) return BACK[s];
-    if (s === "job") return committedIds().length ? "more" : "type";
+    if (s === "job") return state.pg ? "job" : (committedIds().length ? "more" : "type");
     if (s === "details") return state.editing ? "more" : "job";
     if (s === "more") { var cj = curJob(); return cj ? (cj.ko.length ? "question" : "details") : "job"; }
     return BACK[s];
   }
   function wizTitles() {
     var cj = curJob(), n = Math.min(MAX_TASKS, committedIds().length + 1);
-    TITLES.job = ["What needs fixing?", "Job " + n + " of up to " + MAX_TASKS + ". Pick one, then describe it next."];
+    TITLES.job = ["What needs fixing?", "Job " + n + " of up to " + MAX_TASKS + ". " + (state.pg ? "Tap the job that fits." : "Choose a category, or search.")];
     TITLES.details = [cj ? cj.title : "Tell us about the job", "Tell us what\u2019s going on. Photos are optional."];
     TITLES.question = ["One quick question", cj ? "About: " + cj.title : ""];
   }
@@ -617,6 +605,10 @@
     var lg = el("legend", "t-strong", k.q);
     var opts = el("div", "opts opts--2 opts--stack");
     [["yes", "Yes"], ["no", "No"]].forEach(function (o) {
+      if (WIZ) {   /* tap an answer: Yes moves on right away, No explains the next step */
+        var ab = el("button", "ans", o[1]); ab.type = "button"; ab.setAttribute("data-wiz-ans", k.key + "|" + o[0]); ab.setAttribute("aria-pressed", String(state.ko[k.key] === o[0]));
+        opts.appendChild(ab); return;
+      }
       var lab = el("label", "opt"), inp = el("input"); inp.type = "radio"; inp.name = "ko-" + k.key; inp.value = o[0]; inp.checked = state.ko[k.key] === o[0];
       var rd = el("span", "opt__radio"); rd.setAttribute("aria-hidden", "true");
       lab.appendChild(inp); lab.appendChild(rd); lab.appendChild(el("span", "opt__title", o[1]));
@@ -651,6 +643,59 @@
     items.forEach(function (k) { box.appendChild(koCard(k)); });
   }
 
+  /* ---------- Wizard: pick a job with one tap (categories, then jobs; or search) ---------- */
+  function pickResults(toks) {
+    var gm = {};
+    CATALOG.forEach(function (g) { var h = g.title.toLowerCase(); gm[g.id] = toks.every(function (t) { return hit(h, t); }); });
+    var any = CATALOG.some(function (g) { return gm[g.id]; }) || JOBS.some(function (j) { return toks.every(function (t) { return hit(j.titleHay, t); }); });
+    return JOBS.filter(function (j) { return any ? (gm[j.group] || toks.every(function (t) { return hit(j.titleHay, t); })) : toks.every(function (t) { return hit(j.hay, t); }); });
+  }
+  function pkChev() { var s = el("span", "pk__chev"); s.setAttribute("aria-hidden", "true"); s.innerHTML = '<svg class="i"><use href="#ri-arrow-right-s-line"/></svg>'; return s; }
+  function renderPick() {
+    var box = $("#tree"), q = state.q.trim(), toks = q.toLowerCase().split(/[^a-z0-9']+/).filter(Boolean), jobs = null, title = "Choose a category", sub = "";
+    box.innerHTML = "";
+    if ($("#search").value !== state.q) $("#search").value = state.q;
+    if (toks.length) { jobs = pickResults(toks); title = "Results"; }
+    else if (state.pg) {
+      jobs = JOBS.filter(function (j) { return j.group === state.pg; });
+      title = CATALOG.filter(function (g) { return g.id === state.pg; })[0].title; sub = "Tap the job that fits.";
+    }
+    var none = toks.length > 0 && jobs.length === 0;
+    if (!none) {
+      var head = el("div", "pk__head"); head.appendChild(el("h2", "t-strong", title)); if (sub) head.appendChild(el("p", "t-meta", sub));
+      box.appendChild(head);
+      var list = el("div", "pk");
+      if (!jobs) {
+        CATALOG.forEach(function (g) {
+          var b = el("button", "pkb"); b.type = "button"; b.setAttribute("data-pk-group", g.id);
+          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", g.title)); m.appendChild(el("span", "pkb__meta", g.jobs.length + " jobs"));
+          b.appendChild(icon(g.icon)); b.appendChild(m); b.appendChild(pkChev()); list.appendChild(b);
+        });
+      } else {
+        jobs.forEach(function (j) {
+          var done = !!state.committed[j.id] && !!state.jobs[j.id];
+          var b = el("button", "pkb pkb--job"); b.type = "button"; b.setAttribute("data-pick", j.id); b.disabled = done;
+          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", j.title)); if (toks.length) m.appendChild(el("span", "pkb__meta", j.groupTitle));
+          b.appendChild(m);
+          if (done) b.appendChild(el("span", "opt__added", "Added")); else b.appendChild(pkChev());
+          list.appendChild(b);
+        });
+      }
+      box.appendChild(list);
+    }
+    $("#search-none").hidden = !none;
+    $("#search-clear").hidden = !state.q;
+    setText($("#search-live"), toks.length ? (jobs.length + (jobs.length === 1 ? " job" : " jobs") + " found") : "");
+  }
+  function wizPickNow(id) {
+    var prev = state.cur;
+    if (prev && prev !== id && !state.committed[prev]) unselectJob(prev);
+    selectJob(id); state.cur = id; state.editing = false; resetPicks();
+    state.q = ""; state.pg = null;
+    navigate("details");
+  }
+  function koAnswered() { var k = koFor(state.cur); return !!(k && state.ko[k.key]); }
+
   /* ---------- Wizard screens ---------- */
   function renderDetails() {
     var jb = curJob(); if (!jb) return;
@@ -681,15 +726,7 @@
   }
   function wizNext() {
     var s = state.screen, jb;
-    if (s === "job") {
-      if (!curJob()) {
-        setText($("#err-sel span"), "Pick a job to continue."); setError("sel", true); announce("Pick a job to continue.");
-        $("#err-sel").scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
-        $("#search").focus({ preventScroll: true });
-        return true;
-      }
-      state.editing = false; navigate("details"); return true;
-    }
+    if (s === "job") return true;   /* picking a job moves on by itself */
     if (s === "details") {
       jb = curJob(); if (!jb) { navigate("job"); return true; }
       if ((state.notes[jb.id] || "").trim().length < 3) { setError("wnote", true); announce("Add a few words about this job."); $("#wnote").focus(); return true; }
@@ -699,7 +736,7 @@
     if (s === "question") {
       var k = koFor(state.cur); if (!k) { navigate("more"); return true; }
       var a = state.ko[k.key];
-      if (!a) { setError("ko-" + k.key, true); focusFirst("#fs-ko-" + k.key + " input"); return true; }
+      if (!a) return true;
       if (a === "no") { state.reason = "ko"; navigate("sent"); return true; }
       state.committed[state.cur] = true; state.editing = false; navigate("more"); return true;
     }
@@ -816,6 +853,7 @@
     if (state.screen === "time") updateRec();
     updateCta();
     updateSummary();
+    if (WIZ) updateDock();
   }
 
   /* ---------- Errors ---------- */
@@ -852,8 +890,9 @@
   }
 
   function fromHash() {
-    var m = /^#\/([a-z]+)$/.exec(location.hash);
-    return m && SCREENS.indexOf(m[1]) > -1 ? m[1] : "type";
+    var m = /^#\/([a-z]+)(?:\/([a-z0-9-]+))?$/.exec(location.hash), s = m && SCREENS.indexOf(m[1]) > -1 ? m[1] : "type";
+    state.pg = WIZ && s === "job" && m[2] && CATALOG.some(function (g) { return g.id === m[2]; }) ? m[2] : null;
+    return s;
   }
   function navigate(screen) {
     if (location.hash === "#/" + screen) render(screen); else location.hash = "#/" + screen;
@@ -1128,6 +1167,15 @@
         return;
       }
       if (t.closest("[data-sr-link]")) { srAction(); return; }
+      var pkj = t.closest("[data-pick]"); if (pkj) { if (!pkj.disabled) wizPickNow(pkj.getAttribute("data-pick")); return; }
+      var pkg = t.closest("[data-pk-group]"); if (pkg) { state.q = ""; location.hash = "#/job/" + pkg.getAttribute("data-pk-group"); return; }
+      var wn = t.closest("[data-wiz-ans]");
+      if (wn) {
+        var wp = wn.getAttribute("data-wiz-ans").split("|"); state.ko[wp[0]] = wp[1];
+        if (wp[1] === "yes") { if (state.cur) state.committed[state.cur] = true; state.editing = false; navigate("more"); }
+        else { renderWizQuestion(); refresh(); var nb = $('[data-wiz-ans="' + wp[0] + '|no"]'); if (nb) nb.focus(); }
+        return;
+      }
       var wa = t.closest("[data-wiz-add]"); if (wa) { wizAdd(); return; }
       var we = t.closest("[data-wiz-edit]"); if (we) { state.cur = we.getAttribute("data-wiz-edit"); state.editing = true; navigate("details"); return; }
       var wr = t.closest("[data-wiz-remove]"); if (wr) { wizRemove(wr.getAttribute("data-wiz-remove")); return; }
@@ -1232,8 +1280,9 @@
     /* Pick-it-yourself order: search and groups first, the selected jobs (with optional details) below them */
     $(".step.finder-only").remove();
     $("#pick-ui").appendChild($("#sel-sec"));
-    setText($("#add-title label"), WIZ ? "Pick a job" : "Find your jobs");
-    setText($("#search-hint"), WIZ ? "Search by job or category, or open a category. Pick one." : "Search by job or category, or open a category. You can pick up to 4.");
+    setText($("#add-title label"), WIZ ? "Search for a job" : "Find your jobs");
+    setText($("#search-hint"), "Search by job or category, or open a category. You can pick up to 4.");
+    if (WIZ) { $("#add-title").className = "sr-only"; $("#search-hint").hidden = true; $("#search").removeAttribute("aria-describedby"); $("#search").setAttribute("placeholder", "Search jobs, like \u201Cfaucet\u201D"); }
     if (WIZ) setText($('.step[data-step="job"] .step__t'), "Your jobs");
   }
   applySwitch("multi", true);
