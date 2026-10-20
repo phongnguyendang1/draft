@@ -182,7 +182,15 @@ body.variant-wizard #sel-sec { display: none !important; }
 body[data-nocta="1"] [data-screen-id="job"] .factions,
 body[data-nocta="1"] [data-screen-id="question"] .factions { display: none; }
 body.variant-wizard #tree { margin-top: 0; }
-.pk__head { margin-top: var(--s-24); margin-bottom: var(--s-12); }
+.pk__head { margin-top: var(--s-16); margin-bottom: var(--s-12); }
+.pk__head .pk__up { margin-bottom: var(--s-8); }
+.pk__foot { margin-top: var(--s-16); }
+.pk__up {
+  display: inline-flex; align-items: center; gap: var(--s-4); min-height: 44px; padding: 0 var(--s-16) 0 var(--s-8); border: 0; border-radius: var(--r-pill);
+  background: var(--blue-tint); color: var(--blue-text); font: inherit; font-size: 16px; line-height: 24px; font-weight: 600; cursor: pointer;
+}
+.pk__up:hover { box-shadow: inset 0 0 0 2px var(--blue); }
+.pk__up:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; }
 .pk__head h2 { margin: 0; }
 .pk__head .t-meta { margin: var(--s-4) 0 0; }
 .pk { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-8); }

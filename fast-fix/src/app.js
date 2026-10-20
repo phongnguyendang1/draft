@@ -430,7 +430,7 @@
   }
   function backFor(s) {
     if (!WIZ) return BACK[s];
-    if (s === "job") return state.pg ? "job" : (committedIds().length ? "more" : "type");
+    if (s === "job") return committedIds().length ? "more" : "type";
     if (s === "details") return state.editing ? "more" : "job";
     if (s === "more") { var cj = curJob(); return cj ? (cj.ko.length ? "question" : "details") : "job"; }
     return BACK[s];
@@ -650,6 +650,11 @@
     var any = CATALOG.some(function (g) { return gm[g.id]; }) || JOBS.some(function (j) { return toks.every(function (t) { return hit(j.titleHay, t); }); });
     return JOBS.filter(function (j) { return any ? (gm[j.group] || toks.every(function (t) { return hit(j.titleHay, t); })) : toks.every(function (t) { return hit(j.hay, t); }); });
   }
+  function pkUp() {
+    var b = el("button", "pk__up"); b.type = "button"; b.setAttribute("data-pk-up", "1");
+    b.innerHTML = '<svg class="i" aria-hidden="true"><use href="#ri-arrow-left-s-line"/></svg>'; b.appendChild(document.createTextNode("All categories"));
+    return b;
+  }
   function pkChev() { var s = el("span", "pk__chev"); s.setAttribute("aria-hidden", "true"); s.innerHTML = '<svg class="i"><use href="#ri-arrow-right-s-line"/></svg>'; return s; }
   function renderPick() {
     var box = $("#tree"), q = state.q.trim(), toks = q.toLowerCase().split(/[^a-z0-9']+/).filter(Boolean), jobs = null, title = "Choose a category", sub = "";
@@ -662,7 +667,9 @@
     }
     var none = toks.length > 0 && jobs.length === 0;
     if (!none) {
-      var head = el("div", "pk__head"); head.appendChild(el("h2", "t-strong", title)); if (sub) head.appendChild(el("p", "t-meta", sub));
+      var head = el("div", "pk__head"), inCat = !!state.pg && !toks.length;
+      if (inCat) head.appendChild(pkUp());
+      head.appendChild(el("h2", "t-strong", title)); if (sub) head.appendChild(el("p", "t-meta", sub));
       box.appendChild(head);
       var list = el("div", "pk");
       if (!jobs) {
@@ -682,6 +689,7 @@
         });
       }
       box.appendChild(list);
+      if (inCat) { var ft = el("div", "pk__foot"); ft.appendChild(pkUp()); box.appendChild(ft); }
     }
     $("#search-none").hidden = !none;
     $("#search-clear").hidden = !state.q;
@@ -1168,6 +1176,7 @@
       }
       if (t.closest("[data-sr-link]")) { srAction(); return; }
       var pkj = t.closest("[data-pick]"); if (pkj) { if (!pkj.disabled) wizPickNow(pkj.getAttribute("data-pick")); return; }
+      var pku = t.closest("[data-pk-up]"); if (pku) { state.q = ""; navigate("job"); return; }
       var pkg = t.closest("[data-pk-group]"); if (pkg) { state.q = ""; location.hash = "#/job/" + pkg.getAttribute("data-pk-group"); return; }
       var wn = t.closest("[data-wiz-ans]");
       if (wn) {
