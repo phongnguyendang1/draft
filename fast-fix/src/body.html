@@ -192,6 +192,10 @@
 
         <!-- ============ 2. Quick check ============ -->
         <section class="card" data-screen-id="check" aria-label="Quick check" hidden>
+          <div class="qsec__head" id="global-head" hidden>
+            <h2 class="t-strong" id="global-title">About your visit</h2>
+            <p class="t-meta">These three apply to the whole visit.</p>
+          </div>
           <div class="fsec">
             <fieldset id="fs-ladder" aria-describedby="hint-ladder err-ladder">
               <legend class="t-strong">Can you reach it with a standard step ladder?</legend>
@@ -235,7 +239,11 @@
 
           <div class="note manual-only" id="ko-removed" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span></span></div>
 
-          <div class="fsec" id="ko-sec" hidden>
+          <div class="qsec" id="ko-sec" hidden>
+            <div class="qsec__head">
+              <h2 class="t-strong" id="ko-title">About each job</h2>
+              <p class="t-meta">One question for each job you picked.</p>
+            </div>
             <div id="ko-box"></div>
           </div>
 

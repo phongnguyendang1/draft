@@ -90,7 +90,7 @@
   /* ---------- State ---------- */
   var state = {
     screen: "type", home: "mueller", jobs: {}, order: [], notes: {}, showAll: false, hours: 0, ladder: "", trade: "", part: "",
-    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}
+    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, photos: {}, perr: {}
   };
 
 
@@ -116,7 +116,7 @@
     if (state.dropped[id]) { delete state.dropped[id]; syncSr(); }
   }
   function unselectJob(id) {
-    state.jobs[id] = false;
+    state.jobs[id] = false; dropPhotos(id);
     var at = state.order.indexOf(id); if (at > -1) state.order.splice(at, 1);
   }
   function icon(name) { var s = el("span", "d-icon"); s.setAttribute("aria-hidden", "true"); s.innerHTML = '<svg class="i"><use href="#' + name + '"/></svg>'; return s; }
@@ -163,6 +163,61 @@
     $("#fdock").hidden = !show;
   }
 
+  /* ----- Optional photos for each picked job (prototype: kept in the page, never uploaded) ----- */
+  var MAX_PHOTOS = 3, MAX_PHOTO_MB = 10;
+  function photosOf(id) { return state.photos[id] || []; }
+  function dropPhotos(id) { photosOf(id).forEach(function (p) { URL.revokeObjectURL(p.url); }); delete state.photos[id]; delete state.perr[id]; }
+  function photoBlock(jb) {
+    var list = photosOf(jb.id), full = list.length >= MAX_PHOTOS, box = el("div", "photos");
+    var ttl = el("p", "photos__title"); ttl.id = "photos-t-" + jb.id;
+    ttl.appendChild(document.createTextNode("Photos ")); ttl.appendChild(el("span", "", "(optional)"));
+    box.appendChild(ttl);
+    box.appendChild(el("p", "t-meta", "A photo helps your Home Manager come prepared. Add up to " + MAX_PHOTOS + "."));
+    if (list.length) {
+      var ul = el("ul", "photos__list");
+      list.forEach(function (ph, i) {
+        var li = el("li", "photo"), img = el("img"), rm = el("button", "link photo__rm", "Remove");
+        img.src = ph.url; img.alt = "Photo " + (i + 1) + " for " + jb.title;
+        rm.type = "button"; rm.setAttribute("data-photo-rm", jb.id + ":" + i); rm.setAttribute("aria-label", "Remove photo " + (i + 1) + " for " + jb.title);
+        li.appendChild(img); li.appendChild(rm); ul.appendChild(li);
+      });
+      box.appendChild(ul);
+    }
+    var err = el("p", "error"); err.id = "err-photo-" + jb.id; err.setAttribute("role", "alert"); err.hidden = !state.perr[jb.id];
+    err.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span></span>'; err.lastChild.textContent = state.perr[jb.id] || "";
+    box.appendChild(err);
+    if (full) {
+      box.appendChild(el("p", "t-meta", "You have added " + MAX_PHOTOS + " photos. Remove one to add another."));
+    } else {
+      var inp = el("input"); inp.type = "file"; inp.accept = "image/*"; inp.multiple = true; inp.hidden = true; inp.tabIndex = -1; inp.setAttribute("data-photo-in", jb.id); inp.id = "photo-in-" + jb.id;
+      var add = el("button", "btn btn--secondary photos__add", list.length ? "Add another photo" : "Add photos"); add.type = "button"; add.id = "photo-add-" + jb.id;
+      add.setAttribute("data-photo-add", jb.id); add.setAttribute("aria-label", add.textContent + " for " + jb.title);
+      box.appendChild(add); box.appendChild(inp);
+    }
+    return box;
+  }
+  function addPhotos(id, files) {
+    var room = MAX_PHOTOS - photosOf(id).length, added = 0, msg = "";
+    Array.prototype.slice.call(files).forEach(function (f) {
+      if (!/^image\//.test(f.type)) { msg = "Only photos can be added."; return; }
+      if (f.size > MAX_PHOTO_MB * 1048576) { msg = "A photo can be up to " + MAX_PHOTO_MB + " MB."; return; }
+      if (added >= room) { msg = "You can add up to " + MAX_PHOTOS + " photos."; return; }
+      (state.photos[id] = state.photos[id] || []).push({ url: URL.createObjectURL(f), name: f.name }); added++;
+    });
+    state.perr[id] = msg;
+    renderSelected(); refresh();
+    var n = photosOf(id).length, b = $("#photo-add-" + id) || $all('[data-photo-rm^="' + id + ':"]').pop();
+    if (b) b.focus({ preventScroll: true });
+    announce((added ? added + (added === 1 ? " photo added. " : " photos added. ") + n + " of " + MAX_PHOTOS + "." : msg));
+  }
+  function removePhoto(id, i) {
+    var p = photosOf(id)[i]; if (!p) return;
+    URL.revokeObjectURL(p.url); state.photos[id].splice(i, 1); state.perr[id] = "";
+    renderSelected(); refresh();
+    var b = $("#photo-add-" + id); if (b) b.focus({ preventScroll: true });
+    announce("Photo removed. " + photosOf(id).length + " of " + MAX_PHOTOS + ".");
+  }
+
   /* ----- Step 2: selected jobs (top) ----- */
   function renderSelected() {
     var jobs = selectedJobs(), list = $("#sel");
@@ -189,7 +244,7 @@
         var re = el("p", "error"); re.id = "err-note-" + jb.id; re.hidden = true; re.setAttribute("role", "alert");
         re.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span></span>';
         re.lastChild.textContent = "Add a few words about this job so your Home Manager knows what to expect.";
-        req.appendChild(rl); req.appendChild(rt); req.appendChild(re);
+        req.appendChild(rl); req.appendChild(rt); req.appendChild(re); req.appendChild(photoBlock(jb));
         li.appendChild(top); li.appendChild(req);
         list.appendChild(li);
         return;
@@ -477,14 +532,19 @@
     announce("Removed " + title + ". After you book, you can submit a service request for it.");
     var rm = $("#ko-removed"); if (rm) { rm.setAttribute("tabindex", "-1"); rm.focus(); }
   }
+  /* Task-specific questions: one card per picked job, under its own heading, apart from the three overall questions */
   function renderKo() {
     var box = $("#ko-box"), items = koItems();
     box.innerHTML = "";
     $("#ko-sec").hidden = items.length === 0;
+    $("#global-head").hidden = items.length === 0;
     items.forEach(function (k) {
-      var fs = el("fieldset"); fs.id = "fs-ko-" + k.key; fs.className = "ko";
+      var card = el("div", "ko"), head = el("div", "ko__head"), tx = el("div", "ko__text");
+      var hd = el("h3", "t-strong ko__job", k.job.title); hd.id = "ko-h-" + k.key;
+      tx.appendChild(hd); tx.appendChild(el("p", "t-meta", k.job.groupTitle));
+      head.appendChild(icon(k.job.icon)); head.appendChild(tx); card.appendChild(head);
+      var fs = el("fieldset"); fs.id = "fs-ko-" + k.key; fs.className = "ko__fs";
       var lg = el("legend", "t-strong", k.q);
-      var meta = el("p", "t-meta", "About: " + k.job.title);
       var opts = el("div", "opts opts--2 opts--stack");
       [["yes", "Yes"], ["no", "No"]].forEach(function (o) {
         var lab = el("label", "opt"), inp = el("input"); inp.type = "radio"; inp.name = "ko-" + k.key; inp.value = o[0]; inp.checked = state.ko[k.key] === o[0];
@@ -505,9 +565,10 @@
       } else {
         sp.appendChild(document.createTextNode("We will send this to our team as a service request. You will not need to enter anything again."));
       }
-      fs.setAttribute("aria-describedby", "err-ko-" + k.key);
-      fs.appendChild(lg); fs.appendChild(meta); fs.appendChild(opts); fs.appendChild(err); fs.appendChild(note);
-      box.appendChild(fs);
+      fs.setAttribute("aria-describedby", "ko-h-" + k.key + " err-ko-" + k.key);
+      fs.appendChild(lg); fs.appendChild(opts); fs.appendChild(err); fs.appendChild(note);
+      card.appendChild(fs);
+      box.appendChild(card);
     });
   }
 
@@ -566,6 +627,8 @@
         n.textContent = note;
         li.appendChild(n);
       }
+      var np = photosOf(j.id).length;
+      if (np) { var pn = document.createElement("span"); pn.className = "sum__jobnote"; pn.textContent = np + (np === 1 ? " photo" : " photos"); li.appendChild(pn); }
       list.appendChild(li);
     });
 
@@ -902,6 +965,8 @@
         return;
       }
       if (t.closest("[data-sr-link]")) { srAction(); return; }
+      var pa = t.closest("[data-photo-add]"); if (pa) { var pi = $("#photo-in-" + pa.getAttribute("data-photo-add")); if (pi) pi.click(); return; }
+      var pr = t.closest("[data-photo-rm]"); if (pr) { var pp = pr.getAttribute("data-photo-rm").split(":"); removePhoto(pp[0], +pp[1]); return; }
       var kr = t.closest("[data-ko-remove]"); if (kr) { removeFailed(kr.getAttribute("data-ko-remove")); return; }
       if (t.closest("[data-sr-confirm]")) { state.srModal = true; syncSr(); closeModal(); updateSrFlag(); announce("After you book, you can submit a service request for your other job."); return; }
       if (t.closest("[data-sr-undo]")) { state.srModal = false; state.dropped = {}; syncSr(); updateSrFlag(); return; }
@@ -955,6 +1020,7 @@
 
   document.addEventListener("change", function (e) {
     var el = e.target;
+    if (el.hasAttribute && el.hasAttribute("data-photo-in")) { addPhotos(el.getAttribute("data-photo-in"), el.files); return; }
     if (el.name === "jobs") { toggleJob(el.value, el.checked); return; }
     else if (Q.indexOf(el.name) > -1) { state[el.name] = el.value; setError(el.name, false); }
     else if (/^ko-/.test(el.name)) { state.ko[el.name.slice(3)] = el.value; setError(el.name, false); }

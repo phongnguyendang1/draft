@@ -113,9 +113,6 @@ body.variant-finder .manual-only { display: none !important; }
 .sr-pointer .link, .search__none .link { min-height: 44px; }
 
 /* Per-task knockout questions on the quick check */
-.ko { margin: 0; }
-.ko + .ko { margin-top: var(--s-24); }
-.ko .t-meta { margin: var(--s-4) 0 0; }
 body.is-modal { overflow: hidden; }
 
 /* Modal: flat, no shadow */
@@ -135,6 +132,32 @@ body.is-modal { overflow: hidden; }
 .job__box--req .error { background: var(--surface); padding: var(--s-8) var(--s-12); border-radius: var(--r-inner); }
 
 .ko .note { margin-top: var(--s-12); }
-.ko .note .link { min-height: 44px; text-align: left; }
+.ko .note .link { display: block; min-height: 44px; margin-top: var(--s-4); text-align: left; }
 #ko-removed { margin-bottom: var(--s-16); }
 #ko-removed:focus { outline: none; }
+
+/* ---------- Quick check: overall questions, then one card per job ---------- */
+.qsec__head { margin-bottom: var(--s-16); }
+.qsec__head h2 { margin: 0; }
+.qsec__head .t-meta { margin: var(--s-4) 0 0; }
+#ko-sec { margin-top: var(--s-32); padding-top: var(--s-32); border-top: 2px solid var(--border); }
+#ko-removed { margin-top: var(--s-24); }
+#ko-removed + #ko-sec { margin-top: var(--s-24); }
+.ko { padding: var(--s-16); border: 1px solid var(--border); border-radius: var(--r-inner); background: var(--surface); }
+.ko + .ko { margin-top: var(--s-16); }
+.ko__head { display: flex; align-items: center; gap: var(--s-12); padding-bottom: var(--s-12); margin-bottom: var(--s-16); border-bottom: 1px solid var(--border); }
+.ko__text { min-width: 0; }
+.ko__job { margin: 0; overflow-wrap: anywhere; }
+.ko__text .t-meta { margin: 0; }
+
+/* ---------- Photos on each picked job ---------- */
+.photos { margin-top: var(--s-16); padding-top: var(--s-16); border-top: 1px solid var(--border); }
+.photos__title { margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; }
+.photos__title span { font-weight: 400; color: var(--text-2); }
+.photos .t-meta { margin: var(--s-4) 0 0; }
+.photos__list { display: flex; flex-wrap: wrap; gap: var(--s-12); margin: var(--s-12) 0 0; padding: 0; list-style: none; }
+.photo { display: flex; flex-direction: column; align-items: flex-start; width: 88px; }
+.photo img { display: block; width: 88px; height: 88px; object-fit: cover; border-radius: var(--r-inner); background: var(--page); }
+.photo__rm { min-height: 44px; padding: 0; }
+.photos__add { height: 44px; margin-top: var(--s-12); padding: 0 var(--s-20); }
+.photos .error { margin-top: var(--s-8); }
