@@ -69,10 +69,11 @@ def build():
     for variant, vclass, vtitle, vprefix in (
         ("", "", "Request service", "request-flow"),
         ("describe", " variant-finder", "Request service, describe first", "request-flow-describe"),
+        ("wizard", " variant-wizard", "Request service, one job at a time", "request-flow-wizard"),
     ):
       for frame, suffix in (("desktop", "Desktop"), ("mobile", "Mobile")):
         # the pick-it-yourself version has its own symptom-worded catalog; describe-first keeps the earlier one
-        cat = "catalog_manual.js" if (variant == "" and os.path.exists(os.path.join(SRC, "catalog_manual.js"))) else "catalog.js"
+        cat = "catalog_manual.js" if (variant in ("", "wizard") and os.path.exists(os.path.join(SRC, "catalog_manual.js"))) else "catalog.js"
         js = read(cat) + "\n" + app_js
         out = "%s-%s.html" % (vprefix, frame)
         title = "HomeHub \u00b7 %s \u00b7 %s" % (vtitle, suffix)

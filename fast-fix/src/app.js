@@ -5,6 +5,7 @@
 
   var body = document.body;
   var FIND = body.classList.contains("variant-finder");
+  var WIZ = body.classList.contains("variant-wizard");   /* one job at a time: pick, describe, photos, question, add another */
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
   function pad(n) { return (n < 10 ? "0" : "") + n; }
@@ -55,6 +56,16 @@
     time: "Fast Fix: pick a time", booked: "Fast Fix: booked", sent: "Request sent"
   };
   var BACK = { type: null, job: "type", check: "job", time: "check", booked: null, sent: null };
+  if (WIZ) {
+    SCREENS = ["type", "job", "details", "question", "more", "check", "time", "booked", "sent"];
+    TITLES.job = ["What needs fixing?", ""];
+    TITLES.details = ["Tell us about the job", "Tell us what\u2019s going on. Photos are optional."];
+    TITLES.question = ["One quick question", ""];
+    TITLES.more = ["Add another job?", "Each job gets its own description, photos and question. You can add up to 4."];
+    TITLES.check = ["A quick check", "Three questions about the whole visit. All are required."];
+    PAGE_TITLE.job = "Fast Fix: pick a job"; PAGE_TITLE.details = "Fast Fix: about the job"; PAGE_TITLE.question = "Fast Fix: one question"; PAGE_TITLE.more = "Fast Fix: add another job";
+    BACK = { type: null, job: "type", details: "job", question: "details", more: "question", check: "more", time: "check", booked: null, sent: null };
+  }
   if (FIND) {
     SCREENS = ["type", "describe", "job", "check", "time", "booked", "sent"];
     TITLES.describe = ["What do you need done?", "Tell us in your own words. We’ll select the jobs for you."];
@@ -90,7 +101,7 @@
   /* ---------- State ---------- */
   var state = {
     screen: "type", home: "mueller", jobs: {}, order: [], notes: {}, showAll: false, hours: 0, ladder: "", trade: "", part: "",
-    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, photos: {}, perr: {}
+    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, photos: {}, perr: {}, cur: null, committed: {}, editing: false
   };
 
 
@@ -158,7 +169,7 @@
   }
 
   function updateDock() {
-    var show = /^(describe|job|check|time)$/.test(state.screen);
+    var show = /^(describe|job|details|question|more|check|time)$/.test(state.screen);
     body.setAttribute("data-dock", show ? "on" : "off");
     $("#fdock").hidden = !show;
   }
@@ -196,6 +207,11 @@
     }
     return box;
   }
+  function redrawPhotos() {
+    if (!WIZ) { renderSelected(); return; }
+    var jb = curJob(), host = $("#w-photos"); if (!jb || !host) return;
+    host.innerHTML = ""; host.appendChild(photoBlock(jb));
+  }
   function addPhotos(id, files) {
     var room = MAX_PHOTOS - photosOf(id).length, added = 0, msg = "";
     Array.prototype.slice.call(files).forEach(function (f) {
@@ -205,7 +221,7 @@
       (state.photos[id] = state.photos[id] || []).push({ url: URL.createObjectURL(f), name: f.name }); added++;
     });
     state.perr[id] = msg;
-    renderSelected(); refresh();
+    redrawPhotos(); refresh();
     var n = photosOf(id).length, b = $("#photo-add-" + id) || $all('[data-photo-rm^="' + id + ':"]').pop();
     if (b) b.focus({ preventScroll: true });
     announce((added ? added + (added === 1 ? " photo added. " : " photos added. ") + n + " of " + MAX_PHOTOS + "." : msg));
@@ -213,7 +229,7 @@
   function removePhoto(id, i) {
     var p = photosOf(id)[i]; if (!p) return;
     URL.revokeObjectURL(p.url); state.photos[id].splice(i, 1); state.perr[id] = "";
-    renderSelected(); refresh();
+    redrawPhotos(); refresh();
     var b = $("#photo-add-" + id); if (b) b.focus({ preventScroll: true });
     announce("Photo removed. " + photosOf(id).length + " of " + MAX_PHOTOS + ".");
   }
@@ -295,8 +311,10 @@
         lab.appendChild(inp);
         var m = el("span", "opt__main"); m.appendChild(el("span", "opt__title", j.title)); lab.appendChild(m);
         var bx = el("span", "opt__box"); bx.setAttribute("aria-hidden", "true"); bx.innerHTML = '<svg class="i"><use href="#ri-check-line"/></svg>'; lab.appendChild(bx);
+        var ad = null;
+        if (WIZ) { ad = el("span", "opt__added", "Added"); ad.hidden = true; lab.appendChild(ad); }
         panel.appendChild(lab);
-        tiles.push({ job: j, el: lab, input: inp });
+        tiles.push({ job: j, el: lab, input: inp, added: ad });
       });
       root.appendChild(h); root.appendChild(panel); tree.appendChild(root);
       GROUPS.push({ id: g.id, title: g.title, titleHay: g.title.toLowerCase(), root: root, btn: btn, panel: panel, sel: sel, meta: meta, tiles: tiles });
@@ -325,6 +343,7 @@
         var on = !!state.jobs[t.job.id];
         if (on) n++;
         t.input.checked = on;
+        if (WIZ) { var done = on && !!state.committed[t.job.id]; t.input.disabled = done; t.el.classList.toggle("is-added", done); t.added.hidden = !done; }
         var show = !toks.length || byGroup[g.id] || byTitle[t.job.id];
         t.el.hidden = !show; if (show) shown++;
       });
@@ -345,7 +364,7 @@
   /* ----- "I can not find my job": point to a service request; if jobs are already picked, finish booking first ----- */
   var lastFocus = null;
   function srAction() {
-    if (selectedJobs().length) openModal(); else toast("Continues in the current service request flow");
+    if ((WIZ ? committedIds() : selectedJobs()).length) openModal(); else toast("Continues in the current service request flow");
   }
   function modalEls() { return $all("#sr-modal button"); }
   function openModal() {
@@ -364,7 +383,19 @@
   }
 
   /* ----- one place for every add / remove ----- */
+  function wizPick(id, on) {
+    var prev = state.cur;
+    if (on) {
+      if (prev && prev !== id && !state.committed[prev]) unselectJob(prev);
+      selectJob(id); state.cur = id;
+    } else if (!state.committed[id]) {
+      unselectJob(id); if (state.cur === id) state.cur = null;
+    }
+    resetPicks(); setError("sel", false); syncTree(); refresh();
+    announce(on ? JOB[id].title + " selected." : "Selection cleared.");
+  }
   function toggleJob(id, on, focusId) {
+    if (WIZ) { wizPick(id, on); return; }
     if (on) selectJob(id); else unselectJob(id);
     resetPicks();
     setError("sel", false); setError("note-other", false);
@@ -375,6 +406,7 @@
   }
 
   function renderJobsStep() {
+    if (WIZ) { syncTree(); return; }
     renderSelected(); syncTree();
   }
 
@@ -399,6 +431,39 @@
   function shortDate(d) { return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }); }
   function monthName(y, m) { return new Date(y, m, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" }); }
   function money(n) { return "$" + n; }
+
+  /* ---------- Wizard helpers ---------- */
+  function committedIds() { return state.order.filter(function (id) { return state.jobs[id] && state.committed[id]; }); }
+  function curJob() { return state.cur && state.jobs[state.cur] ? JOB[state.cur] : null; }
+  function koFor(id) { return koItems().filter(function (k) { return k.job.id === id; })[0] || null; }
+  function dropPending() {
+    state.order.slice().forEach(function (id) { if (state.jobs[id] && !state.committed[id]) unselectJob(id); });
+    if (state.cur && !state.committed[state.cur]) state.cur = null;
+  }
+  function backFor(s) {
+    if (!WIZ) return BACK[s];
+    if (s === "job") return committedIds().length ? "more" : "type";
+    if (s === "details") return state.editing ? "more" : "job";
+    if (s === "more") { var cj = curJob(); return cj ? (cj.ko.length ? "question" : "details") : "job"; }
+    return BACK[s];
+  }
+  function wizTitles() {
+    var cj = curJob(), n = Math.min(MAX_TASKS, committedIds().length + 1);
+    TITLES.job = ["What needs fixing?", "Job " + n + " of up to " + MAX_TASKS + ". Pick one, then describe it next."];
+    TITLES.details = [cj ? cj.title : "Tell us about the job", "Tell us what\u2019s going on. Photos are optional."];
+    TITLES.question = ["One quick question", cj ? "About: " + cj.title : ""];
+  }
+  /* Deep links (and the "Jump to screen" panel) land on a sensible state when nothing has been picked yet */
+  function wizEnter(screen) {
+    if (screen === "type" || screen === "more" || screen === "check") dropPending();
+    if (/^(details|question|more)$/.test(screen) && !selectedJobs().length) {
+      var id = JOB["running-toilet"] ? "running-toilet" : JOBS[0].id;
+      selectJob(id); state.cur = id; state.notes[id] = state.notes[id] || "Water keeps running after I flush.";
+      if (screen === "more") { state.committed[id] = true; var kk = koFor(id); if (kk) state.ko[kk.key] = "yes"; }
+    }
+    if (/^(details|question)$/.test(screen) && !curJob()) state.cur = state.order.filter(function (i) { return state.jobs[i]; }).pop() || null;
+    if (screen === "more" && !curJob()) state.cur = committedIds().pop() || null;
+  }
 
   /* ---------- Derived ---------- */
   function selectedJobs() {
@@ -495,10 +560,13 @@
   var lastOver = false;
   function updateOver() {
     var now = overLimit();
-    $("#note-over-sel").hidden = !now;
-    if (now) $("#note-over-sel span").innerHTML = overCount()
-      ? "<strong>That’s more than 4 jobs.</strong> To book a time now, keep it to 4 jobs or fewer. Otherwise we’ll send this to our team as a service request, and you won’t need to enter anything else."
-      : "<strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.";
+    ["#note-over-sel", "#note-over-more"].forEach(function (id) {
+      var n = $(id); if (!n) return;
+      n.hidden = !now;
+      if (now) n.querySelector("span").innerHTML = overCount()
+        ? "<strong>That’s more than 4 jobs.</strong> To book a time now, keep it to 4 jobs or fewer. Otherwise we’ll send this to our team as a service request, and you won’t need to enter anything else."
+        : "<strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.";
+    });
     if (now !== lastOver) { lastOver = now; if (now) announce("That is more than a Fast Fix covers. We will send this to our team."); }
   }
 
@@ -517,64 +585,150 @@
       $("#hint-" + q).textContent = (routed && !state[q] ? "Optional. " : "") + HINT[q];
     });
     koItems().forEach(function (k) { var n = $("#note-ko-" + k.key); if (n) n.hidden = state.ko[k.key] !== "no"; });
-    var dk = Object.keys(state.dropped), rm = $("#ko-removed");
-    if (rm) {
-      rm.hidden = !dk.length || state.screen !== "check";
-      if (dk.length) setText(rm.lastChild, "Removed " + dk.map(function (id) { return state.dropped[id]; }).join(", ") + ". After you book, we\u2019ll take you to a service request for " + (dk.length > 1 ? "them" : "it") + ".");
-    }
+    var dk = Object.keys(state.dropped), rm = $("#ko-removed"), mr = $("#more-removed");
+    var dtxt = dk.length ? "Removed " + dk.map(function (id) { return state.dropped[id]; }).join(", ") + ". After you book, we\u2019ll take you to a service request for " + (dk.length > 1 ? "them" : "it") + "." : "";
+    if (rm) { rm.hidden = !dk.length || state.screen !== "check"; if (dk.length) setText(rm.lastChild, dtxt); }
+    if (mr) { mr.hidden = !dk.length || state.screen !== "more"; if (dk.length) setText(mr.lastChild, dtxt); }
   }
   /* A task failed its knockout question: drop just that task, keep the rest, and point to a service request for it afterwards */
   function removeFailed(id) {
     var title = JOB[id].title, re = new RegExp("^" + id + "-\\d+$");
     Object.keys(state.ko).forEach(function (k) { if (re.test(k)) delete state.ko[k]; });
     unselectJob(id); state.dropped[id] = title; syncSr(); resetPicks();
+    if (WIZ) {
+      delete state.committed[id]; if (state.cur === id) state.cur = null;
+      announce("Removed " + title + ". After you book, you can submit a service request for it.");
+      navigate(committedIds().length ? "more" : "job"); return;
+    }
     renderKo(); refresh();
     announce("Removed " + title + ". After you book, you can submit a service request for it.");
     var rm = $("#ko-removed"); if (rm) { rm.setAttribute("tabindex", "-1"); rm.focus(); }
   }
   /* Task-specific questions: one card per picked job, under its own heading, apart from the three overall questions */
-  function renderKo() {
-    var box = $("#ko-box"), items = koItems();
-    box.innerHTML = "";
-    $("#ko-sec").hidden = items.length === 0;
-    $("#global-head").hidden = items.length === 0;
-    items.forEach(function (k) {
-      var card = el("div", "ko"), head = el("div", "ko__head"), tx = el("div", "ko__text");
+  function koCard(k, noHead) {
+    var card = el("div", "ko");
+    if (!noHead) {
+      var head = el("div", "ko__head"), tx = el("div", "ko__text");
       var hd = el("h3", "t-strong ko__job", k.job.title); hd.id = "ko-h-" + k.key;
       tx.appendChild(hd); tx.appendChild(el("p", "t-meta", k.job.groupTitle));
       head.appendChild(icon(k.job.icon)); head.appendChild(tx); card.appendChild(head);
-      var fs = el("fieldset"); fs.id = "fs-ko-" + k.key; fs.className = "ko__fs";
-      var lg = el("legend", "t-strong", k.q);
-      var opts = el("div", "opts opts--2 opts--stack");
-      [["yes", "Yes"], ["no", "No"]].forEach(function (o) {
-        var lab = el("label", "opt"), inp = el("input"); inp.type = "radio"; inp.name = "ko-" + k.key; inp.value = o[0]; inp.checked = state.ko[k.key] === o[0];
-        var rd = el("span", "opt__radio"); rd.setAttribute("aria-hidden", "true");
-        lab.appendChild(inp); lab.appendChild(rd); lab.appendChild(el("span", "opt__title", o[1]));
-        opts.appendChild(lab);
-      });
-      var err = el("p", "error"); err.id = "err-ko-" + k.key; err.hidden = true; err.setAttribute("role", "alert");
-      err.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes or no.</span>';
-      var note = el("div", "note"); note.id = "note-ko-" + k.key; note.hidden = true; note.setAttribute("role", "status");
-      note.innerHTML = '<svg class="i"><use href="#ri-information-line"/></svg><span></span>';
-      var sp = note.lastChild;
-      sp.appendChild(el("strong", "", k.job.title + " needs our team. "));
-      if (selectedJobs().length > 1) {
-        sp.appendChild(document.createTextNode("It can\u2019t be done as a Fast Fix. Remove it to keep booking your other jobs, and we\u2019ll point you to a service request for it afterwards. Or continue to send everything to our team. "));
-        var rb = el("button", "link", "Remove this job and keep booking the others"); rb.type = "button"; rb.setAttribute("data-ko-remove", k.job.id);
-        sp.appendChild(rb);
-      } else {
-        sp.appendChild(document.createTextNode("We will send this to our team as a service request. You will not need to enter anything again."));
-      }
-      fs.setAttribute("aria-describedby", "ko-h-" + k.key + " err-ko-" + k.key);
-      fs.appendChild(lg); fs.appendChild(opts); fs.appendChild(err); fs.appendChild(note);
-      card.appendChild(fs);
-      box.appendChild(card);
+    }
+    var fs = el("fieldset"); fs.id = "fs-ko-" + k.key; fs.className = "ko__fs";
+    var lg = el("legend", "t-strong", k.q);
+    var opts = el("div", "opts opts--2 opts--stack");
+    [["yes", "Yes"], ["no", "No"]].forEach(function (o) {
+      var lab = el("label", "opt"), inp = el("input"); inp.type = "radio"; inp.name = "ko-" + k.key; inp.value = o[0]; inp.checked = state.ko[k.key] === o[0];
+      var rd = el("span", "opt__radio"); rd.setAttribute("aria-hidden", "true");
+      lab.appendChild(inp); lab.appendChild(rd); lab.appendChild(el("span", "opt__title", o[1]));
+      opts.appendChild(lab);
     });
+    var err = el("p", "error"); err.id = "err-ko-" + k.key; err.hidden = true; err.setAttribute("role", "alert");
+    err.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes or no.</span>';
+    var note = el("div", "note"); note.id = "note-ko-" + k.key; note.hidden = true; note.setAttribute("role", "status");
+    note.innerHTML = '<svg class="i"><use href="#ri-information-line"/></svg><span></span>';
+    var sp = note.lastChild, others = selectedJobs().length > 1;
+    sp.appendChild(el("strong", "", k.job.title + " needs our team. "));
+    if (others) {
+      sp.appendChild(document.createTextNode("It can\u2019t be done as a Fast Fix. Remove it to keep booking your other jobs, and we\u2019ll point you to a service request for it afterwards. Or continue to send everything to our team. "));
+      var rb = el("button", "link", WIZ ? "Remove this job and keep going" : "Remove this job and keep booking the others"); rb.type = "button"; rb.setAttribute("data-ko-remove", k.job.id);
+      sp.appendChild(rb);
+    } else {
+      sp.appendChild(document.createTextNode("We will send this to our team as a service request. You will not need to enter anything again."));
+      if (WIZ) { sp.appendChild(document.createTextNode(" ")); var cb = el("button", "link", "Pick a different job instead"); cb.type = "button"; cb.setAttribute("data-wiz-change", k.job.id); sp.appendChild(cb); }
+    }
+    fs.setAttribute("aria-describedby", (noHead ? "" : "ko-h-" + k.key + " ") + "err-ko-" + k.key);
+    fs.appendChild(lg); fs.appendChild(opts); fs.appendChild(err); fs.appendChild(note);
+    card.appendChild(fs);
+    return card;
+  }
+  /* Task-specific questions: one card per picked job, under its own heading, apart from the three overall questions */
+  function renderKo() {
+    var box = $("#ko-box"), items = koItems();
+    box.innerHTML = "";
+    if (WIZ) { $("#ko-sec").hidden = true; $("#global-head").hidden = true; return; }   /* asked one job at a time instead */
+    $("#ko-sec").hidden = items.length === 0;
+    $("#global-head").hidden = items.length === 0;
+    items.forEach(function (k) { box.appendChild(koCard(k)); });
+  }
+
+  /* ---------- Wizard screens ---------- */
+  function renderDetails() {
+    var jb = curJob(); if (!jb) return;
+    var ta = $("#wnote"); ta.value = state.notes[jb.id] || ""; ta.placeholder = jb.ex; ta.setAttribute("data-note", jb.id);
+    setError("wnote", false);
+    redrawPhotos();
+  }
+  function renderWizQuestion() {
+    var box = $("#wq-box"); box.innerHTML = "";
+    var k = koFor(state.cur); if (k) box.appendChild(koCard(k, true));
+  }
+  function renderMore() {
+    var list = $("#more-list"); list.innerHTML = "";
+    var ids = committedIds();
+    ids.forEach(function (id) {
+      var jb = JOB[id], li = el("li", "pick"), top = el("div", "pick__top"), main = el("div", "pick__main"), acts = el("div", "pick__acts");
+      main.appendChild(el("p", "pick__title", jb.title)); main.appendChild(el("p", "pick__group", jb.groupTitle));
+      var note = (state.notes[id] || "").trim(); if (note) main.appendChild(el("p", "pick__note", note));
+      var np = photosOf(id).length; if (np) main.appendChild(el("p", "pick__group", np + (np === 1 ? " photo" : " photos")));
+      var ed = el("button", "link pick__remove", "Edit"); ed.type = "button"; ed.setAttribute("data-wiz-edit", id); ed.setAttribute("aria-label", "Edit " + jb.title);
+      var rm = el("button", "link pick__remove", "Remove"); rm.type = "button"; rm.setAttribute("data-wiz-remove", id); rm.setAttribute("aria-label", "Remove " + jb.title);
+      acts.appendChild(ed); acts.appendChild(rm);
+      top.appendChild(icon(jb.icon)); top.appendChild(main); top.appendChild(acts); li.appendChild(top); list.appendChild(li);
+    });
+    var full = ids.length >= MAX_TASKS, over = overLimit();
+    $("#more-add").setAttribute("aria-disabled", String(full || over));
+    $("#more-cap").hidden = !(full && !over);
+  }
+  function wizNext() {
+    var s = state.screen, jb;
+    if (s === "job") {
+      if (!curJob()) {
+        setText($("#err-sel span"), "Pick a job to continue."); setError("sel", true); announce("Pick a job to continue.");
+        $("#err-sel").scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" });
+        $("#search").focus({ preventScroll: true });
+        return true;
+      }
+      state.editing = false; navigate("details"); return true;
+    }
+    if (s === "details") {
+      jb = curJob(); if (!jb) { navigate("job"); return true; }
+      if ((state.notes[jb.id] || "").trim().length < 3) { setError("wnote", true); announce("Add a few words about this job."); $("#wnote").focus(); return true; }
+      if (koFor(jb.id)) navigate("question"); else { state.committed[jb.id] = true; state.editing = false; navigate("more"); }
+      return true;
+    }
+    if (s === "question") {
+      var k = koFor(state.cur); if (!k) { navigate("more"); return true; }
+      var a = state.ko[k.key];
+      if (!a) { setError("ko-" + k.key, true); focusFirst("#fs-ko-" + k.key + " input"); return true; }
+      if (a === "no") { state.reason = "ko"; navigate("sent"); return true; }
+      state.committed[state.cur] = true; state.editing = false; navigate("more"); return true;
+    }
+    if (s === "more") {
+      if (!committedIds().length) { navigate("job"); return true; }
+      if (overLimit()) { state.reason = overReason(); navigate("sent"); return true; }
+      navigate("check"); return true;
+    }
+    return false;
+  }
+  function wizAdd() {
+    if ($("#more-add").getAttribute("aria-disabled") === "true") { announce(overLimit() ? "That is more than a Fast Fix covers." : "A Fast Fix covers up to " + MAX_TASKS + " jobs."); return; }
+    state.cur = null; state.editing = false; navigate("job");
+  }
+  function wizRemove(id) {
+    var title = JOB[id].title;
+    unselectJob(id); delete state.committed[id]; if (state.cur === id) state.cur = null; resetPicks();
+    if (!committedIds().length) { navigate("job"); announce("Removed " + title + ". Pick a job to start."); return; }
+    renderMore(); refresh(); announce("Removed " + title + ".");
+    var f = $("#more-add"); if (f) f.focus({ preventScroll: true });
   }
 
   function ctaFor(screen) {
     var n = selectedJobs().length;
     if (screen === "describe") return { label: "Continue", status: "" };
+    if (WIZ && screen === "job") return { label: "Continue", status: curJob() ? curJob().title : "" };
+    if (WIZ && screen === "details") return { label: "Continue", status: "" };
+    if (WIZ && screen === "question") { var wk = koFor(state.cur); return { label: wk && state.ko[wk.key] === "no" ? "Send to our team" : "Continue", status: "" }; }
+    if (WIZ && screen === "more") { var wc = committedIds().length; return { label: overLimit() ? "Send to our team" : "Continue", status: overLimit() ? "More than a Fast Fix covers" : wc + " of " + MAX_TASKS + " jobs" }; }
     if (screen === "job") {
       return {
         label: overLimit() ? "Send to our team" : "Continue",
@@ -678,7 +832,9 @@
   /* ---------- Navigation ---------- */
   function seedDemo(screen) {
     if (!selectedJobs().length) {
-      ["toilet-run", "lock", "light-fixture"].forEach(selectJob);
+      var demo = ["toilet-run", "lock", "light-fixture"].filter(function (i) { return JOB[i]; });
+      if (!demo.length) demo = ["running-toilet", "hang-pictures-or-wall-art", "change-light-bulbs-too-high-to-reach"].filter(function (i) { return JOB[i]; });
+      demo.forEach(function (i) { selectJob(i); if (WIZ) state.committed[i] = true; state.notes[i] = state.notes[i] || "Demo note"; });
       state.hours = 0;
     }
     if (screen === "time" || screen === "booked") {
@@ -705,7 +861,9 @@
 
   var firstRender = true;
   function render(screen) {
+    if (WIZ) wizEnter(screen);
     if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = overReason(); navigate("sent"); return; }
+    if (WIZ && screen === "question" && !koFor(state.cur)) { if (curJob()) state.committed[state.cur] = true; navigate("more"); return; }
     if (screen !== "type" && screen !== "describe" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
     if (screen === "booked" && (!state.date || state.time === null)) seedDemo(screen);
     if (screen === "sent" && !state.reason) seedDemo(screen);
@@ -713,12 +871,13 @@
     body.setAttribute("data-screen", screen);
 
     SCREENS.forEach(function (s) { $('[data-screen-id="' + s + '"]').hidden = s !== screen; });
+    if (WIZ) wizTitles();
     $("#h1").textContent = TITLES[screen][0];
     $("#sub").textContent = TITLES[screen][1];
     document.title = PAGE_TITLE[screen] + SUFFIX;
 
     /* stepper */
-    var idx = (FIND ? ["describe", "job", "check", "time"] : ["job", "check", "time"]).indexOf(screen);
+    var idx = (FIND ? ["describe", "job", "check", "time"] : ["job", "check", "time"]).indexOf(WIZ && /^(details|question|more)$/.test(screen) ? "job" : screen);
     $("#steps").hidden = idx < 0;
     $all(".step").forEach(function (el, i) {
       el.classList.toggle("is-done", i < idx);
@@ -734,7 +893,7 @@
     /* home switcher, back link */
     $("#home-switch").hidden = screen !== "type";
     $(".back").hidden = screen === "booked" || screen === "sent";
-    $("[data-back-label]").textContent = BACK[screen] ? "Back" : "Back to dashboard";
+    $("[data-back-label]").textContent = backFor(screen) ? "Back" : "Back to dashboard";
 
     /* rail */
     $("#summary").hidden = screen === "booked";
@@ -747,6 +906,9 @@
       renderJobsStep();
     }
     if (screen === "check") renderKo();
+    if (screen === "details") renderDetails();
+    if (screen === "question") renderWizQuestion();
+    if (screen === "more") renderMore();
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
       $("#rec").hidden = noSlots;
@@ -848,6 +1010,7 @@
 
   function next() {
     var s = state.screen;
+    if (WIZ && wizNext()) return;
     if (s === "describe") { describeNext(); return; }
     if (s === "job") {
       if (jobsNext()) return;
@@ -965,6 +1128,10 @@
         return;
       }
       if (t.closest("[data-sr-link]")) { srAction(); return; }
+      var wa = t.closest("[data-wiz-add]"); if (wa) { wizAdd(); return; }
+      var we = t.closest("[data-wiz-edit]"); if (we) { state.cur = we.getAttribute("data-wiz-edit"); state.editing = true; navigate("details"); return; }
+      var wr = t.closest("[data-wiz-remove]"); if (wr) { wizRemove(wr.getAttribute("data-wiz-remove")); return; }
+      var wc2 = t.closest("[data-wiz-change]"); if (wc2) { var wid = wc2.getAttribute("data-wiz-change"); unselectJob(wid); delete state.committed[wid]; if (state.cur === wid) state.cur = null; resetPicks(); navigate("job"); return; }
       var pa = t.closest("[data-photo-add]"); if (pa) { var pi = $("#photo-in-" + pa.getAttribute("data-photo-add")); if (pi) pi.click(); return; }
       var pr = t.closest("[data-photo-rm]"); if (pr) { var pp = pr.getAttribute("data-photo-rm").split(":"); removePhoto(pp[0], +pp[1]); return; }
       var kr = t.closest("[data-ko-remove]"); if (kr) { removeFailed(kr.getAttribute("data-ko-remove")); return; }
@@ -986,7 +1153,7 @@
     if (msg) { toast(msg.getAttribute("data-toast")); return; }
 
     if (t.closest("[data-back]")) {
-      var to = BACK[state.screen];
+      var to = backFor(state.screen);
       if (to) navigate(to); else toast("Returns to the dashboard");
       return;
     }
@@ -1038,7 +1205,7 @@
     if (e.target.id === "search") { state.q = e.target.value; state.sc = {}; syncTree(); return; }
     if (FIND && e.target.id === "desc") { if (e.target.value.trim().length >= 3) setError("describe", false); return; }
     var id = e.target.getAttribute && e.target.getAttribute("data-note");
-    if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); refresh(); }
+    if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); if (WIZ && e.target.id === "wnote" && e.target.value.trim().length >= 3) setError("wnote", false); refresh(); }
   });
 
   document.addEventListener("keydown", function (e) {
@@ -1065,8 +1232,9 @@
     /* Pick-it-yourself order: search and groups first, the selected jobs (with optional details) below them */
     $(".step.finder-only").remove();
     $("#pick-ui").appendChild($("#sel-sec"));
-    setText($("#add-title label"), "Find your jobs");
-    setText($("#search-hint"), "Search by job or category, or open a category. You can pick up to 4.");
+    setText($("#add-title label"), WIZ ? "Pick a job" : "Find your jobs");
+    setText($("#search-hint"), WIZ ? "Search by job or category, or open a category. Pick one." : "Search by job or category, or open a category. You can pick up to 4.");
+    if (WIZ) setText($('.step[data-step="job"] .step__t'), "Your jobs");
   }
   applySwitch("multi", true);
   render(fromHash());

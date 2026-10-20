@@ -190,6 +190,45 @@
           </div>
         </section>
 
+        <!-- ============ Wizard: about this job (description + optional photos) ============ -->
+        <section class="card wizard-only" data-screen-id="details" aria-label="About the job" hidden>
+          <div class="fsec">
+            <div class="field" id="field-wnote">
+              <label class="t-strong" for="wnote">What’s going on? <span class="req">(required)</span></label>
+              <p class="t-meta" id="wnote-hint">If there is more than one, say how many.</p>
+              <textarea class="textarea" id="wnote" rows="4" aria-required="true" aria-describedby="wnote-hint err-wnote" data-note=""></textarea>
+              <p class="error" id="err-wnote" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Add a few words about this job so your Home Manager knows what to expect.</span></p>
+            </div>
+            <div id="w-photos"></div>
+          </div>
+          <div class="factions">
+            <span class="factions__status" id="status-details" aria-live="polite"></span>
+            <button class="btn btn--primary btn--lg" type="button" data-next>Continue</button>
+          </div>
+        </section>
+
+        <!-- ============ Wizard: the one question for this job ============ -->
+        <section class="card wizard-only" data-screen-id="question" aria-label="One question about the job" hidden>
+          <div id="wq-box"></div>
+          <div class="factions">
+            <span class="factions__status" id="status-question" aria-live="polite"></span>
+            <button class="btn btn--primary btn--lg" type="button" data-next>Continue</button>
+          </div>
+        </section>
+
+        <!-- ============ Wizard: add another job, or carry on ============ -->
+        <section class="card wizard-only" data-screen-id="more" aria-label="Your jobs" hidden>
+          <div class="note" id="more-removed" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span></span></div>
+          <ul class="picks" id="more-list"></ul>
+          <div class="note" id="note-over-more" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span></span></div>
+          <p class="t-meta more__cap" id="more-cap" hidden>You have added 4 jobs, the most a Fast Fix covers. Need more? Submit a service request after you book.</p>
+          <div class="more__add"><button class="btn btn--secondary btn--lg" type="button" id="more-add" data-wiz-add>Add another job</button></div>
+          <div class="factions">
+            <span class="factions__status" id="status-more" aria-live="polite"></span>
+            <button class="btn btn--primary btn--lg" type="button" data-next>Continue</button>
+          </div>
+        </section>
+
         <!-- ============ 2. Quick check ============ -->
         <section class="card" data-screen-id="check" aria-label="Quick check" hidden>
           <div class="qsec__head" id="global-head" hidden>
@@ -406,6 +445,9 @@
       <button class="proto__link finder-only" type="button" data-jump="describe">Fast Fix 1 · Describe</button>
       <button class="proto__link classic-only" type="button" data-jump="job">Fast Fix 1 · The job</button>
       <button class="proto__link finder-only" type="button" data-jump="job">Fast Fix 2 · Your jobs</button>
+      <button class="proto__link wizard-only" type="button" data-jump="details">Fast Fix 1 · Describe + photos</button>
+      <button class="proto__link wizard-only" type="button" data-jump="question">Fast Fix 1 · One question</button>
+      <button class="proto__link wizard-only" type="button" data-jump="more">Fast Fix 1 · Add another job</button>
       <button class="proto__link classic-only" type="button" data-jump="check">Fast Fix 2 · Quick check</button>
       <button class="proto__link finder-only" type="button" data-jump="check">Fast Fix 3 · Quick check</button>
       <button class="proto__link classic-only" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>
