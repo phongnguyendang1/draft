@@ -801,7 +801,7 @@ body.nomark .tile--pm .hot,body.nomark .h-rec.chg{outline:none}
 <main class="h-in h-main">
   <section class="h-card" aria-label="Flow map">
     <div class="h-maphead">
-      <p><b>V1 scope:</b> a Consultation service type, a proposal the specialist or Central Ops sends, and a proposal page where the member accepts, declines or pushes it to later, like Recommendations. Ops books the consultation; the specialist books jobs of a day or less. The estimator tool is Phase 2. <span id="mapHint">Each row is a system; click a dot to jump to that step.</span></p>
+      <p><b>V1 scope:</b> trade-based consultation service types (Paint, Carpentry, Paint + Carpentry), a proposal the specialist or Central Ops sends, and a proposal page where the member accepts, declines or pushes it to later, like Recommendations. Ops books the consultation; the specialist books jobs of a day or less and Ops schedules longer ones. Declined or pushed proposals go to Sales in HubSpot. The estimator tool is Phase 2. <span id="mapHint">Each row is a system; click a dot to jump to that step.</span></p>
       <button type="button" class="h-link" id="mapToggle" aria-expanded="true">Hide map</button>
     </div>
     <div class="h-map" id="map"></div>
@@ -908,7 +908,12 @@ var HOT = " hot";
 /* steps with "when" only appear when it holds: the HubSpot step after a decline, and who schedules by job length */
 function live(s){ return !s.when || s.when(); }
 function mapSteps(){ return STEPS.filter(live); }
-function steps(){ return STEPS.filter(function(s){ return (!s.only || s.only===S.path) && live(s); }); }
+function pathSteps(p){
+  var list = STEPS.filter(function(s){ return (!s.only || s.only===p) && live(s); });
+  var hs = list.findIndex(function(s){ return s.id==="hs-followup"; });
+  return hs >= 0 ? list.slice(0, hs+1) : list;
+}
+function steps(){ return pathSteps(S.path); }
 function cur(){ return steps()[S.idx]; }
 function idxOf(id){ return steps().findIndex(function(s){ return s.id===id; }); }
 function reviewed(){ return S.path==="B" && S.idx >= idxOf("op-review"); }
@@ -947,7 +952,7 @@ function projDate(){
   var n = T().days, s = kd(p.k), e = addBiz(s, n-1);
   if(n===1) return dfmt(s);
   if(n===2) return s.getMonth()===e.getMonth() ? DOW[s.getDay()] + "–" + DOW[e.getDay()] + ", " + MON[s.getMonth()] + " " + s.getDate() + "–" + e.getDate() : dfmt(s) + " – " + dfmt(e);
-  return "From " + dfmt(s) + ", " + n + " days";
+  return dfmt(s) + " – " + dfmt(e);
 }
 function DT(){
   var c = CS(), nb = addBiz(c.dt, 1), plus30 = function(x){ var y = new Date(x.getTime()); y.setDate(y.getDate()+30); return y; };
@@ -1202,7 +1207,7 @@ function scrFinish(){
   var ovl = '<div class="ovl hp" data-act="dlg-cancel"><div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="sd-t" data-dlg>' +
     '<div class="modal__top"><h2 id="sd-t" tabindex="-1">Send this proposal ' + anno("New") + '</h2><p class="modal__sub">' + esc(S.title) + ' &middot; ' + hrs(t.hours) + ' &middot; ' + money2(t.total) + '</p></div>' +
     '<div class="modal__body" role="radiogroup" aria-labelledby="sd-t">' +
-      '<label class="opt"><input type="radio" name="sendto" value="A" data-act="pick" data-path="A"' + (A?' checked':'') + '><div><b>Send to Sarah now</b><span>For work of about a day or less. Sarah gets the proposal by email and in HomeHub and can accept it online.</span></div></label>' +
+      '<label class="opt"><input type="radio" name="sendto" value="A" data-act="pick" data-path="A"' + (A?' checked':'') + '><div><b>Send to Sarah now</b><span>Sarah gets the proposal by email and in HomeHub and can accept it online.</span></div></label>' +
       '<label class="opt"><input type="radio" name="sendto" value="B" data-act="pick" data-path="B"' + (A?'':' checked') + '><div><b>Send to Central Ops for review</b><span>For bigger or uncertain jobs. Homer checks the scope and price, then sends it.</span></div></label>' +
       (A ? '' :
         '<div class="field"><label for="rv-why">Why does it need review?</label><div class="sel"><select id="rv-why" data-bind="rvReason">' + RV_REASONS.map(function(r){ return '<option' + (S.rvReason===r?' selected':'') + '>' + r + '</option>'; }).join("") + '</select>' + ic("arrow-down-s-line") + '</div></div>' +
@@ -1214,7 +1219,7 @@ function scrFinish(){
 }
 
 function lifecycle(on){
-  var all = ["Pending review","Sent","Accepted","Declined","Pushed to later"];
+  var all = ["Draft","Pending review","Sent","Accepted","Declined","Pushed to later","Expired"];
   return '<p style="font-size:12px;color:#666">Proposal statuses: ' + all.map(function(s){ return s===on ? '<b style="color:#333">' + s + '</b>' : s; }).join(" &middot; ") + ' ' + anno("Every proposal is saved with one") + '</p>';
 }
 function scrProposalObj(){
@@ -1222,21 +1227,21 @@ function scrProposalObj(){
   var rows = [
     ["PF-2026-00148","Mitchell · 4817 Mueller Blvd","#48213","Mario",money(t.total), A ? '<span class="dst ok">Sent</span>' : '<span class="dst pend">Pending review</span>',DT().createdL,true],
     ["PF-2026-00147","Okafor · 3301 Lakeway Blvd","#48190","Mario","$640",'<span class="dst ok">Accepted</span>',dshort(addBiz(CS().dt, -1)) + ", 3:40 p.m."],
-    ["PF-2026-00146","Chen · 640 Canyon Rim","#48177","Carpentry team","$2,380",'<span class="dst pend">Pending review</span>',dshort(addBiz(CS().dt, -1)) + ", 11:15 a.m."],
+    ["PF-2026-00146","Chen · 640 Canyon Rim","#48177","Dana (All trades)","$2,380",'<span class="dst pend">Pending review</span>',dshort(addBiz(CS().dt, -1)) + ", 11:15 a.m."],
     ["PF-2026-00145","Reyes · 812 Sunset Trail","#48162","Mario","$415","Declined",dshort(addBiz(CS().dt, -2)) + ", 2:05 p.m."],
-    ["PF-2026-00144","Patel · 1120 Oakmont Dr","#48150","Painting team","$1,150","Pushed to later",dshort(addBiz(CS().dt, -3)) + ", 9:30 a.m."]
+    ["PF-2026-00144","Patel · 1120 Oakmont Dr","#48150","Lee (Painter)","$1,150","Pushed to later",dshort(addBiz(CS().dt, -3)) + ", 9:30 a.m."]
   ];
   var table = '<div class="tbl"><table><thead><tr><th>Proposal</th><th>Member · home</th><th>Consultation</th><th>Prepared by</th><th class="num">Total</th><th>Status</th><th>Created</th></tr></thead><tbody>' +
     rows.map(function(r){ return '<tr' + (r[7]?' class="hl"':'') + '><td>' + (r[7] ? '<button type="button" class="lnk' + HOT + '" data-act="next">' + r[0] + '</button>' : '<span class="lnk">' + r[0] + '</span>') + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td><td class="num">' + r[4] + '</td><td>' + r[5] + '</td><td>' + r[6] + '</td></tr>'; }).join("") +
     '</tbody></table></div>';
-  var filter = '<div class="dj-filter"><h4>Filter</h4><p>By status</p><ul><li class="on">All</li><li>Pending review</li><li>Sent</li><li>Accepted</li><li>Declined</li><li>Pushed to later</li><li>Expired</li></ul><p>By consultation type</p><ul><li class="on">All</li><li>Paint</li><li>Carpentry</li><li>Paint + Carpentry</li></ul></div>';
+  var filter = '<div class="dj-filter"><h4>Filter</h4><p>By status</p><ul><li class="on">All</li><li>Draft</li><li>Pending review</li><li>Sent</li><li>Accepted</li><li>Declined</li><li>Pushed to later</li><li>Expired</li></ul><p>By consultation type</p><ul><li class="on">All</li><li>Paint</li><li>Carpentry</li><li>Paint + Carpentry</li></ul></div>';
   var inner = '<div class="dj-msg">' + (A
       ? 'Consultation booking #48213 was set to “Completed”. Proposal PF-2026-00148 was created and emailed to Sarah Mitchell.'
       : 'Consultation booking #48213 was set to “Completed – Pending Review”. Proposal PF-2026-00148 was created and Zendesk ticket #91502 was opened for review (reason: ' + esc(S.rvReason.toLowerCase()) + ').') + '</div>' +
     '<div class="dj-title"><h2>Select proposal to change</h2>' + anno("New model") + '</div>' + lifecycle(A ? "Sent" : "Pending review") +
     '<div class="dj-split"><div style="min-width:0">' + table + '</div>' + filter + '</div>' +
     '<div class="dj-fs"><div class="dj-cap">Linked consultation booking</div>' +
-      djr("Booking:", "#48213 · Consultation · Painting, Carpentry", {ro:1}) +
+      djr("Booking:", "#48213 · Paint + Carpentry Consultation", {ro:1}) +
       djr("Status:", A ? "Completed" : "Completed – Pending Review " + anno("New status"), {ro:1, help: A ? null : "A holding status, like “Completed – Pending Contractor Invoice”. It clears when someone sends the proposal."}) +
     '</div>';
   return frame("op", "Django Admin · /admin/proposals/proposal/", djShell("system", "Home › Proposals › Proposals", inner));
@@ -1257,7 +1262,7 @@ function scrZdReview(){
       '<p>Mario finished the consultation at 4817 Mueller Blvd and sent the proposal for review. Reason: <b>' + esc(S.rvReason) + '</b>.</p>' + tbl + '</article>' +
     '<article class="msg note"><header><span class="zav">M</span><b>Mario</b><span class="k">Note for the reviewer</span><span class="t">' + DT().createdT + '</span></header><p>' + esc(S.note) + '</p></article>' +
     '<button type="button" class="zbtn' + HOT + '" data-act="next">Open proposal in Admin</button>' +
-    '</div><aside class="zd-side">' + zf("Group","Central Ops – Specialty") + zf("Assignee","Homer") + zf("Proposal","PF-2026-00148") + zf("Booking","#48213 · Completed – Pending Review") + zf("Review due", DT().due + " (1 business day)") + zf("Tags","proposal_review painting") + '</aside></div>';
+    '</div><aside class="zd-side">' + zf("Group","Central Ops – Specialty") + zf("Assignee","Homer") + zf("Proposal","PF-2026-00148") + zf("Booking","#48213 · Completed – Pending Review") + zf("Review due", DT().due + " (1 business day)") + zf("Tags","proposal_review painting carpentry") + '</aside></div>';
   return frame("zd", "prefix.zendesk.com/agent/tickets/91502", zdShell(main));
 }
 
@@ -1275,7 +1280,7 @@ function scrReview(){
       djr("Number:", "PF-2026-00148", {ro:1}) +
       djr("Title:", esc(S.title), {help:"Member sees this."}) +
       djr("Member · home:", "Sarah Mitchell · 4817 Mueller Blvd", {ro:1}) +
-      djr("Consultation booking:", "#48213 · Consultation · Completed – Pending Review", {ro:1}) +
+      djr("Consultation booking:", "#48213 · Paint + Carpentry Consultation · Completed – Pending Review", {ro:1}) +
       djr("Prepared by:", "Mario · Consultation Specialist – All trades", {ro:1}) +
       djr("Review reason:", esc(S.rvReason), {ro:1}) +
       djr("Valid through:", DT().validISO) +
@@ -1422,7 +1427,7 @@ function scrZdAccepted(){
     '<article class="msg sys"><header><span class="zav">PF</span><b>PreFix system</b><span class="k">Automation</span>' + anno() + '</header>' +
       '<p>Sarah Mitchell accepted PF-2026-00148 for <b>' + money(t.total) + '</b> (' + hrs(t.hours) + '). Booking #48390 was created as Pending from the proposal, with its tasks, hours and price. ' + (t.days<=1 ? 'It\'s a day or less, so Mario schedules it directly with Sarah. Ops follows up only if it isn\'t booked.' : 'It runs more than a day, so Ops schedules it with Sarah.') + '</p></article>' +
     '<button type="button" class="zbtn' + HOT + '" data-act="next">' + (t.days<=1 ? 'Submit as Pending' : 'Open booking #48390 in Admin') + '</button>' +
-    '</div><aside class="zd-side">' + zf("Group","Central Ops – Specialty") + zf("Assignee", t.days<=1 ? "Mario" : "Central Ops") + zf("Proposal","PF-2026-00148 · Accepted") + zf("Booking","#48390 · Pending") + zf("Tags","proposal_accepted painting") + '</aside></div>';
+    '</div><aside class="zd-side">' + zf("Group","Central Ops – Specialty") + zf("Assignee", t.days<=1 ? "Mario" : "Central Ops") + zf("Proposal","PF-2026-00148 · Accepted") + zf("Booking","#48390 · Pending") + zf("Tags","proposal_accepted painting carpentry") + '</aside></div>';
   return frame("zd", "prefix.zendesk.com/agent/tickets/91655", zdShell(main));
 }
 
@@ -1436,8 +1441,8 @@ function scrSchedule(){
   var cal = '<div class="cal" aria-label="Ops Calendar, Tue Nov 3"><b style="font-size:12px;color:#666">Ops Calendar &middot; Tue, Nov 3</b>' +
     '<div class="cal-axis"><span></span><div class="tk">' + [8,10,12,14,16].map(function(h){ return '<span style="left:' + pct(h) + '">' + (h>12?h-12:h) + (h>=12?" PM":" AM") + '</span>'; }).join("") + '</div></div>' +
     '<div class="cal-lane"><span>Mario</span><div class="tr"><span class="blk new" style="left:0;width:' + ((endH-8)/9*100).toFixed(2) + '%">Mitchell &middot; refresh</span></div></div>' +
-    '<div class="cal-lane"><span>Carpentry team</span><div class="tr"><span class="blk busy" style="left:' + pct(9) + ';width:' + (3/9*100).toFixed(2) + '%">Chen &middot; cabinets</span><span class="blk busy" style="left:' + pct(13) + ';width:' + (2/9*100).toFixed(2) + '%">Consult</span></div></div>' +
-    (t.days>1 ? '<p class="help" style="margin:0">Runs ' + t.days + ' days: Mario is booked ' + projDate() + '.</p>' : '') + '</div>';
+    '<div class="cal-lane"><span>Dana · All trades</span><div class="tr"><span class="blk busy" style="left:' + pct(9) + ';width:' + (3/9*100).toFixed(2) + '%">Chen &middot; cabinets</span><span class="blk busy" style="left:' + pct(13) + ';width:' + (2/9*100).toFixed(2) + '%">Consult</span></div></div>' +
+    (t.days>1 ? '<p class="help" style="margin:0">Runs ' + t.days + ' days: Mario is booked ' + projDate() + '. ' + anno("Multi-day bookings are Later") + '</p>' : '') + '</div>';
   var inner = '<div class="dj-title"><h2>Change booking</h2><span style="color:#666">#48390</span></div>' +
     '<div class="dj-fs"><div class="dj-cap">Booking</div>' +
       djr("Service type:", "Specialty – Painting", {sel:1}) +
@@ -1464,7 +1469,7 @@ function scrBooked(){
   var html = '<div class="mp">' + mpTop("Dashboard") +
   '<div class="page">' +
     '<div class="intro"><div class="intro__text"><h2 class="t-display">4817 Mueller Blvd</h2><p class="t-desc">Austin, TX 78723</p></div><span class="btn btn--primary btn--lg" data-stub>' + ic("add-line") + 'Request service</span></div>' +
-    '<div class="message"><span class="message__icon">' + ic("calendar-check-line") + '</span><p class="message__text"><strong>Your project is booked.</strong> ' + esc(S.title) + ', ' + projDate() + '.</p></div>' +
+    '<div class="message"><span class="message__icon">' + ic("calendar-check-line") + '</span><p class="message__text"><strong>Your project is booked.</strong> ' + esc(S.title) + ', ' + projDate() + '.' + (T().days > 1 ? ' ' + anno("Multi-day bookings are Later") : '') + '</p></div>' +
     '<div class="layout"><div class="main">' +
       '<section class="card"><div class="d-head"><h3 class="t-title">Ready to schedule</h3></div><p class="d-empty">' + ic("checkbox-circle-line") + 'You\'re all caught up.</p></section>' +
       mpRecs() + mpProposals("done") +
@@ -1484,8 +1489,8 @@ function scrKpi(){
       return '<div class="brow" role="listitem" tabindex="0" aria-label="' + esc(b.tip) + '"><span>' + b.l + '</span><span class="bt"><i style="width:' + (b.v/20*100) + '%"></i></span><span class="bv">' + b.txt + '</span><span class="tip" aria-hidden="true">' + esc(b.tip) + '</span></div>';
     }).join("") +
     '<div class="baxis" aria-hidden="true"><span></span><div class="tk"><span style="left:0">0</span><span style="left:25%">5</span><span style="left:50%">10</span><span style="left:75%">15</span><span style="left:100%">20 days</span></div><span></span></div></div>';
-  var html = '<div class="mb"><div class="mb-head"><div><small>Field Operations</small><h2>Consultations &amp; proposals</h2></div><div class="mb-filters"><span class="on">October 2026</span><span>Austin</span><span>Carpentry &amp; Painting</span></div></div>' +
-    '<p class="mb-note">Illustrative numbers. This dashboard doesn\'t exist yet. It shows what the consultation service type and proposal statuses make possible.</p>' +
+  var html = '<div class="mb"><div class="mb-head"><div><small>Field Operations</small><h2>Consultations &amp; proposals</h2></div><div class="mb-filters"><span class="on">October 2026</span><span>Austin</span><span>All consultation types</span></div></div>' +
+    '<p class="mb-note">Illustrative numbers. This dashboard doesn\'t exist yet. It shows what the consultation service types and proposal statuses make possible.</p>' +
     '<div class="kpis">' +
       '<div class="kpi"><span class="k">Requests</span><span class="v">96</span><span class="s">Painting and carpentry this month</span></div>' +
       '<div class="kpi"><span class="k">Consultations per specialist</span><span class="v">14</span><span class="s">42 completed by 3 specialists</span></div>' +
@@ -1495,9 +1500,14 @@ function scrKpi(){
     '</div>' +
     '<div class="mb-card"><h3>Request to proposal, median days</h3><p class="sub">From the member\'s request to a price they can accept.</p>' + chart + '</div>' +
     '<div class="mb-card"><h3>By specialist</h3><div class="tbl"><table><thead><tr><th>Specialist</th><th class="num">Consultations</th><th class="num">Priced on site</th><th class="num">Accepted</th></tr></thead><tbody>' +
-      '<tr><td>Mario</td><td class="num">16</td><td class="num">75%</td><td class="num">58%</td></tr>' +
-      '<tr><td>Carpentry specialist</td><td class="num">14</td><td class="num">50%</td><td class="num">52%</td></tr>' +
-      '<tr><td>Painting specialist</td><td class="num">12</td><td class="num">58%</td><td class="num">50%</td></tr>' +
+      '<tr><td>Mario · All trades</td><td class="num">16</td><td class="num">75%</td><td class="num">58%</td></tr>' +
+      '<tr><td>Dana · All trades</td><td class="num">14</td><td class="num">50%</td><td class="num">52%</td></tr>' +
+      '<tr><td>Lee · Painter</td><td class="num">12</td><td class="num">58%</td><td class="num">50%</td></tr>' +
+    '</tbody></table></div></div>' +
+    '<div class="mb-card"><h3>By consultation type</h3><div class="tbl"><table><thead><tr><th>Type</th><th class="num">Consultations</th><th class="num">Priced on site</th><th class="num">Accepted</th></tr></thead><tbody>' +
+      '<tr><td>Paint Consultation</td><td class="num">15</td><td class="num">70%</td><td class="num">60%</td></tr>' +
+      '<tr><td>Carpentry Consultation</td><td class="num">9</td><td class="num">44%</td><td class="num">44%</td></tr>' +
+      '<tr><td>Paint + Carpentry Consultation</td><td class="num">18</td><td class="num">61%</td><td class="num">54%</td></tr>' +
     '</tbody></table></div></div></div>';
   return frame("mb", "metabase · Consultations & proposals", html);
 }
@@ -1520,7 +1530,7 @@ function scrHmSchedule(){
       '<article class="card" style="margin-top:22px"><p class="desc" style="margin-top:0">Jobs of a day or less you book directly with the member. Call or text Sarah, agree a day, then book it here. Longer jobs go to Central Ops.</p>' +
         '<div class="two"><div class="field"><label for="ms-day">Day</label><div class="sel"><select id="ms-day" data-bind="pday">' + MARIO_DAYS.map(function(k){ return '<option value="' + k + '"' + (k===ps.k ? ' selected' : '') + '>' + dfmt(kd(k)) + '</option>'; }).join("") + '</select>' + ic("arrow-down-s-line") + '</div></div>' +
           '<div class="field"><label for="ms-time">Arrival</label><div class="sel"><select id="ms-time" data-bind="ptime">' + [8,9].map(function(hr){ return '<option value="' + hr + '"' + (hr===ps.h ? ' selected' : '') + '>' + win(hr) + '</option>'; }).join("") + '</select>' + ic("arrow-down-s-line") + '</div></div></div>' +
-        '<div class="field"><label for="ms-note">Note<small>Private. How you agreed the time with Sarah.</small></label><textarea id="ms-note" class="grow" rows="1">Called Sarah ' + d.acceptedS + '. Tuesday morning works for her.</textarea></div>' +
+        '<div class="field"><label for="ms-note">Note<small>Private. How you agreed the time with Sarah.</small></label><textarea id="ms-note" class="grow" rows="1">Called Sarah ' + d.acceptedS + '. We agreed the day and arrival time below.</textarea></div>' +
         '<p class="from">Only days you are free for ' + hrs(t.hours) + ' of work are listed. Try another day: Sarah\'s dashboard follows it.</p>' +
       '</article>' +
       '<div class="actions" style="margin-top:28px"><button type="button" class="btn btn--blue' + HOT + '" data-act="next">Book job</button></div>' +
@@ -1600,7 +1610,7 @@ var STEPS = [
      ? "Completing the consultation creates a Proposal record linked to the booking, the request and the ticket. Mario sent it directly, so its status is Sent and the email goes out right away."
      : "Completing the consultation creates a Proposal record linked to the booking, the request and the ticket. The booking waits in the new Completed – Pending Review status, like Completed – Pending Contractor Invoice, and a review ticket opens in Zendesk."; },
    changes:function(p){ return p==="A" ? [["bk1","Completed"],["prp","Sent"]] : [["bk1","Completed – Pending Review"],["prp","Pending review"],["tk2","New · Specialty view"]]; },
-   v1:["Proposal is a new record, linked to booking, request and ticket","Every proposal is saved with a status: Pending review, Sent, Accepted, Declined or Pushed to later"],
+   v1:["Proposal is a new record, linked to booking, request and ticket","Every proposal is saved with a status: Draft (Send Later), Pending review, Sent, Accepted, Declined, Pushed to later or Expired"],
    later:[],
    qs:["Track review on the booking (Completed – Pending Review) or only on the proposal? Both were suggested.","How long is a proposal valid? 30 days shown."], screen:scrProposalObj},
 
@@ -1640,9 +1650,9 @@ var STEPS = [
    title:function(){ return S.declined ? "Sarah declines the proposal" : S.later ? "Sarah pushes the proposal to later" : "Sarah reviews the proposal and accepts it"; },
    summary:function(){ return S.declined ? "Declining records the reason, using the same list as recommendations, and she can reopen it anytime. Next, the proposal goes to HubSpot so Sales can follow up."
      : S.later ? "Push to later works like recommendations. The proposal is marked Pushed to later, and next it goes to HubSpot so Sales can follow up."
-     : "The proposal is a HomeHub page, like the Home Health Snapshot. The price and the decision sit in the right column and stay in view; on a phone they come first. Every section comes from what Mario entered on the iPad. She can Accept, Decline or Push to later, the same choices as recommendations. Try Decline and Push to later too; Accept continues the flow."; },
+     : "The proposal is a HomeHub page, like the Home Health Snapshot. The price and the decision sit in the right column and stay in view; on a phone they come first. Every section comes from what Mario entered on the iPad. She can Accept, Decline or Push to later, the same choices as recommendations. Declining or pushing it to later sends it to Sales in HubSpot. Try Decline and Push to later too; Accept continues the flow."; },
    changes:function(){ return S.declined ? [["prp","Declined"]] : S.later ? [["prp","Pushed to later"]] : []; },
-   v1:["Proposal page","Accept, Decline with the recommendation decline reasons, and Push to later"],
+   v1:["Proposal page","Accept, Decline with the recommendation decline reasons, and Push to later","Declined and pushed-to-later proposals go to HubSpot for Sales follow-up"],
    later:["PDF download","Good, better, best options for bigger projects","Deposits and online payment"],
    qs:["Web page only, or a PDF as well?","The project terms need legal review for Texas home-improvement work before launch."], screen:scrProposal},
 
@@ -1669,8 +1679,8 @@ var STEPS = [
      : "An automatic ticket in the Specialty view tells Ops the proposal was accepted and links the Pending booking. The job runs more than a day, so Ops schedules it by hand."; },
    changes:function(){ return [["tk3", T().days<=1 ? "Pending · Mario scheduling" : "Open"]]; },
    v1:["Automatic ticket when a member accepts a proposal"],
-   later:[],
-   qs:["If Mario doesn't book a job of a day or less, when does Ops step in?"], screen:scrZdAccepted},
+   later:["Multi-day bookings that start on a day and run several days"],
+   qs:["If Mario doesn't book a job of a day or less, when does Ops step in?","Until multi-day bookings exist, does Ops create one booking per day for longer jobs?"], screen:scrZdAccepted},
 
   {id:"hm-schedule", sys:"hm", actor:"Mario", role:"Consultation Specialist – All trades", av:"M", differs:true, when:function(){ return calc(false).days<=1; },
    title:function(){ return "Mario books the job directly with Sarah"; },
@@ -1707,8 +1717,8 @@ var STEPS = [
 
 /* ================= rendering ================= */
 function renderTop(){
-  var a = mapSteps().filter(function(s){ return !s.only || s.only==="A"; }).length;
-  var b = mapSteps().filter(function(s){ return !s.only || s.only==="B"; }).length;
+  var a = pathSteps("A").length;
+  var b = pathSteps("B").length;
   $("#pathSeg").innerHTML =
     '<button type="button" data-act="path" data-path="A" aria-pressed="' + (S.path==="A") + '">Sent directly<small>' + a + ' steps</small></button>' +
     '<button type="button" data-act="path" data-path="B" aria-pressed="' + (S.path==="B") + '">Needs review<small>' + b + ' steps</small></button>';
@@ -1759,7 +1769,7 @@ function renderMap(){
   }
   MS.forEach(function(stp, j){
     var cx = x(j), cy = ys[stp.sys], inP = stp.id in pos, isNow = stp.id===now.id, past = inP && pos[stp.id] < S.idx;
-    var label = (inP ? 'Step ' + (pos[stp.id]+1) + ': ' : 'Review path only: ') + stp.title(S.path) + ' (' + SYS[stp.sys].name + ')';
+    var label = (inP ? 'Step ' + (pos[stp.id]+1) + ': ' : stp.only==='B' ? 'Review path only: ' : 'Not on this branch: ') + stp.title(S.path) + ' (' + SYS[stp.sys].name + ')';
     var dot = stp.id==="hm-finish"
       ? '<rect x="' + (cx-6) + '" y="' + (cy-6) + '" width="12" height="12" transform="rotate(45 ' + cx + ' ' + cy + ')" style="fill:' + (isNow?'var(--blue)':past?'var(--ink)':'var(--dot)') + '"/>'
       : inP ? '<circle cx="' + cx + '" cy="' + cy + '" r="' + (isNow?7:6) + '" style="fill:' + (isNow?'var(--blue)':past?'var(--ink)':'var(--dot)') + '"/>'
@@ -1876,7 +1886,8 @@ function go(i, focusSel){
 }
 function goId(id){
   if(!STEPS.some(function(s){ return s.id===id; })) return;
-  if(idxOf(id) < 0){ S.path = "B"; persist(); }
+  var def = STEPS.filter(function(s){ return s.id===id; })[0];
+  if(idxOf(id) < 0 && def.only==="B"){ S.path = "B"; persist(); }
   if(idxOf(id) < 0) return;
   go(idxOf(id), "#map [aria-current=step]");
 }
@@ -1962,8 +1973,8 @@ document.addEventListener("change", function(e){
   var el = e.target, bind = el.getAttribute && el.getAttribute("data-bind"); if(!bind) return;
   if(bind==="excl"){ S.excl[el.getAttribute("data-ex")] = el.checked; return; }
   if(bind==="rvReason"){ S.rvReason = el.value; return; }
-  if(bind==="pday"){ S.pDay = el.value; return; }
-  if(bind==="ptime"){ S.pTime = +el.value; return; }
+  if(bind==="pday"){ S.pDay = el.value; renderSide(cur()); return; }
+  if(bind==="ptime"){ S.pTime = +el.value; renderSide(cur()); return; }
   if(bind==="cond"){ var l = line(el.getAttribute("data-line")); if(l) l.cond = el.value; }
 });
 window.addEventListener("resize", growAll);
@@ -1978,7 +1989,8 @@ function fromHash(){
   var parts = h.split("."), id = parts[0], p = parts[1];
   if(p==="direct") S.path = "A"; else if(p==="review") S.path = "B";
   if(!STEPS.some(function(s){ return s.id===id; })) return;
-  if(idxOf(id) < 0) S.path = "B";
+  var def = STEPS.filter(function(s){ return s.id===id; })[0];
+  if(idxOf(id) < 0 && def.only==="B") S.path = "B";
   if(idxOf(id) < 0) return;
   S.idx = idxOf(id);
 }
