@@ -193,9 +193,14 @@
         <!-- ============ Wizard: about this job (description + optional photos) ============ -->
         <section class="card wizard-only" data-screen-id="details" aria-label="About the job" hidden>
           <div class="fsec">
+            <div class="field wqty" id="field-wqty">
+              <span class="t-strong" id="wqty-label">How many?</span>
+              <p class="t-meta" id="wqty-hint">For example, 2 if you have two TVs. Up to 6.</p>
+              <div class="qty" id="w-qty" role="group" aria-labelledby="wqty-label" aria-describedby="wqty-hint"></div>
+            </div>
             <div class="field" id="field-wnote">
               <label class="t-strong" for="wnote">What’s going on? <span class="req">(required)</span></label>
-              <p class="t-meta" id="wnote-hint">If there is more than one, say how many.</p>
+              <p class="t-meta" id="wnote-hint">Where is it, and anything else we should know?</p>
               <textarea class="textarea" id="wnote" rows="4" aria-required="true" aria-describedby="wnote-hint err-wnote" data-note=""></textarea>
               <p class="error" id="err-wnote" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Add a few words about this job so your Home Manager knows what to expect.</span></p>
             </div>
@@ -225,6 +230,30 @@
           <div class="more__add"><button class="btn btn--secondary btn--lg" type="button" id="more-add" data-wiz-add>Add another job</button></div>
           <div class="factions">
             <span class="factions__status" id="status-more" aria-live="polite"></span>
+            <button class="btn btn--primary btn--lg" type="button" data-next>Continue</button>
+          </div>
+        </section>
+
+        <!-- ============ Wizard: what fits Fast Fix and what needs a service request ============ -->
+        <section class="card wizard-only" data-screen-id="review" aria-label="What fits Fast Fix" hidden>
+          <div class="rv rv--fit" id="rv-fit">
+            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span id="rv-fit-t">Fits Fast Fix</span></h2>
+            <p class="t-meta" id="rv-fit-sub"></p>
+            <ul class="picks" id="rv-fit-list"></ul>
+          </div>
+          <div class="rv rv--sr" id="rv-sr">
+            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-information-line"/></svg><span id="rv-sr-t">Needs a service request</span></h2>
+            <p class="t-meta" id="rv-sr-sub"></p>
+            <ul class="picks" id="rv-sr-list"></ul>
+          </div>
+          <p class="rv__explain" id="rv-explain"></p>
+          <div class="rv__all">
+            <p class="t-meta" id="rv-all-note"></p>
+            <button class="btn btn--secondary btn--lg" type="button" id="rv-all" data-wiz-sendall></button>
+            <button class="link rv__change" type="button" data-wiz-back>Change my jobs or answers</button>
+          </div>
+          <div class="factions">
+            <span class="factions__status" id="status-review" aria-live="polite"></span>
             <button class="btn btn--primary btn--lg" type="button" data-next>Continue</button>
           </div>
         </section>
@@ -448,6 +477,7 @@
       <button class="proto__link wizard-only" type="button" data-jump="details">Fast Fix 1 · Describe + photos</button>
       <button class="proto__link wizard-only" type="button" data-jump="question">Fast Fix 1 · One question</button>
       <button class="proto__link wizard-only" type="button" data-jump="more">Fast Fix 1 · Add another job</button>
+      <button class="proto__link wizard-only" type="button" data-jump="review">Fast Fix 1 · What fits</button>
       <button class="proto__link classic-only" type="button" data-jump="check">Fast Fix 2 · Quick check</button>
       <button class="proto__link finder-only" type="button" data-jump="check">Fast Fix 3 · Quick check</button>
       <button class="proto__link classic-only" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>

@@ -24,7 +24,7 @@
       g.jobs.forEach(function (t) {
         var o = Array.isArray(t) ? { id: t[0], title: t[1], kw: t[2], min: t[3] } : t;
         out.push({ id: o.id, title: o.title, kw: o.kw, min: o.min, icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
-          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [] });
+          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [], kc: o.kc || [] });
       });
     });
     return out;
@@ -34,7 +34,8 @@
   JOBS.forEach(function (j) { JOB[j.id] = j; });
   var RATE = 55;
   var MAX_MIN = 180;
-  var MAX_TASKS = 4;   /* pick-it-yourself version: more than this goes to a service request */
+  var MAX_TASKS = WIZ ? 3 : 4;   /* more than this goes to a service request */
+  var MAX_QTY = 6;               /* wizard: "How many?" on every job */
   var TODAY = new Date(2026, 9, 13);
   var FIRST_DAY = new Date(2026, 9, 14);
   var LAST_MONTH = { y: 2027, m: 1 };
@@ -57,14 +58,16 @@
   };
   var BACK = { type: null, job: "type", check: "job", time: "check", booked: null, sent: null };
   if (WIZ) {
-    SCREENS = ["type", "job", "details", "question", "more", "check", "time", "booked", "sent"];
+    SCREENS = ["type", "job", "details", "question", "more", "review", "check", "time", "booked", "sent"];
     TITLES.job = ["What needs fixing?", ""];
     TITLES.details = ["Tell us about the job", "Tell us what\u2019s going on. Photos are optional."];
     TITLES.question = ["One quick question", ""];
-    TITLES.more = ["Add another job?", "Each job gets its own description, photos and question. You can add up to 4."];
+    TITLES.more = ["Add another job?", "Each job gets its own description, photos and question. You can add up to " + MAX_TASKS + "."];
+    TITLES.review = ["Here\u2019s what fits Fast Fix", "We checked your answers. Choose how you want to continue."];
     TITLES.check = ["A quick check", "Three questions about the whole visit. All are required."];
+    PAGE_TITLE.review = "Fast Fix: what fits";
     PAGE_TITLE.job = "Fast Fix: pick a job"; PAGE_TITLE.details = "Fast Fix: about the job"; PAGE_TITLE.question = "Fast Fix: one question"; PAGE_TITLE.more = "Fast Fix: add another job";
-    BACK = { type: null, job: "type", details: "job", question: "details", more: "question", check: "more", time: "check", booked: null, sent: null };
+    BACK = { type: null, job: "type", details: "job", question: "details", more: "question", review: "more", check: "more", time: "check", booked: null, sent: null };
   }
   if (FIND) {
     SCREENS = ["type", "describe", "job", "check", "time", "booked", "sent"];
@@ -79,7 +82,7 @@
     trade: "Work with gas, wiring or water lines can need a licensed trade, so our team will plan it.",
     part: "You still need the part, so our team will help plan it.",
     time: "These jobs add up to more than a Fast Fix covers, so our team will plan the visit.",
-    count: "You picked more than 4 jobs, so our team will plan the visit.",
+    count: "You picked more than " + MAX_TASKS + " jobs, so our team will plan the visit.",
     ko: "One of your answers means our team should plan this visit.",
     slots: "We could not find an open time, so our team will find one for you."
   };
@@ -101,7 +104,7 @@
   /* ---------- State ---------- */
   var state = {
     screen: "type", home: "mueller", jobs: {}, order: [], notes: {}, showAll: false, hours: 0, ladder: "", trade: "", part: "",
-    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, photos: {}, perr: {}, cur: null, committed: {}, editing: false
+    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, photos: {}, perr: {}, cur: null, committed: {}, editing: false, split: false, qty: {}
   };
 
 
@@ -121,13 +124,15 @@
   function setText(node, txt) { if (node && node.textContent !== txt) node.textContent = txt; }
   function resetPicks() { state.hours = 0; state.date = null; state.time = null; }
   /* The "service request afterwards" pointer is on when the member chose it in the modal or dropped a task that did not qualify */
-  function syncSr() { state.srAfter = state.srModal || Object.keys(state.dropped).length > 0; }
+  function syncSr() {
+    state.srAfter = state.srModal || Object.keys(state.dropped).length > 0 || (WIZ && state.split && state.order.some(function (i) { return state.jobs[i] && state.committed[i] && isNoFit(i); }));
+  }
   function selectJob(id) {
     if (!state.jobs[id]) { state.jobs[id] = true; state.order.push(id); }
     if (state.dropped[id]) { delete state.dropped[id]; syncSr(); }
   }
   function unselectJob(id) {
-    state.jobs[id] = false; dropPhotos(id);
+    state.jobs[id] = false; dropPhotos(id); delete state.qty[id];
     var at = state.order.indexOf(id); if (at > -1) state.order.splice(at, 1);
   }
   function icon(name) { var s = el("span", "d-icon"); s.setAttribute("aria-hidden", "true"); s.innerHTML = '<svg class="i"><use href="#' + name + '"/></svg>'; return s; }
@@ -170,7 +175,7 @@
 
   function updateDock() {
     var nocta = WIZ && (state.screen === "job" || (state.screen === "question" && !koAnswered()));
-    var show = /^(describe|job|details|question|more|check|time)$/.test(state.screen) && !nocta;
+    var show = /^(describe|job|details|question|more|review|check|time)$/.test(state.screen) && !nocta;
     body.setAttribute("data-nocta", nocta ? "1" : "0");
     body.setAttribute("data-dock", show ? "on" : "off");
     $("#fdock").hidden = !show;
@@ -377,6 +382,8 @@
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
   function updateSrFlag() {
+    var nsr = WIZ ? nofitIds().length : Object.keys(state.dropped).length, srText = "Submit a service request for your other job" + (nsr > 1 ? "s" : "");
+    setText($("#b-sr"), srText); setText($("#sent-sr"), srText);
     $("#sr-flag").hidden = !state.srAfter;
     $("#b-sr").hidden = !state.srAfter;
     $("#sent-sr").hidden = !state.srAfter;
@@ -424,6 +431,26 @@
   function committedIds() { return state.order.filter(function (id) { return state.jobs[id] && state.committed[id]; }); }
   function curJob() { return state.cur && state.jobs[state.cur] ? JOB[state.cur] : null; }
   function koFor(id) { return koItems().filter(function (k) { return k.job.id === id; })[0] || null; }
+  function isNoFit(id) { var k = koFor(id); return !!(k && state.ko[k.key] === "no"); }
+  function nofitIds() { return committedIds().filter(isNoFit); }
+  function fitIds() { return committedIds().filter(function (i) { return !isNoFit(i); }); }
+  /* The same job can be added again (two TVs in two rooms): each one is its own entry with its own note, photos, answer and quantity */
+  function entryTitle(a) {
+    var same = state.order.filter(function (i) { return state.jobs[i] && (JOB[i].base || i) === a.base; }), k = same.indexOf(a.id);
+    return JOB[a.base].title + (k > 0 ? " (" + (k + 1) + ")" : "");
+  }
+  function makeAlias(base, eid) {
+    var b = JOB[base], a = {}, k;
+    for (k in b) a[k] = b[k];
+    a.id = eid; a.base = base;
+    Object.defineProperty(a, "title", { get: function () { return entryTitle(a); }, enumerable: true, configurable: true });
+    JOB[eid] = a;
+  }
+  function newEntryId(base) {
+    if (!state.jobs[base]) return base;
+    for (var n = 2; ; n++) { var eid = base + "_" + n; if (!state.jobs[eid]) { if (!JOB[eid]) makeAlias(base, eid); return eid; } }
+  }
+  function qtyOf(id) { return WIZ ? Math.max(1, Math.min(MAX_QTY, state.qty[id] || 1)) : 1; }
   function dropPending() {
     state.order.slice().forEach(function (id) { if (state.jobs[id] && !state.committed[id]) unselectJob(id); });
     if (state.cur && !state.committed[state.cur]) state.cur = null;
@@ -433,6 +460,7 @@
     if (s === "job") return committedIds().length ? "more" : "type";
     if (s === "details") return state.editing ? "more" : "job";
     if (s === "more") { var cj = curJob(); return cj ? (cj.ko.length ? "question" : "details") : "job"; }
+    if (s === "check") return nofitIds().length ? "review" : "more";
     return BACK[s];
   }
   function wizTitles() {
@@ -449,6 +477,11 @@
       selectJob(id); state.cur = id; state.notes[id] = state.notes[id] || "Water keeps running after I flush.";
       if (screen === "more") { state.committed[id] = true; var kk = koFor(id); if (kk) state.ko[kk.key] = "yes"; }
     }
+    if (screen === "review" && !selectedJobs().length) {
+      var withKo = JOBS.filter(function (j) { return j.ko.length; }), a1 = JOB["running-toilet"] ? "running-toilet" : withKo[0].id, a2 = JOB["mount-a-tv-on-a-drywall-or-wood-wall"] ? "mount-a-tv-on-a-drywall-or-wood-wall" : withKo[1].id;
+      [a1, a2].forEach(function (i, n) { selectJob(i); state.committed[i] = true; state.notes[i] = state.notes[i] || (n ? "Two TVs, one per bedroom." : "Water keeps running after I flush."); var k = koFor(i); if (k) state.ko[k.key] = n ? "no" : "yes"; });
+      state.cur = a2;
+    }
     if (/^(details|question)$/.test(screen) && !curJob()) state.cur = state.order.filter(function (i) { return state.jobs[i]; }).pop() || null;
     if (screen === "more" && !curJob()) state.cur = committedIds().pop() || null;
   }
@@ -457,7 +490,7 @@
   function selectedJobs() {
     return state.order.filter(function (id) { return state.jobs[id]; }).map(function (id) { return JOB[id]; });
   }
-  function totalMin() { return selectedJobs().reduce(function (s, j) { return s + j.min; }, 0); }
+  function totalMin() { return selectedJobs().reduce(function (s, j) { return s + (WIZ && isNoFit(j.id) ? 0 : j.min * qtyOf(j.id)); }, 0); }
   function overCount() { return !FIND && selectedJobs().length > MAX_TASKS; }
   function overLimit() { return overCount() || totalMin() > MAX_MIN; }
   function overReason() { return overCount() ? "count" : "time"; }
@@ -471,7 +504,7 @@
     return out;
   }
   function koBad() { return koItems().filter(function (k) { return state.ko[k.key] === "no"; }); }
-  function routedBy() { return Q.filter(isBad).concat(koBad().length ? ["ko"] : []); }
+  function routedBy() { return Q.filter(isBad).concat(!WIZ && koBad().length ? ["ko"] : []); }
   function checkOutcome() { var r = routedBy(); return r.length ? r[0] : ""; }
   function hours() { return state.hours || recommendedHours(); }
   function hoursText(h) { return h + (h === 1 ? " hour" : " hours"); }
@@ -552,7 +585,7 @@
       var n = $(id); if (!n) return;
       n.hidden = !now;
       if (now) n.querySelector("span").innerHTML = overCount()
-        ? "<strong>That’s more than 4 jobs.</strong> To book a time now, keep it to 4 jobs or fewer. Otherwise we’ll send this to our team as a service request, and you won’t need to enter anything else."
+        ? "<strong>That’s more than " + MAX_TASKS + " jobs.</strong> To book a time now, keep it to " + MAX_TASKS + " jobs or fewer. Otherwise we’ll send this to our team as a service request, and you won’t need to enter anything else."
         : "<strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.";
     });
     if (now !== lastOver) { lastOver = now; if (now) announce("That is more than a Fast Fix covers. We will send this to our team."); }
@@ -583,11 +616,6 @@
     var title = JOB[id].title, re = new RegExp("^" + id + "-\\d+$");
     Object.keys(state.ko).forEach(function (k) { if (re.test(k)) delete state.ko[k]; });
     unselectJob(id); state.dropped[id] = title; syncSr(); resetPicks();
-    if (WIZ) {
-      delete state.committed[id]; if (state.cur === id) state.cur = null;
-      announce("Removed " + title + ". After you book, you can submit a service request for it.");
-      navigate(committedIds().length ? "more" : "job"); return;
-    }
     renderKo(); refresh();
     announce("Removed " + title + ". After you book, you can submit a service request for it.");
     var rm = $("#ko-removed"); if (rm) { rm.setAttribute("tabindex", "-1"); rm.focus(); }
@@ -601,8 +629,15 @@
       tx.appendChild(hd); tx.appendChild(el("p", "t-meta", k.job.groupTitle));
       head.appendChild(icon(k.job.icon)); head.appendChild(tx); card.appendChild(head);
     }
+    var conds = WIZ && k.job.kc && k.job.kc.length ? k.job.kc : null;
+    if (conds) {   /* wizard: what Fast Fix covers, as a list, then ONE question */
+      var lead = el("p", "t-strong ko__lead", "Fast Fix covers this job when:"); lead.id = "ko-lead-" + k.key;
+      var ul = el("ul", "ko__list"); ul.id = "ko-list-" + k.key;
+      conds.forEach(function (c) { ul.appendChild(el("li", "", c)); });
+      card.appendChild(lead); card.appendChild(ul);
+    }
     var fs = el("fieldset"); fs.id = "fs-ko-" + k.key; fs.className = "ko__fs";
-    var lg = el("legend", "t-strong", k.q);
+    var lg = el("legend", "t-strong", conds ? "Does all of this apply to your job?" : k.q);
     var opts = el("div", "opts opts--2 opts--stack");
     [["yes", "Yes"], ["no", "No"]].forEach(function (o) {
       if (WIZ) {   /* tap an answer: Yes moves on right away, No explains the next step */
@@ -619,16 +654,20 @@
     var note = el("div", "note"); note.id = "note-ko-" + k.key; note.hidden = true; note.setAttribute("role", "status");
     note.innerHTML = '<svg class="i"><use href="#ri-information-line"/></svg><span></span>';
     var sp = note.lastChild, others = selectedJobs().length > 1;
+    if (WIZ) {
+      sp.appendChild(el("strong", "", k.job.title + " doesn\u2019t fit Fast Fix. "));
+      sp.appendChild(document.createTextNode("You can keep adding jobs. Before you continue, we\u2019ll show you what fits and what needs a service request."));
+    } else {
     sp.appendChild(el("strong", "", k.job.title + " needs our team. "));
     if (others) {
       sp.appendChild(document.createTextNode("It can\u2019t be done as a Fast Fix. Remove it to keep booking your other jobs, and we\u2019ll point you to a service request for it afterwards. Or continue to send everything to our team. "));
-      var rb = el("button", "link", WIZ ? "Remove this job and keep going" : "Remove this job and keep booking the others"); rb.type = "button"; rb.setAttribute("data-ko-remove", k.job.id);
+      var rb = el("button", "link", "Remove this job and keep booking the others"); rb.type = "button"; rb.setAttribute("data-ko-remove", k.job.id);
       sp.appendChild(rb);
     } else {
       sp.appendChild(document.createTextNode("We will send this to our team as a service request. You will not need to enter anything again."));
-      if (WIZ) { sp.appendChild(document.createTextNode(" ")); var cb = el("button", "link", "Pick a different job instead"); cb.type = "button"; cb.setAttribute("data-wiz-change", k.job.id); sp.appendChild(cb); }
     }
-    fs.setAttribute("aria-describedby", (noHead ? "" : "ko-h-" + k.key + " ") + "err-ko-" + k.key);
+    }
+    fs.setAttribute("aria-describedby", (noHead ? "" : "ko-h-" + k.key + " ") + (conds ? "ko-lead-" + k.key + " ko-list-" + k.key + " " : "") + "err-ko-" + k.key);
     fs.appendChild(lg); fs.appendChild(opts); fs.appendChild(err); fs.appendChild(note);
     card.appendChild(fs);
     return card;
@@ -680,11 +719,11 @@
         });
       } else {
         jobs.forEach(function (j) {
-          var done = !!state.committed[j.id] && !!state.jobs[j.id];
-          var b = el("button", "pkb pkb--job"); b.type = "button"; b.setAttribute("data-pick", j.id); b.disabled = done;
+          var done = state.order.some(function (i) { return state.jobs[i] && state.committed[i] && (JOB[i].base || i) === j.id; });
+          var b = el("button", "pkb pkb--job"); b.type = "button"; b.setAttribute("data-pick", j.id);
           var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", j.title)); if (toks.length) m.appendChild(el("span", "pkb__meta", j.groupTitle));
           b.appendChild(m);
-          if (done) b.appendChild(el("span", "opt__added", "Added")); else b.appendChild(pkChev());
+          if (done) b.appendChild(el("span", "opt__added", "Added")); b.appendChild(pkChev());
           list.appendChild(b);
         });
       }
@@ -697,16 +736,37 @@
   }
   function wizPickNow(id) {
     var prev = state.cur;
-    if (prev && prev !== id && !state.committed[prev]) unselectJob(prev);
-    selectJob(id); state.cur = id; state.editing = false; resetPicks();
+    if (prev && !state.committed[prev]) unselectJob(prev);
+    var eid = newEntryId(id);
+    selectJob(eid); state.cur = eid; state.editing = false; resetPicks();
     state.q = ""; state.pg = null;
     navigate("details");
   }
   function koAnswered() { var k = koFor(state.cur); return !!(k && state.ko[k.key]); }
 
   /* ---------- Wizard screens ---------- */
+  function renderQty() {
+    var jb = curJob(), host = $("#w-qty"); if (!jb || !host) return;
+    var n = qtyOf(jb.id); host.innerHTML = "";
+    function btn(dir, ic, name) {
+      var b = el("button", "qty__btn"); b.type = "button"; b.id = "qty-" + (dir > 0 ? "up" : "dn"); b.setAttribute("data-qty", String(dir)); b.setAttribute("aria-label", name);
+      if (dir > 0 ? n >= MAX_QTY : n <= 1) b.setAttribute("aria-disabled", "true");
+      b.innerHTML = '<svg class="i"><use href="#' + ic + '"/></svg>';
+      return b;
+    }
+    var val = el("span", "qty__val", String(n)); val.id = "qty-val";
+    host.appendChild(btn(-1, "ri-subtract-line", "Fewer")); host.appendChild(val); host.appendChild(btn(1, "ri-add-line", "More"));
+  }
+  function stepQty(d) {
+    var jb = curJob(); if (!jb) return;
+    var cur = qtyOf(jb.id), n = Math.max(1, Math.min(MAX_QTY, cur + d)); if (n === cur) return;
+    state.qty[jb.id] = n; resetPicks(); renderQty(); refresh();
+    var b = $("#qty-" + (d > 0 ? "up" : "dn")); if (b) b.focus({ preventScroll: true });
+    announce("How many: " + n + ".");
+  }
   function renderDetails() {
     var jb = curJob(); if (!jb) return;
+    renderQty();
     var ta = $("#wnote"); ta.value = state.notes[jb.id] || ""; ta.placeholder = jb.ex; ta.setAttribute("data-note", jb.id);
     setError("wnote", false);
     redrawPhotos();
@@ -720,7 +780,10 @@
     var ids = committedIds();
     ids.forEach(function (id) {
       var jb = JOB[id], li = el("li", "pick"), top = el("div", "pick__top"), main = el("div", "pick__main"), acts = el("div", "pick__acts");
-      main.appendChild(el("p", "pick__title", jb.title)); main.appendChild(el("p", "pick__group", jb.groupTitle));
+      var q = qtyOf(id), bad = isNoFit(id);
+      if (bad) li.className = "pick pick--nofit";
+      main.appendChild(el("p", "pick__title", jb.title + (q > 1 ? " \u00d7 " + q : ""))); main.appendChild(el("p", "pick__group", jb.groupTitle));
+      if (nofitIds().length) main.appendChild(el("p", "pick__tag" + (bad ? " pick__tag--no" : ""), bad ? "Needs a service request" : "Fits Fast Fix"));
       var note = (state.notes[id] || "").trim(); if (note) main.appendChild(el("p", "pick__note", note));
       var np = photosOf(id).length; if (np) main.appendChild(el("p", "pick__group", np + (np === 1 ? " photo" : " photos")));
       var ed = el("button", "link pick__remove", "Edit"); ed.type = "button"; ed.setAttribute("data-wiz-edit", id); ed.setAttribute("aria-label", "Edit " + jb.title);
@@ -731,6 +794,38 @@
     var full = ids.length >= MAX_TASKS, over = overLimit();
     $("#more-add").setAttribute("aria-disabled", String(full || over));
     $("#more-cap").hidden = !(full && !over);
+    setText($("#more-cap"), "You have added " + MAX_TASKS + " jobs, the most a Fast Fix covers. Need more? Submit a service request after you book.");
+  }
+  function reviewRow(id, why) {
+    var jb = JOB[id], li = el("li", "pick" + (why ? " pick--nofit" : "")), top = el("div", "pick__top"), main = el("div", "pick__main"), q = qtyOf(id);
+    main.appendChild(el("p", "pick__title", jb.title + (q > 1 ? " \u00d7 " + q : ""))); main.appendChild(el("p", "pick__group", jb.groupTitle));
+    if (why && jb.kc.length) {
+      main.appendChild(el("p", "pick__note pick__why", "Fast Fix covers this job when:"));
+      var cl = el("ul", "pick__conds"); jb.kc.forEach(function (c) { cl.appendChild(el("li", "", c)); }); main.appendChild(cl);
+    }
+    if (!why) {
+      var note = (state.notes[id] || "").trim(); if (note) main.appendChild(el("p", "pick__note", note));
+      var np = photosOf(id).length; if (np) main.appendChild(el("p", "pick__group", np + (np === 1 ? " photo" : " photos")));
+    }
+    top.appendChild(icon(jb.icon)); top.appendChild(main); li.appendChild(top);
+    return li;
+  }
+  /* The page that says plainly what fits Fast Fix and what needs its own service request */
+  function renderReview() {
+    var fit = fitIds(), nf = nofitIds(), all = fit.length + nf.length;
+    $("#rv-fit").hidden = !fit.length; $("#rv-sr").hidden = !nf.length; $("#rv-all").hidden = !fit.length;
+    setText($("#rv-fit-t"), "Fits Fast Fix (" + fit.length + ")");
+    setText($("#rv-fit-sub"), "We can book " + (fit.length === 1 ? "this job" : "these jobs") + " as one visit.");
+    setText($("#rv-sr-t"), "Needs a service request (" + nf.length + ")");
+    setText($("#rv-sr-sub"), nf.length === 1 ? "Fast Fix doesn\u2019t cover this job, so it needs its own service request." : "Fast Fix doesn\u2019t cover these jobs, so they need a service request.");
+    var fl = $("#rv-fit-list"), sl = $("#rv-sr-list"); fl.innerHTML = ""; sl.innerHTML = "";
+    fit.forEach(function (i) { fl.appendChild(reviewRow(i, false)); });
+    nf.forEach(function (i) { sl.appendChild(reviewRow(i, true)); });
+    setText($("#rv-explain"), fit.length
+      ? "Book the Fast Fix " + (fit.length === 1 ? "job" : "jobs") + " now and pick a time. After you book, we\u2019ll take you to a service request for the other " + (nf.length === 1 ? "job" : "jobs") + ". Your description and photos come with you."
+      : "None of these fit Fast Fix. We\u2019ll send " + (nf.length === 1 ? "it" : "them") + " to our team as one service request, and you won\u2019t need to enter anything again.");
+    setText($("#rv-all-note"), "Want one visit for everything instead?");
+    setText($("#rv-all"), "Send all " + all + " jobs as one service request");
   }
   function wizNext() {
     var s = state.screen, jb;
@@ -745,13 +840,17 @@
       var k = koFor(state.cur); if (!k) { navigate("more"); return true; }
       var a = state.ko[k.key];
       if (!a) return true;
-      if (a === "no") { state.reason = "ko"; navigate("sent"); return true; }
       state.committed[state.cur] = true; state.editing = false; navigate("more"); return true;
     }
     if (s === "more") {
       if (!committedIds().length) { navigate("job"); return true; }
       if (overLimit()) { state.reason = overReason(); navigate("sent"); return true; }
-      navigate("check"); return true;
+      navigate(nofitIds().length ? "review" : "check"); return true;
+    }
+    if (s === "review") {
+      if (fitIds().length) { state.split = true; syncSr(); navigate("check"); }
+      else { state.split = false; syncSr(); state.reason = "ko"; navigate("sent"); }
+      return true;
     }
     return false;
   }
@@ -772,7 +871,8 @@
     if (screen === "describe") return { label: "Continue", status: "" };
     if (WIZ && screen === "job") return { label: "Continue", status: curJob() ? curJob().title : "" };
     if (WIZ && screen === "details") return { label: "Continue", status: "" };
-    if (WIZ && screen === "question") { var wk = koFor(state.cur); return { label: wk && state.ko[wk.key] === "no" ? "Send to our team" : "Continue", status: "" }; }
+    if (WIZ && screen === "question") { var wk = koFor(state.cur); return { label: "Continue", status: "" }; }
+    if (WIZ && screen === "review") { var rf = fitIds().length, rn = nofitIds().length; return { label: rf ? "Book the " + rf + (rf === 1 ? " Fast Fix job" : " Fast Fix jobs") : "Send as a service request", status: rf + " fit \u00b7 " + rn + " need a service request" }; }
     if (WIZ && screen === "more") { var wc = committedIds().length; return { label: overLimit() ? "Send to our team" : "Continue", status: overLimit() ? "More than a Fast Fix covers" : wc + " of " + MAX_TASKS + " jobs" }; }
     if (screen === "job") {
       return {
@@ -809,7 +909,7 @@
     $("#s-addr").textContent = h.addr;
     $("#s-city").textContent = h.city;
 
-    var jobs = selectedJobs(), showJobs = s !== "type" && s !== "describe" && jobs.length > 0;
+    var all = selectedJobs(), jobs = WIZ && s !== "sent" ? all.filter(function (j) { return !isNoFit(j.id); }) : all, showJobs = s !== "type" && s !== "describe" && all.length > 0;
     $("#s-jobs-row").hidden = !showJobs;
     var list = $("#s-jobs");
     list.innerHTML = "";
@@ -817,7 +917,7 @@
       var li = document.createElement("li");
       var t = document.createElement("span");
       t.className = "sum__jobname";
-      t.textContent = j.title;
+      t.textContent = j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : "");
       li.appendChild(t);
       var note = (state.notes[j.id] || "").trim();
       if (note) {
@@ -829,6 +929,11 @@
       var np = photosOf(j.id).length;
       if (np) { var pn = document.createElement("span"); pn.className = "sum__jobnote"; pn.textContent = np + (np === 1 ? " photo" : " photos"); li.appendChild(pn); }
       list.appendChild(li);
+    });
+    if (WIZ && s !== "sent" && state.split) all.filter(function (j) { return isNoFit(j.id); }).forEach(function (j) {
+      var li = document.createElement("li"), t = document.createElement("span"), n = document.createElement("span");
+      t.className = "sum__jobname"; t.textContent = j.title; n.className = "sum__jobnote"; n.textContent = "Separate service request";
+      li.appendChild(t); li.appendChild(n); list.appendChild(li);
     });
 
     var showWhen = (s === "time") && state.date && state.time !== null;
@@ -855,6 +960,7 @@
   }
 
   function refresh() {
+    if (WIZ) syncSr();
     updateSrFlag();
     updateOver();
     updateChecksNotes();
@@ -910,6 +1016,7 @@
   function render(screen) {
     if (WIZ) wizEnter(screen);
     if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = overReason(); navigate("sent"); return; }
+    if (WIZ && screen === "review" && !nofitIds().length) { navigate(committedIds().length ? "check" : "job"); return; }
     if (WIZ && screen === "question" && !koFor(state.cur)) { if (curJob()) state.committed[state.cur] = true; navigate("more"); return; }
     if (screen !== "type" && screen !== "describe" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
     if (screen === "booked" && (!state.date || state.time === null)) seedDemo(screen);
@@ -924,7 +1031,7 @@
     document.title = PAGE_TITLE[screen] + SUFFIX;
 
     /* stepper */
-    var idx = (FIND ? ["describe", "job", "check", "time"] : ["job", "check", "time"]).indexOf(WIZ && /^(details|question|more)$/.test(screen) ? "job" : screen);
+    var idx = (FIND ? ["describe", "job", "check", "time"] : ["job", "check", "time"]).indexOf(WIZ && /^(details|question|more|review)$/.test(screen) ? "job" : screen);
     $("#steps").hidden = idx < 0;
     $all(".step").forEach(function (el, i) {
       el.classList.toggle("is-done", i < idx);
@@ -956,6 +1063,7 @@
     if (screen === "details") renderDetails();
     if (screen === "question") renderWizQuestion();
     if (screen === "more") renderMore();
+    if (screen === "review") renderReview();
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
       $("#rec").hidden = noSlots;
@@ -972,7 +1080,7 @@
       renderTimes();
     }
     if (screen === "booked") fillBooked();
-    if (screen === "sent") $("#sent-why").textContent = state.reason === "ko" && koBad().length ? koBad()[0].job.title + " can\u2019t be done as a Fast Fix, so our team will plan this visit." : (WHY[state.reason] || WHY.ladder);
+    if (screen === "sent") $("#sent-why").textContent = state.reason === "ko" && koBad().length ? (WIZ && selectedJobs().length > 1 ? "Some of your jobs don\u2019t fit Fast Fix, so our team will plan all of them together as one service request." : koBad()[0].job.title + " can\u2019t be done as a Fast Fix, so our team will plan this visit.") : (WHY[state.reason] || WHY.ladder);
 
     refresh();
     if (!firstRender) { window.scrollTo(0, 0); $("#h1").focus({ preventScroll: true }); }
@@ -986,7 +1094,7 @@
     $("#b-time").textContent = t12(state.time) + " · Central Time";
     $("#b-addr").textContent = h.addr;
     $("#b-city").textContent = h.city;
-    $("#b-jobs").textContent = selectedJobs().map(function (j) { return j.title; }).join(", ");
+    $("#b-jobs").textContent = selectedJobs().filter(function (j) { return !(WIZ && isNoFit(j.id)); }).map(function (j) { return j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : ""); }).join(", ");
     $("#b-len").textContent = hoursText(hours()) + " booked";
     $("#hm-initials").textContent = h.ini;
     $("#hm-role").textContent = h.hm;
@@ -1175,7 +1283,7 @@
         return;
       }
       if (t.closest("[data-sr-link]")) { srAction(); return; }
-      var pkj = t.closest("[data-pick]"); if (pkj) { if (!pkj.disabled) wizPickNow(pkj.getAttribute("data-pick")); return; }
+      var pkj = t.closest("[data-pick]"); if (pkj) { wizPickNow(pkj.getAttribute("data-pick")); return; }
       var pku = t.closest("[data-pk-up]"); if (pku) { state.q = ""; navigate("job"); return; }
       var pkg = t.closest("[data-pk-group]"); if (pkg) { state.q = ""; location.hash = "#/job/" + pkg.getAttribute("data-pk-group"); return; }
       var wn = t.closest("[data-wiz-ans]");
@@ -1188,7 +1296,9 @@
       var wa = t.closest("[data-wiz-add]"); if (wa) { wizAdd(); return; }
       var we = t.closest("[data-wiz-edit]"); if (we) { state.cur = we.getAttribute("data-wiz-edit"); state.editing = true; navigate("details"); return; }
       var wr = t.closest("[data-wiz-remove]"); if (wr) { wizRemove(wr.getAttribute("data-wiz-remove")); return; }
-      var wc2 = t.closest("[data-wiz-change]"); if (wc2) { var wid = wc2.getAttribute("data-wiz-change"); unselectJob(wid); delete state.committed[wid]; if (state.cur === wid) state.cur = null; resetPicks(); navigate("job"); return; }
+      var wsa = t.closest("[data-wiz-sendall]"); if (wsa) { state.split = false; syncSr(); state.reason = "ko"; navigate("sent"); return; }
+      var wbk = t.closest("[data-wiz-back]"); if (wbk) { navigate("more"); return; }
+      var qb = t.closest("[data-qty]"); if (qb) { if (qb.getAttribute("aria-disabled") !== "true") stepQty(+qb.getAttribute("data-qty")); return; }
       var pa = t.closest("[data-photo-add]"); if (pa) { var pi = $("#photo-in-" + pa.getAttribute("data-photo-add")); if (pi) pi.click(); return; }
       var pr = t.closest("[data-photo-rm]"); if (pr) { var pp = pr.getAttribute("data-photo-rm").split(":"); removePhoto(pp[0], +pp[1]); return; }
       var kr = t.closest("[data-ko-remove]"); if (kr) { removeFailed(kr.getAttribute("data-ko-remove")); return; }
@@ -1291,7 +1401,11 @@
     $("#pick-ui").appendChild($("#sel-sec"));
     setText($("#add-title label"), WIZ ? "Search for a job" : "Find your jobs");
     setText($("#search-hint"), "Search by job or category, or open a category. You can pick up to 4.");
-    if (WIZ) { $("#add-title").className = "sr-only"; $("#search-hint").hidden = true; $("#search").removeAttribute("aria-describedby"); $("#search").setAttribute("placeholder", "Search jobs, like \u201Cfaucet\u201D"); }
+    if (WIZ) {
+      $("#add-title").className = "sr-only"; $("#search").setAttribute("placeholder", "Search jobs, like \u201Cfaucet\u201D");
+      setText($("#search-hint"), "Need the same job twice, like two TVs? Add it again, or say how many on the next screen.");
+      $(".search").insertAdjacentElement("afterend", $("#search-hint")); $("#search-hint").classList.add("pk__hint");
+    }
     if (WIZ) setText($('.step[data-step="job"] .step__t'), "Your jobs");
   }
   applySwitch("multi", true);

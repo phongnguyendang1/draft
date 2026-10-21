@@ -311,7 +311,7 @@ body.is-modal { overflow: hidden; }
   var MEMBER = [
     { symptom: 'Toilet rocks or leaks at the base', group: 'Plumbing', comment: 'Water pools around the base after every flush.' },
     { symptom: 'Cracked or missing grout', group: 'Walls, Paint & Tile', comment: 'Two cracked tiles by the shower door, and grout missing along the bottom row.' },
-    { symptom: 'Hang a heavy mirror', group: 'Mounting & Hanging', comment: 'About 40 lb, going over the bathroom vanity. Drywall wall.' }
+    { symptom: 'Hang a heavy mirror', group: 'Mounting & Hanging', comment: 'About 40 lb each, over the two bathroom vanities. Drywall walls.', qty: 2 }
   ];
   var seq = 0;
   function fast(m) { return { id: 't' + (++seq), kind: 'fast', from: m, tax: null, done: false, reason: '', notes: '', minutes: '', parts: '' }; }
@@ -341,7 +341,7 @@ body.is-modal { overflow: hidden; }
 
   function compiled() {
     if (S.requested) return S.requested;
-    return MEMBER.map(function (m, i) { return '- Task' + (i + 1) + ': ' + m.symptom + ' (' + m.group + '): ' + m.comment; }).join('\n');
+    return MEMBER.map(function (m, i) { return '- Task' + (i + 1) + ': ' + m.symptom + ' (' + m.group + ')' + (m.qty > 1 ? ' x' + m.qty : '') + ': ' + m.comment; }).join('\n');
   }
   function load(name) {
     scenario = name; seq = 0; S = SCN[name](); S.sent = false; S.attn = false;
@@ -429,7 +429,7 @@ body.is-modal { overflow: hidden; }
       h('span', { class: 'tag' }, 'Fast Fix'), k[0], k[1]);
     return h('article', { class: 'card card--fast', 'data-id': t.id, 'aria-labelledby': 'h-' + t.id },
       head,
-      h('div', { class: 'note' }, h('p', { class: 'note__t' }, 'Member’s note'), h('p', { class: 'note__b' }, t.from.comment)),
+      h('div', { class: 'note' }, h('p', { class: 'note__t' }, 'Member’s note'), h('p', { class: 'note__b' }, t.from.comment), t.from.qty > 1 ? h('p', { class: 'note__b' }, 'Quantity: ' + t.from.qty) : null),
       h('div', { class: 'call' },
         h('p', null, 'This is what the member asked for. Replace it with the task you are doing to start updating your work.'),
         h('button', { class: 'btn btn--blue', type: 'button', 'data-fk': t.id + ':replace', onclick: function (e) { openPicker('replace', t, e.currentTarget); } }, 'Replace task')));
@@ -456,7 +456,7 @@ body.is-modal { overflow: hidden; }
       h('div', { class: 'card__head' },
         h('h3', { class: 'card__title', id: 'h-' + id, tabindex: '-1', 'data-fk': id + ':title' }, title), k[0], k[1]),
       h('p', { class: 'desc' }, tx.desc),
-      t.from ? h('p', { class: 'from' }, 'Member asked for: ' + t.from.symptom + ' (' + t.from.group + ')') : null,
+      t.from ? h('p', { class: 'from' }, 'Member asked for: ' + t.from.symptom + ' (' + t.from.group + ')' + (t.from.qty > 1 ? ' × ' + t.from.qty : '')) : null,
       h('p', { class: 'sub' }, 'Sub-tasks'),
       h('div', { class: 'sub__row' },
         h('label', { class: 'chk', for: 'c-' + id }, cb, 'Completed'),
