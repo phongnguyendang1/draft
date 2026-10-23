@@ -249,3 +249,11 @@ body.variant-wizard #tree { margin-top: 0; }
 .rv__all .t-meta { margin: 0 0 var(--s-8); }
 .rv__all .btn { width: 100%; }
 .rv__change { display: block; min-height: 44px; margin-top: var(--s-8); }
+
+/* ---------- Wizard round 2: two steps, visits, service request created ---------- */
+body.variant-wizard .no-wizard { display: none !important; }
+body.variant-wizard .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#s-when { white-space: pre-line; }
+.ko__qty { margin: 0 0 var(--s-8); }
+.pick__num { display: inline-grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--surface); color: var(--blue-text); font-weight: 600; }
+#visit-note, #b-sr-note, #note-split-more { margin-bottom: var(--s-16); }

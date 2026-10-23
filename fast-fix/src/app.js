@@ -58,16 +58,15 @@
   };
   var BACK = { type: null, job: "type", check: "job", time: "check", booked: null, sent: null };
   if (WIZ) {
-    SCREENS = ["type", "job", "details", "question", "more", "review", "check", "time", "booked", "sent"];
+    SCREENS = ["type", "job", "details", "question", "more", "review", "time", "booked", "sent"];
     TITLES.job = ["What needs fixing?", ""];
     TITLES.details = ["Tell us about the job", "Tell us what\u2019s going on. Photos are optional."];
     TITLES.question = ["One quick question", ""];
     TITLES.more = ["Add another job?", "Each job gets its own description, photos and question. You can add up to " + MAX_TASKS + "."];
-    TITLES.review = ["Here\u2019s what fits Fast Fix", "We checked your answers. Choose how you want to continue."];
-    TITLES.check = ["A quick check", "Three questions about the whole visit. All are required."];
+    TITLES.review = ["Here\u2019s what fits Fast Fix", ""];
     PAGE_TITLE.review = "Fast Fix: what fits";
     PAGE_TITLE.job = "Fast Fix: pick a job"; PAGE_TITLE.details = "Fast Fix: about the job"; PAGE_TITLE.question = "Fast Fix: one question"; PAGE_TITLE.more = "Fast Fix: add another job";
-    BACK = { type: null, job: "type", details: "job", question: "details", more: "question", review: "more", check: "more", time: "check", booked: null, sent: null };
+    BACK = { type: null, job: "type", details: "job", question: "details", more: "question", review: "more", time: "more", booked: null, sent: null };
   }
   if (FIND) {
     SCREENS = ["type", "describe", "job", "check", "time", "booked", "sent"];
@@ -104,7 +103,7 @@
   /* ---------- State ---------- */
   var state = {
     screen: "type", home: "mueller", jobs: {}, order: [], notes: {}, showAll: false, hours: 0, ladder: "", trade: "", part: "",
-    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, photos: {}, perr: {}, cur: null, committed: {}, editing: false, split: false, qty: {}
+    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, photos: {}, perr: {}, cur: null, committed: {}, editing: false, split: false, qty: {}, visit: 0, books: []
   };
 
 
@@ -385,8 +384,8 @@
     var nsr = WIZ ? nofitIds().length : Object.keys(state.dropped).length, srText = "Submit a service request for your other job" + (nsr > 1 ? "s" : "");
     setText($("#b-sr"), srText); setText($("#sent-sr"), srText);
     $("#sr-flag").hidden = !state.srAfter;
-    $("#b-sr").hidden = !state.srAfter;
-    $("#sent-sr").hidden = !state.srAfter;
+    $("#b-sr").hidden = WIZ || !state.srAfter;
+    $("#sent-sr").hidden = WIZ || !state.srAfter;
   }
 
   /* ----- one place for every add / remove ----- */
@@ -459,19 +458,23 @@
     if (!WIZ) return BACK[s];
     if (s === "job") return committedIds().length ? "more" : "type";
     if (s === "details") return state.editing ? "more" : "job";
-    if (s === "more") { var cj = curJob(); return cj ? (cj.ko.length ? "question" : "details") : "job"; }
-    if (s === "check") return nofitIds().length ? "review" : "more";
+    if (s === "more") return curJob() ? "question" : "job";
+    if (s === "time") return state.visit > 0 ? "time" : ((nofitIds().length || needsSplit()) ? "review" : "more");
     return BACK[s];
   }
   function wizTitles() {
-    var cj = curJob(), n = Math.min(MAX_TASKS, committedIds().length + 1);
+    var cj = curJob(), n = Math.min(MAX_TASKS, committedIds().length + 1), pv = planVisits(), many = !!(pv && pv.length > 1);
     TITLES.job = ["What needs fixing?", "Job " + n + " of up to " + MAX_TASKS + ". " + (state.pg ? "Tap the job that fits." : "Choose a category, or search.")];
     TITLES.details = [cj ? cj.title : "Tell us about the job", "Tell us what\u2019s going on. Photos are optional."];
-    TITLES.question = ["One quick question", cj ? "About: " + cj.title : ""];
+    TITLES.question = ["One quick question", cj ? "About: " + cj.title + (qtyOf(cj.id) > 1 ? " \u00d7 " + qtyOf(cj.id) : "") : ""];
+    TITLES.review = needsSplit()
+      ? ["We\u2019ll book this as " + pv.length + " Fast Fix visits", "Together your jobs run longer than one Fast Fix (3 hours), and each one fits on its own."]
+      : ["Here\u2019s what fits Fast Fix", "Everything you picked goes in as one request. Here\u2019s how we\u2019ll handle each job."];
+    TITLES.time = [many ? "Pick a time: visit " + (Math.min(state.visit, pv.length - 1) + 1) + " of " + pv.length : "Pick a time", many ? "Each visit is booked on its own. Real open times with your Home Manager." : "Real open times with your Home Manager. Your booking is confirmed right away."];
   }
   /* Deep links (and the "Jump to screen" panel) land on a sensible state when nothing has been picked yet */
   function wizEnter(screen) {
-    if (screen === "type" || screen === "more" || screen === "check") dropPending();
+    if (/^(type|more|review|time)$/.test(screen)) dropPending();
     if (/^(details|question|more)$/.test(screen) && !selectedJobs().length) {
       var id = JOB["running-toilet"] ? "running-toilet" : JOBS[0].id;
       selectJob(id); state.cur = id; state.notes[id] = state.notes[id] || "Water keeps running after I flush.";
@@ -492,21 +495,61 @@
   }
   function totalMin() { return selectedJobs().reduce(function (s, j) { return s + (WIZ && isNoFit(j.id) ? 0 : j.min * qtyOf(j.id)); }, 0); }
   function overCount() { return !FIND && selectedJobs().length > MAX_TASKS; }
-  function overLimit() { return overCount() || totalMin() > MAX_MIN; }
+  /* Wizard: when everything fits Fast Fix but the visit runs past 3 hours, it becomes two separate Fast Fix visits (up to 6 hours in all) */
+  function planVisits() {
+    var jobs = selectedJobs().filter(function (j) { return !(WIZ && isNoFit(j.id)); });
+    var full = jobs.map(function (j) { return qtyOf(j.id); }), total = jobs.reduce(function (s, j, i) { return s + j.min * full[i]; }, 0);
+    function visitOf(counts) {
+      var items = [], m = 0;
+      jobs.forEach(function (j, i) { if (counts[i] > 0) { items.push({ id: j.id, qty: counts[i] }); m += j.min * counts[i]; } });
+      return { min: m, items: items };
+    }
+    if (!jobs.length) return [];
+    if (total <= MAX_MIN) return [visitOf(full)];
+    if (!WIZ || nofitIds().length || total > 2 * MAX_MIN || jobs.some(function (j) { return j.min > MAX_MIN; })) return null;
+    var n = jobs.length, best = null, mask, i;
+    for (mask = 1; mask < (1 << n) - 1; mask++) {   /* first try to keep each job in one visit */
+      var a = 0; for (i = 0; i < n; i++) if (mask & (1 << i)) a += jobs[i].min * full[i];
+      var rest = total - a;
+      if (a <= MAX_MIN && rest <= MAX_MIN && (!best || Math.abs(a - rest) < best.d)) best = { mask: mask, d: Math.abs(a - rest) };
+    }
+    if (best) return [visitOf(full.map(function (q, k) { return best.mask & (1 << k) ? q : 0; })), visitOf(full.map(function (q, k) { return best.mask & (1 << k) ? 0 : q; }))];
+    var units = []; jobs.forEach(function (j, k) { for (var u = 0; u < full[k]; u++) units.push({ i: k, m: j.min }); });   /* otherwise split a job's units across the two visits */
+    var reach = { 0: [] };
+    units.forEach(function (u, idx) { Object.keys(reach).map(Number).forEach(function (s) { var ns = s + u.m; if (ns <= MAX_MIN && !(ns in reach)) reach[ns] = reach[s].concat(idx); }); });
+    var pick = null;
+    Object.keys(reach).map(Number).forEach(function (s) { var r = total - s; if (s > 0 && r > 0 && r <= MAX_MIN && (!pick || Math.abs(s - r) < pick.d)) pick = { s: s, d: Math.abs(s - r) }; });
+    if (!pick) return null;
+    var c1 = full.map(function () { return 0; }), c2 = full.slice();
+    reach[pick.s].forEach(function (idx) { c1[units[idx].i]++; c2[units[idx].i]--; });
+    return [visitOf(c1), visitOf(c2)];
+  }
+  function needsSplit() { return WIZ && totalMin() > MAX_MIN && !nofitIds().length && !!planVisits(); }
+  function overLimit() { return overCount() || (totalMin() > MAX_MIN && !needsSplit()); }
   function overReason() { return overCount() ? "count" : "time"; }
   /* Recommended booking length: what the picked jobs add up to, rounded up to a whole hour, 1 to 3 */
   function recommendedHours() { return Math.min(3, Math.max(1, Math.ceil(totalMin() / 60))); }
   function isBad(q) { return BAD[q].indexOf(state[q]) > -1; }
   /* Per-task knockout questions (placeholder copy): every question is worded so Yes is the right answer */
+  var COMMON = [
+    "You can reach it with a standard step ladder, not on a roof, second story or vaulted ceiling",
+    "It\u2019s only a swap or repair of what is already there, with no gas, new wiring or moved water lines",
+    "You have the part or fixture, if the job needs one"
+  ];
   function koItems() {
     var out = [];
+    if (WIZ) { selectedJobs().forEach(function (jb) { out.push({ key: jb.id + "-0", job: jb, q: (jb.ko || [])[0] || "Does all of this apply to your job?" }); }); return out; }
     selectedJobs().forEach(function (jb) { (jb.ko || []).forEach(function (q, i) { out.push({ key: jb.id + "-" + i, job: jb, q: q }); }); });
     return out;
   }
   function koBad() { return koItems().filter(function (k) { return state.ko[k.key] === "no"; }); }
   function routedBy() { return Q.filter(isBad).concat(!WIZ && koBad().length ? ["ko"] : []); }
   function checkOutcome() { var r = routedBy(); return r.length ? r[0] : ""; }
-  function hours() { return state.hours || recommendedHours(); }
+  function hours() {
+    if (WIZ) { var pv = planVisits(); if (pv && pv.length) return Math.min(3, Math.max(1, Math.ceil(pv[Math.min(state.visit, pv.length - 1)].min / 60))); }
+    return state.hours || recommendedHours();
+  }
+  function itemsText(v) { return v.items.map(function (it) { return JOB[it.id].title + (it.qty > 1 ? " \u00d7 " + it.qty : ""); }).join(", "); }
   function hoursText(h) { return h + (h === 1 ? " hour" : " hours"); }
 
   /* ---------- Availability (deterministic stand-in for the real calendar) ---------- */
@@ -525,6 +568,8 @@
       if (s + h * 60 > 18 * 60) return;
       if ((d.getDate() + i * 3 + h) % 4 === 0) return;
       if (state.taken[isoDate + "@" + s]) return;
+      var b0 = WIZ && state.visit > 0 ? state.books[0] : null;
+      if (b0 && b0.date === isoDate && s < b0.time + b0.hours * 60 && b0.time < s + h * 60) return;
       out.push(s);
     });
     return out;
@@ -597,6 +642,14 @@
     $("#rec-value").textContent = hoursText(h);
     setText($(".rec__label"), "Visit length");
     $("#rec-meta").textContent = (FIND ? "Based on the jobs you selected. " : "Based on the tasks you chose. ") + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
+    if (WIZ) {
+      var pv = planVisits(), vn = $("#visit-note"), vi = pv ? Math.min(state.visit, pv.length - 1) : 0;
+      vn.hidden = !(pv && pv.length > 1);
+      if (!vn.hidden) {
+        setText(vn.lastChild, "Visit " + (vi + 1) + " of " + pv.length + ": " + itemsText(pv[vi]) + ". " + (vi ? "Pick a time that doesn\u2019t overlap visit 1." : "You\u2019ll pick a time for each visit."));
+        setText($("#rec-meta"), "Based on the jobs in this visit. $" + RATE + " per hour, " + money(h * RATE) + " for this visit.");
+      }
+    }
   }
 
   function updateChecksNotes() {
@@ -629,15 +682,25 @@
       tx.appendChild(hd); tx.appendChild(el("p", "t-meta", k.job.groupTitle));
       head.appendChild(icon(k.job.icon)); head.appendChild(tx); card.appendChild(head);
     }
-    var conds = WIZ && k.job.kc && k.job.kc.length ? k.job.kc : null;
-    if (conds) {   /* wizard: what Fast Fix covers, as a list, then ONE question */
-      var lead = el("p", "t-strong ko__lead", "Fast Fix covers this job when:"); lead.id = "ko-lead-" + k.key;
+    var conds = WIZ ? true : null;
+    if (conds) {   /* wizard: what Fast Fix covers for this job, then what it covers for any job, then ONE question */
+      var spec = k.job.kc || [], n = qtyOf(k.job.id);
+      if (n > 1) card.appendChild(el("p", "ko__qty t-meta", "You\u2019re adding " + n + " of these."));
+      var lead = el("p", "t-strong ko__lead", spec.length ? "Fast Fix covers this job when:" : "Fast Fix covers a job when:"); lead.id = "ko-lead-" + k.key;
       var ul = el("ul", "ko__list"); ul.id = "ko-list-" + k.key;
-      conds.forEach(function (c) { ul.appendChild(el("li", "", c)); });
-      card.appendChild(lead); card.appendChild(ul);
+      spec.forEach(function (c) { ul.appendChild(el("li", "", c)); });
+      if (spec.length) {
+        card.appendChild(lead); card.appendChild(ul);
+        var lead2 = el("p", "t-strong ko__lead", "And for any job:"), ul2 = el("ul", "ko__list");
+        COMMON.forEach(function (c) { ul2.appendChild(el("li", "", c)); });
+        card.appendChild(lead2); card.appendChild(ul2);
+      } else {
+        COMMON.forEach(function (c) { ul.appendChild(el("li", "", c)); });
+        card.appendChild(lead); card.appendChild(ul);
+      }
     }
     var fs = el("fieldset"); fs.id = "fs-ko-" + k.key; fs.className = "ko__fs";
-    var lg = el("legend", "t-strong", conds ? "Does all of this apply to your job?" : k.q);
+    var lg = el("legend", "t-strong", conds ? (qtyOf(k.job.id) > 1 ? "Does all of this apply to every one?" : "Does all of this apply to your job?") : k.q);
     var opts = el("div", "opts opts--2 opts--stack");
     [["yes", "Yes"], ["no", "No"]].forEach(function (o) {
       if (WIZ) {   /* tap an answer: Yes moves on right away, No explains the next step */
@@ -794,6 +857,9 @@
     var full = ids.length >= MAX_TASKS, over = overLimit();
     $("#more-add").setAttribute("aria-disabled", String(full || over));
     $("#more-cap").hidden = !(full && !over);
+    var sp = needsSplit(), pvv = sp ? planVisits() : null;
+    $("#note-split-more").hidden = !sp;
+    if (sp) setText($("#note-split-more").lastChild, "Together these run longer than one Fast Fix (3 hours), and each job fits on its own, so we\u2019ll book them as " + pvv.length + " separate Fast Fix visits.");
     setText($("#more-cap"), "You have added " + MAX_TASKS + " jobs, the most a Fast Fix covers. Need more? Submit a service request after you book.");
   }
   function reviewRow(id, why) {
@@ -810,22 +876,33 @@
     top.appendChild(icon(jb.icon)); top.appendChild(main); li.appendChild(top);
     return li;
   }
-  /* The page that says plainly what fits Fast Fix and what needs its own service request */
+  /* The page that says plainly what fits Fast Fix and what needs a service request, or how a long visit is split in two */
   function renderReview() {
-    var fit = fitIds(), nf = nofitIds(), all = fit.length + nf.length;
-    $("#rv-fit").hidden = !fit.length; $("#rv-sr").hidden = !nf.length; $("#rv-all").hidden = !fit.length;
-    setText($("#rv-fit-t"), "Fits Fast Fix (" + fit.length + ")");
+    var fit = fitIds(), nf = nofitIds(), all = fit.length + nf.length, split = needsSplit() && !nf.length, pv = split ? planVisits() : null;
+    $("#rv-fit").hidden = split || !fit.length; $("#rv-sr").hidden = !nf.length; $("#rv-visits").hidden = !split; $("#rv-all").hidden = !fit.length;
+    setText($("#rv-fit-t"), "Fast Fix: book a time now (" + fit.length + ")");
     setText($("#rv-fit-sub"), "We can book " + (fit.length === 1 ? "this job" : "these jobs") + " as one visit.");
     setText($("#rv-sr-t"), "Needs a service request (" + nf.length + ")");
-    setText($("#rv-sr-sub"), nf.length === 1 ? "Fast Fix doesn\u2019t cover this job, so it needs its own service request." : "Fast Fix doesn\u2019t cover these jobs, so they need a service request.");
-    var fl = $("#rv-fit-list"), sl = $("#rv-sr-list"); fl.innerHTML = ""; sl.innerHTML = "";
+    setText($("#rv-sr-sub"), nf.length === 1 ? "Fast Fix doesn\u2019t cover this job, so our team will schedule it." : "Fast Fix doesn\u2019t cover these jobs, so our team will schedule them.");
+    var fl = $("#rv-fit-list"), sl = $("#rv-sr-list"), vl = $("#rv-visits-list"); fl.innerHTML = ""; sl.innerHTML = ""; vl.innerHTML = "";
     fit.forEach(function (i) { fl.appendChild(reviewRow(i, false)); });
     nf.forEach(function (i) { sl.appendChild(reviewRow(i, true)); });
-    setText($("#rv-explain"), fit.length
-      ? "Book the Fast Fix " + (fit.length === 1 ? "job" : "jobs") + " now and pick a time. After you book, we\u2019ll take you to a service request for the other " + (nf.length === 1 ? "job" : "jobs") + ". Your description and photos come with you."
-      : "None of these fit Fast Fix. We\u2019ll send " + (nf.length === 1 ? "it" : "them") + " to our team as one service request, and you won\u2019t need to enter anything again.");
-    setText($("#rv-all-note"), "Want one visit for everything instead?");
-    setText($("#rv-all"), "Send all " + all + " jobs as one service request");
+    if (split) {
+      setText($("#rv-visits-t"), pv.length + " Fast Fix visits");
+      setText($("#rv-visits-sub"), "Each visit is booked on its own, so you pick a time for each.");
+      pv.forEach(function (v, k) {
+        var li = el("li", "pick"), top = el("div", "pick__top"), main = el("div", "pick__main"), hrs = Math.min(3, Math.max(1, Math.ceil(v.min / 60)));
+        main.appendChild(el("p", "pick__title", "Visit " + (k + 1) + " \u00b7 " + hoursText(hrs))); main.appendChild(el("p", "pick__note pick__why", itemsText(v)));
+        top.appendChild(el("span", "pick__num", String(k + 1))); top.appendChild(main); li.appendChild(top); vl.appendChild(li);
+      });
+    }
+    setText($("#rv-explain"), split
+      ? "Together these take longer than one Fast Fix, so we\u2019ll book them as " + pv.length + " separate visits. You\u2019ll pick a time for each one."
+      : fit.length
+        ? "Everything you picked goes in as one request. You pick a time for the Fast Fix " + (fit.length === 1 ? "job" : "jobs") + " now; our team will schedule the other " + (nf.length === 1 ? "job" : "jobs") + " and be in touch."
+        : "None of these fit Fast Fix. We\u2019ll send " + (nf.length === 1 ? "it" : "them") + " to our team as one service request, and you won\u2019t need to enter anything again.");
+    setText($("#rv-all-note"), split ? "Prefer a single visit with our team instead?" : "Want one visit for everything instead?");
+    setText($("#rv-all"), split ? "Send everything to our team instead" : "Send all " + all + " jobs to our team instead");
   }
   function wizNext() {
     var s = state.screen, jb;
@@ -833,7 +910,7 @@
     if (s === "details") {
       jb = curJob(); if (!jb) { navigate("job"); return true; }
       if ((state.notes[jb.id] || "").trim().length < 3) { setError("wnote", true); announce("Add a few words about this job."); $("#wnote").focus(); return true; }
-      if (koFor(jb.id)) navigate("question"); else { state.committed[jb.id] = true; state.editing = false; navigate("more"); }
+      navigate("question");
       return true;
     }
     if (s === "question") {
@@ -845,11 +922,12 @@
     if (s === "more") {
       if (!committedIds().length) { navigate("job"); return true; }
       if (overLimit()) { state.reason = overReason(); navigate("sent"); return true; }
-      navigate(nofitIds().length ? "review" : "check"); return true;
+      navigate(nofitIds().length || needsSplit() ? "review" : "time"); return true;
     }
     if (s === "review") {
-      if (fitIds().length) { state.split = true; syncSr(); navigate("check"); }
-      else { state.split = false; syncSr(); state.reason = "ko"; navigate("sent"); }
+      if (!nofitIds().length) { state.split = false; navigate("time"); }          /* two Fast Fix visits */
+      else if (fitIds().length) { state.split = true; navigate("time"); }            /* book what fits; the rest goes in as a service request */
+      else { state.split = false; state.reason = "ko"; navigate("sent"); }
       return true;
     }
     return false;
@@ -872,7 +950,11 @@
     if (WIZ && screen === "job") return { label: "Continue", status: curJob() ? curJob().title : "" };
     if (WIZ && screen === "details") return { label: "Continue", status: "" };
     if (WIZ && screen === "question") { var wk = koFor(state.cur); return { label: "Continue", status: "" }; }
-    if (WIZ && screen === "review") { var rf = fitIds().length, rn = nofitIds().length; return { label: rf ? "Book the " + rf + (rf === 1 ? " Fast Fix job" : " Fast Fix jobs") : "Send as a service request", status: rf + " fit \u00b7 " + rn + " need a service request" }; }
+    if (WIZ && screen === "review") {
+      var rf = fitIds().length, rn = nofitIds().length;
+      if (!rn) return { label: "Pick times for both visits", status: "2 Fast Fix visits" };
+      return { label: rf ? "Submit and pick a time" : "Submit service request", status: rf + " fit \u00b7 " + rn + " need a service request" };
+    }
     if (WIZ && screen === "more") { var wc = committedIds().length; return { label: overLimit() ? "Send to our team" : "Continue", status: overLimit() ? "More than a Fast Fix covers" : wc + " of " + MAX_TASKS + " jobs" }; }
     if (screen === "job") {
       return {
@@ -889,7 +971,8 @@
     if (screen === "time") {
       var noSlots = body.classList.contains("is-noslots");
       var slot = state.date && state.time !== null ? shortDate(parse(state.date)) + " · " + t12(state.time) : "Pick a date and a time";
-      return { label: noSlots ? "Send to our team" : "Confirm booking", status: noSlots ? "Ready to send" : slot };
+      var pvt = WIZ ? planVisits() : null, lastV = !(pvt && pvt.length > 1 && state.visit < pvt.length - 1);
+      return { label: noSlots ? "Send to our team" : (lastV ? (pvt && pvt.length > 1 ? "Confirm both visits" : "Confirm booking") : "Confirm visit " + (state.visit + 1) + ", then pick visit " + (state.visit + 2)), status: noSlots ? "Ready to send" : slot };
     }
     return null;
   }
@@ -910,7 +993,16 @@
     $("#s-city").textContent = h.city;
 
     var all = selectedJobs(), jobs = WIZ && s !== "sent" ? all.filter(function (j) { return !isNoFit(j.id); }) : all, showJobs = s !== "type" && s !== "describe" && all.length > 0;
-    $("#s-jobs-row").hidden = !showJobs;
+    var nfs = WIZ && s !== "sent" ? all.filter(function (j) { return isNoFit(j.id) && state.committed[j.id]; }) : [];
+    $("#s-jobs-row").hidden = !showJobs || (WIZ && !jobs.length);
+    setText($("#s-jobs-row .sum__label"), nfs.length ? "Fast Fix" : "Jobs");
+    $("#s-sr-row").hidden = !nfs.length;
+    var srl = $("#s-sr-jobs"); srl.innerHTML = "";
+    nfs.forEach(function (j) {
+      var li = document.createElement("li"), t = document.createElement("span"), n = document.createElement("span");
+      t.className = "sum__jobname"; t.textContent = j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : ""); n.className = "sum__jobnote"; n.textContent = "Our team schedules this";
+      li.appendChild(t); li.appendChild(n); srl.appendChild(li);
+    });
     var list = $("#s-jobs");
     list.innerHTML = "";
     jobs.forEach(function (j) {
@@ -930,16 +1022,14 @@
       if (np) { var pn = document.createElement("span"); pn.className = "sum__jobnote"; pn.textContent = np + (np === 1 ? " photo" : " photos"); li.appendChild(pn); }
       list.appendChild(li);
     });
-    if (WIZ && s !== "sent" && state.split) all.filter(function (j) { return isNoFit(j.id); }).forEach(function (j) {
-      var li = document.createElement("li"), t = document.createElement("span"), n = document.createElement("span");
-      t.className = "sum__jobname"; t.textContent = j.title; n.className = "sum__jobnote"; n.textContent = "Separate service request";
-      li.appendChild(t); li.appendChild(n); list.appendChild(li);
-    });
 
-    var showWhen = (s === "time") && state.date && state.time !== null;
+    var showWhen = (s === "time") && ((state.date && state.time !== null) || (WIZ && state.books.length > 0));
     $("#s-when-row").hidden = !showWhen;
     if (showWhen) {
-      $("#s-when").textContent = shortDate(parse(state.date)) + " · " + t12(state.time);
+      var wl = [];
+      if (WIZ) state.books.slice(0, state.visit).forEach(function (bk, k) { wl.push("Visit " + (k + 1) + ": " + shortDate(parse(bk.date)) + " \u00b7 " + t12(bk.time)); });
+      if (state.date && state.time !== null) wl.push((WIZ && planVisits() && planVisits().length > 1 ? "Visit " + (state.visit + 1) + ": " : "") + shortDate(parse(state.date)) + " \u00b7 " + t12(state.time));
+      $("#s-when").textContent = wl.join("\n");
       $("#s-hm").textContent = "with " + h.hm;
     }
 
@@ -1016,11 +1106,12 @@
   function render(screen) {
     if (WIZ) wizEnter(screen);
     if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = overReason(); navigate("sent"); return; }
-    if (WIZ && screen === "review" && !nofitIds().length) { navigate(committedIds().length ? "check" : "job"); return; }
+    if (WIZ && screen === "review" && !nofitIds().length && !needsSplit()) { navigate(committedIds().length ? "time" : "job"); return; }
     if (WIZ && screen === "question" && !koFor(state.cur)) { if (curJob()) state.committed[state.cur] = true; navigate("more"); return; }
     if (screen !== "type" && screen !== "describe" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
     if (screen === "booked" && (!state.date || state.time === null)) seedDemo(screen);
     if (screen === "sent" && !state.reason) seedDemo(screen);
+    if (WIZ && screen === "time" && state.screen !== "time") { state.visit = 0; state.books = []; state.date = null; state.time = null; }
     state.screen = screen;
     body.setAttribute("data-screen", screen);
 
@@ -1031,7 +1122,7 @@
     document.title = PAGE_TITLE[screen] + SUFFIX;
 
     /* stepper */
-    var idx = (FIND ? ["describe", "job", "check", "time"] : ["job", "check", "time"]).indexOf(WIZ && /^(details|question|more|review)$/.test(screen) ? "job" : screen);
+    var idx = (FIND ? ["describe", "job", "check", "time"] : WIZ ? ["job", "time"] : ["job", "check", "time"]).indexOf(WIZ && /^(details|question|more|review)$/.test(screen) ? "job" : screen);
     $("#steps").hidden = idx < 0;
     $all(".step").forEach(function (el, i) {
       el.classList.toggle("is-done", i < idx);
@@ -1089,13 +1180,24 @@
   }
 
   function fillBooked() {
-    var h = HOMES[state.home], d = parse(state.date);
-    $("#b-date").textContent = longDate(d);
-    $("#b-time").textContent = t12(state.time) + " · Central Time";
+    var h = HOMES[state.home], d = parse(state.date), many = WIZ && state.books.length > 1, pv = WIZ ? planVisits() : null;
+    function line(k) { var bk = state.books[k]; return { date: longDate(parse(bk.date)), time: t12(bk.time) + " \u00b7 " + hoursText(bk.hours) + " \u00b7 Central Time" }; }
+    if (many) {
+      var l1 = line(0), l2 = line(1);
+      $("#b-date").textContent = "Visit 1 \u00b7 " + l1.date; $("#b-time").textContent = l1.time + (pv && pv[0] ? " \u00b7 " + itemsText(pv[0]) : "");
+      $("#b-date2").textContent = "Visit 2 \u00b7 " + l2.date; $("#b-time2").textContent = l2.time + (pv && pv[1] ? " \u00b7 " + itemsText(pv[1]) : "");
+    } else {
+      $("#b-date").textContent = longDate(d);
+      $("#b-time").textContent = t12(state.time) + " \u00b7 Central Time";
+    }
+    $("#b-row2").hidden = !many;
     $("#b-addr").textContent = h.addr;
     $("#b-city").textContent = h.city;
     $("#b-jobs").textContent = selectedJobs().filter(function (j) { return !(WIZ && isNoFit(j.id)); }).map(function (j) { return j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : ""); }).join(", ");
-    $("#b-len").textContent = hoursText(hours()) + " booked";
+    $("#b-len").textContent = many ? "2 Fast Fix visits booked" : hoursText(hours()) + " booked";
+    var nfj = WIZ && state.split ? nofitIds() : [], srn = $("#b-sr-note");
+    srn.hidden = !nfj.length;
+    if (nfj.length) setText(srn.lastChild, "We also created a service request for " + nfj.map(function (i) { return JOB[i].title + (qtyOf(i) > 1 ? " \u00d7 " + qtyOf(i) : ""); }).join(", ") + ". Our team will be in touch to schedule " + (nfj.length === 1 ? "it" : "them") + ". Your description and photos came with it.");
     $("#hm-initials").textContent = h.ini;
     $("#hm-role").textContent = h.hm;
     $("#hm-meta").textContent = "Home Manager";
@@ -1208,6 +1310,11 @@
         return;
       }
       setError("time", false);
+      if (WIZ) {
+        var pvc = planVisits() || [];
+        state.books[state.visit] = { date: state.date, time: state.time, hours: hours() };
+        if (state.visit < pvc.length - 1) { state.visit++; state.date = null; state.time = null; state.hours = 0; navigate("time"); announce("Visit " + state.visit + " is set. Now pick a time for visit " + (state.visit + 1) + "."); return; }
+      }
       navigate("booked");
     }
   }
@@ -1296,7 +1403,7 @@
       var wa = t.closest("[data-wiz-add]"); if (wa) { wizAdd(); return; }
       var we = t.closest("[data-wiz-edit]"); if (we) { state.cur = we.getAttribute("data-wiz-edit"); state.editing = true; navigate("details"); return; }
       var wr = t.closest("[data-wiz-remove]"); if (wr) { wizRemove(wr.getAttribute("data-wiz-remove")); return; }
-      var wsa = t.closest("[data-wiz-sendall]"); if (wsa) { state.split = false; syncSr(); state.reason = "ko"; navigate("sent"); return; }
+      var wsa = t.closest("[data-wiz-sendall]"); if (wsa) { state.split = false; state.reason = nofitIds().length ? "ko" : "time"; navigate("sent"); return; }
       var wbk = t.closest("[data-wiz-back]"); if (wbk) { navigate("more"); return; }
       var qb = t.closest("[data-qty]"); if (qb) { if (qb.getAttribute("aria-disabled") !== "true") stepQty(+qb.getAttribute("data-qty")); return; }
       var pa = t.closest("[data-photo-add]"); if (pa) { var pi = $("#photo-in-" + pa.getAttribute("data-photo-add")); if (pi) pi.click(); return; }
@@ -1321,6 +1428,7 @@
 
     if (t.closest("[data-back]")) {
       var to = backFor(state.screen);
+      if (WIZ && state.screen === "time" && state.visit > 0) { state.visit--; state.books.length = state.visit; state.date = null; state.time = null; state.hours = 0; navigate("time"); return; }
       if (to) navigate(to); else toast("Returns to the dashboard");
       return;
     }
@@ -1406,7 +1514,11 @@
       setText($("#search-hint"), "Need the same job twice, like two TVs? Add it again, or say how many on the next screen.");
       $(".search").insertAdjacentElement("afterend", $("#search-hint")); $("#search-hint").classList.add("pk__hint");
     }
-    if (WIZ) setText($('.step[data-step="job"] .step__t'), "Your jobs");
+    if (WIZ) {
+      setText($('.step[data-step="job"] .step__t'), "Your jobs");
+      $('.step[data-step="check"]').remove();
+      $all(".step__n").forEach(function (n, i) { n.textContent = String(i + 1); });
+    }
   }
   applySwitch("multi", true);
   render(fromHash());

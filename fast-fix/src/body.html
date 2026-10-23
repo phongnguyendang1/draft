@@ -225,6 +225,7 @@
         <section class="card wizard-only" data-screen-id="more" aria-label="Your jobs" hidden>
           <div class="note" id="more-removed" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span></span></div>
           <ul class="picks" id="more-list"></ul>
+          <div class="note" id="note-split-more" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span></span></div>
           <div class="note" id="note-over-more" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span></span></div>
           <p class="t-meta more__cap" id="more-cap" hidden>You have added 4 jobs, the most a Fast Fix covers. Need more? Submit a service request after you book.</p>
           <div class="more__add"><button class="btn btn--secondary btn--lg" type="button" id="more-add" data-wiz-add>Add another job</button></div>
@@ -245,6 +246,11 @@
             <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-information-line"/></svg><span id="rv-sr-t">Needs a service request</span></h2>
             <p class="t-meta" id="rv-sr-sub"></p>
             <ul class="picks" id="rv-sr-list"></ul>
+          </div>
+          <div class="rv rv--fit" id="rv-visits" hidden>
+            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-calendar-event-line"/></svg><span id="rv-visits-t"></span></h2>
+            <p class="t-meta" id="rv-visits-sub"></p>
+            <ul class="picks" id="rv-visits-list"></ul>
           </div>
           <p class="rv__explain" id="rv-explain"></p>
           <div class="rv__all">
@@ -324,6 +330,7 @@
         <!-- ============ 3. Pick a time ============ -->
         <section class="card" data-screen-id="time" aria-label="Pick a time" hidden>
           <div class="message message--alert" id="err-time" role="alert" hidden><span class="message__icon"><svg class="i"><use href="#ri-error-warning-fill"/></svg></span><p class="message__text"><strong id="err-time-lead"></strong> <span id="err-time-text"></span></p></div>
+          <div class="note wizard-only" id="visit-note" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span></span></div>
           <div class="rec" id="rec">
             <div class="rec__head">
               <div class="rec__text">
@@ -369,9 +376,11 @@
           <div class="d-head"><h2 class="t-title">Your visit</h2></div>
           <ul class="result__rows">
             <li class="result__row"><span class="d-icon"><svg class="i"><use href="#ri-calendar-event-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-date"></p><p class="d-meta" id="b-time"></p></div></li>
+            <li class="result__row wizard-only" id="b-row2" hidden><span class="d-icon"><svg class="i"><use href="#ri-calendar-event-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-date2"></p><p class="d-meta" id="b-time2"></p></div></li>
             <li class="result__row"><span class="d-icon"><svg class="i"><use href="#ri-home-4-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-addr"></p><p class="d-meta" id="b-city"></p></div></li>
             <li class="result__row"><span class="d-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-jobs"></p><p class="d-meta" id="b-len"></p></div></li>
           </ul>
+          <div class="note wizard-only" id="b-sr-note" role="status" hidden><svg class="i"><use href="#ri-information-line"/></svg><span></span></div>
           <div class="result__actions">
             <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>
             <a class="btn btn--secondary" href="#" id="b-sr" data-handoff="Service request" hidden>Submit a service request for your other job</a>
@@ -401,6 +410,7 @@
           <dl class="sum">
             <div class="sum__row"><dt class="sum__label" id="s-home-label">Home</dt><dd class="sum__val sum__home"><svg class="i"><use href="#ri-home-4-line"/></svg><span><span id="s-addr">4817 Mueller Blvd</span><span class="sum__sub" id="s-city">Austin, TX 78723</span></span></dd></div>
             <div class="sum__row" id="s-jobs-row" hidden><dt class="sum__label">Jobs</dt><dd class="sum__val"><ul class="sum__jobs" id="s-jobs"></ul></dd></div>
+            <div class="sum__row wizard-only" id="s-sr-row" hidden><dt class="sum__label">Service request</dt><dd class="sum__val"><ul class="sum__jobs" id="s-sr-jobs"></ul></dd></div>
             <div class="sum__row" id="s-answers-row" hidden><dt class="sum__label">Your answers</dt><dd class="sum__val"><ul class="sum__list sum__list--plain" id="s-answers"></ul></dd></div>
             <div class="sum__row" id="s-when-row" hidden><dt class="sum__label">When</dt><dd class="sum__val"><span id="s-when"></span><span class="sum__sub" id="s-hm"></span></dd></div>
           </dl>
@@ -478,9 +488,10 @@
       <button class="proto__link wizard-only" type="button" data-jump="question">Fast Fix 1 · One question</button>
       <button class="proto__link wizard-only" type="button" data-jump="more">Fast Fix 1 · Add another job</button>
       <button class="proto__link wizard-only" type="button" data-jump="review">Fast Fix 1 · What fits</button>
-      <button class="proto__link classic-only" type="button" data-jump="check">Fast Fix 2 · Quick check</button>
+      <button class="proto__link classic-only no-wizard" type="button" data-jump="check">Fast Fix 2 · Quick check</button>
       <button class="proto__link finder-only" type="button" data-jump="check">Fast Fix 3 · Quick check</button>
-      <button class="proto__link classic-only" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>
+      <button class="proto__link classic-only no-wizard" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>
+      <button class="proto__link wizard-only" type="button" data-jump="time">Fast Fix 2 · Pick a time</button>
       <button class="proto__link finder-only" type="button" data-jump="time">Fast Fix 4 · Pick a time</button>
       <button class="proto__link" type="button" data-jump="booked">Booked</button>
       <button class="proto__link" type="button" data-jump="sent">Sent to our team</button>
