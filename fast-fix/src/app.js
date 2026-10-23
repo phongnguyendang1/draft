@@ -24,7 +24,7 @@
       g.jobs.forEach(function (t) {
         var o = Array.isArray(t) ? { id: t[0], title: t[1], kw: t[2], min: t[3] } : t;
         out.push({ id: o.id, title: o.title, kw: o.kw, min: o.min, icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
-          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [], kc: o.kc || [] });
+          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [], kc: o.kc || [], kq: o.kq || [] });
       });
     });
     return out;
@@ -61,11 +61,11 @@
     SCREENS = ["type", "job", "details", "question", "more", "review", "time", "booked", "sent"];
     TITLES.job = ["What needs fixing?", ""];
     TITLES.details = ["Tell us about the job", "Tell us what\u2019s going on. Photos are optional."];
-    TITLES.question = ["One quick question", ""];
+    TITLES.question = ["A few questions", ""];
     TITLES.more = ["Add another job?", "Each job gets its own description, photos and question. You can add up to " + MAX_TASKS + "."];
     TITLES.review = ["Here\u2019s what fits Fast Fix", ""];
     PAGE_TITLE.review = "Fast Fix: what fits";
-    PAGE_TITLE.job = "Fast Fix: pick a job"; PAGE_TITLE.details = "Fast Fix: about the job"; PAGE_TITLE.question = "Fast Fix: one question"; PAGE_TITLE.more = "Fast Fix: add another job";
+    PAGE_TITLE.job = "Fast Fix: pick a job"; PAGE_TITLE.details = "Fast Fix: about the job"; PAGE_TITLE.question = "Fast Fix: questions"; PAGE_TITLE.more = "Fast Fix: add another job";
     BACK = { type: null, job: "type", details: "job", question: "details", more: "question", review: "more", time: "more", booked: null, sent: null };
   }
   if (FIND) {
@@ -93,6 +93,11 @@
     trade: "Swapping a fixture is fine. Adding or relocating one is not.",
     part: "If the job needs no part, answer Yes. For example a new faucet, lock set or TV mount."
   };
+  var Q_TEXT = {
+    ladder: "Can you reach it with a standard step ladder?",
+    trade: "Is the work only a swap or repair of what is already there, with no gas, new wiring or moved water lines?",
+    part: "Do you have the part or fixture, if the job needs one?"
+  };
   var QNAME = { ladder: "Standard step ladder", trade: "Gas, wiring or water lines", part: "Part or fixture" };
   var QLABEL = {
     ladder: { yes: "Yes", no: "No, it’s higher", unsure: "Not sure" },
@@ -103,7 +108,7 @@
   /* ---------- State ---------- */
   var state = {
     screen: "type", home: "mueller", jobs: {}, order: [], notes: {}, showAll: false, hours: 0, ladder: "", trade: "", part: "",
-    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, photos: {}, perr: {}, cur: null, committed: {}, editing: false, split: false, qty: {}, visit: 0, books: []
+    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, photos: {}, perr: {}, cur: null, committed: {}, editing: false, split: false, qty: {}, visit: 0, books: [], srDone: false
   };
 
 
@@ -430,7 +435,10 @@
   function committedIds() { return state.order.filter(function (id) { return state.jobs[id] && state.committed[id]; }); }
   function curJob() { return state.cur && state.jobs[state.cur] ? JOB[state.cur] : null; }
   function koFor(id) { return koItems().filter(function (k) { return k.job.id === id; })[0] || null; }
-  function isNoFit(id) { var k = koFor(id); return !!(k && state.ko[k.key] === "no"); }
+  function koList(id) { return koItems().filter(function (k) { return k.job.id === id; }); }
+  function failedQs(id) { return koList(id).filter(function (k) { return state.ko[k.key] === "no" || state.ko[k.key] === "unsure"; }); }
+  function isNoFit(id) { return failedQs(id).length > 0; }
+  function allAnswered(id) { return koList(id).every(function (k) { return !!state.ko[k.key]; }); }
   function nofitIds() { return committedIds().filter(isNoFit); }
   function fitIds() { return committedIds().filter(function (i) { return !isNoFit(i); }); }
   /* The same job can be added again (two TVs in two rooms): each one is its own entry with its own note, photos, answer and quantity */
@@ -466,10 +474,10 @@
     var cj = curJob(), n = Math.min(MAX_TASKS, committedIds().length + 1), pv = planVisits(), many = !!(pv && pv.length > 1);
     TITLES.job = ["What needs fixing?", "Job " + n + " of up to " + MAX_TASKS + ". " + (state.pg ? "Tap the job that fits." : "Choose a category, or search.")];
     TITLES.details = [cj ? cj.title : "Tell us about the job", "Tell us what\u2019s going on. Photos are optional."];
-    TITLES.question = ["One quick question", cj ? "About: " + cj.title + (qtyOf(cj.id) > 1 ? " \u00d7 " + qtyOf(cj.id) : "") : ""];
+    TITLES.question = ["A few questions", cj ? "About: " + cj.title + (qtyOf(cj.id) > 1 ? " \u00d7 " + qtyOf(cj.id) : "") : ""];
     TITLES.review = needsSplit()
       ? ["We\u2019ll book this as " + pv.length + " Fast Fix visits", "Together your jobs run longer than one Fast Fix (3 hours), and each one fits on its own."]
-      : ["Here\u2019s what fits Fast Fix", "Everything you picked goes in as one request. Here\u2019s how we\u2019ll handle each job."];
+      : ["Here\u2019s what fits Fast Fix", "Some of your jobs aren\u2019t eligible for Fast Fix. You\u2019ll schedule the eligible ones now."];
     TITLES.time = [many ? "Pick a time: visit " + (Math.min(state.visit, pv.length - 1) + 1) + " of " + pv.length : "Pick a time", many ? "Each visit is booked on its own. Real open times with your Home Manager." : "Real open times with your Home Manager. Your booking is confirmed right away."];
   }
   /* Deep links (and the "Jump to screen" panel) land on a sensible state when nothing has been picked yet */
@@ -482,7 +490,7 @@
     }
     if (screen === "review" && !selectedJobs().length) {
       var withKo = JOBS.filter(function (j) { return j.ko.length; }), a1 = JOB["running-toilet"] ? "running-toilet" : withKo[0].id, a2 = JOB["mount-a-tv-on-a-drywall-or-wood-wall"] ? "mount-a-tv-on-a-drywall-or-wood-wall" : withKo[1].id;
-      [a1, a2].forEach(function (i, n) { selectJob(i); state.committed[i] = true; state.notes[i] = state.notes[i] || (n ? "Two TVs, one per bedroom." : "Water keeps running after I flush."); var k = koFor(i); if (k) state.ko[k.key] = n ? "no" : "yes"; });
+      [a1, a2].forEach(function (i, n) { selectJob(i); state.committed[i] = true; state.notes[i] = state.notes[i] || (n ? "Two TVs, one per bedroom." : "Water keeps running after I flush."); koList(i).forEach(function (k, q) { state.ko[k.key] = n && q === 0 ? "no" : "yes"; }); });
       state.cur = a2;
     }
     if (/^(details|question)$/.test(screen) && !curJob()) state.cur = state.order.filter(function (i) { return state.jobs[i]; }).pop() || null;
@@ -531,18 +539,25 @@
   function recommendedHours() { return Math.min(3, Math.max(1, Math.ceil(totalMin() / 60))); }
   function isBad(q) { return BAD[q].indexOf(state[q]) > -1; }
   /* Per-task knockout questions (placeholder copy): every question is worded so Yes is the right answer */
-  var COMMON = [
-    "You can reach it with a standard step ladder, not on a roof, second story or vaulted ceiling",
-    "It\u2019s only a swap or repair of what is already there, with no gas, new wiring or moved water lines",
-    "You have the part or fixture, if the job needs one"
+  /* The three overall questions (they used to be a separate Quick Check). In the wizard each one is asked as its own question for every job. */
+  var COMMON_Q = [
+    { type: "ladder", q: Q_TEXT.ladder, hint: HINT.ladder, opts: [["yes", QLABEL.ladder.yes], ["no", QLABEL.ladder.no], ["unsure", QLABEL.ladder.unsure]] },
+    { type: "trade", q: Q_TEXT.trade, hint: HINT.trade, opts: [["yes", QLABEL.trade.yes], ["no", QLABEL.trade.no], ["unsure", QLABEL.trade.unsure]] },
+    { type: "part", q: Q_TEXT.part, hint: HINT.part, opts: [["yes", QLABEL.part.yes], ["no", QLABEL.part.no]] }
   ];
+  function wizQuestions(jb) {
+    var out = [], i = 0;
+    (jb.kq || []).forEach(function (q) { out.push({ key: jb.id + "-" + (i++), job: jb, q: q, type: "spec", hint: "", opts: [["yes", "Yes"], ["no", "No"]] }); });
+    COMMON_Q.forEach(function (c) { out.push({ key: jb.id + "-" + (i++), job: jb, q: c.q, type: c.type, hint: c.hint, opts: c.opts }); });
+    return out;
+  }
   function koItems() {
     var out = [];
-    if (WIZ) { selectedJobs().forEach(function (jb) { out.push({ key: jb.id + "-0", job: jb, q: (jb.ko || [])[0] || "Does all of this apply to your job?" }); }); return out; }
+    if (WIZ) { selectedJobs().forEach(function (jb) { wizQuestions(jb).forEach(function (k) { out.push(k); }); }); return out; }
     selectedJobs().forEach(function (jb) { (jb.ko || []).forEach(function (q, i) { out.push({ key: jb.id + "-" + i, job: jb, q: q }); }); });
     return out;
   }
-  function koBad() { return koItems().filter(function (k) { return state.ko[k.key] === "no"; }); }
+  function koBad() { return koItems().filter(function (k) { return state.ko[k.key] === "no" || state.ko[k.key] === "unsure"; }); }
   function routedBy() { return Q.filter(isBad).concat(!WIZ && koBad().length ? ["ko"] : []); }
   function checkOutcome() { var r = routedBy(); return r.length ? r[0] : ""; }
   function hours() {
@@ -682,6 +697,42 @@
       tx.appendChild(hd); tx.appendChild(el("p", "t-meta", k.job.groupTitle));
       head.appendChild(icon(k.job.icon)); head.appendChild(tx); card.appendChild(head);
     }
+    var fs = el("fieldset"); fs.id = "fs-ko-" + k.key; fs.className = "ko__fs";
+    var lg = el("legend", "t-strong", k.q);
+    var opts = el("div", "opts opts--2 opts--stack");
+    [["yes", "Yes"], ["no", "No"]].forEach(function (o) {
+      var lab = el("label", "opt"), inp = el("input"); inp.type = "radio"; inp.name = "ko-" + k.key; inp.value = o[0]; inp.checked = state.ko[k.key] === o[0];
+      var rd = el("span", "opt__radio"); rd.setAttribute("aria-hidden", "true");
+      lab.appendChild(inp); lab.appendChild(rd); lab.appendChild(el("span", "opt__title", o[1]));
+      opts.appendChild(lab);
+    });
+    var err = el("p", "error"); err.id = "err-ko-" + k.key; err.hidden = true; err.setAttribute("role", "alert");
+    err.innerHTML = '<svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Choose yes or no.</span>';
+    var note = el("div", "note"); note.id = "note-ko-" + k.key; note.hidden = true; note.setAttribute("role", "status");
+    note.innerHTML = '<svg class="i"><use href="#ri-information-line"/></svg><span></span>';
+    var sp = note.lastChild, others = selectedJobs().length > 1;
+    sp.appendChild(el("strong", "", k.job.title + " needs our team. "));
+    if (others) {
+      sp.appendChild(document.createTextNode("It can\u2019t be done as a Fast Fix. Remove it to keep booking your other jobs, and we\u2019ll point you to a service request for it afterwards. Or continue to send everything to our team. "));
+      var rb = el("button", "link", "Remove this job and keep booking the others"); rb.type = "button"; rb.setAttribute("data-ko-remove", k.job.id);
+      sp.appendChild(rb);
+    } else {
+      sp.appendChild(document.createTextNode("We will send this to our team as a service request. You will not need to enter anything again."));
+    }
+    fs.setAttribute("aria-describedby", (noHead ? "" : "ko-h-" + k.key + " ") + "err-ko-" + k.key);
+    fs.appendChild(lg); fs.appendChild(opts); fs.appendChild(err); fs.appendChild(note);
+    card.appendChild(fs);
+    return card;
+  }
+  /* Task-specific questions: one card per picked job, under its own heading, apart from the three overall questions */
+  function koCard(k, noHead) {
+    var card = el("div", "ko");
+    if (!noHead) {
+      var head = el("div", "ko__head"), tx = el("div", "ko__text");
+      var hd = el("h3", "t-strong ko__job", k.job.title); hd.id = "ko-h-" + k.key;
+      tx.appendChild(hd); tx.appendChild(el("p", "t-meta", k.job.groupTitle));
+      head.appendChild(icon(k.job.icon)); head.appendChild(tx); card.appendChild(head);
+    }
     var conds = WIZ ? true : null;
     if (conds) {   /* wizard: what Fast Fix covers for this job, then what it covers for any job, then ONE question */
       var spec = k.job.kc || [], n = qtyOf(k.job.id);
@@ -805,7 +856,7 @@
     state.q = ""; state.pg = null;
     navigate("details");
   }
-  function koAnswered() { var k = koFor(state.cur); return !!(k && state.ko[k.key]); }
+  function koAnswered() { return !!state.cur && state.jobs[state.cur] && (isNoFit(state.cur) || allAnswered(state.cur)); }
 
   /* ---------- Wizard screens ---------- */
   function renderQty() {
@@ -834,44 +885,72 @@
     setError("wnote", false);
     redrawPhotos();
   }
+  function qBlock(k) {
+    var fs = el("div", "ko__q"); fs.id = "fs-ko-" + k.key; fs.setAttribute("role", "group");
+    var qt = el("p", "t-strong ko__text", k.q); qt.id = "kq-" + k.key; fs.appendChild(qt); fs.setAttribute("aria-labelledby", qt.id);
+    if (k.hint) { var hp = el("p", "t-meta ko__hint", k.hint); hp.id = "kh-" + k.key; fs.appendChild(hp); fs.setAttribute("aria-describedby", hp.id); }
+    var opts = el("div", "opts opts--" + k.opts.length + " opts--stack");
+    k.opts.forEach(function (o) {
+      var b = el("button", "ans", o[1]); b.type = "button"; b.setAttribute("data-wiz-ans", k.key + "|" + o[0]); b.setAttribute("aria-pressed", String(state.ko[k.key] === o[0]));
+      opts.appendChild(b);
+    });
+    fs.appendChild(opts);
+    return fs;
+  }
+  /* The wizard's question screen: this job's own questions, then the three overall ones, each answered on its own */
   function renderWizQuestion() {
     var box = $("#wq-box"); box.innerHTML = "";
-    var k = koFor(state.cur); if (k) box.appendChild(koCard(k, true));
+    var jb = curJob(); if (!jb) return;
+    var items = koList(jb.id), done = items.filter(function (k) { return !!state.ko[k.key]; }).length, n = qtyOf(jb.id), card = el("div", "ko ko--list");
+    card.appendChild(el("p", "ko__prog t-meta", done + " of " + items.length + " answered" + (n > 1 ? ". These answers apply to all " + n + "." : "")));
+    var spec = items.filter(function (k) { return k.type === "spec"; }), com = items.filter(function (k) { return k.type !== "spec"; });
+    if (spec.length) { card.appendChild(el("h2", "t-strong ko__sec", "About this job")); spec.forEach(function (k) { card.appendChild(qBlock(k)); }); }
+    card.appendChild(el("h2", "t-strong ko__sec", "For every job")); com.forEach(function (k) { card.appendChild(qBlock(k)); });
+    var note = el("div", "note"); note.id = "note-ko-job"; note.setAttribute("role", "status"); note.hidden = !isNoFit(jb.id);
+    note.innerHTML = '<svg class="i"><use href="#ri-information-line"/></svg><span></span>';
+    note.lastChild.appendChild(el("strong", "", jb.title + " isn\u2019t eligible for Fast Fix. "));
+    note.lastChild.appendChild(document.createTextNode("You can keep adding jobs. Before you continue, we\u2019ll show you which jobs are eligible and which require a service request."));
+    card.appendChild(note);
+    box.appendChild(card);
+  }
+  function moreRow(id) {
+    var jb = JOB[id], li = el("li", "pick" + (isNoFit(id) ? " pick--nofit" : "")), top = el("div", "pick__top"), main = el("div", "pick__main"), acts = el("div", "pick__acts"), q = qtyOf(id);
+    main.appendChild(el("p", "pick__title", jb.title + (q > 1 ? " \u00d7 " + q : ""))); main.appendChild(el("p", "pick__group", jb.groupTitle));
+    var note = (state.notes[id] || "").trim(); if (note) main.appendChild(el("p", "pick__note", note));
+    var np = photosOf(id).length; if (np) main.appendChild(el("p", "pick__group", np + (np === 1 ? " photo" : " photos")));
+    var ed = el("button", "link pick__remove", "Edit"); ed.type = "button"; ed.setAttribute("data-wiz-edit", id); ed.setAttribute("aria-label", "Edit " + jb.title);
+    var rm = el("button", "link pick__remove", "Remove"); rm.type = "button"; rm.setAttribute("data-wiz-remove", id); rm.setAttribute("aria-label", "Remove " + jb.title);
+    acts.appendChild(ed); acts.appendChild(rm);
+    top.appendChild(icon(jb.icon)); top.appendChild(main); top.appendChild(acts); li.appendChild(top);
+    return li;
   }
   function renderMore() {
-    var list = $("#more-list"); list.innerHTML = "";
-    var ids = committedIds();
-    ids.forEach(function (id) {
-      var jb = JOB[id], li = el("li", "pick"), top = el("div", "pick__top"), main = el("div", "pick__main"), acts = el("div", "pick__acts");
-      var q = qtyOf(id), bad = isNoFit(id);
-      if (bad) li.className = "pick pick--nofit";
-      main.appendChild(el("p", "pick__title", jb.title + (q > 1 ? " \u00d7 " + q : ""))); main.appendChild(el("p", "pick__group", jb.groupTitle));
-      if (nofitIds().length) main.appendChild(el("p", "pick__tag" + (bad ? " pick__tag--no" : ""), bad ? "Needs a service request" : "Fits Fast Fix"));
-      var note = (state.notes[id] || "").trim(); if (note) main.appendChild(el("p", "pick__note", note));
-      var np = photosOf(id).length; if (np) main.appendChild(el("p", "pick__group", np + (np === 1 ? " photo" : " photos")));
-      var ed = el("button", "link pick__remove", "Edit"); ed.type = "button"; ed.setAttribute("data-wiz-edit", id); ed.setAttribute("aria-label", "Edit " + jb.title);
-      var rm = el("button", "link pick__remove", "Remove"); rm.type = "button"; rm.setAttribute("data-wiz-remove", id); rm.setAttribute("aria-label", "Remove " + jb.title);
-      acts.appendChild(ed); acts.appendChild(rm);
-      top.appendChild(icon(jb.icon)); top.appendChild(main); top.appendChild(acts); li.appendChild(top); list.appendChild(li);
-    });
+    var ids = committedIds(), nf = nofitIds(), fit = fitIds(), grouped = nf.length > 0;
+    var single = $("#more-list"), fl = $("#ml-fit-list"), sl = $("#ml-sr-list"); single.innerHTML = ""; fl.innerHTML = ""; sl.innerHTML = "";
+    single.hidden = grouped; $("#ml-fit").hidden = !grouped || !fit.length; $("#ml-sr").hidden = !grouped;
+    if (!grouped) ids.forEach(function (id) { single.appendChild(moreRow(id)); });
+    else {
+      fit.forEach(function (id) { fl.appendChild(moreRow(id)); }); nf.forEach(function (id) { sl.appendChild(moreRow(id)); });
+      setText($("#ml-fit-t"), "Eligible for Fast Fix"); setText($("#ml-fit-n"), "(" + fit.length + ")");
+      setText($("#ml-sr-t"), "Requires Service Request"); setText($("#ml-sr-n"), "(" + nf.length + ")");
+      setText($("#ml-sr-sub"), "These didn\u2019t pass the questions. You\u2019ll submit them as a service request after you schedule the eligible jobs.");
+    }
     var full = ids.length >= MAX_TASKS, over = overLimit();
     $("#more-add").setAttribute("aria-disabled", String(full || over));
     $("#more-cap").hidden = !(full && !over);
+    setText($("#more-cap"), "You have added " + MAX_TASKS + " jobs, the most a Fast Fix covers. Need more? Submit a service request after you book.");
     var sp = needsSplit(), pvv = sp ? planVisits() : null;
     $("#note-split-more").hidden = !sp;
-    if (sp) setText($("#note-split-more").lastChild, "Together these run longer than one Fast Fix (3 hours), and each job fits on its own, so we\u2019ll book them as " + pvv.length + " separate Fast Fix visits.");
-    setText($("#more-cap"), "You have added " + MAX_TASKS + " jobs, the most a Fast Fix covers. Need more? Submit a service request after you book.");
+    if (sp) setText($("#note-split-more").lastChild, "Together these run longer than one Fast Fix (3 hours), and each job is eligible, so we\u2019ll book them as " + pvv.length + " separate Fast Fix visits.");
   }
   function reviewRow(id, why) {
-    var jb = JOB[id], li = el("li", "pick" + (why ? " pick--nofit" : "")), top = el("div", "pick__top"), main = el("div", "pick__main"), q = qtyOf(id);
+    var jb = JOB[id], li = el("li", "pick" + (why === "plain" ? "" : (why ? " pick--nofit" : ""))), top = el("div", "pick__top"), main = el("div", "pick__main"), q = qtyOf(id);
     main.appendChild(el("p", "pick__title", jb.title + (q > 1 ? " \u00d7 " + q : ""))); main.appendChild(el("p", "pick__group", jb.groupTitle));
-    if (why && jb.kc.length) {
-      main.appendChild(el("p", "pick__note pick__why", "Fast Fix covers this job when:"));
-      var cl = el("ul", "pick__conds"); jb.kc.forEach(function (c) { cl.appendChild(el("li", "", c)); }); main.appendChild(cl);
-    }
-    if (!why) {
-      var note = (state.notes[id] || "").trim(); if (note) main.appendChild(el("p", "pick__note", note));
-      var np = photosOf(id).length; if (np) main.appendChild(el("p", "pick__group", np + (np === 1 ? " photo" : " photos")));
+    var note = (state.notes[id] || "").trim(); if (note) main.appendChild(el("p", "pick__note", note));
+    var np = photosOf(id).length; if (np) main.appendChild(el("p", "pick__group", np + (np === 1 ? " photo" : " photos")));
+    if (why && why !== "plain") {
+      main.appendChild(el("p", "pick__note pick__why", "Not eligible because of your answer:"));
+      var cl = el("ul", "pick__conds"); failedQs(id).forEach(function (k) { cl.appendChild(el("li", "", k.q + " (" + (state.ko[k.key] === "unsure" ? "not sure" : "no") + ")")); }); main.appendChild(cl);
     }
     top.appendChild(icon(jb.icon)); top.appendChild(main); li.appendChild(top);
     return li;
@@ -880,10 +959,10 @@
   function renderReview() {
     var fit = fitIds(), nf = nofitIds(), all = fit.length + nf.length, split = needsSplit() && !nf.length, pv = split ? planVisits() : null;
     $("#rv-fit").hidden = split || !fit.length; $("#rv-sr").hidden = !nf.length; $("#rv-visits").hidden = !split; $("#rv-all").hidden = !fit.length;
-    setText($("#rv-fit-t"), "Fast Fix: book a time now (" + fit.length + ")");
-    setText($("#rv-fit-sub"), "We can book " + (fit.length === 1 ? "this job" : "these jobs") + " as one visit.");
-    setText($("#rv-sr-t"), "Needs a service request (" + nf.length + ")");
-    setText($("#rv-sr-sub"), nf.length === 1 ? "Fast Fix doesn\u2019t cover this job, so our team will schedule it." : "Fast Fix doesn\u2019t cover these jobs, so our team will schedule them.");
+    setText($("#rv-fit-t"), "Eligible for Fast Fix"); setText($("#rv-fit-n"), "(" + fit.length + ")");
+    setText($("#rv-fit-sub"), "You\u2019ll pick a time for " + (fit.length === 1 ? "this job" : "these jobs") + " next.");
+    setText($("#rv-sr-t"), "Requires Service Request"); setText($("#rv-sr-n"), "(" + nf.length + ")");
+    setText($("#rv-sr-sub"), nf.length === 1 ? "This job didn\u2019t pass the questions. You\u2019ll submit it as a service request after you schedule." : "These jobs didn\u2019t pass the questions. You\u2019ll submit them as a service request after you schedule.");
     var fl = $("#rv-fit-list"), sl = $("#rv-sr-list"), vl = $("#rv-visits-list"); fl.innerHTML = ""; sl.innerHTML = ""; vl.innerHTML = "";
     fit.forEach(function (i) { fl.appendChild(reviewRow(i, false)); });
     nf.forEach(function (i) { sl.appendChild(reviewRow(i, true)); });
@@ -899,8 +978,8 @@
     setText($("#rv-explain"), split
       ? "Together these take longer than one Fast Fix, so we\u2019ll book them as " + pv.length + " separate visits. You\u2019ll pick a time for each one."
       : fit.length
-        ? "Everything you picked goes in as one request. You pick a time for the Fast Fix " + (fit.length === 1 ? "job" : "jobs") + " now; our team will schedule the other " + (nf.length === 1 ? "job" : "jobs") + " and be in touch."
-        : "None of these fit Fast Fix. We\u2019ll send " + (nf.length === 1 ? "it" : "them") + " to our team as one service request, and you won\u2019t need to enter anything again.");
+        ? "Pick a time for the eligible " + (fit.length === 1 ? "job" : "jobs") + " first. When you\u2019re booked, the confirmation page lists the other " + (nf.length === 1 ? "job" : "jobs") + " with a button to submit " + (nf.length === 1 ? "it" : "them") + " as a service request."
+        : "None of these are eligible for Fast Fix. We\u2019ll send " + (nf.length === 1 ? "it" : "them") + " to our team as one service request, and you won\u2019t need to enter anything again.");
     setText($("#rv-all-note"), split ? "Prefer a single visit with our team instead?" : "Want one visit for everything instead?");
     setText($("#rv-all"), split ? "Send everything to our team instead" : "Send all " + all + " jobs to our team instead");
   }
@@ -914,10 +993,9 @@
       return true;
     }
     if (s === "question") {
-      var k = koFor(state.cur); if (!k) { navigate("more"); return true; }
-      var a = state.ko[k.key];
-      if (!a) return true;
-      state.committed[state.cur] = true; state.editing = false; navigate("more"); return true;
+      var qj = curJob(); if (!qj) { navigate("more"); return true; }
+      if (!(isNoFit(qj.id) || allAnswered(qj.id))) return true;
+      state.committed[qj.id] = true; state.editing = false; navigate("more"); return true;
     }
     if (s === "more") {
       if (!committedIds().length) { navigate("job"); return true; }
@@ -953,7 +1031,7 @@
     if (WIZ && screen === "review") {
       var rf = fitIds().length, rn = nofitIds().length;
       if (!rn) return { label: "Pick times for both visits", status: "2 Fast Fix visits" };
-      return { label: rf ? "Submit and pick a time" : "Submit service request", status: rf + " fit \u00b7 " + rn + " need a service request" };
+      return { label: rf ? "Pick a time for Fast Fix" : "Submit for Service Request", status: rf + " eligible \u00b7 " + rn + " require a service request" };
     }
     if (WIZ && screen === "more") { var wc = committedIds().length; return { label: overLimit() ? "Send to our team" : "Continue", status: overLimit() ? "More than a Fast Fix covers" : wc + " of " + MAX_TASKS + " jobs" }; }
     if (screen === "job") {
@@ -995,12 +1073,12 @@
     var all = selectedJobs(), jobs = WIZ && s !== "sent" ? all.filter(function (j) { return !isNoFit(j.id); }) : all, showJobs = s !== "type" && s !== "describe" && all.length > 0;
     var nfs = WIZ && s !== "sent" ? all.filter(function (j) { return isNoFit(j.id) && state.committed[j.id]; }) : [];
     $("#s-jobs-row").hidden = !showJobs || (WIZ && !jobs.length);
-    setText($("#s-jobs-row .sum__label"), nfs.length ? "Fast Fix" : "Jobs");
+    setText($("#s-jobs-row .sum__label"), nfs.length ? "Eligible for Fast Fix" : "Jobs");
     $("#s-sr-row").hidden = !nfs.length;
     var srl = $("#s-sr-jobs"); srl.innerHTML = "";
     nfs.forEach(function (j) {
       var li = document.createElement("li"), t = document.createElement("span"), n = document.createElement("span");
-      t.className = "sum__jobname"; t.textContent = j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : ""); n.className = "sum__jobnote"; n.textContent = "Our team schedules this";
+      t.className = "sum__jobname"; t.textContent = j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : ""); n.className = "sum__jobnote"; n.textContent = "Submit after you schedule";
       li.appendChild(t); li.appendChild(n); srl.appendChild(li);
     });
     var list = $("#s-jobs");
@@ -1036,7 +1114,8 @@
     var ans = [];
     if (s === "sent") {
       Q.forEach(function (q) { if (state[q]) ans.push([QNAME[q], QLABEL[q][state[q]]]); });
-      koItems().forEach(function (k) { if (state.ko[k.key]) ans.push([k.job.title, state.ko[k.key] === "yes" ? "Yes" : "No"]); });
+      if (WIZ) koItems().forEach(function (k) { if (state.ko[k.key] && state.ko[k.key] !== "yes") ans.push([k.q, state.ko[k.key] === "unsure" ? "Not sure" : "No"]); });
+      else koItems().forEach(function (k) { if (state.ko[k.key]) ans.push([k.job.title, state.ko[k.key] === "yes" ? "Yes" : "No"]); });
     }
     $("#s-answers-row").hidden = ans.length === 0;
     $("#s-answers").innerHTML = ans.map(function (r) { return "<li><span>" + r[0] + "</span><span>" + r[1] + "</span></li>"; }).join("");
@@ -1111,7 +1190,7 @@
     if (screen !== "type" && screen !== "describe" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
     if (screen === "booked" && (!state.date || state.time === null)) seedDemo(screen);
     if (screen === "sent" && !state.reason) seedDemo(screen);
-    if (WIZ && screen === "time" && state.screen !== "time") { state.visit = 0; state.books = []; state.date = null; state.time = null; }
+    if (WIZ && screen === "time" && state.screen !== "time") { state.visit = 0; state.books = []; state.date = null; state.time = null; state.srDone = false; }
     state.screen = screen;
     body.setAttribute("data-screen", screen);
 
@@ -1195,9 +1274,17 @@
     $("#b-city").textContent = h.city;
     $("#b-jobs").textContent = selectedJobs().filter(function (j) { return !(WIZ && isNoFit(j.id)); }).map(function (j) { return j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : ""); }).join(", ");
     $("#b-len").textContent = many ? "2 Fast Fix visits booked" : hoursText(hours()) + " booked";
-    var nfj = WIZ && state.split ? nofitIds() : [], srn = $("#b-sr-note");
-    srn.hidden = !nfj.length;
-    if (nfj.length) setText(srn.lastChild, "We also created a service request for " + nfj.map(function (i) { return JOB[i].title + (qtyOf(i) > 1 ? " \u00d7 " + qtyOf(i) : ""); }).join(", ") + ". Our team will be in touch to schedule " + (nfj.length === 1 ? "it" : "them") + ". Your description and photos came with it.");
+    var nfj = WIZ && state.split ? nofitIds() : [], mod = $("#b-sr-module"), dash = $('[data-screen-id="booked"] [data-handoff="Dashboard"]');
+    mod.hidden = !nfj.length;
+    if (nfj.length) {
+      var done = state.srDone, ml = $("#srm-list"); ml.innerHTML = "";
+      setText($("#srm-t"), done ? "Service request submitted" : "Requires Service Request"); setText($("#srm-n"), "(" + nfj.length + ")");
+      setText($("#srm-sub"), done ? "Our team will contact you to schedule " + (nfj.length === 1 ? "this job" : "these jobs") + ". Your descriptions and photos came with the request." : (nfj.length === 1 ? "This job isn\u2019t eligible for Fast Fix." : "These jobs aren\u2019t eligible for Fast Fix.") + " Submit " + (nfj.length === 1 ? "it" : "them") + " as a service request and our team will schedule " + (nfj.length === 1 ? "it" : "them") + ".");
+      nfj.forEach(function (i) { ml.appendChild(reviewRow(i, done ? "plain" : true)); });
+      $("#srm-btn").hidden = done; $("#srm-done").hidden = !done;
+      mod.classList.toggle("is-done", done);
+    }
+    if (dash) { var prim = !nfj.length || state.srDone; dash.classList.toggle("btn--primary", prim); dash.classList.toggle("btn--secondary", !prim); }
     $("#hm-initials").textContent = h.ini;
     $("#hm-role").textContent = h.hm;
     $("#hm-meta").textContent = "Home Manager";
@@ -1396,13 +1483,16 @@
       var wn = t.closest("[data-wiz-ans]");
       if (wn) {
         var wp = wn.getAttribute("data-wiz-ans").split("|"); state.ko[wp[0]] = wp[1];
-        if (wp[1] === "yes") { if (state.cur) state.committed[state.cur] = true; state.editing = false; navigate("more"); }
-        else { renderWizQuestion(); refresh(); var nb = $('[data-wiz-ans="' + wp[0] + '|no"]'); if (nb) nb.focus(); }
+        var cj2 = curJob();
+        if (cj2 && !isNoFit(cj2.id) && allAnswered(cj2.id)) { state.committed[cj2.id] = true; state.editing = false; navigate("more"); return; }   /* the last answer was a Yes: move on */
+        renderWizQuestion(); refresh();
+        var nb = $('[data-wiz-ans="' + wp[0] + '|' + wp[1] + '"]'); if (nb) nb.focus({ preventScroll: true });
         return;
       }
       var wa = t.closest("[data-wiz-add]"); if (wa) { wizAdd(); return; }
       var we = t.closest("[data-wiz-edit]"); if (we) { state.cur = we.getAttribute("data-wiz-edit"); state.editing = true; navigate("details"); return; }
       var wr = t.closest("[data-wiz-remove]"); if (wr) { wizRemove(wr.getAttribute("data-wiz-remove")); return; }
+      var wss = t.closest("[data-wiz-submit-sr]"); if (wss) { state.srDone = true; fillBooked(); announce("Service request submitted."); var sd = $("#srm-t"); if (sd) { sd.setAttribute("tabindex", "-1"); sd.focus({ preventScroll: true }); } return; }
       var wsa = t.closest("[data-wiz-sendall]"); if (wsa) { state.split = false; state.reason = nofitIds().length ? "ko" : "time"; navigate("sent"); return; }
       var wbk = t.closest("[data-wiz-back]"); if (wbk) { navigate("more"); return; }
       var qb = t.closest("[data-qty]"); if (qb) { if (qb.getAttribute("aria-disabled") !== "true") stepQty(+qb.getAttribute("data-qty")); return; }
