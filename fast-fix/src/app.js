@@ -475,9 +475,9 @@
     TITLES.job = ["What needs fixing?", "Job " + n + " of up to " + MAX_TASKS + ". " + (state.pg ? "Tap the job that fits." : "Choose a category, or search.")];
     TITLES.details = [cj ? cj.title : "Tell us about the job", "Tell us what\u2019s going on. Photos are optional."];
     TITLES.question = ["A few questions", cj ? "About: " + cj.title + (qtyOf(cj.id) > 1 ? " \u00d7 " + qtyOf(cj.id) : "") : ""];
-    TITLES.review = needsSplit()
+    TITLES.review = needsSplit() && !nofitIds().length
       ? ["We\u2019ll book this as " + pv.length + " Fast Fix visits", "Together your jobs run longer than one Fast Fix (3 hours), and each one fits on its own."]
-      : ["Here\u2019s what fits Fast Fix", "Some of your jobs aren\u2019t eligible for Fast Fix. You\u2019ll schedule the eligible ones now."];
+      : ["Here\u2019s what fits Fast Fix", "Some of your jobs aren\u2019t eligible for Fast Fix. You\u2019ll schedule the eligible ones now" + (needsSplit() ? ", as " + (planVisits() || []).length + " Fast Fix visits." : ".")];
     TITLES.time = [many ? "Pick a time: visit " + (Math.min(state.visit, pv.length - 1) + 1) + " of " + pv.length : "Pick a time", many ? "Each visit is booked on its own. Real open times with your Home Manager." : "Real open times with your Home Manager. Your booking is confirmed right away."];
   }
   /* Deep links (and the "Jump to screen" panel) land on a sensible state when nothing has been picked yet */
@@ -514,7 +514,7 @@
     }
     if (!jobs.length) return [];
     if (total <= MAX_MIN) return [visitOf(full)];
-    if (!WIZ || nofitIds().length || total > 2 * MAX_MIN || jobs.some(function (j) { return j.min > MAX_MIN; })) return null;
+    if (!WIZ || total > 2 * MAX_MIN || jobs.some(function (j) { return j.min > MAX_MIN; })) return null;
     var n = jobs.length, best = null, mask, i;
     for (mask = 1; mask < (1 << n) - 1; mask++) {   /* first try to keep each job in one visit */
       var a = 0; for (i = 0; i < n; i++) if (mask & (1 << i)) a += jobs[i].min * full[i];
@@ -532,8 +532,10 @@
     reach[pick.s].forEach(function (idx) { c1[units[idx].i]++; c2[units[idx].i]--; });
     return [visitOf(c1), visitOf(c2)];
   }
-  function needsSplit() { return WIZ && totalMin() > MAX_MIN && !nofitIds().length && !!planVisits(); }
-  function overLimit() { return overCount() || (totalMin() > MAX_MIN && !needsSplit()); }
+  function needsSplit() { return WIZ && totalMin() > MAX_MIN && !!planVisits(); }
+  /* Everything eligible, but more than two visits' worth: goes to the team. With a mix of eligible and not eligible jobs the member is never sent everything: they are asked to trim instead. */
+  function mixBlocked() { return WIZ && nofitIds().length > 0 && totalMin() > MAX_MIN && !needsSplit(); }
+  function overLimit() { return overCount() || (totalMin() > MAX_MIN && !needsSplit() && !(WIZ && nofitIds().length)); }
   function overReason() { return overCount() ? "count" : "time"; }
   /* Recommended booking length: what the picked jobs add up to, rounded up to a whole hour, 1 to 3 */
   function recommendedHours() { return Math.min(3, Math.max(1, Math.ceil(totalMin() / 60))); }
@@ -641,10 +643,12 @@
   var lastOver = false;
   function updateOver() {
     var now = overLimit();
+    var mix = mixBlocked();
     ["#note-over-sel", "#note-over-more"].forEach(function (id) {
       var n = $(id); if (!n) return;
-      n.hidden = !now;
-      if (now) n.querySelector("span").innerHTML = overCount()
+      n.hidden = !(now || mix);
+      if (mix) n.querySelector("span").innerHTML = "<strong>That is more than Fast Fix can book.</strong> The jobs that are eligible add up to more than two 3-hour visits. Remove a job or lower a quantity to continue.";
+      else if (now) n.querySelector("span").innerHTML = overCount()
         ? "<strong>That’s more than " + MAX_TASKS + " jobs.</strong> To book a time now, keep it to " + MAX_TASKS + " jobs or fewer. Otherwise we’ll send this to our team as a service request, and you won’t need to enter anything else."
         : "<strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.";
     });
@@ -904,8 +908,8 @@
     var items = koList(jb.id), done = items.filter(function (k) { return !!state.ko[k.key]; }).length, n = qtyOf(jb.id), card = el("div", "ko ko--list");
     card.appendChild(el("p", "ko__prog t-meta", done + " of " + items.length + " answered" + (n > 1 ? ". These answers apply to all " + n + "." : "")));
     var spec = items.filter(function (k) { return k.type === "spec"; }), com = items.filter(function (k) { return k.type !== "spec"; });
-    if (spec.length) { card.appendChild(el("h2", "t-strong ko__sec", "About this job")); spec.forEach(function (k) { card.appendChild(qBlock(k)); }); }
-    card.appendChild(el("h2", "t-strong ko__sec", "For every job")); com.forEach(function (k) { card.appendChild(qBlock(k)); });
+    if (spec.length) { card.appendChild(el("h2", "ko__sec", "Job-Specific Qualification")); spec.forEach(function (k) { card.appendChild(qBlock(k)); }); }
+    card.appendChild(el("h2", "ko__sec", "General Qualification")); com.forEach(function (k) { card.appendChild(qBlock(k)); });
     var note = el("div", "note"); note.id = "note-ko-job"; note.setAttribute("role", "status"); note.hidden = !isNoFit(jb.id);
     note.innerHTML = '<svg class="i"><use href="#ri-information-line"/></svg><span></span>';
     note.lastChild.appendChild(el("strong", "", jb.title + " isn\u2019t eligible for Fast Fix. "));
@@ -935,7 +939,7 @@
       setText($("#ml-sr-t"), "Requires Service Request"); setText($("#ml-sr-n"), "(" + nf.length + ")");
       setText($("#ml-sr-sub"), "These didn\u2019t pass the questions. You\u2019ll submit them as a service request after you schedule the eligible jobs.");
     }
-    var full = ids.length >= MAX_TASKS, over = overLimit();
+    var full = ids.length >= MAX_TASKS, over = overLimit() || mixBlocked();
     $("#more-add").setAttribute("aria-disabled", String(full || over));
     $("#more-cap").hidden = !(full && !over);
     setText($("#more-cap"), "You have added " + MAX_TASKS + " jobs, the most a Fast Fix covers. Need more? Submit a service request after you book.");
@@ -957,8 +961,8 @@
   }
   /* The page that says plainly what fits Fast Fix and what needs a service request, or how a long visit is split in two */
   function renderReview() {
-    var fit = fitIds(), nf = nofitIds(), all = fit.length + nf.length, split = needsSplit() && !nf.length, pv = split ? planVisits() : null;
-    $("#rv-fit").hidden = split || !fit.length; $("#rv-sr").hidden = !nf.length; $("#rv-visits").hidden = !split; $("#rv-all").hidden = !fit.length;
+    var fit = fitIds(), nf = nofitIds(), all = fit.length + nf.length, split = needsSplit(), pv = split ? planVisits() : null;
+    $("#rv-fit").hidden = (split && !nf.length) || !fit.length; $("#rv-sr").hidden = !nf.length; $("#rv-visits").hidden = !split; $("#rv-all").hidden = nf.length > 0 || !fit.length; $("#rv-all-note").hidden = $("#rv-all").hidden;
     setText($("#rv-fit-t"), "Eligible for Fast Fix"); setText($("#rv-fit-n"), "(" + fit.length + ")");
     setText($("#rv-fit-sub"), "You\u2019ll pick a time for " + (fit.length === 1 ? "this job" : "these jobs") + " next.");
     setText($("#rv-sr-t"), "Requires Service Request"); setText($("#rv-sr-n"), "(" + nf.length + ")");
@@ -975,13 +979,13 @@
         top.appendChild(el("span", "pick__num", String(k + 1))); top.appendChild(main); li.appendChild(top); vl.appendChild(li);
       });
     }
-    setText($("#rv-explain"), split
+    setText($("#rv-explain"), split && !nf.length
       ? "Together these take longer than one Fast Fix, so we\u2019ll book them as " + pv.length + " separate visits. You\u2019ll pick a time for each one."
       : fit.length
-        ? "Pick a time for the eligible " + (fit.length === 1 ? "job" : "jobs") + " first. When you\u2019re booked, the confirmation page lists the other " + (nf.length === 1 ? "job" : "jobs") + " with a button to submit " + (nf.length === 1 ? "it" : "them") + " as a service request."
+        ? "Pick a time for the eligible " + (fit.length === 1 ? "job" : "jobs") + (split ? " (booked as " + pv.length + " Fast Fix visits, one time each)" : "") + " first. When you\u2019re booked, the confirmation page lists the other " + (nf.length === 1 ? "job" : "jobs") + " with a button to submit " + (nf.length === 1 ? "it" : "them") + " as a service request."
         : "None of these are eligible for Fast Fix. We\u2019ll send " + (nf.length === 1 ? "it" : "them") + " to our team as one service request, and you won\u2019t need to enter anything again.");
-    setText($("#rv-all-note"), split ? "Prefer a single visit with our team instead?" : "Want one visit for everything instead?");
-    setText($("#rv-all"), split ? "Send everything to our team instead" : "Send all " + all + " jobs to our team instead");
+    setText($("#rv-all-note"), "Prefer a single visit with our team instead?");
+    setText($("#rv-all"), "Send everything to our team instead");
   }
   function wizNext() {
     var s = state.screen, jb;
@@ -999,19 +1003,20 @@
     }
     if (s === "more") {
       if (!committedIds().length) { navigate("job"); return true; }
+      if (mixBlocked()) { announce("The eligible jobs are more than Fast Fix can book. Remove a job or lower a quantity."); var mn = $("#note-over-more"); if (mn) mn.scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" }); return true; }
       if (overLimit()) { state.reason = overReason(); navigate("sent"); return true; }
       navigate(nofitIds().length || needsSplit() ? "review" : "time"); return true;
     }
     if (s === "review") {
       if (!nofitIds().length) { state.split = false; navigate("time"); }          /* two Fast Fix visits */
-      else if (fitIds().length) { state.split = true; navigate("time"); }            /* book what fits; the rest goes in as a service request */
+      else if (fitIds().length) { state.split = true; navigate("time"); }            /* book what is eligible; the rest is submitted from the confirmation page */
       else { state.split = false; state.reason = "ko"; navigate("sent"); }
       return true;
     }
     return false;
   }
   function wizAdd() {
-    if ($("#more-add").getAttribute("aria-disabled") === "true") { announce(overLimit() ? "That is more than a Fast Fix covers." : "A Fast Fix covers up to " + MAX_TASKS + " jobs."); return; }
+    if ($("#more-add").getAttribute("aria-disabled") === "true") { announce(overLimit() || mixBlocked() ? "That is more than a Fast Fix covers." : "A Fast Fix covers up to " + MAX_TASKS + " jobs."); return; }
     state.cur = null; state.editing = false; navigate("job");
   }
   function wizRemove(id) {
@@ -1029,11 +1034,11 @@
     if (WIZ && screen === "details") return { label: "Continue", status: "" };
     if (WIZ && screen === "question") { var wk = koFor(state.cur); return { label: "Continue", status: "" }; }
     if (WIZ && screen === "review") {
-      var rf = fitIds().length, rn = nofitIds().length;
+      var rf = fitIds().length, rn = nofitIds().length, sp2 = needsSplit();
       if (!rn) return { label: "Pick times for both visits", status: "2 Fast Fix visits" };
-      return { label: rf ? "Pick a time for Fast Fix" : "Submit for Service Request", status: rf + " eligible \u00b7 " + rn + " require a service request" };
+      return { label: rf ? (sp2 ? "Pick times for both visits" : "Pick a time for Fast Fix") : "Submit for Service Request", status: rf + " eligible \u00b7 " + rn + " require a service request" };
     }
-    if (WIZ && screen === "more") { var wc = committedIds().length; return { label: overLimit() ? "Send to our team" : "Continue", status: overLimit() ? "More than a Fast Fix covers" : wc + " of " + MAX_TASKS + " jobs" }; }
+    if (WIZ && screen === "more") { var wc = committedIds().length, mb = mixBlocked(); return { label: overLimit() ? "Send to our team" : "Continue", status: overLimit() ? "More than a Fast Fix covers" : mb ? "Over the Fast Fix limit" : wc + " of " + MAX_TASKS + " jobs" }; }
     if (screen === "job") {
       return {
         label: overLimit() ? "Send to our team" : "Continue",
@@ -1058,7 +1063,7 @@
   function updateCta() {
     var c = ctaFor(state.screen);
     if (!c) return;
-    $all("[data-next]").forEach(function (b) { setText(b, c.label); });
+    $all("[data-next]").forEach(function (b) { setText(b, c.label); if (WIZ) b.setAttribute("aria-disabled", String(state.screen === "more" && mixBlocked())); });
     setText($("#status-" + state.screen), c.status);
     setText($("#dock-status"), c.status);
   }
@@ -1185,6 +1190,7 @@
   function render(screen) {
     if (WIZ) wizEnter(screen);
     if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = overReason(); navigate("sent"); return; }
+    if (WIZ && mixBlocked() && /^(review|time)$/.test(screen)) { navigate("more"); return; }
     if (WIZ && screen === "review" && !nofitIds().length && !needsSplit()) { navigate(committedIds().length ? "time" : "job"); return; }
     if (WIZ && screen === "question" && !koFor(state.cur)) { if (curJob()) state.committed[state.cur] = true; navigate("more"); return; }
     if (screen !== "type" && screen !== "describe" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
