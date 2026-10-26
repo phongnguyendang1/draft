@@ -247,17 +247,26 @@
         <!-- ============ Wizard: what fits Fast Fix and what needs a service request ============ -->
         <section class="card wizard-only" data-screen-id="review" aria-label="What fits Fast Fix" hidden>
           <div class="rv rv--fit" id="rv-fit">
-            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span id="rv-fit-t">Eligible for Fast Fix</span><span class="rv__n" id="rv-fit-n"></span></h2>
+            <div class="rv__top">
+              <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span id="rv-fit-t">Eligible for Fast Fix</span><span class="rv__n" id="rv-fit-n"></span></h2>
+              <span class="rv__chip" id="rv-fit-chip"></span>
+            </div>
             <p class="t-meta" id="rv-fit-sub"></p>
             <ul class="rvlist" id="rv-fit-list"></ul>
           </div>
           <div class="rv rv--fit" id="rv-visits" hidden>
-            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-calendar-event-line"/></svg><span id="rv-visits-t"></span></h2>
+            <div class="rv__top">
+              <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-calendar-event-line"/></svg><span id="rv-visits-t"></span></h2>
+              <span class="rv__chip" id="rv-visits-chip"></span>
+            </div>
             <p class="t-meta" id="rv-visits-sub"></p>
             <ul class="rvlist" id="rv-visits-list"></ul>
           </div>
           <div class="rv rv--sr" id="rv-sr">
-            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-information-line"/></svg><span id="rv-sr-t">Requires Service Request</span><span class="rv__n" id="rv-sr-n"></span></h2>
+            <div class="rv__top">
+              <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-information-line"/></svg><span id="rv-sr-t">Requires Service Request</span><span class="rv__n" id="rv-sr-n"></span></h2>
+              <span class="rv__chip" id="rv-sr-chip"></span>
+            </div>
             <p class="t-meta" id="rv-sr-sub"></p>
             <ul class="rvlist" id="rv-sr-list"></ul>
           </div>
@@ -390,11 +399,9 @@
             <li class="result__row"><span class="d-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-jobs"></p><p class="d-meta" id="b-len"></p></div></li>
           </ul>
           <section class="srm wizard-only" id="b-sr-module" aria-labelledby="srm-t" hidden>
-            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-information-line"/></svg><span id="srm-t">Requires Service Request</span><span class="rv__n" id="srm-n"></span></h2>
+            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span id="srm-t">Requires Service Request</span><span class="rv__n" id="srm-n"></span></h2>
             <p class="t-meta" id="srm-sub"></p>
             <ul class="picks" id="srm-list"></ul>
-            <button class="btn btn--primary btn--lg srm__btn" type="button" id="srm-btn" data-wiz-submit-sr>Submit for Service Request</button>
-            <p class="srm__done" id="srm-done" role="status" hidden><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span>Submitted. You’ll hear from our team soon.</span></p>
           </section>
           <div class="result__actions">
             <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>

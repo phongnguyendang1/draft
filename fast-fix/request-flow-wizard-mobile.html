@@ -1076,6 +1076,11 @@ body.variant-wizard[data-screen="review"] .layout { grid-template-columns: minma
 .rvrow__t { font-size: 16px; line-height: 24px; font-weight: 600; }
 .rvrow__why { margin-top: var(--s-4) !important; font-size: 14px; line-height: 20px; color: var(--text-2); }
 
+.rv__top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-4) var(--s-12); }
+.rv__chip { display: inline-block; padding: var(--s-4) var(--s-12); border-radius: var(--r-pill); background: var(--surface); color: var(--blue-text); font-size: 14px; line-height: 20px; font-weight: 600; }
+.rv--sr .rv__chip { background: var(--blue-tint); }
+[data-screen-id="review"] .rv__top + .t-meta { margin-top: var(--s-8); }
+
 </style>
 </head>
 <body class="frame-mobile variant-wizard">
@@ -1329,17 +1334,26 @@ body.variant-wizard[data-screen="review"] .layout { grid-template-columns: minma
         <!-- ============ Wizard: what fits Fast Fix and what needs a service request ============ -->
         <section class="card wizard-only" data-screen-id="review" aria-label="What fits Fast Fix" hidden>
           <div class="rv rv--fit" id="rv-fit">
-            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span id="rv-fit-t">Eligible for Fast Fix</span><span class="rv__n" id="rv-fit-n"></span></h2>
+            <div class="rv__top">
+              <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span id="rv-fit-t">Eligible for Fast Fix</span><span class="rv__n" id="rv-fit-n"></span></h2>
+              <span class="rv__chip" id="rv-fit-chip"></span>
+            </div>
             <p class="t-meta" id="rv-fit-sub"></p>
             <ul class="rvlist" id="rv-fit-list"></ul>
           </div>
           <div class="rv rv--fit" id="rv-visits" hidden>
-            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-calendar-event-line"/></svg><span id="rv-visits-t"></span></h2>
+            <div class="rv__top">
+              <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-calendar-event-line"/></svg><span id="rv-visits-t"></span></h2>
+              <span class="rv__chip" id="rv-visits-chip"></span>
+            </div>
             <p class="t-meta" id="rv-visits-sub"></p>
             <ul class="rvlist" id="rv-visits-list"></ul>
           </div>
           <div class="rv rv--sr" id="rv-sr">
-            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-information-line"/></svg><span id="rv-sr-t">Requires Service Request</span><span class="rv__n" id="rv-sr-n"></span></h2>
+            <div class="rv__top">
+              <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-information-line"/></svg><span id="rv-sr-t">Requires Service Request</span><span class="rv__n" id="rv-sr-n"></span></h2>
+              <span class="rv__chip" id="rv-sr-chip"></span>
+            </div>
             <p class="t-meta" id="rv-sr-sub"></p>
             <ul class="rvlist" id="rv-sr-list"></ul>
           </div>
@@ -1472,11 +1486,9 @@ body.variant-wizard[data-screen="review"] .layout { grid-template-columns: minma
             <li class="result__row"><span class="d-icon"><svg class="i"><use href="#ri-hammer-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-jobs"></p><p class="d-meta" id="b-len"></p></div></li>
           </ul>
           <section class="srm wizard-only" id="b-sr-module" aria-labelledby="srm-t" hidden>
-            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-information-line"/></svg><span id="srm-t">Requires Service Request</span><span class="rv__n" id="srm-n"></span></h2>
+            <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span id="srm-t">Requires Service Request</span><span class="rv__n" id="srm-n"></span></h2>
             <p class="t-meta" id="srm-sub"></p>
             <ul class="picks" id="srm-list"></ul>
-            <button class="btn btn--primary btn--lg srm__btn" type="button" id="srm-btn" data-wiz-submit-sr>Submit for Service Request</button>
-            <p class="srm__done" id="srm-done" role="status" hidden><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span>Submitted. You’ll hear from our team soon.</span></p>
           </section>
           <div class="result__actions">
             <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>
@@ -2205,8 +2217,9 @@ var CATALOG = [
       ? ["This needs a service request", "These jobs didn\u2019t pass the questions, so our team will plan them."]
       : needsSplit() && !nofitIds().length
         ? ["We\u2019ll book this as " + pv.length + " Fast Fix visits", "Together your jobs run longer than one Fast Fix (3 hours), and each one fits on its own."]
-        : ["Here\u2019s the plan", "Fast Fix jobs get booked first. Anything else goes in as a service request."];
-    TITLES.time = [many ? "Pick a time: visit " + (Math.min(state.visit, pv.length - 1) + 1) + " of " + pv.length : "Pick a time", many ? "Each visit is booked on its own. Real open times with your Home Manager." : "Real open times with your Home Manager. Your booking is confirmed right away."];
+        : ["Here\u2019s the plan", "Continue to submit your service request and pick a time for Fast Fix."];
+    var srn = state.srDone && state.split && nofitIds().length ? "Your service request is submitted. " : "";
+    TITLES.time = [many ? "Pick a time: visit " + (Math.min(state.visit, pv.length - 1) + 1) + " of " + pv.length : "Pick a time", srn + (many ? "Each visit is booked on its own. Real open times with your Home Manager." : "Real open times with your Home Manager. Your booking is confirmed right away.")];
   }
   /* Deep links (and the "Jump to screen" panel) land on a sensible state when nothing has been picked yet */
   function wizEnter(screen) {
@@ -2665,7 +2678,7 @@ var CATALOG = [
       fit.forEach(function (id) { fl.appendChild(moreRow(id)); }); nf.forEach(function (id) { sl.appendChild(moreRow(id)); });
       setText($("#ml-fit-t"), "Eligible for Fast Fix"); setText($("#ml-fit-n"), "(" + fit.length + ")");
       setText($("#ml-sr-t"), "Requires Service Request"); setText($("#ml-sr-n"), "(" + nf.length + ")");
-      setText($("#ml-sr-sub"), "These didn\u2019t pass the questions. You\u2019ll submit them as a service request after you schedule the eligible jobs.");
+      setText($("#ml-sr-sub"), "These didn\u2019t pass the questions. We\u2019ll submit them as a service request when you continue.");
     }
     var full = ids.length >= MAX_TASKS, over = overLimit() || mixBlocked();
     $("#more-add").setAttribute("aria-disabled", String(full || over));
@@ -2704,13 +2717,14 @@ var CATALOG = [
     $("#rv-fit").hidden = split || !fit.length; $("#rv-visits").hidden = !split; $("#rv-sr").hidden = !nf.length;
     $("#rv-all").hidden = nf.length > 0 || !fit.length; $("#rv-all-note").hidden = $("#rv-all").hidden; $("#rv-explain").hidden = true;
     setText($("#rv-fit-t"), "Fast Fix"); setText($("#rv-fit-n"), "");
-    setText($("#rv-fit-sub"), "We’ll book this as one visit of about " + hoursText(hrs) + ". You pick the time next.");
+    setText($("#rv-fit-sub"), "One visit of about " + hoursText(hrs) + ".");
+    setText($("#rv-fit-chip"), "Next: pick a time"); setText($("#rv-visits-chip"), "Next: pick times"); setText($("#rv-sr-chip"), "Submitted when you continue");
     setText($("#rv-visits-t"), "Fast Fix"); 
-    setText($("#rv-visits-sub"), "We’ll book this as " + (pv ? pv.length : 2) + " visits. You pick a time for each, next.");
+    setText($("#rv-visits-sub"), (pv ? pv.length : 2) + " visits, each booked on its own.");
     setText($("#rv-sr-t"), "Service request"); setText($("#rv-sr-n"), "");
     setText($("#rv-sr-sub"), mix
-      ? "You’ll submit " + (nf.length === 1 ? "this one" : "these") + " right after you book, from your confirmation page."
-      : "We’ll send " + (nf.length === 1 ? "this" : "these") + " to our team as one service request. You won’t need to enter anything again.");
+      ? "We send " + (nf.length === 1 ? "this" : "these") + " to our team for you. Your notes and photos go along."
+      : "We send " + (nf.length === 1 ? "this" : "these") + " to our team as one service request. You won\u2019t need to enter anything again.");
     var fl = $("#rv-fit-list"), sl = $("#rv-sr-list"), vl = $("#rv-visits-list"); fl.innerHTML = ""; sl.innerHTML = ""; vl.innerHTML = "";
     fit.forEach(function (i) { fl.appendChild(rvRow("", jobLine(i))); });
     nf.forEach(function (i) { sl.appendChild(rvRow("", jobLine(i), whyLines(i))); });
@@ -2740,7 +2754,7 @@ var CATALOG = [
     }
     if (s === "review") {
       if (!nofitIds().length) { state.split = false; navigate("time"); }          /* two Fast Fix visits */
-      else if (fitIds().length) { state.split = true; navigate("time"); }            /* book what is eligible; the rest is submitted from the confirmation page */
+      else if (fitIds().length) { state.split = true; state.srDone = true; navigate("time"); }   /* the service request is submitted here; then book what is eligible */
       else { state.split = false; state.reason = "ko"; navigate("sent"); }
       return true;
     }
@@ -2767,7 +2781,7 @@ var CATALOG = [
     if (WIZ && screen === "review") {
       var rf = fitIds().length, rn = nofitIds().length, sp2 = needsSplit();
       if (!rn) return { label: "Pick times for both visits", status: "2 Fast Fix visits" };
-      return { label: rf ? (sp2 ? "Pick times for both visits" : "Pick a time for Fast Fix") : "Submit for Service Request", status: rf + " eligible \u00b7 " + rn + " require a service request" };
+      return rf ? { label: sp2 ? "Submit request and pick times" : "Submit request and pick a time", status: "Submits your service request, then you pick a time" } : { label: "Submit for Service Request", status: "Submits your service request" };
     }
     if (WIZ && screen === "more") { var wc = committedIds().length, mb = mixBlocked(); return { label: overLimit() ? "Send to our team" : "Continue", status: overLimit() ? "More than a Fast Fix covers" : mb ? "Over the Fast Fix limit" : wc + " of " + MAX_TASKS + " jobs" }; }
     if (screen === "job") {
@@ -2814,7 +2828,7 @@ var CATALOG = [
     var srl = $("#s-sr-jobs"); srl.innerHTML = "";
     nfs.forEach(function (j) {
       var li = document.createElement("li"), t = document.createElement("span"), n = document.createElement("span");
-      t.className = "sum__jobname"; t.textContent = j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : ""); n.className = "sum__jobnote"; n.textContent = "Submit after you schedule";
+      t.className = "sum__jobname"; t.textContent = j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : ""); n.className = "sum__jobnote"; n.textContent = "Submitted when you continue";
       li.appendChild(t); li.appendChild(n); srl.appendChild(li);
     });
     var list = $("#s-jobs");
@@ -2927,7 +2941,7 @@ var CATALOG = [
     if (screen !== "type" && screen !== "describe" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
     if (screen === "booked" && (!state.date || state.time === null)) seedDemo(screen);
     if (screen === "sent" && !state.reason) seedDemo(screen);
-    if (WIZ && screen === "time" && state.screen !== "time") { state.visit = 0; state.books = []; state.date = null; state.time = null; state.srDone = false; }
+    if (WIZ && screen === "time" && state.screen !== "time") { state.visit = 0; state.books = []; state.date = null; state.time = null; }
     state.screen = screen;
     body.setAttribute("data-screen", screen);
 
@@ -3014,14 +3028,12 @@ var CATALOG = [
     var nfj = WIZ && state.split ? nofitIds() : [], mod = $("#b-sr-module"), dash = $('[data-screen-id="booked"] [data-handoff="Dashboard"]');
     mod.hidden = !nfj.length;
     if (nfj.length) {
-      var done = state.srDone, ml = $("#srm-list"); ml.innerHTML = "";
-      setText($("#srm-t"), done ? "Service request submitted" : "Requires Service Request"); setText($("#srm-n"), "(" + nfj.length + ")");
-      setText($("#srm-sub"), done ? "Our team will contact you to schedule " + (nfj.length === 1 ? "this job" : "these jobs") + ". Your descriptions and photos came with the request." : (nfj.length === 1 ? "This job isn\u2019t eligible for Fast Fix." : "These jobs aren\u2019t eligible for Fast Fix.") + " Submit " + (nfj.length === 1 ? "it" : "them") + " as a service request and our team will schedule " + (nfj.length === 1 ? "it" : "them") + ".");
-      nfj.forEach(function (i) { ml.appendChild(reviewRow(i, done ? "plain" : true)); });
-      $("#srm-btn").hidden = done; $("#srm-done").hidden = !done;
-      mod.classList.toggle("is-done", done);
+      var ml = $("#srm-list"); ml.innerHTML = "";
+      setText($("#srm-t"), "Service request submitted"); setText($("#srm-n"), "");
+      setText($("#srm-sub"), "Our team will contact you to schedule " + (nfj.length === 1 ? "this job" : "these jobs") + ". Your descriptions and photos came with the request.");
+      nfj.forEach(function (i) { ml.appendChild(reviewRow(i, "plain")); });
     }
-    if (dash) { var prim = !nfj.length || state.srDone; dash.classList.toggle("btn--primary", prim); dash.classList.toggle("btn--secondary", !prim); }
+    if (dash) { dash.classList.add("btn--primary"); dash.classList.remove("btn--secondary"); }
     $("#hm-initials").textContent = h.ini;
     $("#hm-role").textContent = h.hm;
     $("#hm-meta").textContent = "Home Manager";
@@ -3229,7 +3241,6 @@ var CATALOG = [
       var wa = t.closest("[data-wiz-add]"); if (wa) { wizAdd(); return; }
       var we = t.closest("[data-wiz-edit]"); if (we) { state.cur = we.getAttribute("data-wiz-edit"); state.editing = true; navigate("details"); return; }
       var wr = t.closest("[data-wiz-remove]"); if (wr) { wizRemove(wr.getAttribute("data-wiz-remove")); return; }
-      var wss = t.closest("[data-wiz-submit-sr]"); if (wss) { state.srDone = true; fillBooked(); announce("Service request submitted."); var sd = $("#srm-t"); if (sd) { sd.setAttribute("tabindex", "-1"); sd.focus({ preventScroll: true }); } return; }
       var wsa = t.closest("[data-wiz-sendall]"); if (wsa) { state.split = false; state.reason = nofitIds().length ? "ko" : "time"; navigate("sent"); return; }
       var wbk = t.closest("[data-wiz-back]"); if (wbk) { navigate("more"); return; }
       var qb = t.closest("[data-qty]"); if (qb) { if (qb.getAttribute("aria-disabled") !== "true") stepQty(+qb.getAttribute("data-qty")); return; }

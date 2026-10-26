@@ -298,3 +298,8 @@ body.variant-wizard[data-screen="review"] .layout { grid-template-columns: minma
 .rvrow__k { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--blue-text); }
 .rvrow__t { font-size: 16px; line-height: 24px; font-weight: 600; }
 .rvrow__why { margin-top: var(--s-4) !important; font-size: 14px; line-height: 20px; color: var(--text-2); }
+
+.rv__top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-4) var(--s-12); }
+.rv__chip { display: inline-block; padding: var(--s-4) var(--s-12); border-radius: var(--r-pill); background: var(--surface); color: var(--blue-text); font-size: 14px; line-height: 20px; font-weight: 600; }
+.rv--sr .rv__chip { background: var(--blue-tint); }
+[data-screen-id="review"] .rv__top + .t-meta { margin-top: var(--s-8); }

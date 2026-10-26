@@ -26,16 +26,18 @@ Request type -> Fast Fix
 | **Add another job?** | Each job so far (name × quantity, group, comment, photos) with **Edit** and **Remove**; **Add another job** (secondary) or **Continue** (primary). | Max **3 jobs**. When any job is not eligible the list becomes **two titled sections: Eligible for Fast Fix (n)** and **Requires Service Request (m)**; the summary on the right has the same two groups, and only eligible jobs count toward the visit length. Picking the same job again makes a second entry titled "(2)". |
 | **Review page** | Shown when a job is not eligible, or when every job is eligible but needs two visits. | See below. |
 | **Pick a time** | Real open times, start times only, for the visit (or each visit). | Visit length is the eligible jobs' minutes × quantity, whole hours, 1 to 3, not changeable. |
-| **Booked** | Confirmation of each visit with date, time, hours and jobs. | If any job was not eligible there is **one module** on this page, **Requires Service Request (m)**: the not-eligible jobs listed in full (name × quantity, group, comment, photos, the answer that failed) and one **Submit for Service Request** button (the yellow one; Back to dashboard becomes secondary). Submitting confirms in place ("Service request submitted"; the jobs stay listed; Back to dashboard is primary again). |
+| **Booked** | Confirmation of each visit with date, time, hours and jobs. | If any job was not eligible there is **one confirmation module**, **Service request submitted**: "Our team will contact you to schedule these jobs. Your descriptions and photos came with the request." with the jobs listed. It has **no button**: the request was already submitted on the plan page. Back to dashboard is the one yellow button. |
 
-### Review page ("Here’s the plan"): two plain panels
+### Review page ("Here’s the plan"): two plain panels, and this is where the service request is submitted
 
-Redesigned to be glanceable. No right-hand summary on this page, no per-job cards, no repeated comments, photos or categories. Just two panels, each with a heading, one line, and one row per job:
+No right-hand summary on this page, no per-job cards, no repeated comments, photos or categories. Two panels, each with a heading, a status chip, one line, and one row per job:
 
-- **Fast Fix** (blue panel): "We’ll book this as one visit of about N hours. You pick the time next." With two visits it lists **Visit 1 · 1 hour** and **Visit 2 · 3 hours**, each with its jobs.
-- **Service request** (white panel): each job that did not pass, with the one reason ("No: <question>" or "Not sure: <question>"). With a mix the line says "You’ll submit this one right after you book, from your confirmation page." When nothing is eligible: "We’ll send this to our team as one service request."
+- **Fast Fix** (blue panel), chip **Next: pick a time** (or **Next: pick times**): "One visit of about N hours." With two visits it lists **Visit 1 · 1 hour** and **Visit 2 · 3 hours**, each with its jobs.
+- **Service request** (white panel), chip **Submitted when you continue**: "We send this to our team for you. Your notes and photos go along." Each job that did not pass is listed with the one reason ("No: <question>" or "Not sure: <question>").
 
-One button: **Pick a time for Fast Fix** (or **Pick times for both visits**, or **Submit for Service Request** when nothing is eligible), with the **Change my jobs or answers** link. A mix never offers "send everything". Only when every job is eligible and splits into two visits is there a secondary **Send everything to our team instead**. Titles: "Here’s the plan" (mix), "We’ll book this as 2 Fast Fix visits" (all eligible, split), "This needs a service request" (none eligible). The time screen runs once per visit (visit 1 of 2, then visit 2); visit 2 cannot overlap visit 1.
+**The big yellow button submits the service request and moves on to booking.** Its label says so: **Submit request and pick a time** (or **Submit request and pick times** for two visits), with the line beside it: "Submits your service request, then you pick a time". When nothing is eligible the button is **Submit for Service Request** ("Submits your service request") and ends on the request-sent page. The time screen then opens with "Your service request is submitted." and the right-hand summary reads "Submitted when you continue" under the job. Subtitle: "Continue to submit your service request and pick a time for Fast Fix."
+
+Only when every job is eligible and splits into two visits is there a secondary **Send everything to our team instead**; a mix never offers it. Titles: "Here’s the plan" (mix), "We’ll book this as 2 Fast Fix visits" (all eligible, split), "This needs a service request" (none eligible). The time screen runs once per visit; visit 2 cannot overlap visit 1.
 
 Limits: the **eligible** jobs split into two visits when their total is **at most 6 hours** and they can be packed into two visits of 3 hours or less. Jobs that are not eligible never count toward the hours. Past that limit: every job eligible goes to our team as one service request (open for the stakeholders); a mix shows "Remove a job or lower a quantity to continue" with Continue disabled.
 
@@ -46,7 +48,7 @@ Back goes one step at a time: questions to describe to picker to type; the list 
 - **Max 3 jobs**, **How many?** on every job, and picking the same job again are all in.
 - **Each question is asked on its own** (the job's own, then the three overall ones). Nothing is grouped into one "does all of this apply".
 - **Not eligible = any No or Not sure.** The member sees it immediately and again on every list, the review page and the confirmation page, always as two titled groups.
-- **Eligible jobs are scheduled first; the others are submitted from the confirmation page**, in one module that shows the jobs and has the button. The service request carries the description, photos and quantity.
+- **Eligible jobs are scheduled; the others are submitted automatically** when the member taps the yellow button on the plan page (before they pick a time). The confirmation page only confirms it. The service request carries the description, photos and quantity.
 - **Over 3 hours of eligible work: two Fast Fix visits** (not a service request), whether or not other jobs are not eligible. Not handled: more than two visits.
 - **A mix never goes entirely to a service request.** The eligible jobs are booked; the ineligible ones are submitted from the confirmation page.
 - Still open for the stakeholders (Mark, Justin): when every job is eligible but needs more than two visits (or cannot be packed into two), the prototype sends it to our team as one service request; and whether members should instead get a single visit (the all-eligible split page offers "Send everything to our team instead").
@@ -54,14 +56,14 @@ Back goes one step at a time: questions to describe to picker to type; the list 
 ## Notes for engineering
 
 - Answers are not stored; they only decide routing. The compiled `job_requested` has one line per task: `- Task1: Mount a TV (Mounting & Hanging) x2: <comment>`.
-- One service request holds all tasks; eligible tasks go into one booking (or two when split); the rest stay on the service request until the member submits it from the confirmation page.
+- One service request holds all tasks; eligible tasks go into one booking (or two when split); the service request is created when the member continues from the plan page.
 - Each job's own questions live in the catalog as `kq` (placeholder copy, in the workbook's last column). The three overall questions are the same for every job (`COMMON_Q` in `app.js`). The single question the other versions use is `ko`.
 - Minutes are an internal estimate; quantity multiplies them.
 
 ## Try these
 
 - Tap Mounting & Hanging → Mount a TV (drywall) → More three times (4) → comment → Continue → answer Yes down the list → Continue → the 2-visit page → Pick times for both visits.
-- Same TV, then Add another → search "toilet rocks" → answer **No** to the first question → Continue → the list now has Eligible for Fast Fix and Requires Service Request → Continue → Pick a time for Fast Fix → pick a time → on the confirmation page use **Submit for Service Request**.
+- Same TV, then Add another → search "toilet rocks" → answer **No** to the first question → Continue → the list now has Eligible for Fast Fix and Requires Service Request → Continue → Pick a time for Fast Fix → pick a time → the page says "Submit request and pick a time"; tap it, pick a time, and the confirmation page shows "Service request submitted".
 - A TV ×4 plus a job that is not eligible: the TV splits into 2 Fast Fix visits, the review page shows Eligible (with the 2 visits) and Requires Service Request, and the confirmation page shows both visits plus the module.
 - A 4× long job plus a job that is not eligible: more than two visits of work, so the list says to remove a job or lower a quantity and Continue stays disabled.
 - "Prototype states" → Jump to screen: Describe + photos, Questions, Add another job, What fits and Pick a time all work from a cold start.
