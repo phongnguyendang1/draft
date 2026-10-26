@@ -475,9 +475,11 @@
     TITLES.job = ["What needs fixing?", "Job " + n + " of up to " + MAX_TASKS + ". " + (state.pg ? "Tap the job that fits." : "Choose a category, or search.")];
     TITLES.details = [cj ? cj.title : "Tell us about the job", "Tell us what\u2019s going on. Photos are optional."];
     TITLES.question = ["A few questions", cj ? "About: " + cj.title + (qtyOf(cj.id) > 1 ? " \u00d7 " + qtyOf(cj.id) : "") : ""];
-    TITLES.review = needsSplit() && !nofitIds().length
-      ? ["We\u2019ll book this as " + pv.length + " Fast Fix visits", "Together your jobs run longer than one Fast Fix (3 hours), and each one fits on its own."]
-      : ["Here\u2019s what fits Fast Fix", "Some of your jobs aren\u2019t eligible for Fast Fix. You\u2019ll schedule the eligible ones now" + (needsSplit() ? ", as " + (planVisits() || []).length + " Fast Fix visits." : ".")];
+    TITLES.review = !fitIds().length
+      ? ["This needs a service request", "These jobs didn\u2019t pass the questions, so our team will plan them."]
+      : needsSplit() && !nofitIds().length
+        ? ["We\u2019ll book this as " + pv.length + " Fast Fix visits", "Together your jobs run longer than one Fast Fix (3 hours), and each one fits on its own."]
+        : ["Here\u2019s the plan", "Fast Fix jobs get booked first. Anything else goes in as a service request."];
     TITLES.time = [many ? "Pick a time: visit " + (Math.min(state.visit, pv.length - 1) + 1) + " of " + pv.length : "Pick a time", many ? "Each visit is booked on its own. Real open times with your Home Manager." : "Real open times with your Home Manager. Your booking is confirmed right away."];
   }
   /* Deep links (and the "Jump to screen" panel) land on a sensible state when nothing has been picked yet */
@@ -959,31 +961,34 @@
     top.appendChild(icon(jb.icon)); top.appendChild(main); li.appendChild(top);
     return li;
   }
-  /* The page that says plainly what fits Fast Fix and what needs a service request, or how a long visit is split in two */
+  /* Review page rows: just the name, plus the one reason that matters. Comments, photos and category are already on the request. */
+  function rvRow(eyebrow, title, whys) {
+    var li = el("li", "rvrow");
+    if (eyebrow) li.appendChild(el("p", "rvrow__k", eyebrow));
+    li.appendChild(el("p", "rvrow__t", title));
+    (whys || []).forEach(function (w) { li.appendChild(el("p", "rvrow__why", w)); });
+    return li;
+  }
+  function jobLine(id) { var q = qtyOf(id); return JOB[id].title + (q > 1 ? " × " + q : ""); }
+  function whyLines(id) { return failedQs(id).map(function (k) { return (state.ko[k.key] === "unsure" ? "Not sure: " : "No: ") + k.q; }); }
+  /* The page that says plainly what is booked as Fast Fix and what goes in as a service request */
   function renderReview() {
-    var fit = fitIds(), nf = nofitIds(), all = fit.length + nf.length, split = needsSplit(), pv = split ? planVisits() : null;
-    $("#rv-fit").hidden = (split && !nf.length) || !fit.length; $("#rv-sr").hidden = !nf.length; $("#rv-visits").hidden = !split; $("#rv-all").hidden = nf.length > 0 || !fit.length; $("#rv-all-note").hidden = $("#rv-all").hidden;
-    setText($("#rv-fit-t"), "Eligible for Fast Fix"); setText($("#rv-fit-n"), "(" + fit.length + ")");
-    setText($("#rv-fit-sub"), "You\u2019ll pick a time for " + (fit.length === 1 ? "this job" : "these jobs") + " next.");
-    setText($("#rv-sr-t"), "Requires Service Request"); setText($("#rv-sr-n"), "(" + nf.length + ")");
-    setText($("#rv-sr-sub"), nf.length === 1 ? "This job didn\u2019t pass the questions. You\u2019ll submit it as a service request after you schedule." : "These jobs didn\u2019t pass the questions. You\u2019ll submit them as a service request after you schedule.");
+    var fit = fitIds(), nf = nofitIds(), split = needsSplit(), pv = split ? planVisits() : null, mix = fit.length && nf.length;
+    var hrs = Math.min(3, Math.max(1, Math.ceil(totalMin() / 60)));
+    $("#rv-fit").hidden = split || !fit.length; $("#rv-visits").hidden = !split; $("#rv-sr").hidden = !nf.length;
+    $("#rv-all").hidden = nf.length > 0 || !fit.length; $("#rv-all-note").hidden = $("#rv-all").hidden; $("#rv-explain").hidden = true;
+    setText($("#rv-fit-t"), "Fast Fix"); setText($("#rv-fit-n"), "");
+    setText($("#rv-fit-sub"), "We’ll book this as one visit of about " + hoursText(hrs) + ". You pick the time next.");
+    setText($("#rv-visits-t"), "Fast Fix"); 
+    setText($("#rv-visits-sub"), "We’ll book this as " + (pv ? pv.length : 2) + " visits. You pick a time for each, next.");
+    setText($("#rv-sr-t"), "Service request"); setText($("#rv-sr-n"), "");
+    setText($("#rv-sr-sub"), mix
+      ? "You’ll submit " + (nf.length === 1 ? "this one" : "these") + " right after you book, from your confirmation page."
+      : "We’ll send " + (nf.length === 1 ? "this" : "these") + " to our team as one service request. You won’t need to enter anything again.");
     var fl = $("#rv-fit-list"), sl = $("#rv-sr-list"), vl = $("#rv-visits-list"); fl.innerHTML = ""; sl.innerHTML = ""; vl.innerHTML = "";
-    fit.forEach(function (i) { fl.appendChild(reviewRow(i, false)); });
-    nf.forEach(function (i) { sl.appendChild(reviewRow(i, true)); });
-    if (split) {
-      setText($("#rv-visits-t"), pv.length + " Fast Fix visits");
-      setText($("#rv-visits-sub"), "Each visit is booked on its own, so you pick a time for each.");
-      pv.forEach(function (v, k) {
-        var li = el("li", "pick"), top = el("div", "pick__top"), main = el("div", "pick__main"), hrs = Math.min(3, Math.max(1, Math.ceil(v.min / 60)));
-        main.appendChild(el("p", "pick__title", "Visit " + (k + 1) + " \u00b7 " + hoursText(hrs))); main.appendChild(el("p", "pick__note pick__why", itemsText(v)));
-        top.appendChild(el("span", "pick__num", String(k + 1))); top.appendChild(main); li.appendChild(top); vl.appendChild(li);
-      });
-    }
-    setText($("#rv-explain"), split && !nf.length
-      ? "Together these take longer than one Fast Fix, so we\u2019ll book them as " + pv.length + " separate visits. You\u2019ll pick a time for each one."
-      : fit.length
-        ? "Pick a time for the eligible " + (fit.length === 1 ? "job" : "jobs") + (split ? " (booked as " + pv.length + " Fast Fix visits, one time each)" : "") + " first. When you\u2019re booked, the confirmation page lists the other " + (nf.length === 1 ? "job" : "jobs") + " with a button to submit " + (nf.length === 1 ? "it" : "them") + " as a service request."
-        : "None of these are eligible for Fast Fix. We\u2019ll send " + (nf.length === 1 ? "it" : "them") + " to our team as one service request, and you won\u2019t need to enter anything again.");
+    fit.forEach(function (i) { fl.appendChild(rvRow("", jobLine(i))); });
+    nf.forEach(function (i) { sl.appendChild(rvRow("", jobLine(i), whyLines(i))); });
+    if (split) pv.forEach(function (v, k) { vl.appendChild(rvRow("Visit " + (k + 1) + " · " + hoursText(Math.min(3, Math.max(1, Math.ceil(v.min / 60)))), itemsText(v))); });
     setText($("#rv-all-note"), "Prefer a single visit with our team instead?");
     setText($("#rv-all"), "Send everything to our team instead");
   }
