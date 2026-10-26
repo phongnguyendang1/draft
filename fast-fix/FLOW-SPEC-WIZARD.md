@@ -4,7 +4,7 @@ Prototype: `request-flow-wizard-desktop.html` (1280) and `request-flow-wizard-mo
 
 ## The idea
 
-Finish one job completely, then decide whether to add another. Every choice that can move you on with one tap does; a button only appears where there is something to type or confirm. There is **no separate quick-check step**: each job gets its own questions, **every question answered on its own**, and the three overall questions are asked for every job. A job that fails any question is **not eligible**: the list, the review page, the summary and the confirmation page all split **Eligible for Fast Fix** from **Requires Service Request**. Eligible jobs are **always booked as Fast Fix**; jobs that are not eligible are **never** pulled into a "send everything to a service request": they wait in a module on the confirmation page with their own submit button. A visit past 3 hours becomes two Fast Fix visits.
+Finish one job completely, then decide whether to add another. Every choice that can move you on with one tap does; a button only appears where there is something to type or confirm. There is **no separate quick-check step**: each job gets its own questions, **every question answered on its own**, and the three overall questions are asked for every job. A job that fails any question is **not eligible**: the list, the review page, the summary and the confirmation page all split **Eligible for Fast Fix** from **Requires Service Request**. Eligible jobs are **always booked as Fast Fix**; jobs that are not eligible are **never** pulled into a "send everything to a service request": the service request for them is submitted automatically when the member taps the yellow button on the plan page, and the confirmation page confirms it. A visit past 3 hours becomes two Fast Fix visits.
 
 ```
 Request type -> Fast Fix
@@ -50,7 +50,7 @@ Back goes one step at a time: questions to describe to picker to type; the list 
 - **Not eligible = any No or Not sure.** The member sees it immediately and again on every list, the review page and the confirmation page, always as two titled groups.
 - **Eligible jobs are scheduled; the others are submitted automatically** when the member taps the yellow button on the plan page (before they pick a time). The confirmation page only confirms it. The service request carries the description, photos and quantity.
 - **Over 3 hours of eligible work: two Fast Fix visits** (not a service request), whether or not other jobs are not eligible. Not handled: more than two visits.
-- **A mix never goes entirely to a service request.** The eligible jobs are booked; the ineligible ones are submitted from the confirmation page.
+- **A mix never goes entirely to a service request.** The eligible jobs are booked; the ineligible ones are submitted when the member continues from the plan page.
 - Still open for the stakeholders (Mark, Justin): when every job is eligible but needs more than two visits (or cannot be packed into two), the prototype sends it to our team as one service request; and whether members should instead get a single visit (the all-eligible split page offers "Send everything to our team instead").
 
 ## Notes for engineering
@@ -63,7 +63,7 @@ Back goes one step at a time: questions to describe to picker to type; the list 
 ## Try these
 
 - Tap Mounting & Hanging → Mount a TV (drywall) → More three times (4) → comment → Continue → answer Yes down the list → Continue → the 2-visit page → Pick times for both visits.
-- Same TV, then Add another → search "toilet rocks" → answer **No** to the first question → Continue → the list now has Eligible for Fast Fix and Requires Service Request → Continue → Pick a time for Fast Fix → pick a time → the page says "Submit request and pick a time"; tap it, pick a time, and the confirmation page shows "Service request submitted".
-- A TV ×4 plus a job that is not eligible: the TV splits into 2 Fast Fix visits, the review page shows Eligible (with the 2 visits) and Requires Service Request, and the confirmation page shows both visits plus the module.
+- Same TV, then Add another → search "toilet rocks" → answer **No** to the first question → Continue → the list now has Eligible for Fast Fix and Requires Service Request → Continue → the plan page → **Submit request and pick a time** → pick a time → the confirmation page shows "Service request submitted".
+- A TV ×4 plus a job that is not eligible: the TV splits into 2 Fast Fix visits, the plan page shows the Fast Fix panel (2 visits) and the Service request panel, and the confirmation page shows both visits plus the "Service request submitted" module.
 - A 4× long job plus a job that is not eligible: more than two visits of work, so the list says to remove a job or lower a quantity and Continue stays disabled.
 - "Prototype states" → Jump to screen: Describe + photos, Questions, Add another job, What fits and Pick a time all work from a cold start.
