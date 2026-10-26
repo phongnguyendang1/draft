@@ -1,0 +1,1504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HomeHub Onboarding Prototype</title>
+<meta name="description" content="Clickable front-end prototype of the HomeHub member onboarding flow, updated so a new member's first Preventive Maintenance can be booked into a later window when demand is high.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0c2851;
+  --text2: #3d5374;
+  --text3: #647794;
+  --slate: #587188;
+  --blue: #1867b0;
+  --blue-hover: #135592;
+  --sky: #4498e5;
+  --sky-line: #3b8ad6;
+  --sky-bg: #ebf5fe;
+  --cyan: #5bc8f5;
+  --yellow: #f7cf46;
+  --border: #ced4dc;
+  --grey1: #f4f4f4;
+  --grey-reg: #94a3b0;
+  --green: #23843b;
+  --danger: #b42318;
+  --focus: #0c2851;
+  --note: #c2410c;
+  --bar-h: 52px;
+  --font: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font-family: var(--font); color: var(--navy); background: #fff; overflow: hidden; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+img { max-width: 100%; display: block; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.ic { width: 20px; height: 20px; fill: currentColor; flex: none; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* ---------- Prototype bar (not part of the product) ---------- */
+.proto-bar { position: fixed; inset: 0 0 auto 0; height: var(--bar-h); z-index: 60; display: flex; align-items: center; gap: 16px; padding: 0 16px; background: #111827; color: #f9fafb; font-size: 13px; }
+.pb-title { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.pb-sub { color: #9ca3af; font-weight: 400; margin-left: 6px; }
+.pb-label { color: #9ca3af; margin-right: 8px; }
+.pb-group { display: flex; align-items: center; }
+.seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 8px; background: #1f2937; }
+.seg button { border: 0; background: transparent; color: #d1d5db; padding: 6px 10px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: #f9fafb; color: #111827; }
+.seg button:focus-visible, .pb-switch:focus-visible, .pb-more summary:focus-visible { outline-color: #f7cf46; }
+.pb-switch { display: inline-flex; align-items: center; gap: 8px; border: 0; background: none; color: #f9fafb; font-size: 13px; font-weight: 500; cursor: pointer; padding: 6px 4px; white-space: nowrap; }
+.pb-switch .track { width: 32px; height: 18px; border-radius: 9px; background: #4b5563; position: relative; transition: background .15s; }
+.pb-switch .track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.pb-switch[aria-pressed="true"] .track { background: #f97316; }
+.pb-switch[aria-pressed="true"] .track::after { transform: translateX(14px); }
+.pb-spacer { margin-left: auto; }
+.pb-more { position: relative; }
+.pb-more summary { list-style: none; cursor: pointer; padding: 7px 12px; border-radius: 8px; background: #1f2937; font-weight: 500; white-space: nowrap; }
+.pb-more summary::-webkit-details-marker { display: none; }
+.pb-panel { position: absolute; right: 0; top: calc(100% + 10px); width: 340px; max-width: calc(100vw - 24px); padding: 16px; border-radius: 12px; background: #fff; color: #111827; box-shadow: 0 16px 40px rgba(0,0,0,.25); display: grid; gap: 14px; }
+.pb-panel .seg { background: #f3f4f6; }
+.pb-panel .seg button { color: #374151; }
+.pb-panel .seg button[aria-pressed="true"] { background: #111827; color: #fff; }
+.pb-panel .seg button:focus-visible, .pb-panel .pb-btn:focus-visible { outline-color: #111827; }
+.pb-field { display: grid; gap: 6px; }
+.pb-field > span { font-weight: 600; font-size: 12px; color: #4b5563; }
+.pb-field select { padding: 8px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font-size: 13px; }
+.pb-help { margin: 0; font-size: 12px; line-height: 17px; color: #4b5563; }
+.pb-btn { justify-self: start; border: 1px solid #111827; background: #fff; border-radius: 8px; padding: 7px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.pb-panel .pb-scenario-dup { display: none; }
+@media (max-width: 960px) {
+  .pb-sub, .proto-bar > .pb-scenario { display: none; }
+  .pb-panel .pb-scenario-dup { display: grid; }
+}
+@media (max-width: 760px) {
+  .pb-view { display: none !important; }
+}
+
+/* ---------- Stage / device frame ---------- */
+.stage { position: fixed; inset: var(--bar-h) 0 0 0; }
+body.notes-on .stage { right: 360px; }
+.app { position: relative; width: 100%; height: 100%; overflow: hidden; background: #fff; transform: translateZ(0); container: app / inline-size; }
+.app-scroll { height: 100%; overflow: auto; }
+.stage.mobile { display: grid; place-items: center; padding: 16px; background: #dfe5eb; }
+.stage.mobile .app { width: 390px; height: min(844px, 100%); border-radius: 40px; box-shadow: 0 0 0 10px #0f172a, 0 24px 60px rgba(0,0,0,.3); }
+@media (max-width: 760px) { body.notes-on .stage { right: 0; } }
+
+/* ---------- Site chrome ---------- */
+.site-header { display: flex; align-items: center; gap: 24px; height: 88px; padding: 0 40px; background: #fff; border-bottom: 1px solid #dbe2e6; }
+.logo { display: flex; align-items: center; gap: 6px; color: var(--navy); text-decoration: none; flex: none; }
+.logo-word { display: grid; line-height: 1; }
+.logo-word b { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+.logo-word b sup { font-size: 8px; vertical-align: top; margin-left: 1px; }
+.logo-word small { font-size: 11px; font-weight: 700; color: #1570c0; letter-spacing: .02em; margin-top: 1px; }
+.nav { display: flex; align-items: center; gap: 28px; margin-left: auto; font-size: 14px; }
+.nav a { display: flex; align-items: center; gap: 6px; height: 88px; color: var(--text2); text-decoration: none; border-bottom: 2px solid transparent; white-space: nowrap; }
+.nav a .ic { width: 18px; height: 18px; }
+.nav a[aria-current="page"] { color: var(--navy); border-bottom-color: var(--navy); }
+.nav a:hover { color: var(--navy); }
+.menu-btn { display: none; margin-left: auto; width: 44px; height: 44px; border: 0; background: none; border-radius: 8px; color: var(--navy); cursor: pointer; place-items: center; }
+.site-header .btn-create-sm { display: none; }
+.dash { max-width: 1005px; margin: 0 auto; padding: 32px 24px 64px; }
+.dash h1 { font-size: 24px; line-height: 32px; margin: 0 0 32px; }
+.dash-grid { display: grid; grid-template-columns: minmax(0, 590fr) minmax(0, 335fr); gap: 32px; align-items: start; }
+.card { position: relative; border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 24px; background: #fff; }
+.card-sky { background: var(--sky-bg); border-color: transparent; }
+.card h2 { font-size: 16px; line-height: 24px; margin: 0 0 8px; }
+.card p { font-size: 14px; line-height: 20px; color: var(--text2); margin: 0 0 12px; }
+.welcome h2 { display: flex; gap: 10px; align-items: center; }
+.banner { display: flex; gap: 16px; padding: 24px; margin-bottom: 24px; border-radius: 8px; background: var(--blue); color: #fff; }
+.banner h2 { font-size: 16px; line-height: 24px; font-weight: 400; margin: 0; }
+.banner p { margin: 0 0 16px; font-size: 16px; line-height: 24px; }
+.banner hr { border: 0; border-top: 1px solid rgba(255,255,255,.35); margin: 0 0 16px; }
+.banner .addr { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.banner :focus-visible { outline-color: var(--yellow); }
+.dash-side h2.side-h { font-size: 16px; font-weight: 500; margin: 0 0 16px; }
+.hm-card { text-align: center; }
+.avatar { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 12px; display: grid; place-items: center; background: linear-gradient(135deg, #5bc8f5, #1867b0); color: #fff; font-weight: 700; font-size: 26px; }
+.hm-card .name { color: var(--blue); font-size: 18px; font-weight: 700; margin: 0 0 12px; }
+.upcoming ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 12px; }
+.upcoming li { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
+.upcoming .u-when { font-size: 14px; font-weight: 700; color: var(--navy); margin: 2px 0; }
+.upcoming .u-meta { font-size: 13px; color: var(--text2); margin: 0; }
+.upcoming .u-name { font-size: 16px; font-weight: 700; margin: 0; }
+.upcoming .btn { margin-top: 8px; }
+.survey .opt { display: flex; gap: 12px; align-items: center; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-top: 8px; font-size: 14px; color: var(--text2); }
+.survey .opt span.r { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--grey-reg); flex: none; }
+.site-footer { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; padding: 48px 40px; background: linear-gradient(90deg, #2f63b0, #3a86c8); color: #fff; }
+.site-footer address { font-style: normal; font-size: 13px; line-height: 20px; }
+.site-footer address b { display: block; font-size: 18px; margin-bottom: 6px; }
+.btn-outline-white { border: 2px solid #fff; color: #fff; background: transparent; }
+.site-footer :focus-visible { outline-color: var(--yellow); }
+
+/* ---------- Buttons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 8px 24px; border: 1px solid transparent; border-radius: 999px; font-size: 14px; line-height: 20px; font-weight: 700; text-decoration: none; white-space: nowrap; cursor: pointer; }
+.btn .ic { width: 16px; height: 16px; }
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-primary:hover { background: var(--blue-hover); }
+.btn-secondary { background: #fff; color: var(--navy); border-color: var(--navy); }
+.btn-secondary:hover { background: var(--sky-bg); }
+.btn-yellow { background: var(--yellow); color: var(--navy); }
+.btn-yellow:hover { background: #f3c21f; }
+.btn-sm { min-height: 36px; padding: 6px 16px; }
+.btn-block { width: 100%; }
+.btn-link { display: inline-flex; align-items: center; min-height: 40px; padding: 8px 4px; border: 0; background: none; color: var(--blue); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.btn-link:hover { color: var(--blue-hover); }
+
+/* ---------- Modal ---------- */
+.overlay { position: absolute; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(12, 40, 81, .28); }
+.overlay[hidden] { display: none; }
+.modal { position: relative; display: flex; flex-direction: column; width: min(840px, 100%); height: min(784px, 100%); padding: 32px; border-radius: 8px; background: #fff; box-shadow: 0 24px 48px rgba(12, 40, 81, .18); }
+.modal-close { position: absolute; top: 12px; right: 12px; z-index: 2; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--slate); cursor: pointer; }
+.modal-close:hover { background: var(--grey1); }
+.steps { padding-right: 40px; margin-bottom: 24px; }
+.steps[hidden] { display: none; }
+.steps[hidden] + .modal-body { margin-top: 28px; }
+.step-title { margin: 0 0 12px; font-size: 18px; line-height: 24px; font-weight: 600; }
+.progress { height: 8px; border-radius: 4px; background: #d5dbe1; overflow: hidden; }
+.progress > span { display: block; height: 100%; border-radius: 4px; background: var(--blue); transition: width .3s ease; }
+.progress-segs { display: none; gap: 4px; }
+.progress-segs > span { flex: 1; height: 8px; border-radius: 4px; background: #d5dbe1; overflow: hidden; }
+.progress-segs > span > i { display: block; height: 100%; background: var(--blue); border-radius: 4px; }
+.modal-body { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: auto; }
+.modal-body:focus-visible { outline-offset: -3px; }
+.modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding-top: 24px; flex-wrap: wrap; }
+.modal-footer .push { margin-right: auto; }
+.footer-error { flex-basis: 100%; text-align: right; margin: 0; }
+.panel { flex: 1 0 auto; padding: 24px; border: 1px solid var(--border); border-radius: 8px; }
+.panel-flush { padding: 0; overflow: hidden; }
+.screen-title { margin: 0 0 16px; font-size: 24px; line-height: 32px; font-weight: 700; color: var(--navy); }
+.screen-title:focus, .screen-title:focus-visible { outline: none; }
+:where(.panel, .copy) p { margin: 0 0 12px; font-size: 16px; line-height: 24px; color: var(--text2); }
+.copy ul { margin: 0 0 16px; padding-left: 20px; color: var(--text2); line-height: 24px; }
+:where(.panel, .copy) b { color: var(--navy); font-weight: 700; }
+
+/* Intro */
+.intro-art { width: 100%; height: auto; border-bottom: 1px solid #e4ecf2; }
+.intro-body { padding: 24px; }
+.inline-help { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 16px; padding: 12px 14px; border-radius: 8px; background: var(--sky-bg); font-size: 15px; line-height: 22px; color: var(--navy); }
+.inline-help .ic { color: var(--blue); margin-top: 1px; }
+.inline-help p { margin: 0; color: var(--navy); font-size: 15px; line-height: 22px; }
+
+/* Select home */
+.homes { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; }
+.home-opt { position: relative; display: flex; gap: 16px; align-items: flex-start; padding: 16px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; }
+.home-opt:hover { border-color: var(--blue); }
+.home-opt:has(input:checked) { background: var(--sky-bg); border-color: var(--blue); }
+.home-opt input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--blue); flex: none; }
+.ho-body { flex: 1; display: grid; gap: 8px; }
+.ho-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.ho-street { font-size: 16px; font-weight: 700; }
+.ho-city { font-size: 14px; color: var(--text2); }
+.ho-bar { height: 6px; border-radius: 3px; background: #d5dbe1; overflow: hidden; }
+.ho-bar > i { display: block; height: 100%; background: #e5b40f; }
+.ho-pct { font-size: 12px; font-weight: 500; color: var(--text2); }
+.badge-yellow { align-self: start; padding: 1px 8px; border-radius: 4px; background: var(--yellow); color: var(--navy); font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+/* Visit info */
+.info-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.info-icon, .vc-icon { display: grid; place-items: center; border-radius: 50%; color: #fff; flex: none; }
+.info-icon { width: 40px; height: 40px; }
+.info-icon.he, .vc-icon.he { background: var(--cyan); }
+.info-icon.pm, .vc-icon.pm { background: var(--sky); }
+.info-title { flex: 1; margin: 0; font-size: 24px; line-height: 32px; font-weight: 600; min-width: 220px; }
+.badge-blue { padding: 4px 10px; border-radius: 2px; background: var(--blue); color: #fff; font-size: 14px; font-weight: 500; letter-spacing: .01em; text-transform: uppercase; }
+.subhead { margin: 16px 0 8px; font-size: 16px; line-height: 24px; font-weight: 700; color: var(--text2); }
+.warn, .callout-info { display: flex; gap: 12px; align-items: center; margin: 16px 0; padding: 12px; border-radius: 4px; font-size: 16px; line-height: 24px; }
+.warn { background: #fff9e6; border: 1px solid #f5d77a; color: var(--navy); }
+.warn .ic { color: #b07800; }
+.callout-info { background: #f3f9ff; border: 1px solid var(--sky); color: var(--text2); }
+.callout-info .ic { color: var(--blue); }
+.checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.checklist li { display: flex; gap: 12px; align-items: flex-start; color: var(--text2); line-height: 24px; }
+.checklist li .ic { color: var(--green); margin-top: 2px; }
+.window-callout { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; margin: 16px 0; padding: 16px 20px; border: 1px solid #b9d9f7; border-radius: 8px; background: var(--sky-bg); }
+.wc-icon { grid-row: span 3; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #fff; color: var(--blue); }
+.wc-icon .ic { width: 22px; height: 22px; }
+.window-callout .wc-label { margin: 0; font-size: 13px; line-height: 18px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--blue); }
+.window-callout .wc-range { margin: 0; font-size: 22px; line-height: 30px; font-weight: 700; color: var(--navy); }
+.window-callout .wc-text { margin: 4px 0 0; font-size: 15px; line-height: 22px; color: var(--text2); }
+.help-card { display: flex; gap: 16px; align-items: flex-start; margin: 16px 0; padding: 16px; border: 1px solid var(--border); border-radius: 8px; }
+.help-card .hc-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--sky-bg); color: var(--blue); flex: none; }
+.help-card h4 { margin: 0 0 4px; font-size: 16px; line-height: 24px; }
+.help-card p { margin: 0 0 12px; font-size: 15px; line-height: 22px; }
+.rule { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
+.faq-title { margin: 0 0 4px; font-size: 20px; line-height: 28px; font-weight: 600; }
+.faq { display: grid; gap: 8px; margin-top: 16px; }
+.faq-item { border: 1px solid var(--border); border-radius: 4px; }
+.faq-item h4 { margin: 0; }
+.faq-q { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 12px; border: 0; background: none; color: var(--navy); font-size: 14px; line-height: 20px; font-weight: 600; text-align: left; cursor: pointer; }
+.faq-q:hover { background: #f8fafc; }
+.faq-a { padding: 0 12px 12px; }
+.faq-a p { margin: 0; font-size: 14px; line-height: 20px; color: var(--text2); }
+.faq-new { margin-left: 8px; padding: 1px 6px; border-radius: 4px; background: var(--sky-bg); color: var(--blue); font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+.ack { display: flex; gap: 12px; align-items: flex-start; margin-top: 20px; font-size: 16px; line-height: 24px; cursor: pointer; }
+.ack input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--blue); flex: none; }
+.field-error { display: flex; gap: 6px; align-items: center; margin: 8px 0 0; color: var(--danger); font-size: 14px; line-height: 20px; font-weight: 500; }
+.field-error .ic { width: 18px; height: 18px; }
+
+/* Scheduling */
+.sched { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 32px; align-items: start; }
+.sched-side { display: grid; gap: 12px; }
+.svc { display: grid; gap: 2px; margin: 0; padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px; }
+.svc-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; min-height: 28px; font-size: 14px; line-height: 20px; }
+.svc-row dt { display: flex; align-items: center; gap: 8px; color: var(--text2); }
+.svc-row dd { margin: 0; font-weight: 700; color: var(--navy); }
+.box-dashed, .box-window { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 4px; }
+.box-dashed { border: 1px dashed #8494a3; }
+.box-window { border: 1px solid #b9d9f7; background: var(--sky-bg); }
+.box-window .ic, .box-dashed .ic { color: var(--blue); margin-top: 1px; }
+.box-dashed .ic { color: var(--navy); }
+.box-grey { padding: 12px 16px; border-radius: 4px; background: var(--grey1); }
+.bx-label { margin: 0; font-size: 14px; line-height: 20px; color: var(--text2); }
+.bx-val { margin: 2px 0 0; font-size: 14px; line-height: 20px; font-weight: 700; color: var(--navy); }
+.bx-help { margin: 6px 0 0; font-size: 13px; line-height: 18px; color: var(--text2); }
+.sched-step { margin: 0 0 12px; text-align: center; color: var(--blue); font-size: 16px; line-height: 24px; font-weight: 600; }
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.cal-month { margin: 0; font-size: 16px; line-height: 24px; font-weight: 500; }
+.icon-btn { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: none; color: var(--navy); cursor: pointer; }
+.icon-btn:hover:not(:disabled) { background: var(--grey1); }
+.icon-btn:disabled { color: #c3ccd5; cursor: not-allowed; }
+.cal-grid { width: 100%; border-collapse: separate; border-spacing: 0 4px; table-layout: fixed; }
+.cal-grid th { padding: 4px 0; font-size: 12px; font-weight: 500; color: var(--slate); }
+.cal-grid td { padding: 0; text-align: center; }
+.day { display: inline-grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid transparent; border-radius: 50%; background: none; color: #a6b4c1; font-size: 14px; cursor: default; }
+.day.avail { border-color: var(--sky-line); color: var(--navy); cursor: pointer; }
+.day.avail:hover { background: var(--sky-bg); }
+.day.today { background: var(--sky-bg); color: var(--navy); }
+.day.is-sched { background: #e3e8ed; color: var(--navy); }
+.day.sel { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin: 12px 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--slate); }
+.legend li { display: flex; align-items: center; gap: 6px; }
+.legend .sw { width: 16px; height: 16px; border-radius: 50%; border: 1px solid transparent; }
+.sw-today { background: var(--sky-bg); }
+.sw-avail { border-color: var(--sky-line) !important; }
+.sw-sel { background: var(--blue); }
+.sw-sched { background: #e3e8ed; }
+.date-card { margin-bottom: 16px; padding: 10px; border: 1px solid var(--border); border-radius: 4px; text-align: center; }
+.dc-day { margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; }
+.dc-date { margin: 2px 0 0; font-size: 14px; }
+.slots { display: grid; gap: 12px; margin: 0; padding: 0; border: 0; }
+.slot { position: relative; display: flex; align-items: center; min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px; font-size: 14px; cursor: pointer; }
+.slot input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.slot:hover { border-color: var(--blue); }
+.slot .ic { display: none; margin-left: auto; width: 18px; height: 18px; color: var(--blue); }
+.slot:has(input:checked) { background: var(--sky-bg); border-color: var(--blue); font-weight: 700; }
+.slot:has(input:checked) .ic { display: block; }
+.slot:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* Confirmation cards */
+.confirm-wrap { display: flex; justify-content: center; padding: 16px 0; }
+.vcard { position: relative; display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 380px; padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+.vc-head { display: flex; gap: 12px; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.vc-icon { width: 44px; height: 44px; }
+.vc-eyebrow { margin: 0; font-size: 13px; color: var(--text2); }
+.vc-title { margin: 2px 0 0; font-size: 20px; line-height: 26px; font-weight: 700; }
+.vc-rows { display: grid; gap: 10px; margin: 0; }
+.vc-row { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: flex-start; font-size: 13px; line-height: 20px; }
+.vc-row dt { display: flex; gap: 8px; align-items: center; color: var(--text2); white-space: nowrap; }
+.vc-row dt .ic { width: 18px; height: 18px; color: var(--navy); }
+.vc-row dd { margin: 0; font-weight: 700; }
+.vc-tag { align-self: flex-start; padding: 2px 10px; border-radius: 999px; background: var(--sky-bg); color: var(--blue); font-size: 12px; font-weight: 700; }
+.vc-pending { margin: 0; font-size: 14px; line-height: 20px; color: var(--text2); }
+.vc-pending b { color: var(--navy); }
+.vcard > .btn { margin-top: auto; }
+.review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; padding-top: 8px; }
+.review-grid .vcard { max-width: none; }
+.note-strip { position: relative; display: flex; gap: 12px; align-items: flex-start; margin-top: 16px; padding: 12px 16px; border-radius: 8px; background: var(--sky-bg); font-size: 14px; line-height: 20px; color: var(--navy); }
+.note-strip .ic { color: var(--blue); }
+.note-strip p { margin: 0; font-size: 14px; line-height: 20px; color: var(--navy); }
+
+/* Later + done */
+.later { max-width: 560px; margin: 0 auto; padding: 24px 0; text-align: center; }
+.later .big-icon, .done .big-icon { display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; background: var(--sky-bg); color: var(--blue); }
+.later .big-icon .ic, .done .big-icon .ic { width: 28px; height: 28px; }
+.later .note-strip { text-align: left; }
+.done { padding: 8px 0; text-align: center; }
+.done .big-icon { background: none; color: var(--green); margin-bottom: 8px; }
+.done .big-icon .ic { width: 40px; height: 40px; }
+.done .screen-title { margin-bottom: 4px; }
+.done-sub { max-width: 520px; margin: 0 auto 24px; font-size: 16px; line-height: 24px; color: var(--text2); }
+.tl-heading { margin: 0 auto 12px; max-width: 620px; text-align: left; font-size: 16px; font-weight: 700; }
+.timeline { position: relative; max-width: 620px; margin: 0 auto; padding: 0; list-style: none; text-align: left; }
+.tl-item { position: relative; padding: 0 0 20px 52px; }
+.tl-item::before { content: ""; position: absolute; left: 17px; top: 36px; bottom: 0; width: 2px; background: var(--border); }
+.tl-item:last-child { padding-bottom: 0; }
+.tl-item:last-child::before { display: none; }
+.tl-dot { position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: #fff; }
+.tl-dot .ic { width: 18px; height: 18px; }
+.tl-dot.now { background: var(--green); }
+.tl-dot.he { background: var(--cyan); }
+.tl-dot.pm { background: var(--sky); }
+.tl-dot.pending { background: #fff; border: 2px dashed var(--sky-line); color: var(--blue); }
+.tl-when { margin: 0; font-size: 13px; line-height: 18px; font-weight: 700; color: var(--blue); }
+.tl-what { margin: 2px 0 4px; font-size: 18px; line-height: 24px; font-weight: 700; }
+.tl-item p.tl-text { margin: 0; font-size: 14px; line-height: 20px; color: var(--text2); }
+.tl-item .btn { margin-top: 10px; }
+.done-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; text-align: left; }
+.done-cards .vcard { max-width: none; }
+
+/* ---------- Change notes ---------- */
+.notes-on [data-note] { position: relative; outline: 2px dashed var(--note); outline-offset: 3px; }
+.notes-on [data-note]::after { content: attr(data-note); position: absolute; top: -11px; right: -11px; z-index: 6; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 11px; background: var(--note); color: #fff; font: 700 11px/22px var(--font); text-align: center; pointer-events: none; }
+.notes { position: fixed; top: var(--bar-h); right: 0; bottom: 0; z-index: 55; width: 360px; overflow: auto; padding: 20px; background: #fff; border-left: 1px solid #e5e7eb; box-shadow: -12px 0 30px rgba(0,0,0,.08); color: #111827; font-size: 14px; line-height: 20px; }
+.notes[hidden] { display: none; }
+.notes h2 { margin: 0; font-size: 18px; line-height: 24px; }
+.notes h3 { margin: 24px 0 8px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: #4b5563; }
+.notes p { margin: 8px 0 0; color: #374151; }
+.notes-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.notes-close { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: none; cursor: pointer; }
+.notes-close:hover { background: #f3f4f6; }
+.note-list { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 12px; }
+.note-list li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 10px; }
+.note-num { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--note); color: #fff; font-size: 12px; font-weight: 700; }
+.note-list h4 { margin: 2px 0 4px; font-size: 14px; }
+.note-list p { margin: 0; }
+.note-src { margin-top: 6px !important; font-size: 12px; color: #6b7280 !important; }
+.note-show { margin-top: 6px; padding: 0; border: 0; background: none; color: #1d4ed8; font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.plain-list { margin: 0; padding-left: 18px; color: #374151; display: grid; gap: 6px; }
+@media (max-width: 760px) { .notes { width: 100%; } }
+
+/* ---------- Toast ---------- */
+.toast-region { position: absolute; left: 50%; bottom: 24px; z-index: 40; width: max-content; max-width: calc(100% - 32px); transform: translateX(-50%); pointer-events: none; }
+.toast { padding: 12px 16px; border-radius: 8px; background: #111827; color: #fff; font-size: 14px; line-height: 20px; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+
+/* ---------- Responsive (container-based so the Mobile preview matches a real phone) ---------- */
+@container app (max-width: 1080px) {
+  .nav { gap: 18px; }
+  .site-header { padding: 0 24px; }
+}
+@container app (max-width: 960px) {
+  .nav { display: none; }
+  .menu-btn { display: grid; }
+  .site-header .btn-create-sm { display: inline-flex; margin-left: auto; }
+  .btn-create-sm + .menu-btn { margin-left: 0; }
+}
+@container app (max-width: 760px) {
+  .dash-grid { grid-template-columns: 1fr; }
+  .sched { gap: 24px; }
+}
+@container app (max-width: 640px) {
+  .site-header { height: 64px; padding: 0 16px; gap: 8px; }
+  .btn-create-sm { padding: 6px 14px; min-height: 36px; }
+  .dash { padding: 24px 16px 48px; }
+  .site-footer { padding: 32px 16px; }
+  .overlay { padding: 0; align-items: stretch; }
+  .modal { width: 100%; height: 100%; padding: 16px 16px 0; border-radius: 0; box-shadow: none; }
+  .modal-close { top: 6px; right: 6px; }
+  .steps { margin: 30px 0 16px; padding-right: 0; }
+  .progress { display: none; }
+  .progress-segs { display: flex; }
+  .panel { padding: 0; border: 0; border-radius: 0; }
+  .panel-flush .intro-art { border-radius: 8px; }
+  .intro-body { padding: 16px 0 8px; }
+  .screen-title { font-size: 22px; line-height: 30px; }
+  .info-title { font-size: 22px; min-width: 0; flex-basis: calc(100% - 52px); }
+  .sched { grid-template-columns: 1fr; }
+  .svc { gap: 8px; padding: 12px; }
+  .svc-row { display: grid; grid-template-columns: 20px 1fr; gap: 0 10px; }
+  .svc-row dt { display: contents; }
+  .svc-row dt span { grid-column: 2; }
+  .svc-row dd { grid-column: 2; }
+  .review-grid, .done-cards { grid-template-columns: 1fr; }
+  .confirm-wrap { padding: 0; }
+  .modal-footer { position: sticky; bottom: 0; flex-direction: column-reverse; align-items: stretch; gap: 10px; padding: 12px 0 16px; background: #fff; border-top: 1px solid #e6ebef; }
+  .modal-footer .btn { width: 100%; }
+  .modal-footer .push { margin-right: 0; align-self: center; }
+  .footer-error { text-align: left; }
+  .window-callout { padding: 14px; gap: 4px 12px; }
+  .window-callout .wc-range { font-size: 20px; line-height: 28px; }
+  .wc-icon { grid-row: auto; width: 36px; height: 36px; }
+  .window-callout .wc-label { align-self: center; }
+  .window-callout .wc-range, .window-callout .wc-text { grid-column: 1 / -1; }
+  .help-card { flex-direction: column; gap: 10px; }
+  .later { padding: 8px 0; }
+  .tl-item { padding-left: 48px; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"/></symbol>
+  <symbol id="i-chev-left" viewBox="0 0 24 24"><path d="M10.828 12l4.95 4.95-1.414 1.414L8 12l6.364-6.364 1.414 1.414z"/></symbol>
+  <symbol id="i-chev-right" viewBox="0 0 24 24"><path d="M13.172 12l-4.95-4.95 1.414-1.414L16 12l-6.364 6.364-1.414-1.414z"/></symbol>
+  <symbol id="i-check-fill" viewBox="0 0 24 24"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-.997-6l7.07-7.071-1.414-1.414-5.656 5.657-2.829-2.829-1.414 1.414L11.003 16z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12.866 3l9.526 16.5a1 1 0 0 1-.866 1.5H2.474a1 1 0 0 1-.866-1.5L11.134 3a1 1 0 0 1 1.732 0zM11 16v2h2v-2h-2zm0-7v5h2V9h-2z"/></symbol>
+  <symbol id="i-error" viewBox="0 0 24 24"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zM11 11v6h2v-6h-2zm0-4v2h2V7h-2z"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M19 21H5a1 1 0 0 1-1-1v-9H1l10.327-9.388a1 1 0 0 1 1.346 0L23 11h-3v9a1 1 0 0 1-1 1zM6 19h12V9.157l-6-5.454-6 5.454V19z"/></symbol>
+  <symbol id="i-house-key" viewBox="0 0 24 24"><path d="M19 21H5a1 1 0 0 1-1-1v-9H1l10.327-9.388a1 1 0 0 1 1.346 0L23 11h-3v9a1 1 0 0 1-1 1zM6 19h12V9.157l-6-5.454-6 5.454V19zm6-4a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm-1 1h2v2h-2z"/></symbol>
+  <symbol id="i-tools" viewBox="0 0 24 24"><path d="M5.33 3.271a3.5 3.5 0 0 1 4.254 4.963l10.709 10.71-1.414 1.414-10.71-10.71a3.502 3.502 0 0 1-4.962-4.255L5.47 7.636a1.5 1.5 0 0 0 2.121-2.121L5.33 3.27zm10.367 1.884l3.182-1.768 1.414 1.414-1.768 3.182-1.768.354-2.12 2.121-1.415-1.414 2.121-2.121.354-1.768zm-6.718 8.132l1.414 1.414-5.303 5.303a1 1 0 0 1-1.492-1.327l.078-.087 5.303-5.303z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M4 22a8 8 0 1 1 16 0h-2a6 6 0 1 0-12 0H4zm8-9c-3.315 0-6-2.685-6-6s2.685-6 6-6 6 2.685 6 6-2.685 6-6 6zm0-2c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm1-8h4v2h-6V7h2v5z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M17 3h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4V1h2v2h6V1h2v2zm-2 2H9v2H7V5H4v4h16V5h-3v2h-2V5zm5 6H4v8h16v-8z"/></symbol>
+  <symbol id="i-calendar-check" viewBox="0 0 24 24"><path d="M9 1v2h6V1h2v2h4a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4V1h2zm11 9H4v9h16v-9zm-4.964 1.136l1.414 1.414-4.95 4.95-3.536-3.536L9.38 12.55l2.121 2.122 3.536-3.536zM7 5H4v3h16V5h-3v1h-2V5H9v1H7V5z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></symbol>
+  <symbol id="i-dashboard" viewBox="0 0 24 24"><path d="M13 21V11h8v10h-8zM3 13V3h8v10H3zm6-2V5H5v6h4zM3 21v-6h8v6H3zm2-2h4v-2H5v2zm10 0h4v-6h-4v6zM13 3h8v6h-8V3zm2 2v2h4V5h-4z"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><path d="M7 4V2h10v2h3.007c.548 0 .993.445.993.993v16.014a.994.994 0 0 1-.993.993H3.993A.994.994 0 0 1 3 21.007V4.993C3 4.445 3.445 4 3.993 4H7zm0 2H5v14h14V6h-2v2H7V6zm2-2v2h6V4H9z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M21 16.42v3.536a1 1 0 0 1-.93.998c-.437.03-.794.046-1.07.046-8.837 0-16-7.163-16-16 0-.276.015-.633.046-1.07A1 1 0 0 1 4.044 3H7.58a.5.5 0 0 1 .498.45c.023.23.044.413.064.552A13.901 13.901 0 0 0 9.35 8.003c.095.2.033.439-.147.567l-2.158 1.542a13.047 13.047 0 0 0 6.844 6.844l1.54-2.154a.462.462 0 0 1 .573-.149 13.901 13.901 0 0 0 4 1.205c.139.02.322.042.55.064a.5.5 0 0 1 .449.498z"/></symbol>
+  <symbol id="i-account" viewBox="0 0 24 24"><path d="M12 2c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2zM6.023 15.416C7.491 17.606 9.695 19 12.16 19c2.464 0 4.669-1.393 6.136-3.584A8.968 8.968 0 0 0 12.16 13a8.968 8.968 0 0 0-6.137 2.416zM12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M16.004 9.414l-8.607 8.607-1.414-1.414L14.589 8H7.004V6h11v11h-2V9.414z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M3 3h9.382a1 1 0 0 1 .894.553L14 5h6a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-6.382a1 1 0 0 1-.894-.553L12 16H5v6H3V3z"/></symbol>
+</svg>
+
+<div class="proto-bar" role="region" aria-label="Prototype controls">
+  <div class="pb-title">HomeHub onboarding<span class="pb-sub">Prototype · “today” is Mon, Oct 26, 2026</span></div>
+  <div class="pb-group pb-scenario" role="group" aria-label="Scenario">
+    <span class="pb-label">Scenario</span>
+    <div class="seg">
+      <button type="button" data-action="scenario" data-value="window">First-PM window</button>
+      <button type="button" data-action="scenario" data-value="standard">Normal availability</button>
+    </div>
+  </div>
+  <div class="pb-spacer"></div>
+  <button type="button" class="pb-switch" data-action="notes"><span class="track" aria-hidden="true"></span>Change notes</button>
+  <details class="pb-more" id="pb-more">
+    <summary>Controls</summary>
+    <div class="pb-panel">
+      <div class="pb-field pb-scenario-dup" role="group" aria-label="Scenario">
+        <span>Scenario</span>
+        <div class="seg">
+          <button type="button" data-action="scenario" data-value="window">First-PM window</button>
+          <button type="button" data-action="scenario" data-value="standard">Normal availability</button>
+        </div>
+      </div>
+      <p class="pb-help"><b>First-PM window:</b> demand in the member’s territory is over capacity, so their first checkup is pushed to a later window (Jan 4 – Feb 26, 2027 here). <b>Normal availability:</b> demand is under the threshold, so the flow matches today’s.</p>
+      <div class="pb-field" role="group" aria-label="Homes on the membership">
+        <span>Homes on the membership</span>
+        <div class="seg">
+          <button type="button" data-action="homes" data-value="1">1 home</button>
+          <button type="button" data-action="homes" data-value="2">2 homes</button>
+        </div>
+      </div>
+      <div class="pb-field pb-view" role="group" aria-label="Preview size">
+        <span>Preview size</span>
+        <div class="seg">
+          <button type="button" data-action="view" data-value="desktop">Desktop</button>
+          <button type="button" data-action="view" data-value="mobile">Mobile</button>
+        </div>
+      </div>
+      <label class="pb-field">
+        <span>Jump to screen</span>
+        <select id="jump" data-action="jump"></select>
+      </label>
+      <button type="button" class="pb-btn" data-action="restart">Restart from the beginning</button>
+    </div>
+  </details>
+</div>
+
+<div class="stage" id="stage">
+  <div class="app" id="app">
+    <div class="app-scroll" id="app-scroll">
+      <header class="site-header">
+        <a class="logo" href="#" data-action="nav" aria-label="PreFix HomeHub, Dashboard">
+          <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true" focusable="false"><circle cx="18" cy="18" r="18" fill="#1a8fe3"/><path d="M9.5 17.5 18 10l8.5 7.5V26a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1v-8.5Z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M15 27v-6.5M21 27v-6.5M15 23.5h6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+          <span class="logo-word"><b>PreFix<sup>™</sup></b><small>HOMEHUB</small></span>
+        </a>
+        <nav class="nav" aria-label="Main">
+          <a href="#" class="btn btn-yellow btn-sm" data-action="nav" style="height:auto;border-bottom:0;color:var(--navy)">Create Request</a>
+          <a href="#" aria-current="page" data-action="nav-dash"><svg class="ic" aria-hidden="true"><use href="#i-dashboard"/></svg>Dashboard</a>
+          <a href="#" data-action="nav"><svg class="ic" aria-hidden="true"><use href="#i-clipboard"/></svg>To-Dos</a>
+          <a href="#" data-action="nav"><svg class="ic" aria-hidden="true"><use href="#i-tools"/></svg>Service Requests</a>
+          <a href="#" data-action="nav"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>Appointments</a>
+          <a href="#" data-action="nav"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg>Contact Us<svg class="ic" aria-hidden="true"><use href="#i-external"/></svg></a>
+          <a href="#" data-action="nav"><svg class="ic" aria-hidden="true"><use href="#i-account"/></svg>Account</a>
+        </nav>
+        <a href="#" class="btn btn-yellow btn-sm btn-create-sm" data-action="nav">Create Request</a>
+        <button type="button" class="menu-btn" data-action="nav" aria-label="Menu"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg></button>
+      </header>
+      <main class="dash" id="dashboard"></main>
+      <footer class="site-footer">
+        <address><b>PreFix</b>611 S. Congress Ave.<br>Suite 505<br>Austin, TX 78704</address>
+        <button type="button" class="btn btn-outline-white" data-action="nav">New Service Visit</button>
+      </footer>
+    </div>
+
+    <div class="overlay" id="overlay" hidden>
+      <div class="modal" id="modal" role="dialog" aria-modal="true">
+        <button type="button" class="modal-close" data-action="close" data-fk="close" aria-label="Close setup"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
+        <div class="steps" id="steps">
+          <h2 class="step-title" id="step-title"></h2>
+          <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="4"><span></span></div>
+          <div class="progress-segs" id="progress-segs" aria-hidden="true"></div>
+        </div>
+        <div class="modal-body" id="modal-body" tabindex="0" role="region" aria-label="Step content"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+    <div class="toast-region" id="toast-region" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<aside class="notes" id="notes" aria-labelledby="notes-title" hidden></aside>
+
+<noscript><p style="position:fixed;top:60px;left:16px;right:16px;padding:16px;background:#fff3cd">This prototype needs JavaScript to run.</p></noscript>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Fixed prototype data ----------
+  const TODAY = new Date(2026, 9, 26);
+  const FIRST_PM_WINDOW = { start: new Date(2027, 0, 4), end: new Date(2027, 1, 26) };
+  const BOOKABLE_UNTIL = new Date(2026, 11, 31);
+  const HOME_MANAGER = 'Thomas Schmidt';
+  const MEMBER = 'John Doe';
+  const HOMES = {
+    main: { street: '2456 Main Street', city: 'Austin, TX 78704', pct: 0 },
+    sunset: { street: '812 Sunset Trail', city: 'Austin, TX 78703', pct: 50 },
+  };
+  const VISITS = {
+    he: { name: 'Home Enrollment', long: 'Home Enrollment (First visit)', icon: 'i-house-key', minutes: 60 },
+    pm: { name: 'Preventive Maintenance', long: 'Preventive Maintenance', icon: 'i-tools', minutes: 60 },
+  };
+  const SLOT_TIMES = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00'];
+  const SAMPLE = {
+    he: { date: '2026-11-02', time: '10:00' },
+    pmWindow: { date: '2027-02-13', time: '14:00' },
+    pmStandard: { date: '2026-11-05', time: '14:00' },
+  };
+  const INTRO_ART = 'data:image/webp;base64,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';
+
+  const FAQ_BASE = [
+    { k: 'home', q: 'Do I need to be home?', a: 'Only if your Home Manager needs physical access. If you provide digital entry codes or lockbox instructions in advance, you can completely skip it and go about your day.' },
+    { k: 'long', q: 'How long does it take?', a: 'About 60 minutes for most homes. Larger homes, or homes with more systems, can take a little longer.' },
+    { k: 'reach', q: 'What if an appliance or panel is hard to reach?', a: 'No problem. Your Home Manager will document what they can safely reach and note anything that needs to be opened up or moved later.' },
+    { k: 'problem', q: 'What happens if you find a problem during a checkup?', a: 'We’ll document it and add a recommendation to your HomeHub. Any repair is your call. Nothing is done without your OK.' },
+    { k: 'skip', q: 'Can I ask the Home Manager to skip certain tasks?', a: 'Yes. Just let your Home Manager know at the start of the visit.' },
+  ];
+  const FAQ_WINDOW = [
+    { k: 'why', q: 'Why is my first checkup a few months out?', a: 'When a lot of new members join at once, we book first checkups into the months when your Home Manager has the most open time. That way no one runs into a fully booked calendar, and every visit, including yours, happens on schedule. You still get both of your included checkups this membership year.' },
+    { k: 'sooner', q: 'Can I get help before my checkup?', a: 'Yes. Request service anytime from your HomeHub and your Home Manager will take care of it. Standalone tasks, like a water heater flush, can be booked at our standard hourly rate. You can also bring anything up during your Home Enrollment.' },
+    { k: 'later', q: 'What if I don’t book my checkup now?', a: 'That’s okay. We’ll email you a reminder, and you can book anytime from Appointments in your HomeHub.' },
+  ];
+
+  const NOTES = [
+    { n: 1, title: 'First checkup window', body: 'When demand in the territory is over capacity, a new member’s first Preventive Maintenance calendar only offers dates inside a later window (Jan 4 – Feb 26, 2027 here) and opens on that month. They can still lock in a time today.', src: 'Justin 11:07–11:09 · JC & Justin 11:24–11:25 · JC 11:30', jump: 'date:pm' },
+    { n: 2, title: 'Explain why, up front', body: 'Copy tells members their membership includes two checkups a year, why the first one is later, and that they still get both. It shows on the intro, the Preventive Maintenance details, the scheduling screen and in the FAQ.', src: 'Mark 11:10–11:11 · Phong 11:14', jump: 'info:pm' },
+    { n: 3, title: 'Get help before the checkup', body: 'Calls out that members can request service anytime, or book a standalone task like a water heater flush at the hourly rate. Repeated on the PM details, Confirmation, the final screen and the dashboard.', src: 'Mark 11:12–11:13 · Justin 11:30–11:31', jump: 'info:pm' },
+    { n: 4, title: 'Home Enrollment unchanged', body: 'Home Enrollment is still booked as soon as possible. One new checklist line: the Home Manager can talk through anything the member wants done before the checkup.', src: 'Mark & Justin 11:09–11:10 · Mark 11:31–11:32', jump: 'info:he' },
+    { n: 5, title: 'Closing summary with both dates', body: 'The final screen lays out what happens next on a timeline (today, Home Enrollment, first checkup) and repeats that nothing stops them from requesting service in the meantime.', src: 'Mark 11:31–11:32', jump: 'done' },
+    { n: 6, title: 'Book the checkup later', body: 'Members can skip booking the checkup for now. They get reminder emails and can book anytime from Appointments. The call described this as what happens today if a member leaves the flow; the explicit option is my addition.', src: 'JC 11:25–11:26 · Mark, Justin & JC 11:33–11:34', jump: 'later' },
+    { n: 7, title: 'Normal availability = today’s flow', body: 'If demand is under the threshold, the member sees today’s flow with near-term dates. Use the Scenario switch in the bar to compare. Markers 1–6 only show in the First-PM window scenario.', src: 'Justin 11:26', jump: null },
+  ];
+
+  const JUMPS = [
+    ['intro', 'Introduction'],
+    ['home', 'Select a home (2 homes)'],
+    ['info:he', 'Home Enrollment · details'],
+    ['date:he', 'Home Enrollment · pick a date'],
+    ['time:he', 'Home Enrollment · pick a time'],
+    ['confirm:he', 'Home Enrollment · confirm'],
+    ['info:pm', 'Preventive Maintenance · details'],
+    ['date:pm', 'Preventive Maintenance · pick a date'],
+    ['time:pm', 'Preventive Maintenance · pick a time'],
+    ['confirm:pm', 'Preventive Maintenance · confirm'],
+    ['later', 'Book checkup later (window only)'],
+    ['review', 'Confirmation'],
+    ['resched', 'Reschedule from Confirmation'],
+    ['done', 'You’re all set'],
+    ['dash-after', 'Dashboard after setup'],
+    ['dash-before', 'Dashboard, setup not finished'],
+  ];
+
+  // ---------- State ----------
+  const freshFlow = () => ({
+    screen: 'intro', mode: 'flow', homeId: 'main',
+    he: { date: null, time: null },
+    pm: { date: null, time: null, later: false },
+    ack: { he: false, pm: false },
+    draft: { date: null, time: null },
+    calMonth: null, faq: { 'he-home': true, 'pm-home': true },
+    errors: {}, completed: false, started: false,
+  });
+  const state = Object.assign(freshFlow(), { scenario: 'window', multi: false, view: 'desktop', notes: false, modalOpen: true });
+
+  // ---------- DOM ----------
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const stage = $('#stage');
+  const appScroll = $('#app-scroll');
+  const overlay = $('#overlay');
+  const modal = $('#modal');
+  const stepsEl = $('#steps');
+  const stepTitle = $('#step-title');
+  const progress = $('#progress');
+  const progressSegs = $('#progress-segs');
+  const modalBody = $('#modal-body');
+  const modalFooter = $('#modal-footer');
+  const dashboard = $('#dashboard');
+  const notesEl = $('#notes');
+  const toastRegion = $('#toast-region');
+  const jumpSelect = $('#jump');
+
+  // ---------- Helpers ----------
+  const ic = (id, cls = '') => `<svg class="ic ${cls}" aria-hidden="true" focusable="false"><use href="#${id}"/></svg>`;
+  const pad = (n) => String(n).padStart(2, '0');
+  const keyOf = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const parse = (k) => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+  const monthIdx = (d) => d.getFullYear() * 12 + d.getMonth();
+  const monthStart = (d) => new Date(d.getFullYear(), d.getMonth(), 1);
+  const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  const fmt = (d, o) => d.toLocaleDateString('en-US', o);
+  const fmtFull = (d) => fmt(d, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const fmtMed = (d) => fmt(d, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  const fmtMD = (d) => fmt(d, { month: 'short', day: 'numeric' });
+  const fmtMonth = (d) => fmt(d, { month: 'long', year: 'numeric' });
+  function fmtTime(t) {
+    const [h, m] = t.split(':').map(Number);
+    return `${((h + 11) % 12) + 1}:${pad(m)} ${h >= 12 ? 'PM' : 'AM'}`;
+  }
+  function fmtRange(t, minutes = 60) {
+    const [h, m] = t.split(':').map(Number);
+    const end = h * 60 + m + minutes;
+    const a = fmtTime(t), b = fmtTime(`${pad(Math.floor(end / 60))}:${pad(end % 60)}`);
+    return a.slice(-2) === b.slice(-2) ? `${a.slice(0, -3)} – ${b}` : `${a} – ${b}`;
+  }
+  const isWindow = () => state.scenario === 'window';
+  const home = () => HOMES[state.homeId];
+  const windowRange = `${fmtMD(FIRST_PM_WINDOW.start)} – ${fmtMD(FIRST_PM_WINDOW.end)}, ${FIRST_PM_WINDOW.end.getFullYear()}`;
+  const windowMonths = `${fmt(FIRST_PM_WINDOW.start, { month: 'long' })} – ${fmt(FIRST_PM_WINDOW.end, { month: 'long' })} ${FIRST_PM_WINDOW.end.getFullYear()}`;
+  const noteAttr = (n) => (isWindow() ? ` data-note="${n}"` : '');
+  const visitWhen = (v) => `${fmtMed(parse(state[v].date))}, ${fmtRange(state[v].time, VISITS[v].minutes)}`;
+
+  // ---------- Availability (fake, deterministic) ----------
+  function bookableRange(visit) {
+    if (visit === 'pm' && isWindow()) return { min: FIRST_PM_WINDOW.start, max: FIRST_PM_WINDOW.end };
+    return { min: addDays(TODAY, 2), max: BOOKABLE_UNTIL };
+  }
+  const fullyBooked = (d) => (d.getDate() * 37 + (d.getMonth() + 1) * 101 + d.getFullYear()) % 9 === 0;
+  function dayStatus(visit, d) {
+    const k = keyOf(d);
+    const other = visit === 'he' ? 'pm' : 'he';
+    if (state[other].date === k) return 'sched';
+    if (state[visit].date === k) return 'current';
+    const r = bookableRange(visit);
+    if (d < r.min || d > r.max || d.getDay() === 0 || fullyBooked(d)) return 'unavail';
+    return 'avail';
+  }
+  const slotsFor = (d) => SLOT_TIMES.filter((t, i) => (d.getDate() * 3 + i * 7 + d.getMonth()) % 5 !== 0);
+
+  // ---------- Flow map ----------
+  function sectionOf(screen) {
+    if (screen === 'intro' || screen === 'home') return 0;
+    if (screen.endsWith(':he')) return 1;
+    if (screen.endsWith(':pm') || screen === 'later') return 2;
+    if (screen === 'review') return 3;
+    return -1;
+  }
+  const SECTION_TITLES = ['Introduction', 'Home Enrollment', 'Preventive Maintenance', 'Confirmation'];
+  function sectionFraction(screen) {
+    if (screen === 'intro') return state.multi ? 0.5 : 1;
+    const part = screen.split(':')[0];
+    return { info: 0.25, date: 0.5, time: 0.75 }[part] ?? 1;
+  }
+
+  function goto(screen) {
+    state.screen = screen;
+    state.errors = {};
+    state.started = true;
+    render({ newScreen: true });
+  }
+  function startDate(visit, mode) {
+    state.mode = mode;
+    state.draft = { date: null, time: null };
+    const r = bookableRange(visit);
+    const cur = state[visit].date ? parse(state[visit].date) : null;
+    // Today's flow: the checkup calendar opens on the Home Enrollment month, as in Figma
+    const heDate = visit === 'pm' && !isWindow() && state.he.date ? parse(state.he.date) : null;
+    const anchor = heDate && heDate > r.min ? heDate : r.min;
+    state.calMonth = monthStart(cur && cur >= r.min && cur <= r.max ? cur : anchor);
+    goto(`date:${visit}`);
+  }
+  function commit(visit) {
+    state[visit].date = state.draft.date;
+    state[visit].time = state.draft.time;
+    if (visit === 'pm') state.pm.later = false;
+  }
+  function fail(key, focusSel) {
+    state.errors = { [key]: true };
+    render();
+    const el = focusSel && $(focusSel, modal);
+    if (el) el.focus();
+  }
+
+  function next() {
+    const s = state.screen;
+    const visit = s.split(':')[1];
+    switch (s.split(':')[0]) {
+      case 'intro': return goto(state.multi ? 'home' : 'info:he');
+      case 'home': return goto('info:he');
+      case 'info':
+        if (!state.ack[visit]) return fail('ack', '[data-fk="ack"]');
+        return startDate(visit, 'flow');
+      case 'date':
+        if (!state.draft.date) return fail('date', '.cal-grid .day[tabindex="0"]');
+        return goto(`time:${visit}`);
+      case 'time':
+        if (!state.draft.time) return fail('time', '.slot input');
+        commit(visit);
+        return goto(`confirm:${visit}`);
+      case 'confirm':
+        if (state.mode === 'resched' || visit === 'pm') { state.mode = 'flow'; return goto('review'); }
+        return goto(state.pm.date || state.pm.later ? 'review' : 'info:pm');
+      case 'later': return goto('review');
+      case 'review': state.completed = true; return goto('done');
+      case 'done': return closeModal();
+    }
+  }
+  function back() {
+    const s = state.screen;
+    const visit = s.split(':')[1];
+    switch (s.split(':')[0]) {
+      case 'home': return goto('intro');
+      case 'info': return goto(visit === 'he' ? (state.multi ? 'home' : 'intro') : 'confirm:he');
+      case 'date':
+        if (state.mode === 'resched') { state.mode = 'flow'; return goto('review'); }
+        return goto(state[visit].date ? `confirm:${visit}` : `info:${visit}`);
+      case 'time': return goto(`date:${visit}`);
+      case 'later': return startDate('pm', 'flow');
+    }
+  }
+
+  // ---------- Rendering: modal screens ----------
+  const btn = (label, action, kind = 'primary', opts = {}) =>
+    `<button type="button" class="btn btn-${kind}${opts.cls ? ' ' + opts.cls : ''}" data-action="${action}" data-fk="f-${action}"${opts.attrs || ''}>${label}${opts.arrow ? ic('i-arrow-right') : ''}</button>`;
+  const errorMsg = (text, id) => `<p class="field-error" id="${id}" role="alert">${ic('i-error')}${text}</p>`;
+
+  function titleTag(text, id = 'screen-title') {
+    const level = stepsEl.hidden ? 'h2' : 'h3';
+    return `<${level} class="screen-title" id="${id}" tabindex="-1">${text}</${level}>`;
+  }
+
+  function screenIntro() {
+    const pmLine = isWindow()
+      ? `<li${noteAttr('1·2')}><b>Preventive Maintenance, twice a year:</b> full checkups to catch small issues early. Your first one is in <b>${windowMonths}</b>.</li>`
+      : `<li><b>Preventive Maintenance</b> your first checkup to catch small issues early.</li>`;
+    return {
+      body: `<div class="panel panel-flush">
+        <img class="intro-art" src="${INTRO_ART}" alt="" width="772" height="207">
+        <div class="intro-body copy">
+          ${titleTag('Your Home’s Care Starts Here')}
+          <p>Welcome to PreFix. You get one Primary Home Manager who looks after your home and handles repairs: one call, text, or email and done.</p>
+          ${isWindow() ? `<p>Your membership includes:</p>` : `<p>Two visits get you started, both included:</p>`}
+          <ul>
+            <li><b>Home Enrollment</b> so we get to know your home.${isWindow() ? ' You can book it for as soon as this week.' : ''}</li>
+            ${pmLine}
+          </ul>
+          ${isWindow() ? `<div class="inline-help"${noteAttr(3)}>${ic('i-tools')}<p><b>Need a repair before then?</b> You don’t have to wait for your checkup. Request service anytime.</p></div>` : ''}
+          <p>Next, you’ll see what each covers and pick your times.</p>
+        </div>
+      </div>`,
+      footer: btn('Continue', 'next', 'primary', { arrow: true }),
+    };
+  }
+
+  function screenHome() {
+    const opt = (id) => {
+      const h = HOMES[id];
+      return `<label class="home-opt">
+        <input type="radio" name="home" value="${id}" data-action="home" data-fk="home-${id}" ${state.homeId === id ? 'checked' : ''}>
+        <span class="ho-body">
+          <span class="ho-top"><span class="ho-street">${h.street}</span><span class="badge-yellow">Enrollment needed</span></span>
+          <span class="ho-city">${h.city}</span>
+          <span class="ho-bar" aria-hidden="true"><i style="width:${h.pct}%"></i></span>
+          <span class="ho-pct">${h.pct}% complete</span>
+        </span>
+      </label>`;
+    };
+    return {
+      body: `<div class="panel">
+        ${titleTag('Choose which property you would like to schedule for.')}
+        <fieldset class="homes" aria-labelledby="screen-title">${opt('main')}${opt('sunset')}</fieldset>
+      </div>`,
+      footer: btn('Continue', 'next', 'primary', { arrow: true }),
+    };
+  }
+
+  function faqList(prefix, items) {
+    return `<div class="faq">${items.map((f) => {
+      const id = `${prefix}-${f.k}`;
+      const open = !!state.faq[id];
+      return `<div class="faq-item"${f.isNew ? noteAttr(2) : ''}>
+        <h4><button type="button" class="faq-q" data-action="faq" data-id="${id}" data-fk="faq-${id}" aria-expanded="${open}" aria-controls="faq-a-${id}">
+          <span>${f.q}${f.isNew && isWindow() ? '<span class="faq-new">New</span>' : ''}</span>${ic(open ? 'i-minus' : 'i-plus')}
+        </button></h4>
+        <div class="faq-a" id="faq-a-${id}"${open ? '' : ' hidden'}><p>${f.a}</p></div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  function ackBlock(visit) {
+    const err = state.errors.ack;
+    return `<label class="ack">
+        <input type="checkbox" data-action="ack" data-fk="ack" ${state.ack[visit] ? 'checked' : ''}${err ? ' aria-invalid="true" aria-describedby="ack-err"' : ''}>
+        <span>I have read and understood the scope and expectations of this visit.</span>
+      </label>${err ? errorMsg('Please confirm you’ve read the visit details to continue.', 'ack-err') : ''}`;
+  }
+
+  function screenInfoHE() {
+    const items = ['Walk through your home with you', 'Document your major systems and their condition', 'Note anything that needs attention', 'Build your starter to-do list'];
+    return {
+      body: `<div class="panel">
+        <div class="info-head">
+          <span class="info-icon he">${ic('i-house-key')}</span>
+          <h3 class="info-title screen-title" id="screen-title" tabindex="-1" style="margin:0">Home Enrollment · Included</h3>
+          <span class="badge-blue">Free for member</span>
+        </div>
+        <div class="copy">
+          <p>Your Home Manager comes to your home to get to know it in person: your major systems, where the shut-offs are, and anything that needs attention. It’s the foundation for everything PreFix does to protect your home.</p>
+          <p class="subhead">Why it matters:</p>
+          <p>Every home is different. Once we know yours, future service is faster and we can catch small problems before they turn into expensive ones. No starting from scratch each visit.</p>
+          <p class="subhead">What to expect:</p>
+          <p>This first visit is about learning your home, not fixing it. Nothing to prep, nothing to clean up.</p>
+        </div>
+        <div class="warn">${ic('i-alert')}<span><b>Important:</b> This is a diagnostic cataloging visit. No repairs will be made.</span></div>
+        <p class="subhead">Your Home Manager will:</p>
+        <ul class="checklist">
+          ${items.map((t) => `<li>${ic('i-check-fill')}<span>${t}</span></li>`).join('')}
+          ${isWindow() ? `<li${noteAttr(4)}>${ic('i-check-fill')}<span>Talk through anything you’d like done before your first checkup</span></li>` : ''}
+        </ul>
+        <hr class="rule">
+        <h4 class="faq-title">A Few Things to Know</h4>
+        <p style="margin:0;font-size:14px">Quick answers to the questions most homeowners ask before their first visit.</p>
+        ${faqList('he', FAQ_BASE)}
+        ${ackBlock('he')}
+      </div>`,
+      footer: btn('Back', 'back', 'secondary') + btn('Continue', 'next', 'primary', { arrow: true }),
+    };
+  }
+
+  function screenInfoPM() {
+    const items = ['Inspect your HVAC, water heater, and plumbing for leaks, wear, and drainage issues', 'Replace your HVAC and refrigerator filters', 'Test your smoke and carbon monoxide detectors', 'Add Recommendations to your HomeHub for anything that needs attention', 'Capture any work you’d like done so it can be scheduled'];
+    const faqs = isWindow() ? [...FAQ_WINDOW.map((f) => ({ ...f, isNew: true })), ...FAQ_BASE] : FAQ_BASE;
+    return {
+      body: `<div class="panel">
+        <div class="info-head">
+          <span class="info-icon pm">${ic('i-tools')}</span>
+          <h3 class="info-title screen-title" id="screen-title" tabindex="-1" style="margin:0">Preventive Maintenance</h3>
+          <span class="badge-blue">Included in membership</span>
+        </div>
+        <div class="copy">
+          <p>Twice a year, your Home Manager gives your home a full checkup. We inspect and maintain your primary systems, plumbing and appliances to keep them running and catch problems early.</p>
+        </div>
+        ${isWindow() ? `<section class="window-callout"${noteAttr('1·2')} aria-labelledby="wc-label">
+          <span class="wc-icon">${ic('i-calendar-check')}</span>
+          <p class="wc-label" id="wc-label">Your first checkup window</p>
+          <p class="wc-range">${windowRange}</p>
+          <p class="wc-text">We book new members’ first checkups when your Home Manager has the most open time, so every visit stays on schedule, including yours. Pick your time today and we’ll remind you before the visit. You still get both checkups this membership year.</p>
+        </section>` : ''}
+        <div class="copy">
+          <p class="subhead">Why it matters:</p>
+          <p>This visit is how we help protect your home. We look for small issues, a corroding valve, a clogged drain line, a worn part, so they can be addressed before they become expensive emergencies. Staying ahead of problems is how you avoid surprise breakdowns and help your systems last longer.</p>
+        </div>
+        <div class="callout-info">${ic('i-info')}<span>Your visit and maintenance are included. Any repair is your call, no surprises.</span></div>
+        <p class="subhead">During this visit, your Home Manager will:</p>
+        <ul class="checklist">${items.map((t) => `<li>${ic('i-check-fill')}<span>${t}</span></li>`).join('')}</ul>
+        ${isWindow() ? `<section class="help-card"${noteAttr(3)} aria-labelledby="hc-title">
+          <span class="hc-icon">${ic('i-tools')}</span>
+          <div>
+            <h4 id="hc-title">Need something done before your checkup?</h4>
+            <p>You don’t have to wait. Request service anytime, or book a standalone task like a water heater flush at our standard hourly rate. You can also bring it up during your Home Enrollment.</p>
+            ${btn('Create a Service Request', 'sr', 'secondary', { cls: 'btn-sm' })}
+          </div>
+        </section>` : ''}
+        <hr class="rule">
+        <h4 class="faq-title">A Few Things to Know</h4>
+        <p style="margin:0;font-size:14px">Quick answers to the questions most homeowners ask before their first visit.</p>
+        ${faqList('pm', faqs)}
+        ${ackBlock('pm')}
+      </div>`,
+      footer: btn('Back', 'back', 'secondary') + btn('Continue', 'next', 'primary', { arrow: true }),
+    };
+  }
+
+  function serviceSummary(visit) {
+    const row = (icon, label, val) => `<div class="svc-row"><dt>${ic(icon)}<span>${label}:</span></dt><dd>${val}</dd></div>`;
+    return `<dl class="svc">
+      ${row('i-tools', 'Service Visit', VISITS[visit].long)}
+      ${row('i-user', 'Home Manager', HOME_MANAGER)}
+      ${row('i-home', 'Address', home().street)}
+      ${row('i-clock', 'Service Duration', `${VISITS[visit].minutes} min`)}
+    </dl>`;
+  }
+  function sideBoxes(visit) {
+    let out = '';
+    if (state[visit].date) {
+      out += `<div class="box-dashed">${ic('i-info')}<div><p class="bx-label">Current Scheduled Time</p><p class="bx-val">${fmtMed(parse(state[visit].date))} · ${fmtTime(state[visit].time)}</p></div></div>`;
+    }
+    if (visit === 'pm' && isWindow()) {
+      out += `<div class="box-window"${noteAttr(1)}>${ic('i-calendar-check')}<div>
+        <p class="bx-label">Your first checkup window</p><p class="bx-val">${windowRange}</p>
+        <p class="bx-help">Only dates in your window are shown. Need something sooner? You can request service anytime.</p>
+      </div></div>`;
+    }
+    const other = visit === 'he' ? 'pm' : 'he';
+    if (state[other].date) {
+      out += `<div class="box-grey"><p class="bx-label">${VISITS[other].name} Scheduled:</p><p class="bx-val">${fmtMed(parse(state[other].date))} · ${fmtTime(state[other].time)}</p></div>`;
+    }
+    return out;
+  }
+
+  function calendar(visit) {
+    const m = state.calMonth;
+    const r = bookableRange(visit);
+    const prevOk = monthIdx(m) > monthIdx(r.min) && monthIdx(m) > monthIdx(TODAY);
+    const nextOk = monthIdx(m) < monthIdx(r.max);
+    const days = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
+    const lead = m.getDay();
+    const draftKey = state.draft.date;
+    const all = Array.from({ length: days }, (_, i) => new Date(m.getFullYear(), m.getMonth(), i + 1));
+    const focusKey = (draftKey && all.some((d) => keyOf(d) === draftKey)) ? draftKey
+      : keyOf(all.find((d) => dayStatus(visit, d) === 'avail') || all[0]);
+    const statusText = { avail: 'available', unavail: 'not available', sched: `your ${VISITS[visit === 'he' ? 'pm' : 'he'].name}`, current: 'your current appointment' };
+    const cells = [];
+    for (let i = 0; i < lead; i++) cells.push('<td role="gridcell"></td>');
+    all.forEach((d) => {
+      const k = keyOf(d);
+      const st = dayStatus(visit, d);
+      const sel = k === draftKey;
+      const cls = ['day', st === 'avail' ? 'avail' : '', st === 'sched' || st === 'current' ? 'is-sched' : '', keyOf(TODAY) === k ? 'today' : '', sel ? 'sel' : ''].join(' ');
+      const label = `${fmtFull(d)}, ${statusText[st]}${keyOf(TODAY) === k ? ', today' : ''}`;
+      cells.push(`<td role="gridcell"><button type="button" class="${cls}" data-action="day" data-date="${k}" data-fk="day-${k}" tabindex="${k === focusKey ? 0 : -1}" aria-label="${label}" aria-pressed="${sel}"${st === 'avail' ? '' : ' aria-disabled="true"'}${keyOf(TODAY) === k ? ' aria-current="date"' : ''}>${d.getDate()}</button></td>`);
+    });
+    while (cells.length % 7) cells.push('<td role="gridcell"></td>');
+    const rows = [];
+    for (let i = 0; i < cells.length; i += 7) rows.push(`<tr>${cells.slice(i, i + 7).join('')}</tr>`);
+    const wd = [['S', 'Sunday'], ['M', 'Monday'], ['T', 'Tuesday'], ['W', 'Wednesday'], ['T', 'Thursday'], ['F', 'Friday'], ['S', 'Saturday']];
+    return `<div class="cal"${visit === 'pm' ? noteAttr(1) : ''}>
+      <div class="cal-head">
+        <button type="button" class="icon-btn" data-action="cal-prev" data-fk="cal-prev" aria-label="Previous month"${prevOk ? '' : ' disabled'}>${ic('i-chev-left')}</button>
+        <p class="cal-month" id="cal-label" aria-live="polite">${fmtMonth(m)}</p>
+        <button type="button" class="icon-btn" data-action="cal-next" data-fk="cal-next" aria-label="Next month"${nextOk ? '' : ' disabled'}>${ic('i-chev-right')}</button>
+      </div>
+      <table class="cal-grid" role="grid" aria-labelledby="cal-label">
+        <thead><tr>${wd.map(([s, l]) => `<th scope="col" abbr="${l}">${s}</th>`).join('')}</tr></thead>
+        <tbody>${rows.join('')}</tbody>
+      </table>
+      <ul class="legend" aria-label="Legend">
+        <li><span class="sw sw-today"></span>Today</li>
+        <li><span class="sw sw-avail"></span>Available slots</li>
+        <li><span class="sw sw-sel"></span>Selected</li>
+        <li><span class="sw sw-sched"></span>Scheduled</li>
+      </ul>
+    </div>`;
+  }
+
+  function screenDate(visit) {
+    const showLater = visit === 'pm' && isWindow() && !state.pm.date;
+    return {
+      body: `<div class="panel">
+        ${titleTag(state[visit].date ? 'Reschedule Appointment' : 'Schedule Appointment')}
+        <div class="sched">
+          <div class="sched-side">${serviceSummary(visit)}${sideBoxes(visit)}</div>
+          <div class="sched-main">
+            <p class="sched-step">1. Select the date</p>
+            ${calendar(visit)}
+            ${state.errors.date ? errorMsg('Select a date to see available times.', 'date-err') : ''}
+          </div>
+        </div>
+      </div>`,
+      footer: (showLater ? `<button type="button" class="btn-link push" data-action="later" data-fk="f-later"${noteAttr(6)}>I’ll book my checkup later</button>` : '')
+        + btn('Back', 'back', 'secondary') + btn('View Times', 'next', 'primary', { arrow: true }),
+    };
+  }
+
+  function screenTime(visit) {
+    const d = parse(state.draft.date);
+    const err = state.errors.time;
+    return {
+      body: `<div class="panel">
+        ${titleTag(state[visit].date ? 'Reschedule Appointment' : 'Schedule Appointment')}
+        <div class="sched">
+          <div class="sched-side">${serviceSummary(visit)}${sideBoxes(visit)}</div>
+          <div class="sched-main">
+            <p class="sched-step" id="time-label">2. What time works best?</p>
+            <div class="date-card"><p class="dc-day">${fmt(d, { weekday: 'long' })}</p><p class="dc-date">${fmt(d, { month: 'long', day: 'numeric', year: 'numeric' })}</p></div>
+            <fieldset class="slots"${err ? ' aria-describedby="time-err"' : ''}>
+              <legend class="sr-only">Start times on ${fmtFull(d)}</legend>
+              ${slotsFor(d).map((t) => `<label class="slot"><input type="radio" name="slot" value="${t}" data-action="slot" data-fk="slot-${t}" ${state.draft.time === t ? 'checked' : ''}><span>${fmtTime(t)}</span>${ic('i-check')}</label>`).join('')}
+            </fieldset>
+            ${err ? errorMsg('Choose a time to continue.', 'time-err') : ''}
+          </div>
+        </div>
+      </div>`,
+      footer: btn('Back', 'back', 'secondary') + btn('Schedule Appointment', 'next', 'primary', { arrow: true }),
+    };
+  }
+
+  function visitCard(visit, opts = {}) {
+    const v = VISITS[visit];
+    const hl = stepsEl.hidden ? 'h3' : 'h4';
+    const head = `<div class="vc-head"><span class="vc-icon ${visit}">${ic(v.icon)}</span><div><p class="vc-eyebrow">Service Visit</p><${hl} class="vc-title" id="vc-${visit}">${v.long}</${hl}></div></div>`;
+    if (visit === 'pm' && state.pm.later) {
+      return `<article class="vcard" aria-labelledby="vc-pm"${noteAttr(6)}>${head}
+        <p class="vc-pending"><b>Not booked yet.</b> Your first checkup window is ${windowRange}. We’ll email you a reminder.</p>
+        ${btn('Book Now', 'book-pm', 'primary', { cls: 'btn-block' })}
+      </article>`;
+    }
+    const row = (icon, label, val) => `<div class="vc-row"><dt>${ic(icon)}${label}:</dt><dd>${val}</dd></div>`;
+    return `<article class="vcard" aria-labelledby="vc-${visit}">${head}
+      ${visit === 'pm' && isWindow() ? `<span class="vc-tag"${noteAttr(1)}>First checkup · in your ${fmt(FIRST_PM_WINDOW.start, { month: 'short' })}–${fmt(FIRST_PM_WINDOW.end, { month: 'short' })} window</span>` : ''}
+      <dl class="vc-rows">
+        ${row('i-home', 'Address', home().street)}
+        ${row('i-user', 'Home Manager', HOME_MANAGER)}
+        ${row('i-clock', 'Service Duration', `${v.minutes} min`)}
+        ${row('i-calendar', 'Day & Time', visitWhen(visit))}
+      </dl>
+      ${opts.reschedule ? `<button type="button" class="btn btn-secondary btn-block" data-action="resched" data-visit="${visit}" data-fk="resched-${visit}" aria-label="Reschedule ${v.name}">Reschedule</button>` : ''}
+    </article>`;
+  }
+
+  function screenConfirm(visit) {
+    let primary;
+    if (state.mode === 'resched') primary = btn('Confirm New Time', 'next', 'primary', { arrow: true });
+    else if (visit === 'he' && !(state.pm.date || state.pm.later)) primary = btn('Continue to Preventive Maintenance', 'next', 'primary', { arrow: true });
+    else primary = btn('Continue', 'next', 'primary', { arrow: true });
+    return {
+      body: `<div class="panel">${titleTag('Confirm Appointment')}<div class="confirm-wrap">${visitCard(visit)}</div></div>`,
+      footer: btn('Reschedule', 'resched-here', 'secondary') + primary,
+    };
+  }
+
+  function screenLater() {
+    return {
+      body: `<div class="panel"><div class="later"${noteAttr(6)}>
+        <span class="big-icon">${ic('i-calendar-check')}</span>
+        ${titleTag('No problem. You can book your checkup later.')}
+        <p>Your first checkup window is <b>${windowRange}</b>. We’ll email you a reminder, and you can book anytime from <b>Appointments</b> in your HomeHub.</p>
+        <div class="note-strip"${noteAttr(3)}>${ic('i-tools')}<p><b>You don’t need to wait for your checkup to get help.</b> Request service anytime.</p></div>
+      </div></div>`,
+      footer: btn('Book Now Instead', 'back', 'secondary') + btn('Continue', 'next', 'primary', { arrow: true }),
+    };
+  }
+
+  function screenReview() {
+    const until = state.pm.date && !state.pm.later ? fmtMD(parse(state.pm.date)) : 'your checkup';
+    return {
+      body: `<h3 class="sr-only" id="screen-title" tabindex="-1">Review your visits</h3>
+        <div class="review-grid">${visitCard('he', { reschedule: true })}${visitCard('pm', { reschedule: true })}</div>
+        ${isWindow() ? `<div class="note-strip"${noteAttr(3)}>${ic('i-info')}<p><b>Need something before ${until}?</b> You can request service anytime. No need to wait for your checkup.</p></div>` : ''}`,
+      footer: btn('Submit', 'next', 'primary', { arrow: true }),
+    };
+  }
+
+  function screenDone() {
+    const pmLater = state.pm.later;
+    const sub = pmLater
+      ? 'Your membership is active and your Home Enrollment is booked. We’ll remind you to book your first checkup.'
+      : 'Your membership is active and your first two visits are booked.<br>This is where PreFix starts taking care of your home.';
+    let content;
+    if (isWindow()) {
+      const h = home();
+      content = `<h3 class="tl-heading">What happens next</h3>
+        <ol class="timeline"${noteAttr(5)}>
+          <li class="tl-item"><span class="tl-dot now">${ic('i-check')}</span>
+            <p class="tl-when">Today · ${fmt(TODAY, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+            <p class="tl-what">Membership active</p>
+            <p class="tl-text">Have a repair or project in mind? Request service anytime. You don’t need to wait for your checkup.</p></li>
+          <li class="tl-item"><span class="tl-dot he">${ic('i-house-key')}</span>
+            <p class="tl-when">${visitWhen('he')}</p>
+            <p class="tl-what">Home Enrollment</p>
+            <p class="tl-text">${HOME_MANAGER} gets to know your home at ${h.street}. Bring up anything you’d like done before your checkup.</p></li>
+          ${pmLater
+            ? `<li class="tl-item"><span class="tl-dot pending">${ic('i-calendar')}</span>
+                <p class="tl-when">Window: ${windowRange}</p>
+                <p class="tl-what">Preventive Maintenance · not booked yet</p>
+                <p class="tl-text">We’ll email you a reminder. You can book anytime from Appointments.</p>
+                ${btn('Book Now', 'book-pm', 'secondary', { cls: 'btn-sm' })}</li>`
+            : `<li class="tl-item"><span class="tl-dot pm">${ic('i-tools')}</span>
+                <p class="tl-when">${visitWhen('pm')}</p>
+                <p class="tl-what">Preventive Maintenance · first checkup</p>
+                <p class="tl-text">Your first full checkup. Your second included checkup comes later in your membership year.</p></li>`}
+        </ol>`;
+    } else {
+      content = `<div class="done-cards">${visitCard('he')}${visitCard('pm')}</div>`;
+    }
+    return {
+      body: `<div class="done">
+        <span class="big-icon">${ic('i-check-fill')}</span>
+        ${titleTag('You’re All Set!')}
+        <p class="done-sub">${sub}</p>
+        ${content}
+      </div>`,
+      footer: (isWindow() ? btn('Create a Service Request', 'sr', 'secondary', { attrs: noteAttr(3) }) : '') + btn('Go to Dashboard', 'next', 'primary', { arrow: true }),
+    };
+  }
+
+  function screenView() {
+    const [kind, visit] = state.screen.split(':');
+    switch (kind) {
+      case 'intro': return screenIntro();
+      case 'home': return screenHome();
+      case 'info': return visit === 'he' ? screenInfoHE() : screenInfoPM();
+      case 'date': return screenDate(visit);
+      case 'time': return screenTime(visit);
+      case 'confirm': return screenConfirm(visit);
+      case 'later': return screenLater();
+      case 'review': return screenReview();
+      case 'done': return screenDone();
+    }
+  }
+
+  // ---------- Rendering: dashboard ----------
+  function renderDashboard() {
+    const w = isWindow();
+    const h = home();
+    let status;
+    if (!state.completed) {
+      status = `<section class="banner" aria-labelledby="enroll-h">
+        ${ic('i-info')}
+        <div>
+          <h2 id="enroll-h">Schedule your <b>Enrollment Visit</b></h2>
+          <p>It is important to schedule your Home Enrollment as soon as possible so ${w ? 'we can get to know your home before your first checkup' : 'you can start receiving your Preventive Maintenance'}.</p>
+          <hr>
+          <p class="addr">${ic('i-home')}${h.street} (${MEMBER})</p>
+          <button type="button" class="btn btn-yellow" data-action="open-flow">${state.started ? 'Continue Setup' : 'Schedule'}</button>
+        </div>
+      </section>`;
+    } else {
+      const pmItem = state.pm.later
+        ? `<li${noteAttr(6)}><span class="vc-icon pm">${ic('i-tools')}</span><div>
+            <p class="u-name">Book your first checkup</p>
+            <p class="u-meta">Preventive Maintenance · window ${windowRange}</p>
+            ${btn('Schedule', 'book-pm', 'primary', { cls: 'btn-sm' })}</div></li>`
+        : `<li><span class="vc-icon pm">${ic('i-tools')}</span><div>
+            <p class="u-name">Preventive Maintenance</p><p class="u-when">${visitWhen('pm')}</p>
+            <p class="u-meta">${HOME_MANAGER} · ${h.street}</p></div></li>`;
+      status = `<section class="card upcoming" aria-labelledby="up-h">
+        <h2 id="up-h">Your upcoming visits</h2>
+        <ul>
+          <li><span class="vc-icon he">${ic('i-house-key')}</span><div>
+            <p class="u-name">Home Enrollment</p><p class="u-when">${visitWhen('he')}</p>
+            <p class="u-meta">${HOME_MANAGER} · ${h.street}</p></div></li>
+          ${pmItem}
+        </ul>
+      </section>`;
+    }
+    const srCopy = state.completed && w
+      ? `<h2>Don’t wait for your checkup</h2><p>Have any <b>home repairs or projects</b> right now? Submit a service request anytime and ${HOME_MANAGER} will take care of it.</p>`
+      : `<p>Have any <b>home repairs or projects</b> right now? Submit your first service request!</p>`;
+    dashboard.innerHTML = `
+      <h1>Dashboard</h1>
+      <div class="dash-grid">
+        <div>
+          <section class="card card-sky welcome" aria-labelledby="welcome-h">
+            <h2 id="welcome-h"><span aria-hidden="true">👋</span> Welcome to PreFix HomeHub!</h2>
+            <p>You should be able to find all of your most important PreFix service information here. Whether that’s upcoming service appointments, or completed repairs and maintenance, HomeHub is the place to find it!</p>
+            <p style="margin:0">Our team will also be continuing to add new features to HomeHub into the future, to help keep the hassle out of homeownership!</p>
+          </section>
+          ${status}
+          <section class="card card-sky"${state.completed ? noteAttr(3) : ''}>
+            ${srCopy}
+            <button type="button" class="btn btn-primary" data-action="sr">Create Service Request</button>
+          </section>
+          <section class="card survey" aria-labelledby="survey-h">
+            <h2 id="survey-h" style="color:var(--text3)">How would you like to use PreFix?</h2>
+            <p>This helps us understand how best to support you as a member.</p>
+            <div class="opt"><span class="r"></span><span><b>Maintain</b> - keep my home in its current condition</span></div>
+            <div class="opt"><span class="r"></span><span><b>Improve</b> - make small updates and lifestyle changes</span></div>
+          </section>
+        </div>
+        <div class="dash-side">
+          <section class="card" aria-labelledby="todo-h">
+            <h2 id="todo-h" style="color:var(--blue);font-size:18px">My Upcoming To-Dos</h2>
+            <p>Unlock the full potential of your home! Save your <b>to-do list</b> here in HomeHub and when you’re ready, repairs and projects are just a click away!</p>
+            <button type="button" class="btn btn-primary" data-action="nav">Add To-Dos</button>
+          </section>
+          <h2 class="side-h">Your Home Manager</h2>
+          <section class="card hm-card" aria-label="Your Home Manager">
+            <div class="avatar" aria-hidden="true">TS</div>
+            <p class="name">${HOME_MANAGER}</p>
+            <p>Expert in home systems and preventive care</p>
+            <p style="margin:0">Your one point of contact for repairs: call, text, or email</p>
+          </section>
+          <section class="card card-sky" style="text-align:center" aria-label="Referral">
+            <h2><span aria-hidden="true">💰</span> Give/Get $50</h2>
+            <p style="margin:0">Refer a neighbour in Austin and get a $50 in repair credits</p>
+          </section>
+        </div>
+      </div>`;
+  }
+
+  // ---------- Rendering: prototype chrome ----------
+  function renderProto() {
+    document.querySelectorAll('[data-action="scenario"]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === state.scenario)));
+    document.querySelectorAll('[data-action="homes"]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === (state.multi ? '2' : '1'))));
+    document.querySelectorAll('[data-action="view"]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === state.view)));
+    $('[data-action="notes"]').setAttribute('aria-pressed', String(state.notes));
+    if (!jumpSelect.options.length) {
+      jumpSelect.innerHTML = `<option value="">Choose a screen…</option>` + JUMPS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+    }
+  }
+
+  function renderNotes() {
+    notesEl.hidden = !state.notes;
+    document.body.classList.toggle('notes-on', state.notes);
+    if (!state.notes || notesEl.dataset.ready) return;
+    notesEl.dataset.ready = '1';
+    notesEl.innerHTML = `
+      <div class="notes-head"><h2 id="notes-title">What changed</h2>
+        <button type="button" class="notes-close" data-action="notes" aria-label="Hide change notes">${ic('i-close')}</button></div>
+      <p>Pulled from the scheduling call transcript: only the parts about enrollment and onboarding. Timestamps point back to the transcript. Numbered markers on the screens match this list.</p>
+      <ol class="note-list">${NOTES.map((n) => `<li><span class="note-num" aria-hidden="true">${n.n}</span><div>
+        <h4><span class="sr-only">${n.n}. </span>${n.title}</h4><p>${n.body}</p><p class="note-src">Source: ${n.src}</p>
+        ${n.jump ? `<button type="button" class="note-show" data-action="jump-to" data-value="${n.jump}">Show me</button>` : `<button type="button" class="note-show" data-action="scenario" data-value="standard">Switch to Normal availability</button>`}
+      </div></li>`).join('')}</ol>
+      <h3>Other fixes (not from the call)</h3>
+      <ul class="plain-list">
+        <li>Times use a 12-hour format (“2:00 PM”) instead of “14:00 pm”.</li>
+        <li>The selected date uses the darker brand blue so the white number passes WCAG AA contrast.</li>
+        <li>Continue checks the “I have read and understood” box and explains what’s missing, instead of failing silently.</li>
+      </ul>
+      <h3>Open questions</h3>
+      <ul class="plain-list">
+        <li>Does the calendar API return exact window dates, or just a start month? Copy here assumes exact dates.</li>
+        <li>Should “book later” be offered at all, or should we nudge harder to book now?</li>
+        <li>Where does “book a standalone task at the hourly rate” go: Create Request, or a new booking path?</li>
+        <li>What’s the longest a window can be pushed? JC noted first checkups must happen within the first 6 months.</li>
+        <li>FAQ answers other than “Do I need to be home?” were not in Figma, so they are placeholder copy.</li>
+      </ul>
+      <h3>Left out (not onboarding)</h3>
+      <ul class="plain-list">
+        <li>Fast Fix wizard: “choose up to 3”, and quantities like two TVs</li>
+        <li>Consultations, proposals, and the HM/agent portal</li>
+        <li>Multi-day bookings</li>
+        <li>Back-end capacity logic and smoothing for existing members</li>
+      </ul>`;
+  }
+
+  // ---------- Main render ----------
+  function render(opts = {}) {
+    const { newScreen = false } = opts;
+    stage.classList.toggle('mobile', state.view === 'mobile');
+    renderProto();
+    renderNotes();
+    renderDashboard();
+
+    if (!state.modalOpen) {
+      overlay.hidden = true;
+      appScroll.inert = false;
+      return;
+    }
+    const active = document.activeElement;
+    const fk = !newScreen && active && modal.contains(active) ? active.dataset.fk : null;
+    const keepScroll = newScreen ? 0 : modalBody.scrollTop;
+
+    overlay.hidden = false;
+    appScroll.inert = true;
+
+    const sec = sectionOf(state.screen);
+    const showSteps = sec >= 0 && state.mode !== 'resched';
+    stepsEl.hidden = !showSteps;
+    if (showSteps) {
+      const frac = sectionFraction(state.screen);
+      const title = state.screen === 'home' ? 'Select a home' : SECTION_TITLES[sec];
+      stepTitle.textContent = title;
+      progress.firstElementChild.style.width = `${((sec + frac) / 4) * 100}%`;
+      progress.setAttribute('aria-valuenow', String(sec + 1));
+      progress.setAttribute('aria-valuetext', `Step ${sec + 1} of 4: ${SECTION_TITLES[sec]}`);
+      progress.setAttribute('aria-label', 'Setup progress');
+      progressSegs.innerHTML = [0, 1, 2, 3].map((i) => `<span><i style="width:${i < sec ? 100 : i === sec ? frac * 100 : 0}%"></i></span>`).join('');
+    }
+
+    const view = screenView();
+    modalBody.innerHTML = view.body;
+    modalFooter.innerHTML = view.footer;
+    modal.setAttribute('aria-labelledby', showSteps ? 'step-title' : 'screen-title');
+    modalBody.scrollTop = keepScroll;
+
+    if (newScreen) {
+      const h = $('#screen-title', modal);
+      if (h) h.focus({ preventScroll: true });
+      modalBody.scrollTop = 0;
+    } else if (fk) {
+      const el = modal.querySelector(`[data-fk="${CSS.escape(fk)}"]`);
+      if (el) el.focus({ preventScroll: true });
+    }
+  }
+
+  // ---------- Modal open/close ----------
+  function closeModal() {
+    state.modalOpen = false;
+    state.mode = 'flow';
+    render();
+    const target = dashboard.querySelector('[data-action="open-flow"], [data-action="book-pm"]') || $('h1', dashboard);
+    if (target) { if (target.tagName === 'H1') target.tabIndex = -1; target.focus(); }
+  }
+  function openModal() {
+    state.modalOpen = true;
+    render({ newScreen: true });
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    toastRegion.innerHTML = `<div class="toast">${msg}</div>`;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toastRegion.innerHTML = ''; }, 4000);
+  }
+
+  // ---------- Prototype controls ----------
+  function samplePM() { return isWindow() ? { ...SAMPLE.pmWindow } : { ...SAMPLE.pmStandard }; }
+  function ensureHE() { if (!state.he.date) state.he = { ...SAMPLE.he }; state.ack.he = true; }
+  function ensurePM() { if (!state.pm.date && !state.pm.later) state.pm = { ...samplePM(), later: false }; state.ack.pm = true; }
+  function resetFlow() {
+    const keep = { scenario: state.scenario, multi: state.multi, view: state.view, notes: state.notes };
+    Object.assign(state, freshFlow(), keep);
+  }
+
+  function jump(target) {
+    resetFlow();
+    state.modalOpen = true;
+    if (target === 'later' && !isWindow()) state.scenario = 'window';
+    switch (target) {
+      case 'intro': return goto('intro');
+      case 'home': state.multi = true; return goto('home');
+      case 'info:he': return goto('info:he');
+      case 'date:he': state.ack.he = true; return startDate('he', 'flow');
+      case 'time:he': state.ack.he = true; startDate('he', 'flow'); state.draft = { date: SAMPLE.he.date, time: null }; return goto('time:he');
+      case 'confirm:he': ensureHE(); return goto('confirm:he');
+      case 'info:pm': ensureHE(); return goto('info:pm');
+      case 'date:pm': ensureHE(); state.ack.pm = true; return startDate('pm', 'flow');
+      case 'time:pm': ensureHE(); state.ack.pm = true; startDate('pm', 'flow'); state.draft = { date: samplePM().date, time: null }; return goto('time:pm');
+      case 'confirm:pm': ensureHE(); ensurePM(); return goto('confirm:pm');
+      case 'later': ensureHE(); state.ack.pm = true; state.pm = { date: null, time: null, later: true }; return goto('later');
+      case 'review': ensureHE(); ensurePM(); return goto('review');
+      case 'resched': ensureHE(); ensurePM(); return startDate('pm', 'resched');
+      case 'done': ensureHE(); ensurePM(); state.completed = true; return goto('done');
+      case 'dash-after': ensureHE(); ensurePM(); state.completed = true; state.screen = 'done'; state.started = true; return closeModal();
+      case 'dash-before': state.started = true; state.screen = 'info:he'; return closeModal();
+    }
+  }
+
+  function setScenario(value) {
+    if (state.scenario === value) return;
+    state.scenario = value;
+    if (state.pm.date && dayStatus('pm', parse(state.pm.date)) === 'unavail') state.pm = { ...samplePM(), later: false };
+    if (!isWindow() && state.pm.later) state.pm = { date: null, time: null, later: false };
+    const [kind, visit] = state.screen.split(':');
+    if (visit === 'pm' && (kind === 'date' || kind === 'time')) {
+      const r = bookableRange('pm');
+      if (state.draft.date && dayStatus('pm', parse(state.draft.date)) !== 'avail') state.draft = { date: null, time: null };
+      state.calMonth = monthStart(state.draft.date ? parse(state.draft.date) : (state.pm.date ? parse(state.pm.date) : r.min));
+      if (kind === 'time' && !state.draft.date) state.screen = 'date:pm';
+    }
+    if (state.screen === 'later' && !isWindow()) state.screen = state.pm.date ? 'review' : 'date:pm';
+    if (state.screen === 'review' && !state.pm.date && !state.pm.later) { state.ack.pm = true; startDate('pm', 'flow'); return; }
+    render();
+    toast(isWindow() ? 'Scenario: first checkup pushed to a later window' : 'Scenario: normal availability (today’s flow)');
+  }
+
+  // ---------- Events ----------
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const a = el.dataset.action;
+    if (el.tagName === 'INPUT' || el.tagName === 'SELECT') return;
+    if (el.tagName === 'A') e.preventDefault();
+    switch (a) {
+      case 'next': return next();
+      case 'back': return back();
+      case 'close': return closeModal();
+      case 'open-flow': return openModal();
+      case 'faq': state.faq[el.dataset.id] = !state.faq[el.dataset.id]; return render();
+      case 'day': {
+        const d = parse(el.dataset.date);
+        const visit = state.screen.split(':')[1];
+        if (dayStatus(visit, d) !== 'avail') return;
+        state.draft = { date: el.dataset.date, time: null };
+        state.errors = {};
+        return render();
+      }
+      case 'cal-prev': case 'cal-next':
+        state.calMonth = new Date(state.calMonth.getFullYear(), state.calMonth.getMonth() + (a === 'cal-next' ? 1 : -1), 1);
+        render();
+        if (modal.querySelector(`[data-fk="${a}"]`)?.disabled) modal.querySelector('.cal-grid .day[tabindex="0"]')?.focus();
+        return;
+      case 'later': state.pm = { date: null, time: null, later: true }; return goto('later');
+      case 'resched': return startDate(el.dataset.visit, 'resched');
+      case 'resched-here': return startDate(state.screen.split(':')[1], state.mode);
+      case 'book-pm': state.modalOpen = true; state.ack.pm = true; return startDate('pm', 'resched');
+      case 'sr': return toast('Prototype: this would open Create Request in a new tab, so you don’t lose your place.');
+      case 'nav': return toast('Not part of this prototype. Try the Schedule button or the Controls menu.');
+      case 'nav-dash': return;
+      case 'scenario': return setScenario(el.dataset.value);
+      case 'homes':
+        state.multi = el.dataset.value === '2';
+        if (!state.multi) { state.homeId = 'main'; if (state.screen === 'home') state.screen = 'info:he'; }
+        return render();
+      case 'view': state.view = el.dataset.value; return render();
+      case 'notes': state.notes = !state.notes; return render();
+      case 'restart': $('#pb-more').open = false; return jump('intro');
+      case 'jump-to': return jump(el.dataset.value);
+    }
+  });
+
+  document.addEventListener('change', (e) => {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    switch (el.dataset.action) {
+      case 'home': state.homeId = el.value; return render();
+      case 'ack': state.ack[state.screen.split(':')[1]] = el.checked; state.errors = {}; return render();
+      case 'slot': state.draft.time = el.value; state.errors = {}; return render();
+      case 'jump':
+        if (el.value) { const v = el.value; el.value = ''; $('#pb-more').open = false; jump(v); }
+        return;
+    }
+  });
+
+  // Calendar keyboard support (arrow keys, Home/End, PageUp/PageDown)
+  modal.addEventListener('keydown', (e) => {
+    const day = e.target.closest('.day');
+    if (!day) return;
+    const moves = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+    let d = parse(day.dataset.date);
+    if (e.key in moves) d = addDays(d, moves[e.key]);
+    else if (e.key === 'Home') d = addDays(d, -d.getDay());
+    else if (e.key === 'End') d = addDays(d, 6 - d.getDay());
+    else if (e.key === 'PageUp' || e.key === 'PageDown') {
+      const dir = e.key === 'PageUp' ? -1 : 1;
+      d = new Date(d.getFullYear(), d.getMonth() + dir, Math.min(d.getDate(), 28));
+    } else return;
+    e.preventDefault();
+    const visit = state.screen.split(':')[1];
+    const r = bookableRange(visit);
+    const lo = monthIdx(r.min) > monthIdx(TODAY) ? monthStart(r.min) : monthStart(TODAY);
+    const hi = new Date(r.max.getFullYear(), r.max.getMonth() + 1, 0);
+    if (d < lo || d > hi) return;
+    if (monthIdx(d) !== monthIdx(state.calMonth)) { state.calMonth = monthStart(d); render(); }
+    modal.querySelectorAll('.day').forEach((b) => b.setAttribute('tabindex', '-1'));
+    const target = modal.querySelector(`.day[data-date="${keyOf(d)}"]`);
+    if (target) { target.setAttribute('tabindex', '0'); target.focus(); }
+  });
+
+  // Focus trap + Escape
+  document.addEventListener('keydown', (e) => {
+    const more = $('#pb-more');
+    if (e.key === 'Escape' && more.open) { more.open = false; more.querySelector('summary').focus(); return; }
+    if (!state.modalOpen || overlay.hidden) return;
+    if (e.key === 'Escape' && modal.contains(document.activeElement)) { e.preventDefault(); return closeModal(); }
+    if (e.key !== 'Tab' || !modal.contains(document.activeElement)) return;
+    const f = [...modal.querySelectorAll('button:not([disabled]), input, select, [tabindex="0"], a[href]')].filter((n) => n.offsetParent !== null || n.getClientRects().length);
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  document.addEventListener('click', (e) => {
+    const more = $('#pb-more');
+    if (more.open && !more.contains(e.target)) more.open = false;
+  });
+
+  render({ newScreen: true });
+})();
+</script>
+</body>
+</html>
