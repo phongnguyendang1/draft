@@ -35,7 +35,6 @@
   var RATE = 55;
   var MAX_MIN = 180;
   var MAX_TASKS = WIZ ? 3 : 4;   /* more than this goes to a service request */
-  var MAX_QTY = 6;               /* wizard: "How many?" on every job */
   var TODAY = new Date(2026, 9, 13);
   var FIRST_DAY = new Date(2026, 9, 14);
   var LAST_MONTH = { y: 2027, m: 1 };
@@ -457,7 +456,7 @@
     if (!state.jobs[base]) return base;
     for (var n = 2; ; n++) { var eid = base + "_" + n; if (!state.jobs[eid]) { if (!JOB[eid]) makeAlias(base, eid); return eid; } }
   }
-  function qtyOf(id) { return WIZ ? Math.max(1, Math.min(MAX_QTY, state.qty[id] || 1)) : 1; }
+  function qtyOf(id) { return WIZ ? Math.max(1, Math.floor(state.qty[id] || 1)) : 1; }
   function dropPending() {
     state.order.slice().forEach(function (id) { if (state.jobs[id] && !state.committed[id]) unselectJob(id); });
     if (state.cur && !state.committed[state.cur]) state.cur = null;
@@ -506,39 +505,57 @@
   }
   function totalMin() { return selectedJobs().reduce(function (s, j) { return s + (WIZ && isNoFit(j.id) ? 0 : j.min * qtyOf(j.id)); }, 0); }
   function overCount() { return !FIND && selectedJobs().length > MAX_TASKS; }
-  /* Wizard: when everything fits Fast Fix but the visit runs past 3 hours, it becomes two separate Fast Fix visits (up to 6 hours in all) */
+  /* Wizard: eligible work past 3 hours becomes as many separate Fast Fix visits as it takes (each up to 3 hours, as even as possible).
+     Whole jobs are kept together when they can be; otherwise a job's units are shared out across visits. */
+  var planKey = "", planVal = null;
   function planVisits() {
     var jobs = selectedJobs().filter(function (j) { return !(WIZ && isNoFit(j.id)); });
     var full = jobs.map(function (j) { return qtyOf(j.id); }), total = jobs.reduce(function (s, j, i) { return s + j.min * full[i]; }, 0);
+    var key = jobs.map(function (j, i) { return j.id + ":" + j.min + ":" + full[i]; }).join("|");
+    if (key === planKey) return planVal;
+    planKey = key; planVal = planCompute(jobs, full, total); return planVal;
+  }
+  function planCompute(jobs, full, total) {
     function visitOf(counts) {
       var items = [], m = 0;
       jobs.forEach(function (j, i) { if (counts[i] > 0) { items.push({ id: j.id, qty: counts[i] }); m += j.min * counts[i]; } });
       return { min: m, items: items };
     }
+    function finish(bins) {   /* bins: per-visit unit counts per job; drop empties, order by the first job in each */
+      var out = bins.filter(function (c) { return c.some(function (x) { return x > 0; }); }).map(visitOf);
+      out.sort(function (a, b) { return jobs.findIndex(function (j) { return j.id === a.items[0].id; }) - jobs.findIndex(function (j) { return j.id === b.items[0].id; }) || b.min - a.min; });
+      return out;
+    }
     if (!jobs.length) return [];
     if (total <= MAX_MIN) return [visitOf(full)];
-    if (!WIZ || total > 2 * MAX_MIN || jobs.some(function (j) { return j.min > MAX_MIN; })) return null;
-    var n = jobs.length, best = null, mask, i;
-    for (mask = 1; mask < (1 << n) - 1; mask++) {   /* first try to keep each job in one visit */
-      var a = 0; for (i = 0; i < n; i++) if (mask & (1 << i)) a += jobs[i].min * full[i];
-      var rest = total - a;
-      if (a <= MAX_MIN && rest <= MAX_MIN && (!best || Math.abs(a - rest) < best.d)) best = { mask: mask, d: Math.abs(a - rest) };
+    if (!WIZ || jobs.some(function (j) { return j.min > MAX_MIN; })) return null;
+    var n = jobs.length, units = full.reduce(function (s, q) { return s + q; }, 0), k0 = Math.ceil(total / MAX_MIN), k, bins, rem, i, q;
+    function zeros(k) { var o = []; for (var x = 0; x < k; x++) o.push(jobs.map(function () { return 0; })); return o; }
+    var order = jobs.map(function (j, idx) { return idx; }).sort(function (a, b) { return jobs[b].min * full[b] - jobs[a].min * full[a]; });
+    for (k = k0; k <= k0 + 4 && units * k <= 2000000; k++) {
+      /* 1. whole jobs, biggest first, each into the visit with the most room */
+      if (order.every(function (x) { return jobs[x].min * full[x] <= MAX_MIN; })) {
+        bins = zeros(k); rem = []; for (i = 0; i < k; i++) rem.push(MAX_MIN);
+        var okw = order.every(function (x) { var best = 0; for (i = 1; i < k; i++) if (rem[i] > rem[best]) best = i; var m = jobs[x].min * full[x]; if (m > rem[best]) return false; rem[best] -= m; bins[best][x] = full[x]; return true; });
+        if (okw) return finish(bins);
+      }
+      /* 2. otherwise share a job's units out, longest units first, each into the visit with the most room */
+      bins = zeros(k); rem = []; for (i = 0; i < k; i++) rem.push(MAX_MIN);
+      var ordU = jobs.map(function (j, idx) { return idx; }).sort(function (a, b) { return jobs[b].min - jobs[a].min; }), oku = true;
+      for (var oi = 0; oi < ordU.length && oku; oi++) {
+        var x = ordU[oi];
+        for (q = 0; q < full[x]; q++) { var bb = 0; for (i = 1; i < k; i++) if (rem[i] > rem[bb]) bb = i; if (jobs[x].min > rem[bb]) { oku = false; break; } rem[bb] -= jobs[x].min; bins[bb][x]++; }
+      }
+      if (oku) return finish(bins);
     }
-    if (best) return [visitOf(full.map(function (q, k) { return best.mask & (1 << k) ? q : 0; })), visitOf(full.map(function (q, k) { return best.mask & (1 << k) ? 0 : q; }))];
-    var units = []; jobs.forEach(function (j, k) { for (var u = 0; u < full[k]; u++) units.push({ i: k, m: j.min }); });   /* otherwise split a job's units across the two visits */
-    var reach = { 0: [] };
-    units.forEach(function (u, idx) { Object.keys(reach).map(Number).forEach(function (s) { var ns = s + u.m; if (ns <= MAX_MIN && !(ns in reach)) reach[ns] = reach[s].concat(idx); }); });
-    var pick = null;
-    Object.keys(reach).map(Number).forEach(function (s) { var r = total - s; if (s > 0 && r > 0 && r <= MAX_MIN && (!pick || Math.abs(s - r) < pick.d)) pick = { s: s, d: Math.abs(s - r) }; });
-    if (!pick) return null;
-    var c1 = full.map(function () { return 0; }), c2 = full.slice();
-    reach[pick.s].forEach(function (idx) { c1[units[idx].i]++; c2[units[idx].i]--; });
-    return [visitOf(c1), visitOf(c2)];
+    /* very large requests: fill visit after visit (fast, not as even) */
+    bins = []; var cur = null, left = 0;
+    ordU = jobs.map(function (j, idx) { return idx; }).sort(function (a, b) { return jobs[b].min - jobs[a].min; });
+    ordU.forEach(function (x) { var c = full[x]; while (c > 0) { if (!cur || left < jobs[x].min) { cur = jobs.map(function () { return 0; }); bins.push(cur); left = MAX_MIN; } var t = Math.min(c, Math.floor(left / jobs[x].min)); cur[x] += t; left -= t * jobs[x].min; c -= t; } });
+    return finish(bins);
   }
   function needsSplit() { return WIZ && totalMin() > MAX_MIN && !!planVisits(); }
-  /* Everything eligible, but more than two visits' worth: goes to the team. With a mix of eligible and not eligible jobs the member is never sent everything: they are asked to trim instead. */
-  function mixBlocked() { return WIZ && nofitIds().length > 0 && totalMin() > MAX_MIN && !needsSplit(); }
-  function overLimit() { return overCount() || (totalMin() > MAX_MIN && !needsSplit() && !(WIZ && nofitIds().length)); }
+  function overLimit() { return overCount() || (totalMin() > MAX_MIN && !needsSplit()); }
   function overReason() { return overCount() ? "count" : "time"; }
   /* Recommended booking length: what the picked jobs add up to, rounded up to a whole hour, 1 to 3 */
   function recommendedHours() { return Math.min(3, Math.max(1, Math.ceil(totalMin() / 60))); }
@@ -588,8 +605,7 @@
       if (s + h * 60 > 18 * 60) return;
       if ((d.getDate() + i * 3 + h) % 4 === 0) return;
       if (state.taken[isoDate + "@" + s]) return;
-      var b0 = WIZ && state.visit > 0 ? state.books[0] : null;
-      if (b0 && b0.date === isoDate && s < b0.time + b0.hours * 60 && b0.time < s + h * 60) return;
+      if (WIZ && state.visit > 0 && state.books.slice(0, state.visit).some(function (b0) { return b0 && b0.date === isoDate && s < b0.time + b0.hours * 60 && b0.time < s + h * 60; })) return;
       out.push(s);
     });
     return out;
@@ -646,12 +662,10 @@
   var lastOver = false;
   function updateOver() {
     var now = overLimit();
-    var mix = mixBlocked();
     ["#note-over-sel", "#note-over-more"].forEach(function (id) {
       var n = $(id); if (!n) return;
-      n.hidden = !(now || mix);
-      if (mix) n.querySelector("span").innerHTML = "<strong>That is more than Fast Fix can book.</strong> The jobs that are eligible add up to more than two 3-hour visits. Remove a job or lower a quantity to continue.";
-      else if (now) n.querySelector("span").innerHTML = overCount()
+      n.hidden = !now;
+      if (now) n.querySelector("span").innerHTML = overCount()
         ? "<strong>That’s more than " + MAX_TASKS + " jobs.</strong> To book a time now, keep it to " + MAX_TASKS + " jobs or fewer. Otherwise we’ll send this to our team as a service request, and you won’t need to enter anything else."
         : "<strong>That is more than a Fast Fix covers.</strong> We will send this to our team as a service request. You will not need to enter anything else.";
     });
@@ -668,7 +682,7 @@
       var pv = planVisits(), vn = $("#visit-note"), vi = pv ? Math.min(state.visit, pv.length - 1) : 0;
       vn.hidden = !(pv && pv.length > 1);
       if (!vn.hidden) {
-        setText(vn.lastChild, "Visit " + (vi + 1) + " of " + pv.length + ": " + itemsText(pv[vi]) + ". " + (vi ? "Pick a time that doesn\u2019t overlap visit 1." : "You\u2019ll pick a time for each visit."));
+        setText(vn.lastChild, "Visit " + (vi + 1) + " of " + pv.length + ": " + itemsText(pv[vi]) + ". " + (vi ? "Pick a time that doesn\u2019t overlap your earlier " + (vi === 1 ? "visit" : "visits") + "." : "You\u2019ll pick a time for each visit."));
         setText($("#rec-meta"), "Based on the jobs in this visit. $" + RATE + " per hour, " + money(h * RATE) + " for this visit.");
       }
     }
@@ -871,16 +885,26 @@
     var n = qtyOf(jb.id); host.innerHTML = "";
     function btn(dir, ic, name) {
       var b = el("button", "qty__btn"); b.type = "button"; b.id = "qty-" + (dir > 0 ? "up" : "dn"); b.setAttribute("data-qty", String(dir)); b.setAttribute("aria-label", name);
-      if (dir > 0 ? n >= MAX_QTY : n <= 1) b.setAttribute("aria-disabled", "true");
+      if (dir < 0 && n <= 1) b.setAttribute("aria-disabled", "true");
       b.innerHTML = '<svg class="i"><use href="#' + ic + '"/></svg>';
       return b;
     }
-    var val = el("span", "qty__val", String(n)); val.id = "qty-val";
-    host.appendChild(btn(-1, "ri-subtract-line", "Fewer")); host.appendChild(val); host.appendChild(btn(1, "ri-add-line", "More"));
+    /* No upper limit on how many; the box takes up to 3 digits only so a typo cannot freeze the page */
+    var val = el("input", "qty__val"); val.id = "qty-val"; val.type = "text"; val.inputMode = "numeric"; val.pattern = "[0-9]*"; val.maxLength = 3; val.value = String(n); val.setAttribute("aria-label", "How many");
+    var dn = btn(-1, "ri-subtract-line", "Fewer");
+    function syncDn() { if (qtyOf(jb.id) <= 1) dn.setAttribute("aria-disabled", "true"); else dn.removeAttribute("aria-disabled"); }
+    val.addEventListener("input", function () {
+      var v = parseInt(val.value.replace(/\D/g, ""), 10);
+      if (!(v >= 1) || v === qtyOf(jb.id)) return;
+      state.qty[jb.id] = v; resetPicks(); syncDn(); refresh();
+    });
+    val.addEventListener("change", function () { val.value = String(qtyOf(jb.id)); syncDn(); });
+    val.addEventListener("blur", function () { val.value = String(qtyOf(jb.id)); syncDn(); });
+    host.appendChild(dn); host.appendChild(val); host.appendChild(btn(1, "ri-add-line", "More"));
   }
   function stepQty(d) {
     var jb = curJob(); if (!jb) return;
-    var cur = qtyOf(jb.id), n = Math.max(1, Math.min(MAX_QTY, cur + d)); if (n === cur) return;
+    var cur = qtyOf(jb.id), n = Math.max(1, cur + d); if (n === cur) return;
     state.qty[jb.id] = n; resetPicks(); renderQty(); refresh();
     var b = $("#qty-" + (d > 0 ? "up" : "dn")); if (b) b.focus({ preventScroll: true });
     announce("How many: " + n + ".");
@@ -942,7 +966,7 @@
       setText($("#ml-sr-t"), "Requires Service Request"); setText($("#ml-sr-n"), "(" + nf.length + ")");
       setText($("#ml-sr-sub"), "These didn\u2019t pass the questions. We\u2019ll submit them as a service request when you continue.");
     }
-    var full = ids.length >= MAX_TASKS, over = overLimit() || mixBlocked();
+    var full = ids.length >= MAX_TASKS, over = overLimit();
     $("#more-add").setAttribute("aria-disabled", String(full || over));
     $("#more-cap").hidden = !(full && !over);
     setText($("#more-cap"), "You have added " + MAX_TASKS + " jobs, the most a Fast Fix covers. Need more? Submit a service request after you book.");
@@ -990,7 +1014,11 @@
     var fl = $("#rv-fit-list"), sl = $("#rv-sr-list"), vl = $("#rv-visits-list"); fl.innerHTML = ""; sl.innerHTML = ""; vl.innerHTML = "";
     fit.forEach(function (i) { fl.appendChild(rvRow("", jobLine(i))); });
     nf.forEach(function (i) { sl.appendChild(rvRow("", jobLine(i), whyLines(i))); });
-    if (split) pv.forEach(function (v, k) { vl.appendChild(rvRow("Visit " + (k + 1) + " · " + hoursText(Math.min(3, Math.max(1, Math.ceil(v.min / 60)))), itemsText(v))); });
+    if (split) {   /* identical visits in a row share one line, so 10 bookings do not mean 10 near-identical rows */
+      var groups = [];
+      pv.forEach(function (v, k) { var sig = v.min + "|" + itemsText(v), g = groups[groups.length - 1]; if (g && g.sig === sig) g.to = k + 1; else groups.push({ sig: sig, from: k + 1, to: k + 1, v: v }); });
+      groups.forEach(function (g) { vl.appendChild(rvRow((g.from === g.to ? "Visit " + g.from : "Visits " + g.from + "–" + g.to) + " · " + hoursText(Math.min(3, Math.max(1, Math.ceil(g.v.min / 60)))) + (g.from === g.to ? "" : " each"), itemsText(g.v))); });
+    }
     setText($("#rv-all-note"), "Prefer a single visit with our team instead?");
     setText($("#rv-all"), "Send everything to our team instead");
   }
@@ -1010,7 +1038,6 @@
     }
     if (s === "more") {
       if (!committedIds().length) { navigate("job"); return true; }
-      if (mixBlocked()) { announce("The eligible jobs are more than Fast Fix can book. Remove a job or lower a quantity."); var mn = $("#note-over-more"); if (mn) mn.scrollIntoView({ block: "center", behavior: REDUCED ? "auto" : "smooth" }); return true; }
       if (overLimit()) { state.reason = overReason(); navigate("sent"); return true; }
       navigate(nofitIds().length || needsSplit() ? "review" : "time"); return true;
     }
@@ -1023,7 +1050,7 @@
     return false;
   }
   function wizAdd() {
-    if ($("#more-add").getAttribute("aria-disabled") === "true") { announce(overLimit() || mixBlocked() ? "That is more than a Fast Fix covers." : "A Fast Fix covers up to " + MAX_TASKS + " jobs."); return; }
+    if ($("#more-add").getAttribute("aria-disabled") === "true") { announce(overLimit() ? "That is more than a Fast Fix covers." : "A Fast Fix covers up to " + MAX_TASKS + " jobs."); return; }
     state.cur = null; state.editing = false; navigate("job");
   }
   function wizRemove(id) {
@@ -1042,10 +1069,10 @@
     if (WIZ && screen === "question") { var wk = koFor(state.cur); return { label: "Continue", status: "" }; }
     if (WIZ && screen === "review") {
       var rf = fitIds().length, rn = nofitIds().length, sp2 = needsSplit();
-      if (!rn) return { label: "Pick times for both visits", status: "2 Fast Fix visits" };
+      var nv = (planVisits() || []).length; if (!rn) return { label: nv === 2 ? "Pick times for both visits" : "Pick times for all " + nv + " visits", status: nv + " Fast Fix visits" };
       return rf ? { label: sp2 ? "Submit request and pick times" : "Submit request and pick a time", status: "Submits your service request, then you pick a time" } : { label: "Submit for Service Request", status: "Submits your service request" };
     }
-    if (WIZ && screen === "more") { var wc = committedIds().length, mb = mixBlocked(); return { label: overLimit() ? "Send to our team" : "Continue", status: overLimit() ? "More than a Fast Fix covers" : mb ? "Over the Fast Fix limit" : wc + " of " + MAX_TASKS + " jobs" }; }
+    if (WIZ && screen === "more") { var wc = committedIds().length; return { label: overLimit() ? "Send to our team" : "Continue", status: overLimit() ? "More than a Fast Fix covers" : wc + " of " + MAX_TASKS + " jobs" }; }
     if (screen === "job") {
       return {
         label: overLimit() ? "Send to our team" : "Continue",
@@ -1062,7 +1089,7 @@
       var noSlots = body.classList.contains("is-noslots");
       var slot = state.date && state.time !== null ? shortDate(parse(state.date)) + " · " + t12(state.time) : "Pick a date and a time";
       var pvt = WIZ ? planVisits() : null, lastV = !(pvt && pvt.length > 1 && state.visit < pvt.length - 1);
-      return { label: noSlots ? "Send to our team" : (lastV ? (pvt && pvt.length > 1 ? "Confirm both visits" : "Confirm booking") : "Confirm visit " + (state.visit + 1) + ", then pick visit " + (state.visit + 2)), status: noSlots ? "Ready to send" : slot };
+      return { label: noSlots ? "Send to our team" : (lastV ? (pvt && pvt.length > 1 ? (pvt.length === 2 ? "Confirm both visits" : "Confirm all " + pvt.length + " visits") : "Confirm booking") : "Confirm visit " + (state.visit + 1) + ", then pick visit " + (state.visit + 2)), status: noSlots ? "Ready to send" : slot };
     }
     return null;
   }
@@ -1070,7 +1097,7 @@
   function updateCta() {
     var c = ctaFor(state.screen);
     if (!c) return;
-    $all("[data-next]").forEach(function (b) { setText(b, c.label); if (WIZ) b.setAttribute("aria-disabled", String(state.screen === "more" && mixBlocked())); });
+    $all("[data-next]").forEach(function (b) { setText(b, c.label); });
     setText($("#status-" + state.screen), c.status);
     setText($("#dock-status"), c.status);
   }
@@ -1197,7 +1224,6 @@
   function render(screen) {
     if (WIZ) wizEnter(screen);
     if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = overReason(); navigate("sent"); return; }
-    if (WIZ && mixBlocked() && /^(review|time)$/.test(screen)) { navigate("more"); return; }
     if (WIZ && screen === "review" && !nofitIds().length && !needsSplit()) { navigate(committedIds().length ? "time" : "job"); return; }
     if (WIZ && screen === "question" && !koFor(state.cur)) { if (curJob()) state.committed[state.cur] = true; navigate("more"); return; }
     if (screen !== "type" && screen !== "describe" && screen !== "job" && !selectedJobs().length) seedDemo(screen);
@@ -1274,10 +1300,19 @@
   function fillBooked() {
     var h = HOMES[state.home], d = parse(state.date), many = WIZ && state.books.length > 1, pv = WIZ ? planVisits() : null;
     function line(k) { var bk = state.books[k]; return { date: longDate(parse(bk.date)), time: t12(bk.time) + " \u00b7 " + hoursText(bk.hours) + " \u00b7 Central Time" }; }
+    $all(".b-extra").forEach(function (r) { r.remove(); });
+    var anchor = $("#b-row2");
     if (many) {
       var l1 = line(0), l2 = line(1);
       $("#b-date").textContent = "Visit 1 \u00b7 " + l1.date; $("#b-time").textContent = l1.time + (pv && pv[0] ? " \u00b7 " + itemsText(pv[0]) : "");
       $("#b-date2").textContent = "Visit 2 \u00b7 " + l2.date; $("#b-time2").textContent = l2.time + (pv && pv[1] ? " \u00b7 " + itemsText(pv[1]) : "");
+      for (var vk = 2; vk < state.books.length; vk++) {
+        var lk = line(vk), rw = el("li", "result__row"), ic = el("span", "d-icon"), mn = el("div", "d-main");
+        ic.innerHTML = '<svg class="i"><use href="#ri-calendar-event-line"/></svg>';
+        var dt = el("p", "t-strong", "Visit " + (vk + 1) + " \u00b7 " + lk.date); dt.id = "b-date" + (vk + 1);
+        var tm = el("p", "d-meta", lk.time + (pv && pv[vk] ? " \u00b7 " + itemsText(pv[vk]) : "")); tm.id = "b-time" + (vk + 1);
+        mn.appendChild(dt); mn.appendChild(tm); rw.appendChild(ic); rw.appendChild(mn); rw.classList.add("b-extra"); anchor.after(rw); anchor = rw;
+      }
     } else {
       $("#b-date").textContent = longDate(d);
       $("#b-time").textContent = t12(state.time) + " \u00b7 Central Time";
@@ -1286,7 +1321,7 @@
     $("#b-addr").textContent = h.addr;
     $("#b-city").textContent = h.city;
     $("#b-jobs").textContent = selectedJobs().filter(function (j) { return !(WIZ && isNoFit(j.id)); }).map(function (j) { return j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : ""); }).join(", ");
-    $("#b-len").textContent = many ? "2 Fast Fix visits booked" : hoursText(hours()) + " booked";
+    $("#b-len").textContent = many ? state.books.length + " Fast Fix visits booked" : hoursText(hours()) + " booked";
     var nfj = WIZ && state.split ? nofitIds() : [], mod = $("#b-sr-module"), dash = $('[data-screen-id="booked"] [data-handoff="Dashboard"]');
     mod.hidden = !nfj.length;
     if (nfj.length) {
