@@ -161,8 +161,8 @@ body.notes-on .stage { right: 360px; }
 .modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding-top: 24px; flex-wrap: wrap; }
 .panel { flex: 1 0 auto; padding: 24px; border: 1px solid var(--border); border-radius: 8px; }
 .panel-flush { padding: 0; overflow: hidden; }
-.screen-title { margin: 0 0 16px; font-size: 24px; line-height: 32px; font-weight: 700; color: var(--navy); }
-.screen-title:focus, .screen-title:focus-visible { outline: none; }
+.screen-title { margin: 0 0 16px; font-size: 24px; line-height: 32px; font-weight: 600; color: var(--navy); }
+#screen-title:focus, #screen-title:focus-visible { outline: none; }
 :where(.panel, .copy) p { margin: 0 0 12px; font-size: 16px; line-height: 24px; color: var(--text2); }
 .copy ul { margin: 0 0 16px; padding-left: 20px; color: var(--text2); line-height: 24px; }
 :where(.panel, .copy) b { color: var(--navy); font-weight: 700; }
@@ -170,21 +170,6 @@ body.notes-on .stage { right: 360px; }
 /* Intro */
 .intro-art { width: 100%; height: auto; border-bottom: 1px solid #e4ecf2; }
 .intro-body { padding: 24px; }
-
-/* Select home */
-.homes { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; }
-.home-opt { position: relative; display: flex; gap: 16px; align-items: flex-start; padding: 16px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; }
-.home-opt:hover { border-color: var(--blue); }
-.home-opt:has(input:checked) { background: var(--sky-bg); border-color: var(--blue); }
-.home-opt input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--blue); flex: none; }
-.ho-body { flex: 1; display: grid; gap: 8px; }
-.ho-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.ho-street { font-size: 16px; font-weight: 700; }
-.ho-city { font-size: 14px; color: var(--text2); }
-.ho-bar { height: 6px; border-radius: 3px; background: #d5dbe1; overflow: hidden; }
-.ho-bar > i { display: block; height: 100%; background: #e5b40f; }
-.ho-pct { font-size: 12px; font-weight: 500; color: var(--text2); }
-.badge-yellow { align-self: start; padding: 1px 8px; border-radius: 4px; background: var(--yellow); color: var(--navy); font-size: 12px; font-weight: 600; white-space: nowrap; }
 
 /* Visit details */
 .info-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
@@ -213,14 +198,16 @@ body.notes-on .stage { right: 360px; }
 .faq-q:hover { background: #f8fafc; }
 .faq-a { padding: 0 12px 12px; }
 .faq-a p { margin: 0; font-size: 14px; line-height: 20px; color: var(--text2); }
+.faq-a p.faq-placeholder { font-style: italic; color: var(--text3); }
 
 /* Scheduling */
 .sched { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 32px; align-items: start; }
 .sched-side { display: grid; gap: 12px; }
 .svc { display: grid; gap: 2px; margin: 0; padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px; }
-.svc-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; min-height: 28px; font-size: 14px; line-height: 20px; }
-.svc-row dt { display: flex; align-items: center; gap: 8px; color: var(--text2); }
-.svc-row dd { margin: 0; font-weight: 700; color: var(--navy); }
+.svc-row { padding: 4px 0; font-size: 14px; line-height: 20px; }
+.svc-row dt { display: inline; color: var(--text2); }
+.svc-row dt .ic { width: 16px; height: 16px; margin-right: 6px; vertical-align: -3px; }
+.svc-row dd { display: inline; margin: 0; font-weight: 700; color: var(--navy); }
 .box-dashed, .box-grey { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: 4px; }
 .box-dashed { border: 1px dashed #8494a3; }
 .box-grey { background: var(--grey1); }
@@ -263,16 +250,17 @@ body.notes-on .stage { right: 360px; }
 
 /* Visit cards */
 .confirm-wrap { display: flex; justify-content: center; padding: 16px 0; }
-.vcard { position: relative; display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 380px; padding: 16px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
-.vc-head { display: flex; gap: 12px; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-.vc-icon { width: 44px; height: 44px; }
-.vc-eyebrow { margin: 0; font-size: 13px; color: var(--text2); }
-.vc-title { margin: 2px 0 0; font-size: 20px; line-height: 26px; font-weight: 700; }
-.vc-rows { display: grid; gap: 10px; margin: 0; }
-.vc-row { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: flex-start; font-size: 13px; line-height: 20px; }
+.vcard { position: relative; display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 480px; padding: 24px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+.vc-head { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.vc-icon { width: 56px; height: 56px; }
+.vc-icon .ic { width: 24px; height: 24px; }
+.vc-eyebrow { margin: 4px 0 0; font-size: 14px; color: var(--text2); }
+.vc-title { margin: 2px 0 0; font-size: 22px; line-height: 30px; font-weight: 600; }
+.vc-rows { display: grid; gap: 16px; margin: 0; }
+.vc-row { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; line-height: 20px; }
 .vc-row dt { display: flex; gap: 8px; align-items: center; color: var(--text2); white-space: nowrap; }
 .vc-row dt .ic { width: 18px; height: 18px; color: var(--navy); }
-.vc-row dd { margin: 0; font-weight: 700; }
+.vc-row dd { margin: 0; font-weight: 700; color: var(--navy); }
 .vcard > .btn { margin-top: auto; align-self: center; }
 .review-grid, .done-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
 .review-grid { padding-top: 8px; }
@@ -343,7 +331,7 @@ body.notes-on .stage { right: 360px; }
   .svc-row { display: grid; grid-template-columns: 20px 1fr; gap: 0 10px; }
   .svc-row dt { display: contents; }
   .svc-row dt span { grid-column: 2; }
-  .svc-row dd { grid-column: 2; }
+  .svc-row dd { grid-column: 2; margin: 0; }
   .slots { max-height: none; overflow: visible; }
   .review-grid, .done-cards { grid-template-columns: 1fr; }
   .confirm-wrap { padding: 0; }
@@ -414,13 +402,6 @@ body.notes-on .stage { right: 360px; }
         </div>
       </div>
       <p class="pb-help"><b>Copy</b> swaps between what Alex built and Mark’s proposed copy. <b>First PM slot</b> only changes the fake availability the calendar shows, the same way the scheduling API’s slots would. The flow and logic are identical either way.</p>
-      <div class="pb-field" role="group" aria-label="Homes on the membership">
-        <span>Homes on the membership</span>
-        <div class="seg">
-          <button type="button" data-action="homes" data-value="1">1 home</button>
-          <button type="button" data-action="homes" data-value="2">2 homes</button>
-        </div>
-      </div>
       <div class="pb-field pb-view" role="group" aria-label="Preview size">
         <span>Preview size</span>
         <div class="seg">
@@ -496,11 +477,11 @@ body.notes-on .stage { right: 360px; }
   const MEMBER = 'John Doe';
   const VISITS = {
     he: { name: 'Home Enrollment', card: 'Home Enrollment (First visit)', serviceType: 'Home Enrollment', manager: 'Maria Casey', icon: 'i-house-key', minutes: 60 },
-    pm: { name: 'Preventive Maintenance', card: 'Preventive Maintenance', serviceType: 'Fall/Winter Preventive Maintenance', manager: 'Jeffrey Williams', icon: 'i-tools', minutes: 60 },
+    pm: { name: 'Preventive Maintenance', card: 'Preventive Maintenance', serviceType: 'Spring/Summer Preventive Maintenance', manager: 'Jeffrey Williams', icon: 'i-tools', minutes: 60 },
   };
   // Earliest/latest bookable day per visit. "First PM slot" in the bar only swaps the PM range.
   const RANGES = {
-    he: { min: new Date(2026, 9, 29), max: new Date(2027, 0, 31) },
+    he: { min: new Date(2026, 9, 27), max: new Date(2027, 0, 31) },
     pmSoon: { min: new Date(2026, 10, 3), max: new Date(2027, 2, 31) },
     pmLater: { min: new Date(2027, 1, 23), max: new Date(2027, 4, 31) },
   };
@@ -512,35 +493,35 @@ body.notes-on .stage { right: 360px; }
   };
   const INTRO_ART = 'data:image/webp;base64,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';
 
-  // FAQ questions match the build. Answers are drafted from copy already on these screens;
-  // the approved answers live in the FAQ copy doc (PFX-382).
+  // FAQ questions match the build. The build screenshots only show one answer; the approved answers
+  // live in the FAQ copy doc (PFX-382), so the rest show a labelled placeholder instead of made-up copy.
+  const FAQ_PLACEHOLDER = 'Placeholder: this answer is in the FAQ copy doc (PFX-382) and isn’t shown in the prototype.';
   const FAQ = {
     he: [
-      { k: 'what', q: 'What is an Enrollment Visit?', a: 'Your Home Manager comes to your home to get to know it in person: your major systems, where the shut-offs are, and anything that needs attention.' },
-      { k: 'first', q: 'Why does this come first?', a: 'Every home is different. Once we know yours, future service is faster and we can catch small problems before they turn into expensive ones.' },
-      { k: 'home', q: 'Do I need to be home or prepare anything?', a: 'Only if your Home Manager needs physical access. If you provide digital entry codes or lockbox instructions in advance, you can skip it and go about your day. Nothing to prep, nothing to clean up.' },
-      { k: 'need', q: 'What will my Home Manager need from me?', a: 'Access to your home and its major systems, plus anything you already know about your home that would help.' },
+      { k: 'what', q: 'What is an Enrollment Visit?' },
+      { k: 'first', q: 'Why does this come first?' },
+      { k: 'home', q: 'Do I need to be home or prepare anything?' },
+      { k: 'need', q: 'What will my Home Manager need from me?' },
       { k: 'after', q: 'What happens after the visit?', a: 'Everything becomes your home’s profile, which we use to plan future work and keep current as things change. Then you’re ready for your first Preventive Maintenance visit.' },
     ],
     pm: [
-      { k: 'what', q: 'What is Preventive Maintenance?', a: 'Twice a year, your Home Manager gives your home a full checkup. We inspect and maintain your primary systems, plumbing and appliances to keep them running and catch problems early.' },
-      { k: 'cost', q: 'Is there any cost to me?', a: 'Your visit and maintenance are included in your membership. Any repair is your call, no surprises.' },
-      { k: 'often', q: 'How often, and how long?', a: 'Twice a year, spaced across your membership year. Each visit takes about 60 minutes.' },
-      { k: 'week', q: 'Why can’t I book it for this week?', a: 'Your checkups are spaced across your membership year, and the calendar shows your Home Manager’s real availability. Your first checkup may be a few weeks or a few months out. Pick the time that works best for you.' },
-      { k: 'know', q: 'How will I know what was done?', a: 'Your Home Manager adds Recommendations to your HomeHub for anything that needs attention, so you can see what was found and what was done.' },
-      { k: 'problem', q: 'What if my Home Manager finds a problem?', a: 'They’ll note it and add a recommendation to your HomeHub. Any repair is your call.' },
+      { k: 'what', q: 'What is Preventive Maintenance?' },
+      { k: 'cost', q: 'Is there any cost to me?' },
+      { k: 'often', q: 'How often, and how long?' },
+      { k: 'week', q: 'Why can’t I book it for this week?' },
+      { k: 'know', q: 'How will I know what was done?' },
+      { k: 'problem', q: 'What if my Home Manager finds a problem?' },
     ],
   };
 
   const NOTES = [
     { n: 1, title: 'Intro: Preventive Maintenance line', body: 'The PM bullet now reads: <q>Preventive Maintenance, twice a year: full checkups to catch small issues early. Your checkups are spaced across your membership year, and you’ll pick a time for your first one in a moment.</q>', src: 'Mark’s deck, slide 2', jump: 'intro' },
-    { n: 2, title: 'PM details: “How checkups are scheduled”', body: 'One short section above “Why it matters”: <q>Your two checkups are spaced across your membership year. On the next step, you’ll see the available times for your first one and pick what works for you.</q>', src: 'Mark’s deck, slide 6', jump: 'info:pm' },
+    { n: 2, title: 'PM details: “How checkups are scheduled”', body: 'One short section above “Why it matters”, titled “How checkups are scheduled” (colon added to match the other headings): <q>Your two checkups are spaced across your membership year. On the next step, you’ll see the available times for your first one and pick what works for you.</q>', src: 'Mark’s deck, slide 6', jump: 'info:pm' },
     { n: 3, title: 'Service request button at the very end', body: 'A “Create a Service Request” button on “You’re All Set!”, after both visits are booked. It’s the only service request call to action in the flow.', src: 'Mark in Slack (4:23 AM) · deck slide 14', jump: 'done' },
   ];
 
   const JUMPS = [
     ['intro', 'Introduction'],
-    ['home', 'Select a home (2 homes)'],
     ['info:he', 'Home Enrollment · details'],
     ['date:he', 'Home Enrollment · pick a date'],
     ['time:he', 'Home Enrollment · pick a time'],
@@ -556,14 +537,15 @@ body.notes-on .stage { right: 360px; }
   ];
 
   // ---------- State ----------
+  // resched: null, or where a reschedule started ('confirm' = the visit's Confirm screen, 'review' = Confirmation)
   const freshFlow = () => ({
-    screen: 'intro', mode: 'flow', homeId: 'main',
+    screen: 'intro', resched: null, homeId: 'main',
     he: { date: null, time: null },
     pm: { date: null, time: null },
     draft: { date: null, time: null },
-    calMonth: null, faq: { 'he-after': true }, completed: false, started: false,
+    calMonth: null, faq: {}, completed: false,
   });
-  const state = Object.assign(freshFlow(), { copy: 'proposed', avail: 'soon', multi: false, view: 'desktop', notes: false, modalOpen: true });
+  const state = Object.assign(freshFlow(), { copy: 'proposed', avail: 'soon', view: 'desktop', notes: false, modalOpen: true });
 
   // ---------- DOM ----------
   const $ = (sel, root = document) => root.querySelector(sel);
@@ -618,20 +600,22 @@ body.notes-on .stage { right: 360px; }
 
   // ---------- Availability (fake, deterministic) ----------
   const rangeFor = (visit) => (visit === 'he' ? RANGES.he : state.avail === 'later' ? RANGES.pmLater : RANGES.pmSoon);
-  const fullyBooked = (d) => (d.getDate() * 37 + (d.getMonth() + 1) * 101 + d.getFullYear()) % 9 === 0;
+  const isWeekend = (d) => d.getDay() === 0 || d.getDay() === 6;
+  // Like the build: only the other visit's day shows as Scheduled; this visit's current day stays bookable
   function dayStatus(visit, d) {
-    const k = keyOf(d);
     const other = visit === 'he' ? 'pm' : 'he';
-    if (state[other].date === k || state[visit].date === k) return 'sched';
+    if (state[other].date === keyOf(d)) return 'sched';
     const r = rangeFor(visit);
-    if (d < r.min || d > r.max || d.getDay() === 0 || fullyBooked(d)) return 'unavail';
+    if (d < r.min || d > r.max || isWeekend(d)) return 'unavail';
+    // Sample data keeps the checkup after the enrollment visit
+    if (state[other].date && (visit === 'pm' ? d <= parse(state[other].date) : d >= parse(state[other].date))) return 'unavail';
     return 'avail';
   }
   const slotsFor = (d) => SLOT_TIMES.filter((t, i) => (d.getDate() * 3 + i * 7 + d.getMonth()) % 4 !== 0);
 
   // ---------- Flow ----------
   function sectionOf(screen) {
-    if (screen === 'intro' || screen === 'home') return 0;
+    if (screen === 'intro') return 0;
     if (screen.endsWith(':he')) return 1;
     if (screen.endsWith(':pm')) return 2;
     if (screen === 'review') return 3;
@@ -641,14 +625,13 @@ body.notes-on .stage { right: 360px; }
 
   function goto(screen) {
     state.screen = screen;
-    state.started = true;
     render({ newScreen: true });
   }
-  // The calendar opens on the current month, like the build.
-  function startDate(visit, mode) {
-    state.mode = mode;
+  // Like the build: the calendar opens on the current month, or on the booked month when rescheduling
+  function startDate(visit, from) {
+    state.resched = from;
     state.draft = { date: null, time: null };
-    state.calMonth = monthStart(TODAY);
+    state.calMonth = monthStart(state[visit].date ? parse(state[visit].date) : TODAY);
     goto(`date:${visit}`);
   }
   function commit(visit) {
@@ -658,17 +641,18 @@ body.notes-on .stage { right: 360px; }
   function next() {
     const [kind, visit] = state.screen.split(':');
     switch (kind) {
-      case 'intro': return goto(state.multi ? 'home' : 'info:he');
-      case 'home': return goto('info:he');
-      case 'info': return startDate(visit, 'flow');
+      case 'intro': return goto('info:he');
+      case 'info': return startDate(visit, null);
       case 'date': return state.draft.date && goto(`time:${visit}`);
       case 'time':
         if (!state.draft.time) return;
         commit(visit);
         return goto(`confirm:${visit}`);
-      case 'confirm':
-        if (state.mode === 'resched' || visit === 'pm' || state.pm.date) { state.mode = 'flow'; return goto('review'); }
-        return goto('info:pm');
+      case 'confirm': {
+        const fromReview = state.resched === 'review';
+        state.resched = null;
+        return goto(!fromReview && visit === 'he' && !state.pm.date ? 'info:pm' : 'review');
+      }
       case 'review': state.completed = true; return goto('done');
       case 'done': return closeModal();
     }
@@ -676,11 +660,12 @@ body.notes-on .stage { right: 360px; }
   function back() {
     const [kind, visit] = state.screen.split(':');
     switch (kind) {
-      case 'home': return goto('intro');
-      case 'info': return goto(visit === 'he' ? (state.multi ? 'home' : 'intro') : 'confirm:he');
-      case 'date':
-        if (state.mode === 'resched') { state.mode = 'flow'; return goto('review'); }
-        return goto(state[visit].date ? `confirm:${visit}` : `info:${visit}`);
+      case 'info': return goto(visit === 'he' ? 'intro' : 'confirm:he');
+      case 'date': {
+        const from = state.resched;
+        state.resched = null;
+        return goto(from === 'review' ? 'review' : from === 'confirm' ? `confirm:${visit}` : `info:${visit}`);
+      }
       case 'time': return goto(`date:${visit}`);
     }
   }
@@ -715,28 +700,6 @@ body.notes-on .stage { right: 360px; }
     };
   }
 
-  function screenHome() {
-    const opt = (id) => {
-      const h = HOMES[id];
-      return `<label class="home-opt">
-        <input type="radio" name="home" value="${id}" data-action="home" data-fk="home-${id}" ${state.homeId === id ? 'checked' : ''}>
-        <span class="ho-body">
-          <span class="ho-top"><span class="ho-street">${h.street}</span><span class="badge-yellow">Enrollment needed</span></span>
-          <span class="ho-city">${h.city}</span>
-          <span class="ho-bar" aria-hidden="true"><i style="width:${h.pct}%"></i></span>
-          <span class="ho-pct">${h.pct}% complete</span>
-        </span>
-      </label>`;
-    };
-    return {
-      body: `<div class="panel">
-        ${titleTag('Choose which property you would like to schedule for.')}
-        <fieldset class="homes" aria-labelledby="screen-title">${opt('main')}${opt('sunset')}</fieldset>
-      </div>`,
-      footer: btn('Continue', 'next', 'primary', { arrow: true }),
-    };
-  }
-
   function faqList(visit) {
     return `<div class="faq">${FAQ[visit].map((f) => {
       const id = `${visit}-${f.k}`;
@@ -745,7 +708,7 @@ body.notes-on .stage { right: 360px; }
         <h4><button type="button" class="faq-q" data-action="faq" data-id="${id}" data-fk="faq-${id}" aria-expanded="${open}" aria-controls="faq-a-${id}">
           <span>${f.q}</span>${ic(open ? 'i-minus' : 'i-plus')}
         </button></h4>
-        <div class="faq-a" id="faq-a-${id}"${open ? '' : ' hidden'}><p>${f.a}</p></div>
+        <div class="faq-a" id="faq-a-${id}"${open ? '' : ' hidden'}><p${f.a ? '' : ' class="faq-placeholder"'}>${f.a || FAQ_PLACEHOLDER}</p></div>
       </div>`;
     }).join('')}</div>`;
   }
@@ -808,7 +771,7 @@ body.notes-on .stage { right: 360px; }
 
   function serviceSummary(visit) {
     const v = VISITS[visit];
-    const row = (icon, label, val) => `<div class="svc-row"><dt>${ic(icon)}<span>${label}:</span></dt><dd>${val}</dd></div>`;
+    const row = (icon, label, val) => `<div class="svc-row"><dt>${ic(icon)}<span>${label}:</span></dt> <dd>${val}</dd></div>`;
     return `<dl class="svc">
       ${row('i-tools', 'Service Visit', v.serviceType)}
       ${row('i-user', 'Home Manager', v.manager)}
@@ -839,7 +802,7 @@ body.notes-on .stage { right: 360px; }
     const draftKey = state.draft.date;
     const focusKey = (draftKey && all.some((d) => keyOf(d) === draftKey)) ? draftKey
       : keyOf(all.find((d) => dayStatus(visit, d) === 'avail') || all.find((d) => keyOf(d) === keyOf(TODAY)) || all[0]);
-    const label = { avail: 'available', unavail: 'not available', sched: 'already scheduled' };
+    const label = { avail: 'available', unavail: 'not available', sched: `your ${VISITS[visit === 'he' ? 'pm' : 'he'].name}` };
     const cells = [];
     for (let i = 0; i < m.getDay(); i++) cells.push('<td role="gridcell"></td>');
     all.forEach((d) => {
@@ -854,22 +817,22 @@ body.notes-on .stage { right: 360px; }
     const rows = [];
     for (let i = 0; i < cells.length; i += 7) rows.push(`<tr>${cells.slice(i, i + 7).join('')}</tr>`);
     const wd = [['S', 'Sunday'], ['M', 'Monday'], ['T', 'Tuesday'], ['W', 'Wednesday'], ['T', 'Thursday'], ['F', 'Friday'], ['S', 'Saturday']];
-    const hasSched = !!(state.he.date || state.pm.date);
+    const hasSched = !!state[visit === 'he' ? 'pm' : 'he'].date;
     return `<div class="cal">
       <div class="cal-head">
-        <button type="button" class="icon-btn" data-action="cal-prev" data-fk="cal-prev" aria-label="Previous month"${prevOk ? '' : ' disabled'}>${ic('i-chev-left')}</button>
+        <button type="button" class="icon-btn" data-action="cal-prev" data-fk="cal-prev" aria-label="Previous month"${prevOk ? '' : ' disabled style="visibility:hidden"'}>${ic('i-chev-left')}</button>
         <p class="cal-month" id="cal-label" aria-live="polite">${fmt(m, { month: 'short', year: 'numeric' })}</p>
-        <button type="button" class="icon-btn" data-action="cal-next" data-fk="cal-next" aria-label="Next month"${nextOk ? '' : ' disabled'}>${ic('i-chev-right')}</button>
+        <button type="button" class="icon-btn" data-action="cal-next" data-fk="cal-next" aria-label="Next month"${nextOk ? '' : ' disabled style="visibility:hidden"'}>${ic('i-chev-right')}</button>
       </div>
       <table class="cal-grid" role="grid" aria-labelledby="cal-label">
         <thead><tr>${wd.map(([s, l]) => `<th scope="col" abbr="${l}">${s}</th>`).join('')}</tr></thead>
         <tbody>${rows.join('')}</tbody>
       </table>
       <ul class="legend" aria-label="Legend">
-        <li><span class="sw sw-today"></span>Today</li>
-        <li><span class="sw sw-avail"></span>Available Slots</li>
-        <li><span class="sw sw-sel"></span>Selected</li>
-        ${hasSched ? '<li><span class="sw sw-sched"></span>Scheduled</li>' : ''}
+        <li><span class="sw sw-today"></span>- Today</li>
+        <li><span class="sw sw-avail"></span>- Available Slots</li>
+        <li><span class="sw sw-sel"></span>- Selected</li>
+        ${hasSched ? '<li><span class="sw sw-sched"></span>- Scheduled</li>' : ''}
       </ul>
     </div>`;
   }
@@ -925,9 +888,7 @@ body.notes-on .stage { right: 360px; }
   }
 
   function screenConfirm(visit) {
-    let label = 'Continue to Confirmation';
-    if (state.mode === 'resched') label = 'Back to Confirmation';
-    else if (visit === 'he' && !state.pm.date) label = 'Continue to Preventive Maintenance';
+    const label = state.resched !== 'review' && visit === 'he' && !state.pm.date ? 'Continue to Preventive Maintenance' : 'Continue to Confirmation';
     return {
       body: `<div class="panel">${titleTag('Confirm Appointment')}<div class="confirm-wrap">${visitCard(visit)}</div></div>`,
       footer: btn('Reschedule', 'resched-here', 'secondary') + btn(label, 'next', 'primary', { arrow: true }),
@@ -958,7 +919,6 @@ body.notes-on .stage { right: 360px; }
     const [kind, visit] = state.screen.split(':');
     switch (kind) {
       case 'intro': return screenIntro();
-      case 'home': return screenHome();
       case 'info': return visit === 'he' ? screenInfoHE() : screenInfoPM();
       case 'date': return screenDate(visit);
       case 'time': return screenTime(visit);
@@ -978,7 +938,7 @@ body.notes-on .stage { right: 360px; }
           <p>It is important to schedule your Home Enrollment as soon as possible so you can start receiving your Preventive Maintenance.</p>
           <hr>
           <p class="addr">${ic('i-home')}${h.street} (${MEMBER})</p>
-          <button type="button" class="btn btn-yellow" data-action="open-flow">${state.started ? 'Continue Setup' : 'Schedule'}</button>
+          <button type="button" class="btn btn-yellow" data-action="open-flow">Schedule</button>
         </div>
       </section>`;
     dashboard.innerHTML = `
@@ -988,7 +948,8 @@ body.notes-on .stage { right: 360px; }
           <section class="card card-sky welcome" aria-labelledby="welcome-h">
             <h2 id="welcome-h"><span aria-hidden="true">👋</span> Welcome to PreFix HomeHub!</h2>
             <p>You should be able to find all of your most important PreFix service information here. Whether that’s upcoming service appointments, or completed repairs and maintenance, HomeHub is the place to find it!</p>
-            <p style="margin:0">Our team will also be continuing to add new features to HomeHub into the future, to help keep the hassle out of homeownership!</p>
+            <p>Our team will also be continuing to add new features to HomeHub into the future, to help keep the hassle out of homeownership!</p>
+            <p style="margin:0">Again, we thank you for putting your trust in PreFix.homeownership!</p>
           </section>
           ${banner}
           <section class="card card-sky">
@@ -1011,8 +972,7 @@ body.notes-on .stage { right: 360px; }
           <h2 class="side-h">Your Home Manager</h2>
           <section class="card hm-card" aria-label="Your Home Manager">
             <div class="avatar" aria-hidden="true">MC</div>
-            <p class="name">${VISITS.he.manager}</p>
-            <p style="margin:0">Your one point of contact for repairs: call, text, or email</p>
+            <p class="name" style="margin:0">${VISITS.he.manager}</p>
           </section>
           <section class="card card-sky" style="text-align:center" aria-label="Referral">
             <h2><span aria-hidden="true">💰</span> Give/Get $50</h2>
@@ -1027,7 +987,6 @@ body.notes-on .stage { right: 360px; }
     const pressed = (action, value) => document.querySelectorAll(`[data-action="${action}"]`).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === value)));
     pressed('copy', state.copy);
     pressed('avail', state.avail);
-    pressed('homes', state.multi ? '2' : '1');
     pressed('view', state.view);
     $('[data-action="notes"]').setAttribute('aria-pressed', String(state.notes));
     if (!jumpSelect.options.length) {
@@ -1048,10 +1007,10 @@ body.notes-on .stage { right: 360px; }
         <h4><span class="sr-only">${n.n}. </span>${n.title}</h4><p>${n.body}</p><p class="note-src">Source: ${n.src}</p>
         <button type="button" class="note-show" data-action="jump-to" data-value="${n.jump}">Show me</button>
       </div></li>`).join('')}</ol>
-      <h3>Unchanged</h3>
+      <h3>Unchanged from the build</h3>
       <ul class="plain-list">
-        <li>Scheduling API and logic: the calendar shows whatever slots come back, the same as today. The first slot might be next week or months away. Use <b>First PM slot</b> in the bar to try both.</li>
-        <li>Screens, steps and buttons match the build. Nothing new is saved.</li>
+        <li>Scheduling API and logic: the calendar shows whatever slots come back, the same as today. Use <b>First PM slot</b> in the bar to see a slot next week or about 4 months out.</li>
+        <li>Every screen, step, button and label matches Alex’s build as shown in Mark’s deck. Nothing new is saved.</li>
       </ul>
       <h3>Removed since the last version</h3>
       <ul class="plain-list">
@@ -1060,11 +1019,18 @@ body.notes-on .stage { right: 360px; }
         <li>The service request boxes and button before booking</li>
         <li>“I’ll book my checkup later” and its extra screen</li>
         <li>The “What happens next” timeline. “You’re All Set!” is back to the built screen, plus the button in note 3.</li>
+        <li>The “Select a home” screen. It’s in Figma, but per the Confluence page the build runs the modal once per home.</li>
       </ul>
-      <h3>Open questions</h3>
+      <h3>Not verified (the deck doesn’t show these)</h3>
       <ul class="plain-list">
-        <li>When the first PM slot is months out, the calendar still opens on the current month, so members click Next past empty months (try <b>~4 months out</b>). Should it open on the first month with a slot? That would be a front-end change only.</li>
-        <li>FAQ questions match the build. The answers here are drafted from on-screen copy; the real ones are in the FAQ doc (PFX-382). “Why can’t I book it for this week?” is the one to check against Mark’s new lines.</li>
+        <li>FAQ answers: only “What happens after the visit?” is visible in the build screenshots. The rest show a placeholder; the real copy is in the FAQ doc (PFX-382). “Why can’t I book it for this week?” is the one to read against Mark’s new lines.</li>
+        <li>The build’s Home Enrollment FAQ has at least one more question below “What happens after the visit?” that the screenshot cuts off.</li>
+        <li>After rescheduling from the Confirmation screen, the button reads “Continue to Confirmation”. The deck doesn’t show this step, and Figma’s version says “Continue to Preventive Maintenance”, which looks like a copy-paste slip.</li>
+        <li>Mobile layouts follow Figma; the deck only shows desktop.</li>
+      </ul>
+      <h3>Open question</h3>
+      <ul class="plain-list">
+        <li>When the first PM slot is months out, the calendar still opens on the current month, so members click Next past empty months (try <b>~4 months out</b>). Should it open on the first month with a slot? That would be a front-end-only change, and it isn’t made here.</li>
       </ul>`;
   }
 
@@ -1090,10 +1056,10 @@ body.notes-on .stage { right: 360px; }
     appScroll.inert = true;
 
     const sec = sectionOf(state.screen);
-    const showSteps = sec >= 0 && state.mode !== 'resched';
+    const showSteps = sec >= 0 && !state.resched;
     stepsEl.hidden = !showSteps;
     if (showSteps) {
-      stepTitle.textContent = state.screen === 'home' ? 'Select a home' : SECTION_TITLES[sec];
+      stepTitle.textContent = SECTION_TITLES[sec];
       progress.setAttribute('aria-valuenow', String(sec + 1));
       progress.setAttribute('aria-valuetext', `Step ${sec + 1} of 4: ${SECTION_TITLES[sec]}`);
       progress.innerHTML = [0, 1, 2, 3].map((i) => `<span${i <= sec ? ' class="on"' : ''}></span>`).join('');
@@ -1117,7 +1083,7 @@ body.notes-on .stage { right: 360px; }
 
   function closeModal() {
     state.modalOpen = false;
-    state.mode = 'flow';
+    state.resched = null;
     render();
     const target = dashboard.querySelector('[data-action="open-flow"]') || $('h1', dashboard);
     target?.focus();
@@ -1137,7 +1103,7 @@ body.notes-on .stage { right: 360px; }
   // ---------- Jumps ----------
   const samplePM = () => ({ ...(state.avail === 'later' ? SAMPLE.pmLater : SAMPLE.pmSoon) });
   function resetFlow() {
-    const keep = { copy: state.copy, avail: state.avail, multi: state.multi, view: state.view, notes: state.notes };
+    const keep = { copy: state.copy, avail: state.avail, view: state.view, notes: state.notes };
     Object.assign(state, freshFlow(), keep);
   }
   function jump(target) {
@@ -1147,19 +1113,18 @@ body.notes-on .stage { right: 360px; }
     const withPM = () => { state.pm = samplePM(); };
     switch (target) {
       case 'intro': return goto('intro');
-      case 'home': state.multi = true; return goto('home');
       case 'info:he': return goto('info:he');
-      case 'date:he': return startDate('he', 'flow');
+      case 'date:he': return startDate('he', null);
       case 'time:he': state.calMonth = monthStart(TODAY); state.draft = { date: SAMPLE.he.date, time: null }; return goto('time:he');
       case 'confirm:he': withHE(); return goto('confirm:he');
       case 'info:pm': withHE(); return goto('info:pm');
-      case 'date:pm': withHE(); return startDate('pm', 'flow');
+      case 'date:pm': withHE(); return startDate('pm', null);
       case 'time:pm': withHE(); state.calMonth = monthStart(TODAY); state.draft = { date: samplePM().date, time: null }; return goto('time:pm');
       case 'confirm:pm': withHE(); withPM(); return goto('confirm:pm');
       case 'review': withHE(); withPM(); return goto('review');
-      case 'resched': withHE(); withPM(); return startDate('pm', 'resched');
+      case 'resched': withHE(); withPM(); return startDate('pm', 'review');
       case 'done': withHE(); withPM(); state.completed = true; return goto('done');
-      case 'dash-before': state.started = true; state.screen = 'info:he'; return closeModal();
+      case 'dash-before': state.screen = 'info:he'; return closeModal();
     }
   }
 
@@ -1200,17 +1165,13 @@ body.notes-on .stage { right: 360px; }
         render();
         if (modal.querySelector(`[data-fk="${a}"]`)?.disabled) modal.querySelector('.cal-grid .day[tabindex="0"]')?.focus();
         return;
-      case 'resched': return startDate(el.dataset.visit, 'resched');
-      case 'resched-here': return startDate(state.screen.split(':')[1], state.mode);
+      case 'resched': return startDate(el.dataset.visit, 'review');
+      case 'resched-here': return startDate(state.screen.split(':')[1], state.resched === 'review' ? 'review' : 'confirm');
       case 'sr': return toast('Prototype: this opens Create Request, after both visits are booked.');
       case 'nav': return toast('Not part of this prototype. Try the Controls menu to jump around.');
       case 'nav-dash': return;
       case 'copy': state.copy = el.dataset.value; return render();
       case 'avail': return setAvail(el.dataset.value);
-      case 'homes':
-        state.multi = el.dataset.value === '2';
-        if (!state.multi) { state.homeId = 'main'; if (state.screen === 'home') state.screen = 'info:he'; }
-        return render();
       case 'view': state.view = el.dataset.value; return render();
       case 'notes': state.notes = !state.notes; return render();
       case 'restart': $('#pb-more').open = false; return jump('intro');
@@ -1222,7 +1183,6 @@ body.notes-on .stage { right: 360px; }
     const el = e.target.closest('[data-action]');
     if (!el) return;
     switch (el.dataset.action) {
-      case 'home': state.homeId = el.value; return render();
       case 'slot': state.draft.time = el.value; return render();
       case 'jump':
         if (el.value) { const v = el.value; el.value = ''; $('#pb-more').open = false; jump(v); }

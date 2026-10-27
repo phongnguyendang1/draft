@@ -19,8 +19,10 @@ The dark bar at the top is prototype chrome, not product UI:
 - **Copy:** switches between *As built* and *Proposed*.
 - **First PM slot:** switches the fake availability between *Next week* and *~4 months out*. This is the same data the scheduling API would return; the flow itself does not change.
 - **Change notes:** shows numbered markers for the three changes, plus a side panel listing what was removed since the last version and the open questions.
-- **Controls:** switch between 1 and 2 homes, switch between Desktop and Mobile preview, jump to any screen, or restart.
+- **Controls:** switch between Desktop and Mobile preview, jump to any screen, or restart.
 
 All dates, names and availability are sample data. "Today" is fixed at Tue, Oct 27, 2026.
 
-The FAQ questions match the build. The answers are drafted from copy already on these screens; the approved answers are in the FAQ copy doc (PFX-382).
+The FAQ questions match the build. Only one answer ("What happens after the visit?") is visible in the build screenshots. The others show a labelled placeholder, because the approved answers are in the FAQ copy doc (PFX-382).
+
+The "Select a home" screen from Figma is not included. Per the Confluence page, the build runs the modal once per home.
