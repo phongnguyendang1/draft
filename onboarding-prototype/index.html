@@ -230,6 +230,11 @@ body.notes-on .stage { right: 360px; }
 .day.today { background: var(--sky-bg); color: var(--navy); }
 .day.is-sched { background: #e3e8ed; color: var(--navy); }
 .day.sel { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 700; }
+.cal-body { position: relative; }
+.cal-empty { position: absolute; inset: 0; display: grid; place-items: center; padding: 8px; border-radius: 8px; background: rgba(255, 255, 255, .78); }
+.cal-empty-card { max-width: 320px; padding: 16px 20px; border: 1px solid var(--border); border-radius: 8px; background: #fff; box-shadow: 0 6px 24px rgba(12, 40, 81, .16); text-align: center; }
+.cal-empty-title { margin: 0 0 4px; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--navy); }
+.cal-empty-text { margin: 0 0 14px; font-size: 14px; line-height: 20px; color: var(--text2); text-wrap: balance; }
 .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin: 12px 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--slate); }
 .legend li { display: flex; align-items: center; gap: 6px; }
 .legend .sw { width: 16px; height: 16px; border-radius: 50%; border: 1px solid transparent; }
@@ -526,6 +531,7 @@ body.notes-on .stage { right: 360px; }
     { n: 4, add: true, title: 'PM details: first checkup may be months out', body: 'One more sentence after Mark’s, in the same section: <q>Depending on your Home Manager’s schedule, your first open time may be a few months out. We schedule this way so every member’s visits stay on time, and you’ll still get both checkups this membership year.</q>', src: 'Call: Mark 10:50, 11:10–11:11 and 11:23 (two a year, consistent for every member, still get both) · Phong 11:14 (give the reason why)', jump: 'info:pm' },
     { n: 5, add: true, title: 'FAQ answer: “Why can’t I book it for this week?”', body: 'Proposed answer for the question that’s already in the build: <q>We book first checkups where your Home Manager has open time, so every member’s visits stay on schedule. Your first one may be a few weeks or a few months out, and you’ll still get both checkups this membership year. Need something sooner? You can request service anytime.</q> The current answer is in the FAQ doc (PFX-382), so this would replace or merge with it.', src: 'Call: Mark 11:10–11:11 · Phong 11:14 · Mark 11:12–11:13', jump: 'faq-week' },
     { n: 6, add: true, title: '“You’re All Set!”: request service in the meantime', body: 'One line above the button from note 3: <q>Need something done before your checkup? You don’t have to wait. Request service anytime.</q>', src: 'Call: Mark 11:12–11:13 (“overemphasize you can get work done before your PM”) and 11:31–11:32 (say it at the end)', jump: 'done' },
+    { n: 7, add: true, title: 'Calendar: card when a month has no times', body: 'Like Calendly: when the month on screen has no open times, the dates fade and a card says <q>No times available in October</q>, shows <q>Next available: Tuesday, November 3, 2026</q>, and offers <q>Jump to next available date</q>. Members no longer click Next past empty months. Front end only; it uses the slots the API already returns.', src: 'Phong (Calendly pattern)', jump: 'date:pm' },
   ];
 
   const JUMPS = [
@@ -802,6 +808,14 @@ body.notes-on .stage { right: 360px; }
     return out;
   }
 
+  function nextAvailable(visit, from) {
+    const r = rangeFor(visit);
+    for (let d = new Date(Math.max(monthStart(from), TODAY)); d <= r.max; d = addDays(d, 1)) {
+      if (dayStatus(visit, d) === 'avail') return d;
+    }
+    return null;
+  }
+
   function calendar(visit) {
     const m = state.calMonth;
     const r = rangeFor(visit);
@@ -828,16 +842,31 @@ body.notes-on .stage { right: 360px; }
     for (let i = 0; i < cells.length; i += 7) rows.push(`<tr>${cells.slice(i, i + 7).join('')}</tr>`);
     const wd = [['S', 'Sunday'], ['M', 'Monday'], ['T', 'Tuesday'], ['W', 'Wednesday'], ['T', 'Thursday'], ['F', 'Friday'], ['S', 'Saturday']];
     const hasSched = !!state[visit === 'he' ? 'pm' : 'he'].date;
+    // Proposed: like Calendly, a month with no open times gets a card pointing to the next available date
+    const empty = proposed() && !all.some((d) => dayStatus(visit, d) === 'avail');
+    const nextDate = empty ? nextAvailable(visit, m) : null;
+    const overlay = !empty ? '' : `<div class="cal-empty">
+        <div class="cal-empty-card" role="group" aria-labelledby="cal-empty-title"${noteAttr(7, 'add')}>
+          <p class="cal-empty-title" id="cal-empty-title">No times available in ${monthLong(m)}</p>
+          ${nextDate
+            ? `<p class="cal-empty-text">Next available: ${fmtFull(nextDate)}</p>
+          <button type="button" class="btn btn-primary btn-sm" data-action="cal-jump" data-date="${keyOf(nextDate)}" data-fk="cal-jump">Jump to next available date</button>`
+            : '<p class="cal-empty-text" style="margin:0">There are no open times yet. Please check back soon.</p>'}
+        </div>
+      </div>`;
     return `<div class="cal">
       <div class="cal-head">
         <button type="button" class="icon-btn" data-action="cal-prev" data-fk="cal-prev" aria-label="Previous month"${prevOk ? '' : ' disabled style="visibility:hidden"'}>${ic('i-chev-left')}</button>
         <p class="cal-month" id="cal-label" aria-live="polite">${fmt(m, { month: 'short', year: 'numeric' })}</p>
         <button type="button" class="icon-btn" data-action="cal-next" data-fk="cal-next" aria-label="Next month"${nextOk ? '' : ' disabled style="visibility:hidden"'}>${ic('i-chev-right')}</button>
       </div>
-      <table class="cal-grid" role="grid" aria-labelledby="cal-label">
-        <thead><tr>${wd.map(([s, l]) => `<th scope="col" abbr="${l}">${s}</th>`).join('')}</tr></thead>
-        <tbody>${rows.join('')}</tbody>
-      </table>
+      <div class="cal-body">
+        <table class="cal-grid" role="grid" aria-labelledby="cal-label"${empty ? ' inert' : ''}>
+          <thead><tr>${wd.map(([s, l]) => `<th scope="col" abbr="${l}">${s}</th>`).join('')}</tr></thead>
+          <tbody>${rows.join('')}</tbody>
+        </table>
+        ${overlay}
+      </div>
       <ul class="legend" aria-label="Legend">
         <li><span class="sw sw-today"></span>- Today</li>
         <li><span class="sw sw-avail"></span>- Available Slots</li>
@@ -1018,15 +1047,15 @@ body.notes-on .stage { right: 360px; }
     notesEl.innerHTML = `
       <div class="notes-head"><h2 id="notes-title">What changed</h2>
         <button type="button" class="notes-close" data-action="notes" aria-label="Hide change notes">${ic('i-close')}</button></div>
-      <p>This matches the onboarding flow Alex built, plus copy changes only: no new logic, screens, or data. Markers show with <b>Copy: Proposed</b>; switch to <b>As built</b> to compare.</p>
+      <p>This matches the onboarding flow Alex built, plus proposed copy, one button at the end, and one calendar card. There’s no new logic, screen, or data. Markers show with <b>Copy: Proposed</b>; switch to <b>As built</b> to compare.</p>
       <h3>Mark’s proposed copy (orange)</h3>
       ${noteList(NOTES.filter((n) => !n.add))}
-      <h3>Added from the call transcript (purple), for Mark to accept or cut</h3>
+      <h3>Proposed additions (purple), for Mark to accept or cut</h3>
       ${noteList(NOTES.filter((n) => n.add))}
       <h3>Unchanged from the build</h3>
       <ul class="plain-list">
         <li>Scheduling API and logic: the calendar shows whatever slots come back, the same as today. Use <b>First PM slot</b> in the bar to see a slot next week or about 4 months out.</li>
-        <li>Every screen, step, button and label matches Alex’s build as shown in Mark’s deck. Nothing new is saved.</li>
+        <li>Apart from the numbered changes, every screen, step, button and label matches Alex’s build as shown in Mark’s deck. Nothing new is saved.</li>
       </ul>
       <h3>Removed since the last version</h3>
       <ul class="plain-list">
@@ -1044,9 +1073,9 @@ body.notes-on .stage { right: 360px; }
         <li>After rescheduling from the Confirmation screen, the button reads “Continue to Confirmation”. The deck doesn’t show this step, and Figma’s version says “Continue to Preventive Maintenance”, which looks like a copy-paste slip.</li>
         <li>Mobile layouts follow Figma; the deck only shows desktop.</li>
       </ul>
-      <h3>Open question</h3>
+      <h3>Question for Alex</h3>
       <ul class="plain-list">
-        <li>When the first PM slot is months out, the calendar still opens on the current month, so members click Next past empty months (try <b>~4 months out</b>). Should it open on the first month with a slot? That would be a front-end-only change, and it isn’t made here.</li>
+        <li>Note 7 needs the first open date, which may be several months out. Does the scheduling API return slots across months in one call, or one month at a time?</li>
       </ul>`;
   }
 
@@ -1183,7 +1212,12 @@ body.notes-on .stage { right: 360px; }
       case 'cal-prev': case 'cal-next':
         state.calMonth = new Date(state.calMonth.getFullYear(), state.calMonth.getMonth() + (a === 'cal-next' ? 1 : -1), 1);
         render();
-        if (modal.querySelector(`[data-fk="${a}"]`)?.disabled) modal.querySelector('.cal-grid .day[tabindex="0"]')?.focus();
+        if (modal.querySelector(`[data-fk="${a}"]`)?.disabled) modal.querySelector('.cal-grid:not([inert]) .day[tabindex="0"], [data-fk="cal-jump"]')?.focus();
+        return;
+      case 'cal-jump':
+        state.calMonth = monthStart(parse(el.dataset.date));
+        render();
+        modal.querySelector(`.day[data-date="${el.dataset.date}"]`)?.focus();
         return;
       case 'resched': return startDate(el.dataset.visit, 'review');
       case 'resched-here': return startDate(state.screen.split(':')[1], state.resched === 'review' ? 'review' : 'confirm');
