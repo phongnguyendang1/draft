@@ -1,15 +1,26 @@
 # HomeHub onboarding prototype
 
-A clickable, front-end-only prototype of the HomeHub member onboarding flow (Introduction → Home Enrollment → Preventive Maintenance → Confirmation). It is based on the "Onboarding popup" section of the HomeHub-WCAG Figma file.
+A clickable, front-end-only prototype of the HomeHub onboarding flow:
 
-This version is updated for the scheduling discussion about pushing out a new member's **first Preventive Maintenance** when demand in their territory is over capacity.
+Introduction → Home Enrollment → Preventive Maintenance → Confirmation → You're All Set.
+
+It matches the flow Alex built ([HomeHub Onboarding Flow](https://prefixinc.atlassian.net/wiki/spaces/PDS/pages/3313991682/HomeHub+Onboarding+Flow)), plus Mark's proposed copy. That copy sets expectations that the first Preventive Maintenance may be a while out. The change is copy only: no new logic, screens, or data. The scheduling API and calendar behave as they do today.
+
+The changes:
+
+1. **Intro:** Mark's new Preventive Maintenance line (deck, slide 2).
+2. **Preventive Maintenance details:** a "How checkups are scheduled" section above "Why it matters" (deck, slide 6).
+3. **You're All Set:** a "Create a Service Request" button. This is the only service request button in the flow, and it appears after both visits are booked.
 
 Open `index.html` in a browser. It is a single self-contained file. It needs no build step, but it loads the DM Sans font from Google Fonts.
 
 The dark bar at the top is prototype chrome, not product UI:
 
-- **Scenario:** *First-PM window* shows the new flow. *Normal availability* shows today's flow.
-- **Change notes:** numbered markers on the screens, plus a side panel listing each change with its transcript timestamp, open questions, and what was left out.
+- **Copy:** switches between *As built* and *Proposed*.
+- **First PM slot:** switches the fake availability between *Next week* and *~4 months out*. This is the same data the scheduling API would return; the flow itself does not change.
+- **Change notes:** shows numbered markers for the three changes, plus a side panel listing what was removed since the last version and the open questions.
 - **Controls:** switch between 1 and 2 homes, switch between Desktop and Mobile preview, jump to any screen, or restart.
 
-All dates, times and availability are fake. "Today" is fixed at Mon, Oct 26, 2026, and the first checkup window is Jan 4 – Feb 26, 2027.
+All dates, names and availability are sample data. "Today" is fixed at Tue, Oct 27, 2026.
+
+The FAQ questions match the build. The answers are drafted from copy already on these screens; the approved answers are in the FAQ copy doc (PFX-382).
