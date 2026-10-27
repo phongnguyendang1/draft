@@ -27,6 +27,7 @@
   --green: #23843b;
   --focus: #0c2851;
   --note: #c2410c;
+  --note-add: #6d28d9;
   --bar-h: 52px;
   --font: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color-scheme: light;
@@ -271,9 +272,12 @@ body.notes-on .stage { right: 360px; }
 .done .screen-title { margin-bottom: 4px; }
 .done-sub { max-width: 520px; margin: 0 auto 24px; font-size: 16px; line-height: 24px; color: var(--text2); }
 .done-cards { text-align: left; }
+.done-help { max-width: 560px; margin: 24px auto 0; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--navy); }
 
 /* ---------- Change notes ---------- */
 .notes-on [data-note] { position: relative; outline: 2px dashed var(--note); outline-offset: 3px; }
+.notes-on [data-note-kind="add"] { outline-color: var(--note-add); }
+.notes-on [data-note-kind="add"]::after { background: var(--note-add) !important; }
 .notes-on [data-note]::after { content: attr(data-note); position: absolute; top: -11px; right: -11px; z-index: 6; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 11px; background: var(--note); color: #fff; font: 700 11px/22px var(--font); text-align: center; pointer-events: none; }
 .notes { position: fixed; top: var(--bar-h); right: 0; bottom: 0; z-index: 55; width: 360px; overflow: auto; padding: 20px; background: #fff; border-left: 1px solid #e5e7eb; box-shadow: -12px 0 30px rgba(0,0,0,.08); color: #111827; font-size: 14px; line-height: 20px; }
 .notes[hidden] { display: none; }
@@ -286,6 +290,7 @@ body.notes-on .stage { right: 360px; }
 .note-list { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 12px; }
 .note-list li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 10px; }
 .note-num { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--note); color: #fff; font-size: 12px; font-weight: 700; }
+.note-num.add { background: var(--note-add); }
 .note-list h4 { margin: 2px 0 4px; font-size: 14px; }
 .note-list p { margin: 0; }
 .note-list q { font-style: italic; }
@@ -508,7 +513,7 @@ body.notes-on .stage { right: 360px; }
       { k: 'what', q: 'What is Preventive Maintenance?' },
       { k: 'cost', q: 'Is there any cost to me?' },
       { k: 'often', q: 'How often, and how long?' },
-      { k: 'week', q: 'Why can’t I book it for this week?' },
+      { k: 'week', q: 'Why can’t I book it for this week?', proposed: 'We book first checkups where your Home Manager has open time, so every member’s visits stay on schedule. Your first one may be a few weeks or a few months out, and you’ll still get both checkups this membership year. Need something sooner? You can request service anytime.', note: 5 },
       { k: 'know', q: 'How will I know what was done?' },
       { k: 'problem', q: 'What if my Home Manager finds a problem?' },
     ],
@@ -518,6 +523,9 @@ body.notes-on .stage { right: 360px; }
     { n: 1, title: 'Intro: Preventive Maintenance line', body: 'The PM bullet now reads: <q>Preventive Maintenance, twice a year: full checkups to catch small issues early. Your checkups are spaced across your membership year, and you’ll pick a time for your first one in a moment.</q>', src: 'Mark’s deck, slide 2', jump: 'intro' },
     { n: 2, title: 'PM details: “How checkups are scheduled”', body: 'One short section above “Why it matters”, titled “How checkups are scheduled” (colon added to match the other headings): <q>Your two checkups are spaced across your membership year. On the next step, you’ll see the available times for your first one and pick what works for you.</q>', src: 'Mark’s deck, slide 6', jump: 'info:pm' },
     { n: 3, title: 'Service request button at the very end', body: 'A “Create a Service Request” button on “You’re All Set!”, after both visits are booked. It’s the only service request call to action in the flow.', src: 'Mark in Slack (4:23 AM) · deck slide 14', jump: 'done' },
+    { n: 4, add: true, title: 'PM details: first checkup may be months out', body: 'One more sentence after Mark’s, in the same section: <q>Depending on your Home Manager’s schedule, your first open time may be a few months out. We schedule this way so every member’s visits stay on time, and you’ll still get both checkups this membership year.</q>', src: 'Call: Mark 10:50, 11:10–11:11 and 11:23 (two a year, consistent for every member, still get both) · Phong 11:14 (give the reason why)', jump: 'info:pm' },
+    { n: 5, add: true, title: 'FAQ answer: “Why can’t I book it for this week?”', body: 'Proposed answer for the question that’s already in the build: <q>We book first checkups where your Home Manager has open time, so every member’s visits stay on schedule. Your first one may be a few weeks or a few months out, and you’ll still get both checkups this membership year. Need something sooner? You can request service anytime.</q> The current answer is in the FAQ doc (PFX-382), so this would replace or merge with it.', src: 'Call: Mark 11:10–11:11 · Phong 11:14 · Mark 11:12–11:13', jump: 'faq-week' },
+    { n: 6, add: true, title: '“You’re All Set!”: request service in the meantime', body: 'One line above the button from note 3: <q>Need something done before your checkup? You don’t have to wait. Request service anytime.</q>', src: 'Call: Mark 11:12–11:13 (“overemphasize you can get work done before your PM”) and 11:31–11:32 (say it at the end)', jump: 'done' },
   ];
 
   const JUMPS = [
@@ -575,7 +583,7 @@ body.notes-on .stage { right: 360px; }
   const fmtFull = (d) => fmt(d, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   const monthLong = (d) => fmt(d, { month: 'long' });
   const proposed = () => state.copy === 'proposed';
-  const noteAttr = (n) => (proposed() ? ` data-note="${n}"` : '');
+  const noteAttr = (n, kind) => (proposed() ? ` data-note="${n}"${kind ? ` data-note-kind="${kind}"` : ''}` : '');
   const home = () => HOMES[state.homeId];
 
   // Time formats mirror the build: slot list "01:15 PM", cards "1:15 PM - 2:15 PM", boxes "1:15 PM, 24 August 2026"
@@ -704,11 +712,12 @@ body.notes-on .stage { right: 360px; }
     return `<div class="faq">${FAQ[visit].map((f) => {
       const id = `${visit}-${f.k}`;
       const open = !!state.faq[id];
-      return `<div class="faq-item">
+      const answer = (proposed() && f.proposed) || f.a;
+      return `<div class="faq-item"${proposed() && f.note ? noteAttr(f.note, 'add') : ''}>
         <h4><button type="button" class="faq-q" data-action="faq" data-id="${id}" data-fk="faq-${id}" aria-expanded="${open}" aria-controls="faq-a-${id}">
           <span>${f.q}</span>${ic(open ? 'i-minus' : 'i-plus')}
         </button></h4>
-        <div class="faq-a" id="faq-a-${id}"${open ? '' : ' hidden'}><p${f.a ? '' : ' class="faq-placeholder"'}>${f.a || FAQ_PLACEHOLDER}</p></div>
+        <div class="faq-a" id="faq-a-${id}"${open ? '' : ' hidden'}><p${answer ? '' : ' class="faq-placeholder"'}>${answer || FAQ_PLACEHOLDER}</p></div>
       </div>`;
     }).join('')}</div>`;
   }
@@ -756,7 +765,8 @@ body.notes-on .stage { right: 360px; }
           ${proposed() ? `<div${noteAttr(2)}>
             <p class="subhead">How checkups are scheduled:</p>
             <p>Your two checkups are spaced across your membership year. On the next step, you’ll see the available times for your first one and pick what works for you.</p>
-          </div>` : ''}
+          </div>
+          <p${noteAttr(4, 'add')}>Depending on your Home Manager’s schedule, your first open time may be a few months out. We schedule this way so every member’s visits stay on time, and you’ll still get both checkups this membership year.</p>` : ''}
           <p class="subhead">Why it matters:</p>
           <p>This visit is how we help protect your home. We look for small issues, a corroding valve, a clogged drain line, a worn part, so they can be addressed before they become expensive emergencies. Staying ahead of problems is how you avoid surprise breakdowns and help your systems last longer.</p>
         </div>
@@ -910,6 +920,7 @@ body.notes-on .stage { right: 360px; }
         ${titleTag('You’re All Set!')}
         <p class="done-sub">Your membership is active and your first two visits are booked.<br>This is where PreFix starts taking care of your home.</p>
         <div class="done-cards">${visitCard('he')}${visitCard('pm')}</div>
+        ${proposed() ? `<p class="done-help"${noteAttr(6, 'add')}>Need something done before your checkup? You don’t have to wait. Request service anytime.</p>` : ''}
       </div>`,
       footer: (proposed() ? btn('Create a Service Request', 'sr', 'secondary', { attrs: noteAttr(3) }) : '') + btn('Go to Dashboard', 'next', 'primary', { arrow: true }),
     };
@@ -994,6 +1005,11 @@ body.notes-on .stage { right: 360px; }
     }
   }
 
+  const noteList = (items) => `<ol class="note-list">${items.map((n) => `<li><span class="note-num${n.add ? ' add' : ''}" aria-hidden="true">${n.n}</span><div>
+        <h4><span class="sr-only">${n.n}. </span>${n.title}</h4><p>${n.body}</p><p class="note-src">Source: ${n.src}</p>
+        <button type="button" class="note-show" data-action="jump-to" data-value="${n.jump}">Show me</button>
+      </div></li>`).join('')}</ol>`;
+
   function renderNotes() {
     notesEl.hidden = !state.notes;
     document.body.classList.toggle('notes-on', state.notes);
@@ -1002,11 +1018,11 @@ body.notes-on .stage { right: 360px; }
     notesEl.innerHTML = `
       <div class="notes-head"><h2 id="notes-title">What changed</h2>
         <button type="button" class="notes-close" data-action="notes" aria-label="Hide change notes">${ic('i-close')}</button></div>
-      <p>This matches the onboarding flow Alex built, plus Mark’s proposed copy. It’s a copy change only: no new logic, screens, or data. Numbered markers show with <b>Copy: Proposed</b>; switch to <b>As built</b> to compare.</p>
-      <ol class="note-list">${NOTES.map((n) => `<li><span class="note-num" aria-hidden="true">${n.n}</span><div>
-        <h4><span class="sr-only">${n.n}. </span>${n.title}</h4><p>${n.body}</p><p class="note-src">Source: ${n.src}</p>
-        <button type="button" class="note-show" data-action="jump-to" data-value="${n.jump}">Show me</button>
-      </div></li>`).join('')}</ol>
+      <p>This matches the onboarding flow Alex built, plus copy changes only: no new logic, screens, or data. Markers show with <b>Copy: Proposed</b>; switch to <b>As built</b> to compare.</p>
+      <h3>Mark’s proposed copy (orange)</h3>
+      ${noteList(NOTES.filter((n) => !n.add))}
+      <h3>Added from the call transcript (purple), for Mark to accept or cut</h3>
+      ${noteList(NOTES.filter((n) => n.add))}
       <h3>Unchanged from the build</h3>
       <ul class="plain-list">
         <li>Scheduling API and logic: the calendar shows whatever slots come back, the same as today. Use <b>First PM slot</b> in the bar to see a slot next week or about 4 months out.</li>
@@ -1018,12 +1034,12 @@ body.notes-on .stage { right: 360px; }
         <li>Both “I have read and understood” checkboxes</li>
         <li>The service request boxes and button before booking</li>
         <li>“I’ll book my checkup later” and its extra screen</li>
-        <li>The “What happens next” timeline. “You’re All Set!” is back to the built screen, plus the button in note 3.</li>
+        <li>The “What happens next” timeline. “You’re All Set!” is back to the built screen, plus notes 3 and 6.</li>
         <li>The “Select a home” screen. It’s in Figma, but per the Confluence page the build runs the modal once per home.</li>
       </ul>
       <h3>Not verified (the deck doesn’t show these)</h3>
       <ul class="plain-list">
-        <li>FAQ answers: only “What happens after the visit?” is visible in the build screenshots. The rest show a placeholder; the real copy is in the FAQ doc (PFX-382). “Why can’t I book it for this week?” is the one to read against Mark’s new lines.</li>
+        <li>FAQ answers: only “What happens after the visit?” is visible in the build screenshots. The rest show a placeholder; the real copy is in the FAQ doc (PFX-382). With <b>Proposed</b> copy, “Why can’t I book it for this week?” shows the answer from note 5.</li>
         <li>The build’s Home Enrollment FAQ has at least one more question below “What happens after the visit?” that the screenshot cuts off.</li>
         <li>After rescheduling from the Confirmation screen, the button reads “Continue to Confirmation”. The deck doesn’t show this step, and Figma’s version says “Continue to Preventive Maintenance”, which looks like a copy-paste slip.</li>
         <li>Mobile layouts follow Figma; the deck only shows desktop.</li>
@@ -1118,6 +1134,10 @@ body.notes-on .stage { right: 360px; }
       case 'time:he': state.calMonth = monthStart(TODAY); state.draft = { date: SAMPLE.he.date, time: null }; return goto('time:he');
       case 'confirm:he': withHE(); return goto('confirm:he');
       case 'info:pm': withHE(); return goto('info:pm');
+      case 'faq-week':
+        withHE(); state.faq['pm-week'] = true; goto('info:pm');
+        modal.querySelector('[data-id="pm-week"]')?.scrollIntoView({ block: 'center' });
+        return;
       case 'date:pm': withHE(); return startDate('pm', null);
       case 'time:pm': withHE(); state.calMonth = monthStart(TODAY); state.draft = { date: samplePM().date, time: null }; return goto('time:pm');
       case 'confirm:pm': withHE(); withPM(); return goto('confirm:pm');
