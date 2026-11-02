@@ -392,6 +392,7 @@
         <!-- ============ 4a. Booked ============ -->
         <section class="card result" data-screen-id="booked" aria-label="Booking confirmed" hidden>
           <div class="d-head"><h2 class="t-title">Your visit</h2></div>
+          <ul class="vcards wizard-only" id="b-visit-cards"></ul>
           <ul class="result__rows">
             <li class="result__row"><span class="d-icon"><svg class="i"><use href="#ri-calendar-event-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-date"></p><p class="d-meta" id="b-time"></p></div></li>
             <li class="result__row wizard-only" id="b-row2" hidden><span class="d-icon"><svg class="i"><use href="#ri-calendar-event-line"/></svg></span><div class="d-main"><p class="t-strong" id="b-date2"></p><p class="d-meta" id="b-time2"></p></div></li>
@@ -401,13 +402,31 @@
           <section class="srm wizard-only" id="b-sr-module" aria-labelledby="srm-t" hidden>
             <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span id="srm-t">Requires Service Request</span><span class="rv__n" id="srm-n"></span></h2>
             <p class="t-meta" id="srm-sub"></p>
-            <ul class="picks" id="srm-list"></ul>
+            <ul class="rvlist" id="srm-list"></ul>
           </section>
           <div class="result__actions">
             <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>
             <a class="btn btn--secondary" href="#" id="b-sr" data-handoff="Service request" hidden>Submit a service request for your other job</a>
             <a class="link" href="#" data-toast="Added to your calendar">Add to calendar</a>
-            <a class="link" href="#" data-toast="Opens Appointments">Reschedule or cancel</a>
+            <a class="link" href="#" data-toast="Opens Appointments" data-wiz-manage>Reschedule or cancel</a>
+          </div>
+        </section>
+
+        <!-- ============ 5. Your visits: reschedule or cancel (wizard) ============ -->
+        <section class="card plain wizard-only" data-screen-id="manage" aria-label="Your visits" hidden>
+          <div class="note" id="mg-note" role="status" hidden><svg class="i"><use href="#ri-checkbox-circle-line"/></svg><span></span></div>
+          <ul class="vcards" id="mg-list"></ul>
+          <div class="mg__bar">
+            <span class="mg__status" id="mg-status" aria-live="polite"></span>
+            <a class="btn btn--primary btn--lg" href="#" data-handoff="Dashboard">Done</a>
+          </div>
+        </section>
+        <section class="card plain wizard-only" data-screen-id="cancel" aria-label="Cancel a visit" hidden>
+          <ul class="vcards" id="cn-card"></ul>
+          <div class="note"><svg class="i"><use href="#ri-information-line"/></svg><span id="cn-text"></span></div>
+          <div class="cn__actions">
+            <button class="btn btn--primary btn--lg" type="button" id="cn-keep" data-wiz-cancel-keep>Keep visit</button>
+            <button class="btn btn--secondary btn--danger btn--lg" type="button" id="cn-go" data-wiz-cancel-go>Cancel visit</button>
           </div>
         </section>
 
@@ -514,6 +533,8 @@
       <button class="proto__link finder-only" type="button" data-jump="check">Fast Fix 3 · Quick check</button>
       <button class="proto__link classic-only no-wizard" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>
       <button class="proto__link wizard-only" type="button" data-jump="time">Fast Fix 2 · Pick a time</button>
+      <button class="proto__link wizard-only" type="button" data-jump="manage">Your visits (reschedule / cancel)</button>
+      <button class="proto__link wizard-only" type="button" data-jump="cancel">Cancel a visit</button>
       <button class="proto__link finder-only" type="button" data-jump="time">Fast Fix 4 · Pick a time</button>
       <button class="proto__link" type="button" data-jump="booked">Booked</button>
       <button class="proto__link" type="button" data-jump="sent">Sent to our team</button>

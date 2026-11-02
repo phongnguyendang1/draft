@@ -304,3 +304,40 @@ body.variant-wizard[data-screen="review"] .layout { grid-template-columns: minma
 .rv__chip { display: inline-block; padding: var(--s-4) var(--s-12); border-radius: var(--r-pill); background: var(--surface); color: var(--blue-text); font-size: 14px; line-height: 20px; font-weight: 600; }
 .rv--sr .rv__chip { background: var(--blue-tint); }
 [data-screen-id="review"] .rv__top + .t-meta { margin-top: var(--s-8); }
+
+/* ---------- Visits: one card each (confirmation page, your visits, cancel) ---------- */
+body.variant-wizard [data-screen-id="booked"], body.variant-wizard .card.plain { background: none; border: 0; padding: 0; box-shadow: none; }
+body.variant-wizard [data-screen-id="booked"] .result__rows, body.variant-wizard [data-screen-id="booked"] .d-head { display: none; }
+body.variant-wizard [data-screen-id="booked"] .srm { margin-top: var(--s-16); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: var(--s-20); }
+body.variant-wizard [data-screen-id="booked"] .result__actions { margin-top: var(--s-24); }
+body.variant-wizard[data-screen="manage"] .layout, body.variant-wizard[data-screen="cancel"] .layout { grid-template-columns: minmax(0, 760px); }
+body.variant-wizard[data-screen="manage"] .rail, body.variant-wizard[data-screen="cancel"] .rail { display: none; }
+.vcards { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-16); }
+.vcard { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: var(--s-16); padding: var(--s-20); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); }
+.vcard__tile { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 72px; height: 80px; border-radius: var(--r-inner); background: var(--blue-tint); color: var(--blue-text); }
+.vcard__mon { font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: .06em; }
+.vcard__day { font-size: 32px; line-height: 36px; font-weight: 600; color: var(--ink); }
+.vcard__head p { margin: 0; }
+.vcard__eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-8); font-size: 14px; line-height: 20px; font-weight: 600; color: var(--blue-text); }
+.vcard__chip { padding: 0 var(--s-8); border-radius: var(--r-pill); background: var(--blue-tint); font-size: 12px; line-height: 20px; font-weight: 600; color: var(--blue-text); }
+.vcard__chip--off { background: var(--red-tint); color: #b3260a; }
+.vcard__when { margin-top: var(--s-4) !important; font-size: 20px; line-height: 28px; font-weight: 600; }
+.vcard__time { font-size: 16px; line-height: 24px; }
+.vcard__rows { grid-column: 1 / -1; display: flex; flex-direction: column; gap: var(--s-12); margin: 0; padding: var(--s-16) 0 0; list-style: none; border-top: 1px solid var(--border); }
+.vcard__row { display: flex; align-items: flex-start; gap: var(--s-12); font-size: 16px; line-height: 24px; font-weight: 600; overflow-wrap: anywhere; }
+.vcard__row--addr { font-weight: 400; color: var(--text-2); }
+.vcard__ic { display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; color: var(--slate); }
+.vcard__acts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--s-12); }
+.vcard.is-cancelled .vcard__tile { background: var(--page); color: var(--text-2); }
+.vcard.is-cancelled .vcard__day, .vcard.is-cancelled .vcard__when, .vcard.is-cancelled .vcard__time, .vcard.is-cancelled .vcard__row { color: var(--text-2); }
+.vcard.is-cancelled .vcard__when, .vcard.is-cancelled .vcard__time { text-decoration: line-through; }
+.btn--danger { border-color: var(--red); color: var(--red); }
+.btn--danger:hover { background: var(--red-tint); }
+[data-screen-id="manage"] .note { margin-bottom: var(--s-16); }
+.mg__bar { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); margin-top: var(--s-24); padding-top: var(--s-20); border-top: 1px solid var(--border); }
+.mg__status { font-size: 14px; line-height: 20px; color: var(--text-2); }
+@media (max-width: 760px) { .mg__bar { flex-direction: column-reverse; align-items: stretch; text-align: center; } .mg__bar .btn { width: 100%; } }
+[data-screen-id="cancel"] .note { margin-top: var(--s-16); }
+.cn__actions { display: flex; flex-direction: column; gap: var(--s-12); margin-top: var(--s-24); }
+.cn__actions .btn { width: 100%; }
+@media (max-width: 480px) { .vcard { grid-template-columns: 56px minmax(0, 1fr); padding: var(--s-16); gap: var(--s-12); } .vcard__tile { width: 56px; height: 64px; } .vcard__day { font-size: 24px; line-height: 28px; } .vcard__when { font-size: 18px; line-height: 26px; } .vcard__acts .btn { flex: 1 1 100%; } }
