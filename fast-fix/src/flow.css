@@ -286,6 +286,7 @@ legend { padding: 0; }
   .book { grid-template-columns: minmax(0, 1fr); gap: var(--s-24); }
   .cal__day { width: min(44px, 100%); border-radius: 22px; }
   .back .link, .result__actions .link { min-height: 44px; }
+  .footer__links a { display: inline-flex; align-items: center; min-height: 44px; }
   .opts--stack { grid-template-columns: minmax(0, 1fr); }
   .fdock .btn { height: 48px; }
 

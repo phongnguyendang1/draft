@@ -205,7 +205,7 @@
           <div class="fsec">
             <div class="field wqty" id="field-wqty">
               <span class="t-strong" id="wqty-label">How many?</span>
-              <p class="t-meta" id="wqty-hint">For example, 2 if you have two TVs. Type any number.</p>
+              <p class="t-meta" id="wqty-hint">For example, 2 if you have two of them. Tap + or type a number.</p>
               <div class="qty" id="w-qty" role="group" aria-labelledby="wqty-label" aria-describedby="wqty-hint"></div>
             </div>
             <div class="field" id="field-wnote">
@@ -467,9 +467,10 @@
             <div class="sum__row" id="s-when-row" hidden><dt class="sum__label">When</dt><dd class="sum__val"><span id="s-when"></span><span class="sum__sub" id="s-hm"></span></dd></div>
           </dl>
           <dl class="ledger" id="s-ledger" hidden>
-            <div class="ledger__row"><dt>Time</dt><dd class="t-num" id="l-time"></dd></div>
+            <div class="ledger__row"><dt id="l-time-k">Time</dt><dd class="t-num" id="l-time"></dd></div>
             <div class="ledger__row"><dt>Rate</dt><dd class="t-num">$55 per hour</dd></div>
-            <div class="ledger__row ledger__row--total"><dt>Estimated total</dt><dd class="t-num" id="l-total"></dd></div>
+            <div class="ledger__row ledger__row--total"><dt id="l-total-k">Estimated total</dt><dd class="t-num" id="l-total"></dd></div>
+            <div class="ledger__row" id="l-all-row" hidden><dt id="l-all-k">All visits</dt><dd class="t-num" id="l-all"></dd></div>
           </dl>
         </section>
 
@@ -539,9 +540,9 @@
       <button class="proto__link classic-only" type="button" data-jump="job">Fast Fix 1 · The job</button>
       <button class="proto__link finder-only" type="button" data-jump="job">Fast Fix 2 · Your jobs</button>
       <button class="proto__link wizard-only" type="button" data-jump="details">Fast Fix 1 · Describe + photos</button>
-      <button class="proto__link wizard-only" type="button" data-jump="question">Fast Fix 1 · One question</button>
+      <button class="proto__link wizard-only" type="button" data-jump="question">Fast Fix 1 · Questions</button>
       <button class="proto__link wizard-only" type="button" data-jump="more">Fast Fix 1 · Add another job</button>
-      <button class="proto__link wizard-only" type="button" data-jump="review">Fast Fix 1 · What fits</button>
+      <button class="proto__link wizard-only" type="button" data-jump="review">Fast Fix 1 · The plan</button>
       <button class="proto__link classic-only no-wizard" type="button" data-jump="check">Fast Fix 2 · Quick check</button>
       <button class="proto__link finder-only" type="button" data-jump="check">Fast Fix 3 · Quick check</button>
       <button class="proto__link classic-only no-wizard" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>
@@ -550,7 +551,7 @@
       <button class="proto__link wizard-only" type="button" data-jump="cancel">Cancel a visit</button>
       <button class="proto__link finder-only" type="button" data-jump="time">Fast Fix 4 · Pick a time</button>
       <button class="proto__link" type="button" data-jump="booked">Booked</button>
-      <button class="proto__link" type="button" data-jump="sent">Sent to our team</button>
+      <button class="proto__link" type="button" data-jump="sent">Request sent</button>
     </div>
   </div>
   <button class="proto__toggle" data-proto-toggle aria-expanded="false"><svg class="i"><use href="#ri-equalizer-line"/></svg>Prototype states</button>

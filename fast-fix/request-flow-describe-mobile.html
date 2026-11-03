@@ -714,6 +714,7 @@ legend { padding: 0; }
   .book { grid-template-columns: minmax(0, 1fr); gap: var(--s-24); }
   .cal__day { width: min(44px, 100%); border-radius: 22px; }
   .back .link, .result__actions .link { min-height: 44px; }
+  .footer__links a { display: inline-flex; align-items: center; min-height: 44px; }
   .opts--stack { grid-template-columns: minmax(0, 1fr); }
   .fdock .btn { height: 48px; }
 
@@ -1338,7 +1339,7 @@ body:not(.is-single) .single-only { display: none; }
           <div class="fsec">
             <div class="field wqty" id="field-wqty">
               <span class="t-strong" id="wqty-label">How many?</span>
-              <p class="t-meta" id="wqty-hint">For example, 2 if you have two TVs. Type any number.</p>
+              <p class="t-meta" id="wqty-hint">For example, 2 if you have two of them. Tap + or type a number.</p>
               <div class="qty" id="w-qty" role="group" aria-labelledby="wqty-label" aria-describedby="wqty-hint"></div>
             </div>
             <div class="field" id="field-wnote">
@@ -1600,9 +1601,10 @@ body:not(.is-single) .single-only { display: none; }
             <div class="sum__row" id="s-when-row" hidden><dt class="sum__label">When</dt><dd class="sum__val"><span id="s-when"></span><span class="sum__sub" id="s-hm"></span></dd></div>
           </dl>
           <dl class="ledger" id="s-ledger" hidden>
-            <div class="ledger__row"><dt>Time</dt><dd class="t-num" id="l-time"></dd></div>
+            <div class="ledger__row"><dt id="l-time-k">Time</dt><dd class="t-num" id="l-time"></dd></div>
             <div class="ledger__row"><dt>Rate</dt><dd class="t-num">$55 per hour</dd></div>
-            <div class="ledger__row ledger__row--total"><dt>Estimated total</dt><dd class="t-num" id="l-total"></dd></div>
+            <div class="ledger__row ledger__row--total"><dt id="l-total-k">Estimated total</dt><dd class="t-num" id="l-total"></dd></div>
+            <div class="ledger__row" id="l-all-row" hidden><dt id="l-all-k">All visits</dt><dd class="t-num" id="l-all"></dd></div>
           </dl>
         </section>
 
@@ -1672,9 +1674,9 @@ body:not(.is-single) .single-only { display: none; }
       <button class="proto__link classic-only" type="button" data-jump="job">Fast Fix 1 · The job</button>
       <button class="proto__link finder-only" type="button" data-jump="job">Fast Fix 2 · Your jobs</button>
       <button class="proto__link wizard-only" type="button" data-jump="details">Fast Fix 1 · Describe + photos</button>
-      <button class="proto__link wizard-only" type="button" data-jump="question">Fast Fix 1 · One question</button>
+      <button class="proto__link wizard-only" type="button" data-jump="question">Fast Fix 1 · Questions</button>
       <button class="proto__link wizard-only" type="button" data-jump="more">Fast Fix 1 · Add another job</button>
-      <button class="proto__link wizard-only" type="button" data-jump="review">Fast Fix 1 · What fits</button>
+      <button class="proto__link wizard-only" type="button" data-jump="review">Fast Fix 1 · The plan</button>
       <button class="proto__link classic-only no-wizard" type="button" data-jump="check">Fast Fix 2 · Quick check</button>
       <button class="proto__link finder-only" type="button" data-jump="check">Fast Fix 3 · Quick check</button>
       <button class="proto__link classic-only no-wizard" type="button" data-jump="time">Fast Fix 3 · Pick a time</button>
@@ -1683,7 +1685,7 @@ body:not(.is-single) .single-only { display: none; }
       <button class="proto__link wizard-only" type="button" data-jump="cancel">Cancel a visit</button>
       <button class="proto__link finder-only" type="button" data-jump="time">Fast Fix 4 · Pick a time</button>
       <button class="proto__link" type="button" data-jump="booked">Booked</button>
-      <button class="proto__link" type="button" data-jump="sent">Sent to our team</button>
+      <button class="proto__link" type="button" data-jump="sent">Request sent</button>
     </div>
   </div>
   <button class="proto__toggle" data-proto-toggle aria-expanded="false"><svg class="i"><use href="#ri-equalizer-line"/></svg>Prototype states</button>
@@ -1848,7 +1850,7 @@ var CATALOG = [
       g.jobs.forEach(function (t) {
         var o = Array.isArray(t) ? { id: t[0], title: t[1], kw: t[2], min: t[3] } : t;
         out.push({ id: o.id, title: o.title, kw: o.kw, min: o.min, icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
-          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [], kc: o.kc || [], kq: o.kq || [], kg: o.kg || null, sr: !!o.sr, pri: o.pri || "" });
+          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [], kc: o.kc || [], kq: o.kq || [], kqh: o.kqh || [], qh: o.qh || "", kg: o.kg || null, sr: !!o.sr, pri: o.pri || "", hidden: !!g.hidden });
       });
       if (WIZ && !g.hidden) out.push({ id: "other-" + g.id, title: "Other (" + g.title + ")", kw: "other, something else, not listed, anything else, " + g.title.toLowerCase(), min: 60, icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
         ex: "Example: Tell us what is going on, where it is and when it started.", ko: [], kc: [], kq: [], kg: null, sr: true, pri: "", other: true });
@@ -1861,12 +1863,13 @@ var CATALOG = [
   var RATE = 55;
   var MAX_MIN = 180;
   var MAX_TASKS = WIZ ? Infinity : 4;   /* more than this goes to a service request; the wizard has no limit */
-  var TODAY = new Date(2026, 9, 13);
-  var FIRST_DAY = new Date(2026, 9, 14);
-  var LAST_MONTH = { y: 2027, m: 1 };
-  var FIRST_MONTH = { y: 2026, m: 9 };
+  /* Open times follow the real clock: the first day offered is tomorrow, and the calendar runs five months from there */
+  var TODAY = (function () { var n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); })();
+  var FIRST_DAY = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate() + 1);
+  var FIRST_MONTH = { y: FIRST_DAY.getFullYear(), m: FIRST_DAY.getMonth() };
+  var LAST_MONTH = (function () { var l = new Date(FIRST_DAY.getFullYear(), FIRST_DAY.getMonth() + 4, 1); return { y: l.getFullYear(), m: l.getMonth() }; })();
   var STARTS = [480, 570, 660, 780, 870, 960];
-  var SUFFIX = " | PreFix Home Maintenance";
+  var SUFFIX = " | PreFix HomeHub";
 
   var SCREENS = ["type", "job", "check", "time", "booked", "sent"];
   var TITLES = {
@@ -1891,7 +1894,7 @@ var CATALOG = [
     TITLES.question = ["A few questions", ""];
     TITLES.more = ["Add another job?", "Each job gets its own description, photos and questions. Add as many jobs as you need."];
     TITLES.review = ["Here\u2019s what fits Fast Fix", ""];
-    PAGE_TITLE.review = "Fast Fix: what fits";
+    PAGE_TITLE.review = "Fast Fix: the plan"; PAGE_TITLE.sent = "Fast Fix: request sent";
     PAGE_TITLE.job = "Fast Fix: pick a job"; PAGE_TITLE.details = "Fast Fix: about the job"; PAGE_TITLE.question = "Fast Fix: questions"; PAGE_TITLE.more = "Fast Fix: add another job";
     BACK = { type: null, job: "type", details: "job", question: "details", more: "question", review: "more", time: "more", booked: null, sent: null, manage: "booked", cancel: "manage" };
   }
@@ -1935,7 +1938,7 @@ var CATALOG = [
   /* ---------- State ---------- */
   var state = {
     screen: "type", home: "mueller", jobs: {}, order: [], notes: {}, showAll: false, hours: 0, ladder: "", trade: "", part: "",
-    date: null, time: null, month: { y: 2026, m: 9 }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, photos: {}, perr: {}, cur: null, committed: {}, editing: false, split: false, qty: {}, visit: 0, books: [], srDone: false, resched: null, target: 0, mgNote: ""
+    date: null, time: null, month: { y: FIRST_MONTH.y, m: FIRST_MONTH.m }, reason: "", taken: {}, ko: {}, srAfter: false, srModal: false, dropped: {}, photos: {}, perr: {}, cur: null, committed: {}, editing: false, split: false, qty: {}, visit: 0, books: [], srDone: false, resched: null, target: 0, mgNote: ""
   };
 
 
@@ -1964,6 +1967,11 @@ var CATALOG = [
   }
   function unselectJob(id) {
     state.jobs[id] = false; dropPhotos(id); delete state.qty[id];
+    if (WIZ) {   /* a job that is removed or abandoned leaves nothing behind: adding it again starts clean */
+      var kre = new RegExp("^" + id + "-\\d+$");
+      Object.keys(state.ko).forEach(function (kk) { if (kre.test(kk)) delete state.ko[kk]; });
+      delete state.notes[id]; delete state.committed[id]; delete state.det[id];
+    }
     var at = state.order.indexOf(id); if (at > -1) state.order.splice(at, 1);
   }
   function icon(name) { var s = el("span", "d-icon"); s.setAttribute("aria-hidden", "true"); s.innerHTML = '<svg class="i"><use href="#' + name + '"/></svg>'; return s; }
@@ -2010,6 +2018,7 @@ var CATALOG = [
     body.setAttribute("data-nocta", nocta ? "1" : "0");
     body.setAttribute("data-dock", show ? "on" : "off");
     $("#fdock").hidden = !show;
+    document.documentElement.style.scrollPaddingBottom = show && $("#fdock").offsetHeight ? ($("#fdock").offsetHeight + 16) + "px" : "";   /* keyboard focus never lands under the sticky bar */
   }
 
   /* ----- Optional photos for each picked job (prototype: kept in the page, never uploaded) ----- */
@@ -2058,11 +2067,13 @@ var CATALOG = [
       if (added >= room) { msg = "You can add up to " + MAX_PHOTOS + " photos."; return; }
       (state.photos[id] = state.photos[id] || []).push({ url: URL.createObjectURL(f), name: f.name }); added++;
     });
-    state.perr[id] = msg;
+    var n = photosOf(id).length, said = msg;
+    if (msg && added) said = "Only " + added + " of " + files.length + " photos were added. " + msg;
+    state.perr[id] = n >= MAX_PHOTOS && /up to/.test(msg) && !added ? "" : said;   /* the full-state line below the list already says it */
     redrawPhotos(); refresh();
-    var n = photosOf(id).length, b = $("#photo-add-" + id) || $all('[data-photo-rm^="' + id + ':"]').pop();
+    var b = $("#photo-add-" + id) || $all('[data-photo-rm^="' + id + ':"]').pop();
     if (b) b.focus({ preventScroll: true });
-    announce((added ? added + (added === 1 ? " photo added. " : " photos added. ") + n + " of " + MAX_PHOTOS + "." : msg));
+    announce((added ? added + (added === 1 ? " photo added. " : " photos added. ") + n + " of " + MAX_PHOTOS + "." + (msg ? " " + said : "") : msg));
   }
   function removePhoto(id, i) {
     var p = photosOf(id)[i]; if (!p) return;
@@ -2200,7 +2211,8 @@ var CATALOG = [
   /* ----- "I can not find my job": point to a service request; if jobs are already picked, finish booking first ----- */
   var lastFocus = null;
   function srAction() {
-    if ((WIZ ? committedIds() : selectedJobs()).length) openModal(); else toast("Continues in the current service request flow");
+    if (WIZ) { toast(committedIds().length ? "Finish your Fast Fix jobs first. Anything that doesn\u2019t fit is sent to our team for you." : "Continues in the current service request flow"); return; }
+    if (selectedJobs().length) openModal(); else toast("Continues in the current service request flow");
   }
   function modalEls() { return $all("#sr-modal button"); }
   function openModal() {
@@ -2269,7 +2281,9 @@ var CATALOG = [
   function urgentLine() { return urgentIds().length ? " We\u2019ll reach out today." : ""; }
   function allAnswered(id) { return koList(id).every(function (k) { return !!state.ko[k.key]; }); }
   function nofitIds() { return committedIds().filter(isNoFit); }
-  function fitIds() { return committedIds().filter(function (i) { return !isNoFit(i); }); }
+  function fitIds() { return committedIds().filter(function (i) { return !isNoFit(i) && allAnswered(i); }); }
+  function incompleteIds() { return committedIds().filter(function (i) { return !isNoFit(i) && !allAnswered(i); }); }
+  function noteOk(v) { return /[a-z0-9]{2,}/i.test(v || ""); }
   /* The same job can be added again (two TVs in two rooms): each one is its own entry with its own note, photos, answer and quantity */
   function entryTitle(a) {
     var same = state.order.filter(function (i) { return state.jobs[i] && (JOB[i].base || i) === a.base; }), k = same.indexOf(a.id);
@@ -2287,6 +2301,13 @@ var CATALOG = [
     for (var n = 2; ; n++) { var eid = base + "_" + n; if (!state.jobs[eid]) { if (!JOB[eid]) makeAlias(base, eid); return eid; } }
   }
   function qtyOf(id) { return WIZ ? Math.max(1, Math.floor(state.qty[id] || 1)) : 1; }
+  /* Starting again from the entry screen begins a clean request (nothing carried over from the last booking) */
+  function newRequest() {
+    state.order.slice().forEach(unselectJob);
+    state.jobs = {}; state.committed = {}; state.notes = {}; state.ko = {}; state.photos = {}; state.perr = {}; state.dropped = {}; state.qty = {};
+    state.cur = null; state.editing = false; state.pg = null; state.q = "";
+    state.books = []; state.visit = 0; state.resched = null; state.target = 0; state.mgNote = ""; state.date = null; state.time = null; state.hours = 0; state.split = false; state.srDone = false; state.reason = "";
+  }
   function dropPending() {
     state.order.slice().forEach(function (id) { if (state.jobs[id] && !state.committed[id]) unselectJob(id); });
     if (state.cur && !state.committed[state.cur]) state.cur = null;
@@ -2301,20 +2322,22 @@ var CATALOG = [
   }
   function wizTitles() {
     var cj = curJob(), n = Math.min(MAX_TASKS, committedIds().length + 1), pv = planVisits(), many = !!(pv && pv.length > 1);
-    TITLES.job = ["What needs fixing?", "Job " + n + ". " + (state.pg ? "Tap the job that fits." : "Choose a category, or search.")];
+    TITLES.job = ["What needs fixing?", "Job " + n + ". " + (state.pg || state.q.trim() ? "Tap the job that fits." : "Choose a category, or search.")];
     TITLES.details = [cj ? cj.title : "Tell us about the job", "Tell us what\u2019s going on. Photos are optional."];
     TITLES.question = ["A few questions", cj ? "About: " + cj.title + (qtyOf(cj.id) > 1 ? " \u00d7 " + qtyOf(cj.id) : "") : ""];
     TITLES.review = !fitIds().length
-      ? ["This needs a service request", "These jobs didn\u2019t pass the questions, so our team will plan them."]
+      ? ["This needs a service request", nofitIds().every(function (i) { return JOB[i].sr; }) ? "Our team handles " + (nofitIds().length === 1 ? "this kind of job" : "these kinds of jobs") + ", so we\u2019ll send " + (nofitIds().length === 1 ? "it" : "them") + " as one service request." : "Based on your answers, our team will plan " + (nofitIds().length === 1 ? "this job" : "these jobs") + "."]
       : needsSplit() && !nofitIds().length
         ? ["We\u2019ll book this as " + pv.length + " Fast Fix visits", "Together your jobs run longer than one Fast Fix (3 hours), and each one fits on its own."]
-        : ["Here\u2019s the plan", "Continue to submit your service request and pick a time for Fast Fix."];
+        : ["Here\u2019s the plan", state.srDone ? "Your service request is submitted. Pick " + (many ? "times" : "a time") + " for Fast Fix." : "Submit your service request, then pick " + (many ? "times" : "a time") + " for Fast Fix."];
     var srn = state.srDone && state.split && nofitIds().length ? "Your service request is submitted. " : "";
+    var nsl = body.classList.contains("is-noslots");
     TITLES.time = [many ? "Pick a time: visit " + (Math.min(state.visit, pv.length - 1) + 1) + " of " + pv.length : "Pick a time", srn + (many ? "Each visit is booked on its own. Real open times with your Home Manager." : "Real open times with your Home Manager. Your booking is confirmed right away.")];
-    var nB = Math.max(1, state.books.length), rk = state.resched;
-    TITLES.booked = ["You\u2019re booked", nB > 1 ? "Your " + nB + " visits are confirmed. Nothing else to do." : "Confirmed. Nothing else to do."];
+    var nB = Math.max(1, state.books.length), rk = state.resched, nAct = state.books.length ? state.books.filter(function (b) { return b && b.status !== "cancelled"; }).length : nB;
+    TITLES.booked = nAct === 0 ? ["Your visits are cancelled", "Nothing is booked right now."] : nAct < nB ? ["You\u2019re booked", nAct + " of your " + nB + " visits " + (nAct === 1 ? "is" : "are") + " still confirmed."] : ["You\u2019re booked", nB > 1 ? "Your " + nB + " visits are confirmed. Nothing else to do." : "Confirmed. Nothing else to do."];
     if (rk != null) TITLES.time = [(state.books[rk] && state.books[rk].status === "cancelled" ? "Book a new time" : "Reschedule") + (nB > 1 ? ": visit " + (rk + 1) : ""), "Pick a new date and time. Real open times with your Home Manager."];
-    TITLES.manage = ["Your visits", "These are the visits from this service request. Reschedule or cancel any of them."];
+    TITLES.manage = ["Your visits", nAct === 0 ? "All your visits are cancelled. Book a new time for any of them." : "These are your Fast Fix visits. Reschedule or cancel any of them."];
+    if (nsl) TITLES.time[1] = "We couldn\u2019t find an open time for " + (rk != null ? "this visit" : many ? "these visits" : "your visit") + ".";
     TITLES.cancel = [nB > 1 ? "Cancel visit " + (Math.min(state.target, nB - 1) + 1) + "?" : "Cancel your visit?", "Check the details, then confirm."];
   }
   /* Deep links (and the "Jump to screen" panel) land on a sensible state when nothing has been picked yet */
@@ -2323,7 +2346,7 @@ var CATALOG = [
     if (/^(details|question|more)$/.test(screen) && !selectedJobs().length) {
       var id = JOB["running-toilet"] ? "running-toilet" : JOBS[0].id;
       selectJob(id); state.cur = id; state.notes[id] = state.notes[id] || "Water keeps running after I flush.";
-      if (screen === "more") { state.committed[id] = true; var kk = koFor(id); if (kk) state.ko[kk.key] = "yes"; }
+      if (screen === "more") { state.committed[id] = true; koList(id).forEach(function (kk) { state.ko[kk.key] = "yes"; }); }
     }
     if (screen === "review" && !selectedJobs().length) {
       var withKo = JOBS.filter(function (j) { return j.ko.length; }), a1 = JOB["running-toilet"] ? "running-toilet" : withKo[0].id, a2 = JOB["mount-a-tv-on-a-drywall-or-wood-wall"] ? "mount-a-tv-on-a-drywall-or-wood-wall" : withKo[1].id;
@@ -2382,6 +2405,14 @@ var CATALOG = [
         for (q = 0; q < full[x]; q++) { var bb = 0; for (i = 1; i < k; i++) if (rem[i] > rem[bb]) bb = i; if (jobs[x].min > rem[bb]) { oku = false; break; } rem[bb] -= jobs[x].min; bins[bb][x]++; }
       }
       if (oku) return finish(bins);
+      /* 3. packed tight: longest units first, each into the first visit that has room (fits some mixes the even spread above cannot) */
+      bins = zeros(k); rem = []; for (i = 0; i < k; i++) rem.push(MAX_MIN);
+      var okf = true;
+      for (var fi = 0; fi < ordU.length && okf; fi++) {
+        var fx = ordU[fi];
+        for (q = 0; q < full[fx]; q++) { var fb = -1; for (i = 0; i < k; i++) if (rem[i] >= jobs[fx].min) { fb = i; break; } if (fb < 0) { okf = false; break; } rem[fb] -= jobs[fx].min; bins[fb][fx]++; }
+      }
+      if (okf) return finish(bins);
     }
     /* very large requests: fill visit after visit (fast, not as even) */
     bins = []; var cur = null, left = 0;
@@ -2405,8 +2436,12 @@ var CATALOG = [
   function wizQuestions(jb) {
     var out = [], i = 0;
     if (jb.sr) return out;
-    (jb.kq || []).forEach(function (q) { out.push({ key: jb.id + "-" + (i++), job: jb, q: q, type: "spec", hint: "", opts: [["yes", "Yes"], ["no", "No"]] }); });
-    COMMON_Q.forEach(function (c) { var g = jb.kg && jb.kg[c.type]; out.push({ key: jb.id + "-" + (i++), job: jb, q: g ? g.q : c.q, type: c.type, hint: g ? g.h : c.hint, opts: c.opts }); });
+    (jb.kq || []).forEach(function (q, qi) { out.push({ key: jb.id + "-" + (i++), job: jb, q: q, type: "spec", hint: (jb.kqh && jb.kqh[qi]) || "", opts: [["yes", "Yes"], ["no", "No"]] }); });
+    COMMON_Q.forEach(function (c) {
+      var g = jb.kg && jb.kg[c.type], opts = c.opts;
+      if (c.type === "ladder" && g && g.n) opts = [["yes", QLABEL.ladder.yes], ["no", g.n], ["unsure", QLABEL.ladder.unsure]];   /* floor-level work: "No, it's higher" would make no sense */
+      out.push({ key: jb.id + "-" + (i++), job: jb, q: g ? g.q : c.q, type: c.type, hint: g ? g.h : c.hint, opts: opts });
+    });
     if (body.classList.contains("is-blankq")) out.forEach(function (k, n) { k.q = "[Question " + (n + 1) + " to be provided by Ops]"; k.hint = ""; });
     return out;
   }
@@ -2427,12 +2462,13 @@ var CATALOG = [
   function hoursText(h) { return h + (h === 1 ? " hour" : " hours"); }
 
   /* ---------- Availability (deterministic stand-in for the real calendar) ---------- */
-  var BLOCKED = { "2026-10-19": 1, "2026-10-27": 1, "2026-11-11": 1, "2026-11-26": 1, "2026-11-27": 1, "2026-12-25": 1 };
+  var BLOCKED = {}, HOLIDAYS = { "01-01": 1, "07-04": 1, "11-26": 1, "11-27": 1, "12-25": 1 };
+  [4, 12].forEach(function (n) { BLOCKED[iso(new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate() + n))] = 1; });   /* two fully booked days that move with the clock */
   function dayOpen(d) {
     var w = d.getDay();
     if (w === 0 || w === 6) return false;
     if (d < FIRST_DAY) return false;
-    if (BLOCKED[iso(d)]) return false;
+    if (BLOCKED[iso(d)] || HOLIDAYS[pad(d.getMonth() + 1) + "-" + pad(d.getDate())]) return false;
     if ((d.getDate() * 7 + d.getMonth()) % 5 === 0) return false;
     return slotsFor(iso(d)).length > 0;
   }
@@ -2442,6 +2478,7 @@ var CATALOG = [
       if (s + h * 60 > 18 * 60) return;
       if ((d.getDate() + i * 3 + h) % 4 === 0) return;
       if (state.taken[isoDate + "@" + s]) return;
+      if (WIZ && state.resched == null && state.visit > 0) { var pb = state.books[state.visit - 1]; if (pb && (isoDate < pb.date || (isoDate === pb.date && s < pb.time))) return; }   /* visits go in order */
       if (WIZ && (state.resched != null || state.visit > 0)) {
         var others = state.resched != null ? state.books.filter(function (b1, i1) { return i1 !== state.resched && b1 && b1.status !== "cancelled"; }) : state.books.slice(0, state.visit);
         if (others.some(function (b0) { return b0 && b0.date === isoDate && s < b0.time + b0.hours * 60 && b0.time < s + h * 60; })) return;
@@ -2517,17 +2554,17 @@ var CATALOG = [
     var h = hours();
     $("#rec-value").textContent = hoursText(h);
     setText($(".rec__label"), "Visit length");
-    $("#rec-meta").textContent = (FIND ? "Based on the jobs you selected. " : "Based on the tasks you chose. ") + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
+    $("#rec-meta").textContent = (FIND || WIZ ? "Based on the jobs you selected. " : "Based on the tasks you chose. ") + "$" + RATE + " per hour, " + money(h * RATE) + " total.";
     if (WIZ) {
       var pv = planVisits(), vn = $("#visit-note"), vi = pv ? Math.min(state.visit, pv.length - 1) : 0;
       vn.hidden = !(pv && pv.length > 1);
       if (!vn.hidden) {
-        setText(vn.lastChild, "Visit " + (vi + 1) + " of " + pv.length + ": " + itemsText(pv[vi]) + ". " + (vi ? "Pick a time that doesn\u2019t overlap your earlier " + (vi === 1 ? "visit" : "visits") + "." : "You\u2019ll pick a time for each visit."));
+        setText(vn.lastChild, "In this visit: " + itemsText(pv[vi]) + ". " + (vi ? "Pick a time after, and not overlapping, your earlier " + (vi === 1 ? "visit" : "visits") + "." : "You\u2019ll pick a time for each visit."));
         setText($("#rec-meta"), "Based on the jobs in this visit. $" + RATE + " per hour, " + money(h * RATE) + " for this visit.");
       }
       if (state.resched != null) {
         var cb = state.books[state.resched]; vn.hidden = !cb;
-        if (cb) setText(vn.lastChild, cb.status === "cancelled" ? "This visit was cancelled. Pick a new time to book it again." : "Now: " + shortDate(parse(cb.date)) + " \u00b7 " + t12(cb.time) + ". Pick a new date and time. It can\u2019t overlap your other visits.");
+        if (cb) setText(vn.lastChild, cb.status === "cancelled" ? "This visit was cancelled. Pick a new time to book it again." : "Now: " + shortDate(parse(cb.date)) + " \u00b7 " + t12(cb.time) + ". It can\u2019t overlap your other visits.");
       }
     }
   }
@@ -2662,11 +2699,59 @@ var CATALOG = [
   }
 
   /* ---------- Wizard: pick a job with one tap (categories, then jobs; or search) ---------- */
-  function pickResults(toks) {
-    var gm = {};
-    CATALOG.forEach(function (g) { var h = g.title.toLowerCase(); gm[g.id] = !g.hidden && toks.every(function (t) { return hit(h, t); }); });
-    var any = CATALOG.some(function (g) { return gm[g.id]; }) || JOBS.some(function (j) { return listed(j) && toks.every(function (t) { return hit(j.titleHay, t); }); });
-    return JOBS.filter(function (j) { return listed(j) && (any ? (gm[j.group] || toks.every(function (t) { return hit(j.titleHay, t); })) : toks.every(function (t) { return hit(j.hay, t); })); });
+  /* Wizard search: plain words in any order. Job names rank first, then the job's own keywords, then its category name. */
+  var STOP = {}; "a an the my our your is are was were be been to of and or it its in on at for with from that this these those i me we have has had need needs needed want wants keep keeps keeping not get gets got please help some so do does can there up out of".split(" ").forEach(function (w) { STOP[w] = 1; });
+  var IRREG = { shelves: "shelf", leaves: "leaf", tvs: "tv", acs: "ac", lightbulb: "lightbulb", lightbulbs: "lightbulb", mice: "mouse" };
+  /* "|" separates alternatives, a space means all of those words */
+  var SYN = { lightbulb: "light bulb", lightbulbs: "light bulb", fridge: "fridge|refrigerator", refrigerator: "refrigerator|fridge", freezer: "freezer|refrigerator", wifi: "wifi|internet|router", internet: "internet|wifi|router", unclog: "clog", unclogging: "clog", aircon: "ac", loo: "toilet", tap: "faucet", taps: "faucet", wi: "wifi", fi: "wifi" };
+  function sw(w) {
+    w = w.toLowerCase().replace(/[’']/g, "");
+    if (IRREG[w]) return IRREG[w];
+    if (w.length > 4 && /ies$/.test(w)) w = w.slice(0, -3) + "y";
+    else if (w.length > 5 && /ing$/.test(w)) w = w.slice(0, -3);
+    else if (w.length > 4 && /(ches|shes|xes|sses)$/.test(w)) w = w.slice(0, -2);
+    else if (w.length > 4 && /ed$/.test(w)) w = w.slice(0, -2);
+    else if (w.length > 3 && /s$/.test(w) && !/ss$/.test(w)) w = w.slice(0, -1);
+    if (w.length > 3 && /e$/.test(w)) w = w.slice(0, -1);
+    return w.replace(/([^aeiou])\1$/, "$1");
+  }
+  function stems(text) { return (text || "").toLowerCase().replace(/[’']/g, "").split(/[^a-z0-9]+/).filter(Boolean).map(sw); }
+  function searchIndex(j) {
+    if (j.sx) return j.sx;
+    var t = stems(j.title), k = stems((j.kw || "").replace(/[|~]/g, " ")), g = stems(j.groupTitle), gk = stems(j.groupKw);
+    return (j.sx = { t: t, k: t.concat(k), g: g, gk: gk });
+  }
+  function hasStem(list, tk) { return list.some(function (w) { return w === tk || (tk.length >= 4 && w.length > tk.length && w.indexOf(tk) === 0); }); }
+  function pickResults(q) {
+    var raw = q.toLowerCase().replace(/[’']/g, "").split(/[^a-z0-9]+/).filter(function (w) { return w && !STOP[w]; }), toks = [], seen = {};
+    raw.forEach(function (w) {
+      var alts = (SYN[w] || w).split("|").map(function (a) { return a.split(" ").map(sw); }), key = JSON.stringify(alts);
+      if (!seen[key]) { seen[key] = 1; toks.push(alts); }
+    });
+    if (!toks.length) return [];
+    var pool = JOBS.filter(listed);
+    function run(useGk, minShare) {
+      var out = [];
+      pool.forEach(function (j) {
+        var ix = searchIndex(j), score = 0, hits = 0;
+        toks.forEach(function (alts) {
+          var s = 0;
+          alts.forEach(function (a) {   /* an alternative counts when every one of its words is found; the weakest word sets its score */
+            var m = 99;
+            a.forEach(function (tk) { var v = hasStem(ix.t, tk) ? 3 : hasStem(ix.k, tk) ? 2 : (!j.hidden && hasStem(ix.g, tk)) ? 1 : useGk && hasStem(ix.gk, tk) ? 0.5 : 0; if (v < m) m = v; });
+            if (m < 99 && m > s) s = m;
+          });
+          if (s) { hits++; score += s; }
+        });
+        if (hits && hits >= Math.max(1, Math.ceil(toks.length * minShare))) out.push({ j: j, score: score, hits: hits, at: out.length });
+      });
+      out.sort(function (a, b) { return b.hits - a.hits || b.score - a.score || a.at - b.at; });
+      return out.map(function (o) { return o.j; });
+    }
+    var all = run(false, 1);                       /* every word found */
+    if (!all.length) all = run(false, 0.5);        /* a sentence: jobs that match at least half of the words */
+    if (!all.length) all = run(true, 1);           /* last try: the category's own keywords */
+    return all;
   }
   function pkUp() {
     var b = el("button", "pk__up"); b.type = "button"; b.setAttribute("data-pk-up", "1");
@@ -2675,18 +2760,18 @@ var CATALOG = [
   }
   function pkChev() { var s = el("span", "pk__chev"); s.setAttribute("aria-hidden", "true"); s.innerHTML = '<svg class="i"><use href="#ri-arrow-right-s-line"/></svg>'; return s; }
   function renderPick() {
-    var box = $("#tree"), q = state.q.trim(), toks = q.toLowerCase().split(/[^a-z0-9']+/).filter(Boolean), jobs = null, title = "Choose a category", sub = "";
+    var box = $("#tree"), q = state.q.trim(), srch = q.length > 0, jobs = null, title = "Choose a category", sub = "";
     box.innerHTML = "";
     if ($("#search").value !== state.q) $("#search").value = state.q;
-    if (toks.length) { jobs = pickResults(toks); title = "Results"; }
+    if (srch) { jobs = pickResults(q); title = "Results"; }
     else if (state.pg) {
       jobs = JOBS.filter(function (j) { return j.group === state.pg && listed(j); });
       jobs = jobs.filter(function (j) { return j.pri === "high"; }).concat(jobs.filter(function (j) { return j.pri !== "high"; }));   /* urgent ones first */
-      title = CATALOG.filter(function (g) { return g.id === state.pg; })[0].title; sub = "Tap the job that fits.";
+      title = CATALOG.filter(function (g) { return g.id === state.pg; })[0].title;
     }
-    var none = toks.length > 0 && jobs.length === 0;
+    var none = srch > 0 && jobs.length === 0;
     if (!none) {
-      var head = el("div", "pk__head"), inCat = !!state.pg && !toks.length;
+      var head = el("div", "pk__head"), inCat = !!state.pg && !srch;
       if (inCat) head.appendChild(pkUp());
       head.appendChild(el("h2", "t-strong", title)); if (sub) head.appendChild(el("p", "t-meta", sub));
       box.appendChild(head);
@@ -2703,7 +2788,7 @@ var CATALOG = [
         jobs.forEach(function (j) {
           var done = state.order.some(function (i) { return state.jobs[i] && state.committed[i] && (JOB[i].base || i) === j.id; });
           var b = el("button", "pkb pkb--job"); b.type = "button"; b.setAttribute("data-pick", j.id);
-          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", j.other && !toks.length ? "Other" : j.title)); if (toks.length) m.appendChild(el("span", "pkb__meta", j.groupTitle));
+          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", j.other && !srch ? "Other" : j.title)); if (srch) m.appendChild(el("span", "pkb__meta", j.groupTitle));
           b.appendChild(m);
           if (done) b.appendChild(el("span", "opt__added", "Added")); b.appendChild(pkChev());
           list.appendChild(b);
@@ -2724,7 +2809,7 @@ var CATALOG = [
     }
     $("#search-none").hidden = !none;
     $("#search-clear").hidden = !state.q;
-    setText($("#search-live"), toks.length ? (jobs.length + (jobs.length === 1 ? " job" : " jobs") + " found") : "");
+    setText($("#search-live"), srch ? (jobs.length + (jobs.length === 1 ? " job" : " jobs") + " found") : "");
   }
   function wizPickNow(id) {
     var prev = state.cur;
@@ -2746,18 +2831,20 @@ var CATALOG = [
       b.innerHTML = '<svg class="i"><use href="#' + ic + '"/></svg>';
       return b;
     }
-    /* No upper limit on how many; the box takes up to 3 digits only so a typo cannot freeze the page */
-    var val = el("input", "qty__val"); val.id = "qty-val"; val.type = "text"; val.inputMode = "numeric"; val.pattern = "[0-9]*"; val.maxLength = 3; val.value = String(n); val.setAttribute("aria-label", "How many");
-    var dn = btn(-1, "ri-subtract-line", "Fewer");
+    /* No upper limit on how many; the box takes up to 4 digits only so a typo cannot freeze the page */
+    var val = el("input", "qty__val"); val.id = "qty-val"; val.type = "text"; val.inputMode = "numeric"; val.pattern = "[0-9]*"; val.maxLength = 4; val.value = String(n); val.setAttribute("aria-label", "How many");
+    var dn = btn(-1, "ri-subtract-line", "Fewer of this job");
     function syncDn() { if (qtyOf(jb.id) <= 1) dn.setAttribute("aria-disabled", "true"); else dn.removeAttribute("aria-disabled"); }
     val.addEventListener("input", function () {
-      var v = parseInt(val.value.replace(/\D/g, ""), 10);
+      var raw = val.value.trim();
+      if (!/^\d+$/.test(raw)) return;   /* anything else (-1, 1.5, 1e3) is ignored and the box goes back to the last good number */
+      var v = parseInt(raw, 10);
       if (!(v >= 1) || v === qtyOf(jb.id)) return;
       state.qty[jb.id] = v; resetPicks(); syncDn(); refresh();
     });
     val.addEventListener("change", function () { val.value = String(qtyOf(jb.id)); syncDn(); });
     val.addEventListener("blur", function () { val.value = String(qtyOf(jb.id)); syncDn(); });
-    host.appendChild(dn); host.appendChild(val); host.appendChild(btn(1, "ri-add-line", "More"));
+    host.appendChild(dn); host.appendChild(val); host.appendChild(btn(1, "ri-add-line", "More of this job"));
   }
   function stepQty(d) {
     var jb = curJob(); if (!jb) return;
@@ -2768,6 +2855,8 @@ var CATALOG = [
   }
   function renderDetails() {
     var jb = curJob(); if (!jb) return;
+    state.perr[jb.id] = "";
+    setText($("#wqty-hint"), jb.qh || "For example, 2 if you have two of them. Tap + or type a number.");
     renderQty();
     var ta = $("#wnote"); ta.value = state.notes[jb.id] || ""; ta.placeholder = jb.ex; ta.setAttribute("data-note", jb.id);
     setError("wnote", false);
@@ -2791,12 +2880,12 @@ var CATALOG = [
     var jb = curJob(); if (!jb) return;
     var items = koList(jb.id), done = items.filter(function (k) { return !!state.ko[k.key]; }).length, n = qtyOf(jb.id), card = el("div", "ko ko--list");
     card.appendChild(el("p", "ko__prog t-meta", done + " of " + items.length + " answered" + (n > 1 ? ". These answers apply to all " + n + "." : "")));
-    items.forEach(function (k) { card.appendChild(qBlock(k)); });
     var note = el("div", "note"); note.id = "note-ko-job"; note.setAttribute("role", "status"); note.hidden = !isNoFit(jb.id);
     note.innerHTML = '<svg class="i"><use href="#ri-information-line"/></svg><span></span>';
-    note.lastChild.appendChild(el("strong", "", jb.title + " isn\u2019t eligible for Fast Fix. "));
+    note.lastChild.appendChild(el("strong", "", "This job isn\u2019t eligible for Fast Fix. "));
     note.lastChild.appendChild(document.createTextNode("You can keep adding jobs. Before you continue, we\u2019ll show you which jobs are eligible and which require a service request."));
-    card.appendChild(note);
+    card.appendChild(note);   /* right under the progress line, so it is on screen when an answer is tapped */
+    items.forEach(function (k) { card.appendChild(qBlock(k)); });
     box.appendChild(card);
   }
   function moreRow(id) {
@@ -2804,6 +2893,7 @@ var CATALOG = [
     main.appendChild(el("p", "pick__title", jb.title + (q > 1 ? " \u00d7 " + q : ""))); main.appendChild(el("p", "pick__group", jb.groupTitle));
     var note = (state.notes[id] || "").trim(); if (note) main.appendChild(el("p", "pick__note", note));
     var np = photosOf(id).length; if (np) main.appendChild(el("p", "pick__group", np + (np === 1 ? " photo" : " photos")));
+    if (!isNoFit(id) && !allAnswered(id)) main.appendChild(el("p", "pick__note", "Some questions are still open. Tap Continue to finish them."));
     var ed = el("button", "link pick__remove", "Edit"); ed.type = "button"; ed.setAttribute("data-wiz-edit", id); ed.setAttribute("aria-label", "Edit " + jb.title);
     var rm = el("button", "link pick__remove", "Remove"); rm.type = "button"; rm.setAttribute("data-wiz-remove", id); rm.setAttribute("aria-label", "Remove " + jb.title);
     acts.appendChild(ed); acts.appendChild(rm);
@@ -2811,7 +2901,7 @@ var CATALOG = [
     return li;
   }
   function renderMore() {
-    var ids = committedIds(), nf = nofitIds(), fit = fitIds(), grouped = nf.length > 0;
+    var ids = committedIds(), nf = nofitIds(), fit = ids.filter(function (i) { return !isNoFit(i); }), grouped = nf.length > 0;
     var single = $("#more-list"), fl = $("#ml-fit-list"), sl = $("#ml-sr-list"); single.innerHTML = ""; fl.innerHTML = ""; sl.innerHTML = "";
     single.hidden = grouped; $("#ml-fit").hidden = !grouped || !fit.length; $("#ml-sr").hidden = !grouped;
     if (!grouped) ids.forEach(function (id) { single.appendChild(moreRow(id)); });
@@ -2819,15 +2909,14 @@ var CATALOG = [
       fit.forEach(function (id) { fl.appendChild(moreRow(id)); }); nf.forEach(function (id) { sl.appendChild(moreRow(id)); });
       setText($("#ml-fit-t"), "Eligible for Fast Fix"); setText($("#ml-fit-n"), "(" + fit.length + ")");
       setText($("#ml-sr-t"), "Requires Service Request"); setText($("#ml-sr-n"), "(" + nf.length + ")");
-      setText($("#ml-sr-sub"), "These need our team. We\u2019ll submit them as a service request when you continue.");
+      setText($("#ml-sr-sub"), nf.length === 1 ? "This one needs our team. We\u2019ll submit it as a service request when you continue." : "These need our team. We\u2019ll submit them as a service request when you continue.");
     }
-    var full = ids.length >= MAX_TASKS, over = overLimit();
-    $("#more-add").setAttribute("aria-disabled", String(full || over));
-    $("#more-cap").hidden = !(full && !over);
-    setText($("#more-cap"), "You have added " + MAX_TASKS + " jobs, the most a Fast Fix covers. Need more? Submit a service request after you book.");
+    var over = overLimit();
+    $("#more-add").setAttribute("aria-disabled", String(over));
+    $("#more-cap").hidden = true;
     var sp = needsSplit(), pvv = sp ? planVisits() : null;
     $("#note-split-more").hidden = !sp;
-    if (sp) setText($("#note-split-more").lastChild, "Together these run longer than one Fast Fix (3 hours), and each job is eligible, so we\u2019ll book them as " + pvv.length + " separate Fast Fix visits.");
+    if (sp) setText($("#note-split-more").lastChild, nf.length ? "The eligible work runs longer than one Fast Fix (3 hours), so we\u2019ll book it as " + pvv.length + " separate Fast Fix visits." : fit.length === 1 ? "This job runs longer than one Fast Fix (3 hours), so we\u2019ll book it as " + pvv.length + " separate Fast Fix visits." : "Together these jobs run longer than one Fast Fix (3 hours), and each one is eligible, so we\u2019ll book them as " + pvv.length + " separate Fast Fix visits.");
   }
   function reviewRow(id, why) {
     var jb = JOB[id], li = el("li", "pick" + (why === "plain" ? "" : (why ? " pick--nofit" : ""))), top = el("div", "pick__top"), main = el("div", "pick__main"), q = qtyOf(id);
@@ -2850,7 +2939,7 @@ var CATALOG = [
     return li;
   }
   function jobLine(id) { var q = qtyOf(id); return JOB[id].title + (q > 1 ? " × " + q : ""); }
-  function whyLines(id) { if (JOB[id] && JOB[id].sr) return ["Our team handles this kind of job."]; return failedQs(id).map(function (k) { return (state.ko[k.key] === "unsure" ? "Not sure: " : "No: ") + k.q; }); }
+  function whyLines(id) { if (JOB[id] && JOB[id].sr) return ["Our team handles this kind of job."]; return failedQs(id).slice(0, 1).map(function (k) { return (state.ko[k.key] === "unsure" ? "Not sure: " : "No: ") + k.q; }); }
   /* The page that says plainly what is booked as Fast Fix and what goes in as a service request */
   function renderReview() {
     var fit = fitIds(), nf = nofitIds(), split = needsSplit(), pv = split ? planVisits() : null, mix = fit.length && nf.length;
@@ -2859,12 +2948,12 @@ var CATALOG = [
     $("#rv-all").hidden = nf.length > 0 || !fit.length; $("#rv-all-note").hidden = $("#rv-all").hidden; $("#rv-explain").hidden = true;
     setText($("#rv-fit-t"), "Fast Fix"); setText($("#rv-fit-n"), "");
     setText($("#rv-fit-sub"), "One visit of about " + hoursText(hrs) + ".");
-    setText($("#rv-fit-chip"), "Next: pick a time"); setText($("#rv-visits-chip"), "Next: pick times"); setText($("#rv-sr-chip"), "Submitted when you continue");
+    setText($("#rv-fit-chip"), "Next: pick a time"); setText($("#rv-visits-chip"), "Next: pick times"); setText($("#rv-sr-chip"), state.srDone ? "Submitted" : "Submitted when you continue");
     setText($("#rv-visits-t"), "Fast Fix"); 
     setText($("#rv-visits-sub"), (pv ? pv.length : 2) + " visits, each booked on its own.");
     setText($("#rv-sr-t"), "Service request"); setText($("#rv-sr-n"), "");
     setText($("#rv-sr-sub"), mix
-      ? "We send " + (nf.length === 1 ? "this" : "these") + " to our team for you. Your notes and photos go along." + urgentLine()
+      ? "We send " + (nf.length === 1 ? "this" : "these") + " to our team for you. Your notes" + (nf.some(function (i) { return photosOf(i).length; }) ? " and photos" : "") + " go along." + urgentLine()
       : "We send " + (nf.length === 1 ? "this" : "these") + " to our team as one service request. You won\u2019t need to enter anything again." + urgentLine());
     var fl = $("#rv-fit-list"), sl = $("#rv-sr-list"), vl = $("#rv-visits-list"); fl.innerHTML = ""; sl.innerHTML = ""; vl.innerHTML = "";
     fit.forEach(function (i) { fl.appendChild(rvRow("", jobLine(i))); });
@@ -2882,7 +2971,7 @@ var CATALOG = [
     if (s === "job") return true;   /* picking a job moves on by itself */
     if (s === "details") {
       jb = curJob(); if (!jb) { navigate("job"); return true; }
-      if ((state.notes[jb.id] || "").trim().length < 3) { setError("wnote", true); announce("Add a few words about this job."); $("#wnote").focus(); return true; }
+      if (!noteOk(state.notes[jb.id])) { setError("wnote", true); announce("Add a few words about this job."); $("#wnote").focus(); return true; }
       navigate("question");
       return true;
     }
@@ -2893,6 +2982,8 @@ var CATALOG = [
     }
     if (s === "more") {
       if (!committedIds().length) { navigate("job"); return true; }
+      var inc = incompleteIds();
+      if (inc.length) { state.cur = inc[0]; state.editing = true; announce("Answer the rest of the questions for " + JOB[inc[0]].title + " first."); navigate("question"); return true; }
       if (overLimit()) { state.reason = overReason(); navigate("sent"); return true; }
       navigate(nofitIds().length || needsSplit() ? "review" : "time"); return true;
     }
@@ -2921,13 +3012,14 @@ var CATALOG = [
     if (screen === "describe") return { label: "Continue", status: "" };
     if (WIZ && screen === "job") return { label: "Continue", status: curJob() ? curJob().title : "" };
     if (WIZ && screen === "details") return { label: "Continue", status: "" };
-    if (WIZ && screen === "question") { var wk = koFor(state.cur); return { label: "Continue", status: "" }; }
+    if (WIZ && screen === "question") { return { label: "Continue", status: curJob() && isNoFit(curJob().id) ? "Not eligible for Fast Fix" : "" }; }
     if (WIZ && screen === "review") {
       var rf = fitIds().length, rn = nofitIds().length, sp2 = needsSplit();
       var nv = (planVisits() || []).length; if (!rn) return { label: nv === 2 ? "Pick times for both visits" : "Pick times for all " + nv + " visits", status: nv + " Fast Fix visits" };
+      if (rf && state.srDone) return { label: sp2 ? "Pick times" : "Pick a time", status: "Your service request is submitted" };
       return rf ? { label: sp2 ? "Submit request and pick times" : "Submit request and pick a time", status: "Submits your service request, then you pick a time" } : { label: "Submit for Service Request", status: "Submits your service request" };
     }
-    if (WIZ && screen === "more") { var wc = committedIds().length; return { label: overLimit() ? "Send to our team" : "Continue", status: overLimit() ? "More than a Fast Fix covers" : wc + (wc === 1 ? " job" : " jobs") }; }
+    if (WIZ && screen === "more") { var wc = committedIds().length; return { label: overLimit() ? "Send to our team" : "Continue", status: overLimit() ? "More than a Fast Fix covers" : incompleteIds().length ? "Some questions are still open" : wc + (wc === 1 ? " job" : " jobs") }; }
     if (screen === "job") {
       return {
         label: overLimit() ? "Send to our team" : "Continue",
@@ -2966,14 +3058,18 @@ var CATALOG = [
     $("#s-city").textContent = h.city;
 
     var all = selectedJobs(), jobs = WIZ && s !== "sent" ? all.filter(function (j) { return !isNoFit(j.id); }) : all, showJobs = s !== "type" && s !== "describe" && all.length > 0;
-    var nfs = WIZ && s !== "sent" ? all.filter(function (j) { return isNoFit(j.id) && state.committed[j.id]; }) : [];
+    var nfs = WIZ && s !== "sent" ? all.filter(function (j) { return isNoFit(j.id) && (state.committed[j.id] || j.id === state.cur); }) : [], ovr = null;
+    if (WIZ && s === "time" && state.resched != null) {   /* moving one visit: the rail shows only that visit's jobs */
+      var rpv = planVisits() || [], rv = rpv[state.resched]; ovr = {}; nfs = [];
+      jobs = rv ? rv.items.map(function (it) { ovr[it.id] = it.qty; return JOB[it.id]; }) : [];
+    }
     $("#s-jobs-row").hidden = !showJobs || (WIZ && !jobs.length);
-    setText($("#s-jobs-row .sum__label"), nfs.length ? "Eligible for Fast Fix" : "Jobs");
+    setText($("#s-jobs-row .sum__label"), WIZ && s === "sent" ? "Sent as a service request" : nfs.length ? "Eligible for Fast Fix" : ovr ? "This visit" : "Jobs");
     $("#s-sr-row").hidden = !nfs.length;
     var srl = $("#s-sr-jobs"); srl.innerHTML = "";
     nfs.forEach(function (j) {
       var li = document.createElement("li"), t = document.createElement("span"), n = document.createElement("span");
-      t.className = "sum__jobname"; t.textContent = j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : ""); n.className = "sum__jobnote"; n.textContent = "Submitted when you continue";
+      t.className = "sum__jobname"; t.textContent = j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : ""); n.className = "sum__jobnote"; n.textContent = state.srDone && s !== "more" && s !== "question" ? "Submitted" : "Submitted when you continue";
       li.appendChild(t); li.appendChild(n); srl.appendChild(li);
     });
     var list = $("#s-jobs");
@@ -2982,7 +3078,8 @@ var CATALOG = [
       var li = document.createElement("li");
       var t = document.createElement("span");
       t.className = "sum__jobname";
-      t.textContent = j.title + (qtyOf(j.id) > 1 ? " \u00d7 " + qtyOf(j.id) : "");
+      var qj2 = ovr && ovr[j.id] ? ovr[j.id] : qtyOf(j.id);
+      t.textContent = j.title + (qj2 > 1 ? " \u00d7 " + qj2 : "");
       li.appendChild(t);
       var note = (state.notes[j.id] || "").trim();
       if (note) {
@@ -3018,8 +3115,13 @@ var CATALOG = [
     var showLedger = s === "time" && !body.classList.contains("is-noslots");
     $("#s-ledger").hidden = !showLedger;
     if (showLedger) {
+      var lpv = WIZ ? planVisits() : null, lmulti = WIZ && ((lpv && lpv.length > 1) || state.resched != null);
+      setText($("#l-time-k"), lmulti ? "Visit length" : "Time"); setText($("#l-total-k"), lmulti ? "This visit" : "Estimated total");
       $("#l-time").textContent = hoursText(hours());
       $("#l-total").textContent = money(hours() * RATE);
+      var lall = $("#l-all-row"), allh = lpv && lpv.length > 1 && state.resched == null ? lpv.reduce(function (a, v) { return a + Math.min(3, Math.max(1, Math.ceil(v.min / 60))); }, 0) : 0;
+      lall.hidden = !allh;
+      if (allh) { setText($("#l-all-k"), "All " + lpv.length + " visits"); setText($("#l-all"), money(allh * RATE)); }
     }
   }
 
@@ -3046,18 +3148,25 @@ var CATALOG = [
   function clearErrors(ids) { ids.forEach(function (id) { setError(id, false); }); }
 
   /* ---------- Navigation ---------- */
+  var DEMO_NOTES = { "running-toilet": "Water keeps running after I flush.", "hang-pictures-or-wall-art": "Three framed prints in the hallway.", "change-light-bulbs-too-high-to-reach": "Two bulbs in the entry ceiling light." };
   function seedDemo(screen) {
     if (!selectedJobs().length) {
       var demo = ["toilet-run", "lock", "light-fixture"].filter(function (i) { return JOB[i]; });
       if (!demo.length) demo = ["running-toilet", "hang-pictures-or-wall-art", "change-light-bulbs-too-high-to-reach"].filter(function (i) { return JOB[i]; });
-      demo.forEach(function (i) { selectJob(i); if (WIZ) state.committed[i] = true; state.notes[i] = state.notes[i] || "Demo note"; });
+      demo.forEach(function (i) { selectJob(i); if (WIZ) state.committed[i] = true; state.notes[i] = state.notes[i] || DEMO_NOTES[i] || "Sample description of the job."; });
       state.hours = 0;
     }
     if (screen === "time" || screen === "booked") {
       state.ladder = state.ladder || "yes"; state.trade = state.trade || "yes"; state.part = state.part || "yes";
       koItems().forEach(function (k) { state.ko[k.key] = state.ko[k.key] || "yes"; });
     }
-    if (screen === "sent" && !state.reason) { state.reason = "ladder"; state.ladder = "no"; }
+    if (screen === "sent" && !state.reason) {
+      if (WIZ) {
+        koItems().forEach(function (k) { state.ko[k.key] = "yes"; });
+        var fj = selectedJobs()[0], fk = fj && koList(fj.id)[0]; if (fk) state.ko[fk.key] = "no";
+        state.reason = "ko";
+      } else { state.reason = "ladder"; state.ladder = "no"; }
+    }
     if (screen === "booked" && (!state.date || state.time === null)) {
       state.date = firstOpenDay();
       var s = slotsFor(state.date);
@@ -3076,9 +3185,11 @@ var CATALOG = [
     if (location.hash === "#/" + screen) render(screen); else location.hash = "#/" + screen;
   }
 
-  var firstRender = true;
+  var firstRender = true, lastConfirm = 0;
   function render(screen) {
+    if (WIZ && screen === "type") newRequest();
     if (WIZ) wizEnter(screen);
+    if (WIZ && /^(review|time)$/.test(screen) && incompleteIds().length) { navigate("more"); return; }
     if (/^(check|time)$/.test(screen) && selectedJobs().length && overLimit()) { state.reason = overReason(); navigate("sent"); return; }
     if (WIZ && screen === "review" && !nofitIds().length && !needsSplit()) { navigate(committedIds().length ? "time" : "job"); return; }
     if (WIZ && screen === "question" && !koFor(state.cur)) { if (curJob()) state.committed[state.cur] = true; navigate("more"); return; }
@@ -3087,7 +3198,12 @@ var CATALOG = [
     if (screen === "sent" && !state.reason) seedDemo(screen);
     if (WIZ && state.resched != null && screen !== "time") state.resched = null;
     if (WIZ && screen !== "manage") state.mgNote = screen === "cancel" ? state.mgNote : "";
-    if (WIZ && screen === "time" && state.screen !== "time" && state.resched == null) { state.visit = 0; state.books = []; state.date = null; state.time = null; }
+    if (WIZ && screen === "time" && state.screen !== "time" && state.resched == null) {
+      /* Back or Forward onto the picker after a confirmed booking goes to the confirmation, never to an empty picker */
+      if (/^(booked|manage|cancel)$/.test(state.screen) && state.books.length && state.books.every(Boolean)) { location.replace("#/booked"); return; }
+      state.visit = 0; state.books = []; state.date = null; state.time = null;
+    }
+    if (WIZ && /^(job|details|question|more)$/.test(screen)) state.srDone = false;   /* editing the jobs after submitting means submitting again */
     if (WIZ && /^(manage|cancel)$/.test(screen)) { ensureBooks(); state.target = Math.max(0, Math.min(state.target, state.books.length - 1)); }
     state.screen = screen;
     body.setAttribute("data-screen", screen);
@@ -3096,7 +3212,7 @@ var CATALOG = [
     if (WIZ) wizTitles();
     $("#h1").textContent = TITLES[screen][0];
     $("#sub").textContent = TITLES[screen][1];
-    document.title = PAGE_TITLE[screen] + SUFFIX;
+    document.title = (WIZ && screen === "time" && state.resched != null ? "Fast Fix: reschedule" : PAGE_TITLE[screen]) + SUFFIX;
 
     /* stepper */
     var idx = (FIND ? ["describe", "job", "check", "time"] : WIZ ? ["job", "time"] : ["job", "check", "time"]).indexOf(WIZ && /^(details|question|more|review)$/.test(screen) ? "job" : screen);
@@ -3138,7 +3254,8 @@ var CATALOG = [
       $("#rec").hidden = noSlots;
       $("#book").hidden = noSlots;
       $("#noslots").hidden = !noSlots;
-      $("#note-fits").hidden = noSlots;
+      if (noSlots && WIZ) $("#noslots").lastChild.innerHTML = state.resched != null || state.visit > 0 ? "<strong>No open times right now.</strong> Send this to our team and they will find a time for this visit. Your other visits stay as they are." : "<strong>No open times right now.</strong> Send this to our team and they will find you a time. Everything you entered comes with it.";
+      $("#note-fits").hidden = noSlots || WIZ;
       setError("time", false);
       if (!state.date && !noSlots) {
         state.date = firstOpenDay();
@@ -3151,7 +3268,7 @@ var CATALOG = [
     if (screen === "booked") fillBooked();
     if (screen === "manage") renderManage();
     if (screen === "cancel") renderCancel();
-    if (screen === "sent") $("#sent-why").textContent = state.reason === "ko" && WIZ && !koBad().length ? ((nofitIds().length > 1 ? "These jobs need our team, so we sent them together as one service request." : (nofitIds()[0] && !JOB[nofitIds()[0]].other && nofitIds()[0] !== "other-not-listed" ? JOB[nofitIds()[0]].title : "This job") + " needs our team, so we sent it as a service request.") + urgentLine()) : state.reason === "ko" && koBad().length ? (WIZ && selectedJobs().length > 1 ? "Some of your jobs don\u2019t fit Fast Fix, so our team will plan all of them together as one service request." : koBad()[0].job.title + " can\u2019t be done as a Fast Fix, so our team will plan this visit.") : (WHY[state.reason] || WHY.ladder);
+    if (screen === "sent") $("#sent-why").textContent = WIZ ? wizSentWhy() : state.reason === "ko" && koBad().length ? koBad()[0].job.title + " can\u2019t be done as a Fast Fix, so our team will plan this visit." : (WHY[state.reason] || WHY.ladder);
 
     refresh();
     if (!firstRender) { window.scrollTo(0, 0); $("#h1").focus({ preventScroll: true }); }
@@ -3159,6 +3276,16 @@ var CATALOG = [
     $all("[data-jump]").forEach(function (b) { if (b.getAttribute("data-jump") === screen) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current"); });
   }
 
+  /* Why the request went to the team (wizard): one plain sentence that matches the path the member took */
+  function wizSentWhy() {
+    var nf = nofitIds(), r = state.reason, one = selectedJobs().length === 1;
+    if (r === "slots") return WHY.slots;
+    if (r === "all") return "You chose to send " + (one ? "this" : "everything") + " to our team, so we sent " + (one ? "it" : "it together") + " as one service request.";
+    if (r === "time") return one ? "This job is longer than one Fast Fix covers, so our team will plan it." : "These jobs add up to more than a Fast Fix covers, so our team will plan them together.";
+    if (nf.length > 1) return "These jobs need our team, so we sent them together as one service request." + urgentLine();
+    var j = nf[0] ? JOB[nf[0]] : null;
+    return (j && !j.other && j.id !== "other-not-listed" ? j.title : "This job") + " needs our team, so we sent it as a service request." + urgentLine();
+  }
   /* ---------- Visits: one card each (confirmation page, manage page, cancel page) ---------- */
   var MONTHS3 = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
   function rangeText(t, h) { var a = t12(t), b = t12(t + h * 60); return a.slice(-2) === b.slice(-2) ? a.slice(0, -3) + " \u2013 " + b : a + " \u2013 " + b; }
@@ -3327,6 +3454,7 @@ var CATALOG = [
     if (s === "time") {
       if (body.classList.contains("is-noslots")) { state.reason = "slots"; navigate("sent"); return; }
       if (state.date && state.time !== null && slotsFor(state.date).indexOf(state.time) < 0) state.time = null;
+      if (state.time === null && Date.now() - lastConfirm < 450) return;   /* a double tap on Confirm must not open the next visit with an error */
       if (!state.date || state.time === null) {
         timeError(!state.date ? "Pick a date and a time." : "Pick a time.", "");
         focusFirst(!state.date ? ".cal__day:not(:disabled)" : "#times input");
@@ -3354,7 +3482,7 @@ var CATALOG = [
           announce(state.mgNote); navigate("manage"); return;
         }
         state.books[state.visit] = { date: state.date, time: state.time, hours: hours(), status: "scheduled" };
-        if (state.visit < pvc.length - 1) { state.visit++; state.date = null; state.time = null; state.hours = 0; navigate("time"); announce("Visit " + state.visit + " is set. Now pick a time for visit " + (state.visit + 1) + "."); return; }
+        if (state.visit < pvc.length - 1) { lastConfirm = Date.now(); state.visit++; state.date = null; state.time = null; state.hours = 0; navigate("time"); announce("Visit " + state.visit + " is set. Now pick a time for visit " + (state.visit + 1) + "."); return; }
       }
       navigate("booked");
     }
@@ -3441,12 +3569,13 @@ var CATALOG = [
         if (cj2 && !isNoFit(cj2.id) && allAnswered(cj2.id)) { state.committed[cj2.id] = true; state.editing = false; navigate("more"); return; }   /* the last answer was a Yes: move on */
         renderWizQuestion(); refresh();
         var nb = $('[data-wiz-ans="' + wp[0] + '|' + wp[1] + '"]'); if (nb) nb.focus({ preventScroll: true });
+        if (cj2 && isNoFit(cj2.id)) announce("This job isn\u2019t eligible for Fast Fix. You can keep adding jobs, and we\u2019ll show you what needs a service request before you continue.");
         return;
       }
       var wa = t.closest("[data-wiz-add]"); if (wa) { wizAdd(); return; }
       var we = t.closest("[data-wiz-edit]"); if (we) { state.cur = we.getAttribute("data-wiz-edit"); state.editing = true; navigate("details"); return; }
       var wr = t.closest("[data-wiz-remove]"); if (wr) { wizRemove(wr.getAttribute("data-wiz-remove")); return; }
-      var wsa = t.closest("[data-wiz-sendall]"); if (wsa) { state.split = false; state.reason = nofitIds().length ? "ko" : "time"; navigate("sent"); return; }
+      var wsa = t.closest("[data-wiz-sendall]"); if (wsa) { state.split = false; state.reason = "all"; navigate("sent"); return; }
       var wbk = t.closest("[data-wiz-back]"); if (wbk) { navigate("more"); return; }
       var qb = t.closest("[data-qty]"); if (qb) { if (qb.getAttribute("aria-disabled") !== "true") stepQty(+qb.getAttribute("data-qty")); return; }
       var pa = t.closest("[data-photo-add]"); if (pa) { var pi = $("#photo-in-" + pa.getAttribute("data-photo-add")); if (pi) pi.click(); return; }
@@ -3537,7 +3666,7 @@ var CATALOG = [
     if (e.target.id === "search") { state.q = e.target.value; state.sc = {}; syncTree(); return; }
     if (FIND && e.target.id === "desc") { if (e.target.value.trim().length >= 3) setError("describe", false); return; }
     var id = e.target.getAttribute && e.target.getAttribute("data-note");
-    if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); if (WIZ && e.target.id === "wnote" && e.target.value.trim().length >= 3) setError("wnote", false); refresh(); }
+    if (id) { state.notes[id] = e.target.value; if (e.target.value.trim()) setError("note-" + id, false); if (WIZ && e.target.id === "wnote" && noteOk(e.target.value)) setError("wnote", false); refresh(); }
   });
 
   document.addEventListener("keydown", function (e) {
@@ -3573,6 +3702,7 @@ var CATALOG = [
     }
     if (WIZ) {
       setText($('.step[data-step="job"] .step__t'), "Your jobs");
+      setText($('[data-jump="job"].classic-only'), "Fast Fix 1 · Pick a job");
       $('.step[data-step="check"]').remove();
       $all(".step__n").forEach(function (n, i) { n.textContent = String(i + 1); });
     }
