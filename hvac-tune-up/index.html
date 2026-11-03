@@ -210,6 +210,7 @@ legend { padding: 0; }
 .opt.is-off .opt__ic { color: var(--text-2); }
 
 .factions { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); margin-top: var(--s-32); padding-top: var(--s-24); border-top: 1px solid var(--border); }
+.factions--plain { margin-top: var(--s-24); padding-top: 0; border-top: 0; }
 .factions__status { font-size: 14px; line-height: 20px; color: var(--text-2); }
 .factions__status strong { color: var(--ink); font-weight: 600; }
 
@@ -642,8 +643,8 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
       '<div class="message__text"><strong>Includes your free HVAC Plan</strong>It starts when you book, at no cost.' +
       '<div class="perks"><span class="perk">' + ic("ri-check-line") + 'Priority HVAC service</span><span class="perk">' + ic("ri-check-line") + 'Discounted off-season tune-ups</span></div></div></div>';
   }
-  function factions(label, status) {
-    return '<div class="factions"><span class="factions__status" id="st" aria-live="polite">' + (status || "") + '</span>' +
+  function factions(label, status, cls) {
+    return '<div class="factions' + (cls ? " " + cls : "") + '"><span class="factions__status" id="st" aria-live="polite">' + (status || "") + '</span>' +
       '<button class="btn btn--primary btn--lg" type="button" data-next>' + label + '</button></div>';
   }
 
@@ -680,7 +681,7 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
       '<fieldset><legend class="sr-only">Your homes</legend><div class="homes">' + list + '</div></fieldset>' +
       (S.err === "home" ? '<p class="error" role="alert">' + ic("ri-error-warning-fill") + 'Choose a home to continue.</p>' : "") +
       bnote("One card per active subscription. Systems = <code>Subscription.plan.allowed_hvac_count</code>. “Pick a time” = a tune-up booking in READY; “Booked” = BOOKED (PFX-593, PFX-595). “Opens Nov 20” uses the 6-month rule from the call, which isn’t defined in PFX-590 yet.") +
-      factions(any ? "Continue" : "Back to dashboard", S.home && selectable(S.home) ? "<strong>" + HOMES[S.home].addr + "</strong>" : "");
+      factions(any ? "Continue" : "Back to dashboard", S.home && selectable(S.home) ? "<strong>" + HOMES[S.home].addr + "</strong>" : "", "factions--plain");
   }
 
   function renderTuneup(sec) {
