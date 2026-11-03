@@ -1363,8 +1363,9 @@
     if (location.hash === "#/" + screen) render(screen); else location.hash = "#/" + screen;
   }
 
-  var firstRender = true, lastConfirm = 0;
+  var firstRender = true, lastConfirm = 0, jumpNext = false;
   function render(screen) {
+    var viaJump = jumpNext; jumpNext = false;   /* the presenter's "Jump to screen" links may open the picker after a booking; the browser's Back may not */
     if (WIZ && screen === "type") newRequest();
     if (WIZ) wizEnter(screen);
     if (WIZ && /^(review|time)$/.test(screen) && incompleteIds().length) { navigate("more"); return; }
@@ -1378,7 +1379,7 @@
     if (WIZ && screen !== "manage") state.mgNote = screen === "cancel" ? state.mgNote : "";
     if (WIZ && screen === "time" && state.screen !== "time" && state.resched == null) {
       /* Back or Forward onto the picker after a confirmed booking goes to the confirmation, never to an empty picker */
-      if (/^(booked|manage|cancel)$/.test(state.screen) && state.books.length && state.books.every(Boolean)) { location.replace("#/booked"); return; }
+      if (!viaJump && /^(booked|manage|cancel)$/.test(state.screen) && state.books.length && state.books.every(Boolean)) { location.replace("#/booked"); return; }
       state.visit = 0; state.books = []; state.date = null; state.time = null;
     }
     if (WIZ && /^(job|details|question|more)$/.test(screen)) state.srDone = false;   /* editing the jobs after submitting means submitting again */
@@ -1812,7 +1813,7 @@
     if (t.closest("#cal-next")) { state.month = { y: state.month.m === 11 ? state.month.y + 1 : state.month.y, m: (state.month.m + 1) % 12 }; renderCal(); return; }
 
     var jump = t.closest("[data-jump]");
-    if (jump) { navigate(jump.getAttribute("data-jump")); return; }
+    if (jump) { jumpNext = true; navigate(jump.getAttribute("data-jump")); return; }
     var pt = t.closest("[data-proto-toggle]");
     if (pt) {
       var panel = $("[data-proto-panel]");
