@@ -14,12 +14,11 @@
   font-display: swap;
 }
 
-/* Layout concept: HomeHub member portal. Sticky top bar, a wide main column of flat cards and a 380px summary rail.
-   Tokens are copied from the HomeHub request-flow prototype (desktop_4 tokens). The product UI is light only, by design. */
+/* Layout concept: HomeHub member portal. Sticky top bar, one focused column per step, a summary rail only where the
+   member confirms. Tokens copied from the HomeHub request-flow prototype. Product UI is light only, by design. */
 :root {
   color-scheme: light;
   --font: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-
   --ink: #0a2041;
   --text-2: #6b6b6b;
   --slate: #587188;
@@ -28,11 +27,9 @@
   --blue-text: #1f6fc0;
   --blue-tint: #ebf5fe;
   --blue-tint-2: #d9ebfc;
-  --blue-faint: #f7fbff;
   --yellow: #f7cf46;
   --yellow-hover: #f2c42a;
   --red: #e0310a;
-  --red-text: #b3260a;
   --red-tint: #fceae6;
   --border: #ccd7dc;
   --dot: #cecece;
@@ -41,54 +38,44 @@
   --on-dark: #ffffff;
   --frame: #e4e8ea;
   --proto: #1d1d1f;
-  --scrim: #0a2041;
+  --skel: #e9edef;
   --note-bg: #fff8db;
   --note-ink: #4a3b00;
   --note-line: #a8860a;
-
   --r-card: 24px;
   --r-inner: 16px;
   --r-pill: 44px;
-
-  --s-4: 4px; --s-8: 8px; --s-12: 12px; --s-16: 16px; --s-20: 20px;
-  --s-24: 24px; --s-32: 32px; --s-40: 40px; --s-48: 48px;
-
+  --s-4: 4px; --s-8: 8px; --s-12: 12px; --s-16: 16px; --s-20: 20px; --s-24: 24px; --s-32: 32px; --s-40: 40px; --s-48: 48px;
   --track: -0.02em;
   --container: 1184px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 96px; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 96px; }
 body {
   margin: 0; background: var(--page); color: var(--ink);
-  font-family: var(--font); font-size: 16px; line-height: 24px; font-weight: 400;
-  letter-spacing: var(--track); font-variation-settings: "opsz" 14; -webkit-font-smoothing: antialiased;
+  font-family: var(--font); font-size: 16px; line-height: 24px; letter-spacing: var(--track);
+  font-variation-settings: "opsz" 14; -webkit-font-smoothing: antialiased;
 }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 25; background: var(--surface); }
-h1, h2, h3, h4, p, ul, ol, figure, dl, dd { margin: 0; }
+h1, h2, p, ul, ol, dl, dd { margin: 0; }
 ul, ol { padding: 0; list-style: none; }
 button { font: inherit; color: inherit; letter-spacing: inherit; }
 a { color: inherit; }
 [hidden] { display: none !important; }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 :focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; }
 h1, h2 { text-wrap: balance; }
 h1[tabindex="-1"]:focus { outline: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
-/* Type scale */
 .t-display { font-size: 32px; line-height: 40px; font-weight: 600; }
 .t-title   { font-size: 24px; line-height: 32px; font-weight: 600; }
 .t-strong  { font-size: 16px; line-height: 24px; font-weight: 600; }
 .t-desc    { font-size: 16px; line-height: 24px; color: var(--text-2); }
-.t-label   { font-size: 14px; line-height: 20px; font-weight: 600; }
 .t-meta    { font-size: 14px; line-height: 20px; color: var(--text-2); }
-.t-num     { font-variant-numeric: tabular-nums; }
 
-/* Icons */
 .i { width: 20px; height: 20px; fill: currentColor; flex: none; display: block; }
-.i--16 { width: 16px; height: 16px; }
 
-/* Buttons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--s-8);
   height: 44px; padding: 0 var(--s-20); border: 2px solid transparent; border-radius: var(--r-pill);
@@ -100,23 +87,14 @@ h1[tabindex="-1"]:focus { outline: none; }
 .btn--primary:hover { background: var(--yellow-hover); }
 .btn--secondary { background: var(--surface); border-color: var(--blue); color: var(--blue-text); }
 .btn--secondary:hover { background: var(--blue-tint); }
-.btn--danger { border-color: var(--red); color: var(--red-text); }
-.btn--danger:hover { background: var(--red-tint); }
 .btn--lg { height: 52px; padding: 0 var(--s-32); font-size: 16px; line-height: 24px; }
-.btn--block { width: 100%; }
-.btn .i { width: 16px; height: 16px; }
-.btn--lg .i { width: 20px; height: 20px; }
-
 .link {
   display: inline-flex; align-items: center; gap: var(--s-4); padding: 0; border: 0; background: none; cursor: pointer;
   color: var(--slate); font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: 0;
-  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; text-align: left;
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px;
 }
 .link:hover { color: var(--ink); }
 .link .i { width: 16px; height: 16px; }
-.link .i--turn { transition: transform .15s ease; }
-.link[aria-expanded="true"] .i--turn { transform: rotate(45deg); }
-
 .icon-btn {
   width: 44px; height: 44px; display: inline-grid; place-items: center; flex: none;
   border: 1px solid var(--border); border-radius: 50%; background: var(--surface); cursor: pointer; color: var(--ink);
@@ -125,108 +103,65 @@ h1[tabindex="-1"]:focus { outline: none; }
 .icon-btn:disabled { opacity: .4; cursor: not-allowed; }
 [aria-expanded="true"] > .icon-when-closed, [aria-expanded="false"] > .icon-when-open { display: none; }
 
-/* Cards */
-.card { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: var(--s-20); }
+.card { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: var(--s-24); }
 .card.plain { background: none; border: 0; padding: 0; }
 .d-head { display: flex; align-items: center; gap: var(--s-8); margin-bottom: var(--s-8); }
-.d-head__link { margin-left: auto; }
-.d-meta { font-size: 14px; line-height: 20px; color: var(--text-2); }
-.d-icon {
-  width: 40px; height: 40px; flex: none; display: grid; place-items: center;
-  border-radius: 12px; background: var(--page); color: var(--ink);
-}
-.d-icon--tint { background: var(--blue-tint); color: var(--blue-text); }
-.d-chev { width: 20px; height: 20px; flex: none; color: var(--text-2); }
-
-/* Badges */
 .badge {
-  display: inline-flex; align-items: center; gap: var(--s-4); padding: 4px 8px; border-radius: 24px;
-  font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: var(--track); white-space: nowrap;
+  display: inline-flex; align-items: center; gap: var(--s-4); padding: 4px 10px; border-radius: 24px;
+  font-size: 12px; line-height: 16px; font-weight: 600; white-space: nowrap;
 }
 .badge .i { width: 14px; height: 14px; }
 .badge--blue { background: var(--blue-text); color: var(--on-dark); }
-.badge--included { background: var(--blue-tint); color: var(--blue-text); }
-.badge--status { background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--border); }
-.badge--status .i { color: var(--blue-text); }
-.badge--neutral { background: var(--surface); color: var(--text-2); box-shadow: inset 0 0 0 1px var(--border); }
-.count {
-  display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px;
-  background: var(--blue-text); color: var(--on-dark); font-size: 12px; line-height: 16px; font-weight: 600; font-variant-numeric: tabular-nums;
-}
-.count--red { background: var(--red); }
+.badge--tint { background: var(--blue-tint); color: var(--blue-text); }
+.badge--quiet { background: var(--surface); color: var(--text-2); box-shadow: inset 0 0 0 1px var(--border); }
+.count { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px; background: var(--red); color: var(--on-dark); font-size: 12px; line-height: 16px; font-weight: 600; }
 
-/* Chips */
-.chips { display: flex; flex-wrap: wrap; gap: var(--s-8); margin-top: var(--s-12); }
-.chip {
-  min-height: 40px; padding: 0 var(--s-16); border-radius: var(--r-pill); cursor: pointer;
-  border: 1px solid var(--border); background: var(--surface); color: var(--ink); font-size: 14px; line-height: 20px;
-}
-.chip:hover { border-color: var(--blue); background: var(--blue-tint); }
-.chip[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-tint); box-shadow: inset 0 0 0 1px var(--blue); font-weight: 600; }
-
-/* Menus and toast */
 .menu-wrap { position: relative; }
-.menu { position: absolute; z-index: 30; top: calc(100% + 8px); right: 0; min-width: 280px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-inner); padding: var(--s-8); }
+.menu { position: absolute; z-index: 30; top: calc(100% + 8px); right: 0; min-width: 260px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-inner); padding: var(--s-8); }
 .menu__who { padding: var(--s-8) var(--s-12); }
-.menu__item { display: flex; align-items: center; gap: var(--s-12); width: 100%; min-height: 44px; padding: var(--s-8) var(--s-12); border: 0; border-radius: 12px; background: none; text-align: left; text-decoration: none; cursor: pointer; font-size: 16px; }
+.menu__item { display: flex; align-items: center; gap: var(--s-12); width: 100%; min-height: 44px; padding: var(--s-8) var(--s-12); border: 0; border-radius: 12px; background: none; text-align: left; text-decoration: none; cursor: pointer; }
 .menu__item:hover { background: var(--blue-tint); }
 .menu__sep { height: 1px; background: var(--border); margin: var(--s-8) 0; }
-.toast {
-  position: fixed; z-index: 90; left: 50%; top: calc(88px + env(safe-area-inset-top, 0px)); transform: translateX(-50%);
-  display: flex; align-items: center; gap: var(--s-8); max-width: calc(100vw - 32px); padding: var(--s-12) var(--s-16);
-  background: var(--ink); color: var(--on-dark); border-radius: var(--r-inner); font-size: 14px; line-height: 20px; font-weight: 600;
-}
+.toast { position: fixed; z-index: 90; left: 50%; top: calc(88px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); display: flex; align-items: center; gap: var(--s-8); max-width: calc(100vw - 32px); padding: var(--s-12) var(--s-16); background: var(--ink); color: var(--on-dark); border-radius: var(--r-inner); font-size: 14px; line-height: 20px; font-weight: 600; }
 
 /* ---------- Page chrome ---------- */
 .app { container-type: inline-size; container-name: app; display: flex; flex-direction: column; min-height: 100vh; background: var(--page); }
-.wrap-x {
-  width: 100%; max-width: calc(var(--container) + 48px); margin: 0 auto;
-  padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px));
-}
+.wrap-x { width: 100%; max-width: calc(var(--container) + 48px); margin: 0 auto; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
 .topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--surface); border-bottom: 1px solid var(--border); }
 .topbar__inner { height: 72px; display: flex; align-items: center; gap: var(--s-32); }
 .brand { display: inline-flex; align-items: center; gap: var(--s-8); flex: none; text-decoration: none; }
 .brand__mark { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: var(--on-dark); }
 .brand__mark .i { width: 18px; height: 18px; }
 .brand__name { font-size: 24px; line-height: 32px; font-weight: 600; }
-.brand__product { padding-left: var(--s-8); border-left: 1px solid var(--border); font-size: 16px; line-height: 24px; color: var(--text-2); }
+.brand__product { padding-left: var(--s-8); border-left: 1px solid var(--border); color: var(--text-2); }
 .nav { flex: 1; align-self: stretch; display: flex; gap: var(--s-24); }
 .nav__link { position: relative; display: inline-flex; align-items: center; gap: var(--s-8); white-space: nowrap; text-decoration: none; color: var(--text-2); }
 .nav__link:hover { color: var(--ink); }
 .nav__link.is-active { color: var(--ink); font-weight: 600; }
 .nav__link.is-active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--ink); }
-.topbar__actions, .topbar__out { display: flex; align-items: center; gap: var(--s-12); margin-left: auto; flex: none; }
-.avatar-btn { width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--blue-tint); color: var(--blue-text); font-size: 14px; line-height: 20px; font-weight: 600; cursor: pointer; }
-.avatar-btn:hover { background: var(--blue-tint-2); }
+.topbar__actions { display: flex; align-items: center; margin-left: auto; flex: none; }
+.avatar-btn { width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--blue-tint); color: var(--blue-text); font-size: 14px; font-weight: 600; cursor: pointer; }
 .topbar__mobile { display: none; }
 .mnav { display: none; }
-body.is-out .when-in { display: none !important; }
-body:not(.is-out) .when-out { display: none !important; }
 
 .page { flex: 1 0 auto; padding-block: var(--s-32) var(--s-48); }
 .back { margin-bottom: var(--s-24); }
-.back .link { min-height: 24px; }
-.fhead { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s-24); margin-bottom: var(--s-24); }
-.fhead__text { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
-.result__icon { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--blue-tint); color: var(--blue-text); margin-bottom: var(--s-12); }
+.fhead { display: flex; flex-direction: column; gap: var(--s-8); margin-bottom: var(--s-24); }
+.result__icon { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--blue-tint); color: var(--blue-text); margin-bottom: var(--s-8); }
 .result__icon .i { width: 28px; height: 28px; }
 
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s-24); align-items: start; }
 .layout--single { grid-template-columns: minmax(0, 760px); }
-.layout--narrow { grid-template-columns: minmax(0, 480px); justify-content: center; }
-.layout--single .rail, .layout--narrow .rail { display: none; }
+.layout--single .rail { display: none; }
 .main, .rail { display: flex; flex-direction: column; gap: var(--s-24); min-width: 0; }
 .rail { position: sticky; top: calc(72px + var(--s-24) + env(safe-area-inset-top, 0px)); }
-body[data-screen="dashboard"] .rail, body[data-screen="booked"] .rail { position: static; }
-body.is-narrow-head .fhead { justify-content: center; text-align: center; }
-body.is-narrow-head .fhead__text { align-items: center; }
+body[data-screen="dashboard"] .rail { position: static; }
 
 .footer { background: var(--surface); border-top: 1px solid var(--border); }
-.footer__inner { padding-block: var(--s-24); display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); }
-.footer__links { display: flex; gap: var(--s-20); }
+.footer__inner { padding-block: var(--s-24); }
 
 /* ---------- Stepper ---------- */
-.steps { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: var(--s-8); max-width: 780px; margin-bottom: var(--s-24); }
+.steps { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: var(--s-8); max-width: 760px; margin-bottom: var(--s-24); }
 .step { display: flex; flex-direction: column; gap: var(--s-8); }
 .step__label { display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
 .step__label .i { width: 14px; height: 14px; color: var(--blue-text); display: none; }
@@ -236,287 +171,164 @@ body.is-narrow-head .fhead__text { align-items: center; }
 .step.is-done .step__label { color: var(--blue-text); }
 .step.is-done .step__label .i { display: block; }
 
-/* ---------- Messages and notes ---------- */
-.message { display: flex; align-items: center; gap: var(--s-12); margin-bottom: var(--s-24); padding: var(--s-12) var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); }
-.message__icon { display: grid; color: var(--blue-text); }
+/* ---------- Messages ---------- */
+.message { display: flex; align-items: center; gap: var(--s-12); padding: var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); }
+.message + * { margin-top: var(--s-24); }
+.message__icon { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 50%; background: var(--surface); color: var(--blue-text); }
 .message__text { flex: 1; font-size: 14px; line-height: 20px; }
-.message__text strong { font-weight: 600; }
+.message__text strong { display: block; font-size: 16px; line-height: 24px; font-weight: 600; }
 .message--alert { background: var(--red-tint); }
 .message--alert .message__icon { color: var(--red); }
-.note { display: flex; align-items: flex-start; gap: var(--s-12); margin-top: var(--s-12); padding: var(--s-12) var(--s-16); border-radius: var(--r-inner); background: var(--blue-tint); font-size: 14px; line-height: 20px; }
-.note .i { color: var(--blue-text); }
-.note strong { font-weight: 600; }
-.note .link { margin-top: 2px; }
-.error { display: flex; align-items: flex-start; gap: 6px; margin-top: var(--s-12); color: var(--red); font-size: 14px; line-height: 20px; font-weight: 600; }
-.error .i { width: 16px; height: 16px; margin-top: 2px; }
+.error { display: flex; align-items: center; gap: 6px; margin-top: var(--s-12); color: var(--red); font-size: 14px; line-height: 20px; font-weight: 600; }
+.error .i { width: 16px; height: 16px; }
 
-/* Build notes: prototype annotations for the team, off by default */
-.bnote {
-  display: flex; align-items: flex-start; gap: var(--s-8); margin-top: var(--s-16); padding: 10px 12px;
-  border: 1px dashed var(--note-line); border-radius: 12px; background: var(--note-bg); color: var(--note-ink);
-  font-size: 13px; line-height: 18px; letter-spacing: 0;
-}
+.bnote { display: flex; align-items: flex-start; gap: var(--s-8); margin-top: var(--s-16); padding: 10px 12px; border: 1px dashed var(--note-line); border-radius: 12px; background: var(--note-bg); color: var(--note-ink); font-size: 13px; line-height: 18px; letter-spacing: 0; }
 .bnote__tag { flex: none; padding: 1px 6px; border-radius: 6px; background: var(--note-ink); color: var(--note-bg); font-size: 11px; line-height: 16px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.bnote code { font-size: 12px; }
 body:not(.show-notes) .bnote { display: none !important; }
 
-/* ---------- Form sections and option tiles ---------- */
-.fsec + .fsec { margin-top: var(--s-24); padding-top: var(--s-24); border-top: 1px solid var(--border); }
+/* ---------- Option tiles ---------- */
 fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 legend { padding: 0; }
-.fsec .t-meta { margin-top: var(--s-4); }
-.sel__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-12); }
-
-.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-12); margin-top: var(--s-12); }
-.opts--1 { grid-template-columns: minmax(0, 1fr); }
 .opt {
-  position: relative; display: flex; align-items: center; gap: var(--s-12); min-height: 72px; padding: var(--s-16);
+  position: relative; display: flex; align-items: center; gap: var(--s-16); padding: var(--s-20);
   border-radius: var(--r-inner); background: var(--page); cursor: pointer; transition: background-color .15s ease, box-shadow .15s ease;
 }
 .opt:hover { box-shadow: inset 0 0 0 1px var(--blue); }
-.opt:hover .opt__title { color: var(--blue-text); }
 .opt:has(input:checked) { background: var(--blue-tint); box-shadow: inset 0 0 0 2px var(--blue); }
-.opt:has(input:checked):hover .opt__title { color: var(--ink); }
 .opt:has(input:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; }
 .opt input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-.opt__main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.opt__title { font-size: 16px; line-height: 24px; font-weight: 600; }
-.opt__meta { font-size: 14px; line-height: 20px; color: var(--text-2); }
-.opt .d-icon { background: var(--surface); }
-.opt:has(input:checked) .d-icon { color: var(--blue-text); }
-.opt__radio {
-  position: relative; width: 20px; height: 20px; flex: none; display: grid; place-items: center;
-  border: 2px solid var(--slate); border-radius: 50%; background: var(--surface);
-}
+.opt__radio { position: relative; width: 20px; height: 20px; flex: none; display: grid; place-items: center; border: 2px solid var(--slate); border-radius: 50%; background: var(--surface); }
 .opt__radio::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--blue-text); transform: scale(0); transition: transform .15s ease; }
 .opt:has(input:checked) .opt__radio { border-color: var(--blue-text); }
 .opt:has(input:checked) .opt__radio::after { transform: scale(1); }
-.opt.is-full { cursor: default; background: var(--surface); box-shadow: inset 0 0 0 1px var(--border); }
-.opt.is-full:hover .opt__title { color: var(--text-2); }
-.opt.is-full .opt__title { color: var(--text-2); }
-.opt.is-full input { cursor: default; }
-.opt.is-full .opt__radio { border-color: var(--border); background: var(--page); }
+.opt__main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.opt__title { font-size: 18px; line-height: 26px; font-weight: 600; }
+.opt.is-off { cursor: default; background: var(--surface); box-shadow: inset 0 0 0 1px var(--border); }
+.opt.is-off .opt__title { color: var(--text-2); }
+.opt.is-off .opt__ic { color: var(--text-2); }
 
 .factions { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); margin-top: var(--s-32); padding-top: var(--s-24); border-top: 1px solid var(--border); }
 .factions__status { font-size: 14px; line-height: 20px; color: var(--text-2); }
 .factions__status strong { color: var(--ink); font-weight: 600; }
 
-/* ---------- Step 1: homes ---------- */
-.homes { display: flex; flex-direction: column; gap: var(--s-12); margin-top: var(--s-16); }
-.hopt { align-items: flex-start; padding: var(--s-16) var(--s-20); }
-.hopt .opt__radio, .hopt__ic { margin-top: 2px; }
-.hopt__ic { color: var(--slate); }
-.hopt__main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.hopt__facts { display: flex; flex-wrap: wrap; gap: var(--s-4) var(--s-16); margin-top: var(--s-8); }
-.hopt__fact { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; line-height: 20px; color: var(--ink); }
-.hopt__fact .i { width: 16px; height: 16px; color: var(--slate); }
-.hopt__line { margin-top: var(--s-8); font-size: 14px; line-height: 20px; color: var(--text-2); }
-.hopt__line .link { position: relative; z-index: 2; }
-.hopt__side { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: var(--s-8); }
-.hopt.is-off { cursor: default; background: var(--surface); box-shadow: inset 0 0 0 1px var(--border); }
-.hopt.is-off:hover { box-shadow: inset 0 0 0 1px var(--border); }
-.hopt.is-off .opt__title { color: var(--ink); }
+/* Step 1: homes */
+.homes { display: flex; flex-direction: column; gap: var(--s-12); }
 
-/* ---------- Step 2: tune-up type ---------- */
-.tcards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-12); margin-top: var(--s-12); }
-.tcard {
-  position: relative; display: flex; flex-direction: column; gap: var(--s-12); padding: var(--s-20);
-  border-radius: var(--r-inner); background: var(--page); cursor: pointer; transition: background-color .15s ease, box-shadow .15s ease;
-}
-.tcard:hover { box-shadow: inset 0 0 0 1px var(--blue); }
-.tcard:has(input:checked) { background: var(--blue-tint); box-shadow: inset 0 0 0 2px var(--blue); }
-.tcard:has(input:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; }
-.tcard input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+/* Step 2: tune-up type */
+.tcards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-12); }
+.tcard { flex-direction: column; align-items: stretch; gap: var(--s-12); }
 .tcard__top { display: flex; align-items: center; gap: var(--s-12); }
-.tcard__name { flex: 1; min-width: 0; font-size: 16px; line-height: 24px; font-weight: 600; }
 .tcard__price { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--s-4) var(--s-8); }
-.tcard__amt { font-size: 32px; line-height: 40px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.tcard__per { font-size: 14px; line-height: 20px; color: var(--ink); }
+.tcard__amt { font-size: 40px; line-height: 48px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tcard__per { font-size: 14px; line-height: 20px; }
 .tcard__retail { font-size: 14px; line-height: 20px; color: var(--text-2); }
 .tcard__retail s { text-decoration-thickness: 1px; }
 .tcard__desc { font-size: 14px; line-height: 20px; color: var(--text-2); }
-.tcard:has(input:checked) .tcard__desc { color: var(--ink); }
-.tcard__rec { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--blue-text); }
-.tcard__rec .i { width: 14px; height: 14px; margin-top: 1px; }
-.tcards.is-info .tcard { cursor: default; background: var(--surface); box-shadow: inset 0 0 0 1px var(--border); }
-.tcards.is-info .tcard input { cursor: default; }
-.tcards.is-info .tcard:hover { box-shadow: inset 0 0 0 1px var(--border); }
-.tcards.is-info .opt__radio { display: none; }
-.tcards.is-info .tcard__desc { color: var(--text-2); }
+.opt:has(input:checked) .tcard__desc { color: var(--ink); }
 
-.incl { margin-top: var(--s-16); }
-.incl > .link { min-height: 32px; }
-.cmp-wrap { overflow-x: auto; margin-top: var(--s-8); }
-.cmp { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 20px; }
-.cmp th { padding: var(--s-8) 0; border-bottom: 2px solid var(--ink); text-align: left; font-weight: 600; }
-.cmp td { padding: 10px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
-.cmp .c { width: 128px; text-align: center; }
-.cmp td.c .i { margin: 0 auto; color: var(--blue-text); }
-.cmp td.c .i.is-no { color: var(--dot); }
-.cmp__sub { display: block; color: var(--text-2); font-size: 12px; line-height: 16px; }
+.total { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); margin-top: var(--s-24); padding: var(--s-20); border-radius: var(--r-inner); background: var(--page); }
+.total__label { font-size: 14px; line-height: 20px; color: var(--text-2); }
+.total__what { font-size: 16px; line-height: 24px; font-weight: 600; }
+.total__amt { font-size: 32px; line-height: 40px; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+.total__amt small { display: block; font-size: 14px; line-height: 20px; font-weight: 400; color: var(--text-2); }
 
-/* Systems */
-.syss { margin-top: var(--s-12); border: 1px solid var(--border); border-radius: var(--r-inner); }
-.sys { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s-12); padding: var(--s-12) var(--s-16); }
-.sys + .sys { border-top: 1px solid var(--border); }
-.sys .d-icon { background: var(--blue-tint); color: var(--blue-text); }
-.sys__main { flex: 1; min-width: 160px; display: flex; flex-direction: column; }
-.sys__hint { display: flex; align-items: center; gap: 6px; margin-top: 2px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--blue-text); }
-.sys__hint .i { width: 14px; height: 14px; }
-.sys__chip { flex: none; padding: var(--s-4) var(--s-12); border-radius: var(--r-pill); background: var(--page); font-size: 14px; line-height: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.seg { display: inline-flex; gap: var(--s-4); padding: var(--s-4); border-radius: var(--r-pill); background: var(--page); flex: none; }
-.seg__opt { position: relative; display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 var(--s-16); border-radius: var(--r-pill); font-size: 14px; line-height: 20px; font-weight: 600; color: var(--text-2); cursor: pointer; white-space: nowrap; }
-.seg__opt input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-.seg__opt:hover { color: var(--ink); }
-.seg__opt:has(input:checked) { background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 2px var(--blue); }
-.seg__opt:has(input:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; }
-.sys__tools { display: flex; flex-wrap: wrap; gap: var(--s-8) var(--s-24); margin-top: var(--s-12); }
-.sys__tools .link { min-height: 32px; }
-
-.qty { display: flex; align-items: center; gap: var(--s-12); margin-top: var(--s-12); }
-.qty__btn { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--slate); border-radius: var(--r-pill); background: var(--surface); color: var(--ink); cursor: pointer; }
-.qty__btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue-text); }
-.qty__btn:disabled { opacity: .4; cursor: default; }
-.qty__val { width: 72px; height: 44px; padding: 0; border: 1px solid var(--border); border-radius: var(--r-pill); background: var(--surface); color: var(--ink); text-align: center; font: inherit; font-size: 20px; line-height: 28px; font-weight: 600; }
-.countbox { margin-top: var(--s-16); padding: var(--s-16); border-radius: var(--r-inner); background: var(--page); }
-.countbox .qty { margin-top: var(--s-8); }
-
-/* ---------- Step 3: day and window ---------- */
-.wk__head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-12); margin: var(--s-12) 0; }
-.wk__range { font-size: 16px; line-height: 24px; font-weight: 600; }
-.wk__navs { display: flex; gap: var(--s-8); }
-.wk { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s-8); }
-.wday {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 92px; padding: var(--s-8) var(--s-4);
-  border: 0; border-radius: var(--r-inner); background: var(--blue-tint); color: var(--ink); cursor: pointer; text-align: center;
+/* Step 3: calendar and times (reference pattern) */
+.rec { display: flex; align-items: center; gap: var(--s-16); margin-bottom: var(--s-24); padding: var(--s-16) var(--s-20); border-radius: var(--r-inner); background: var(--blue-tint); }
+.rec__icon { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 50%; background: var(--surface); color: var(--blue-text); }
+.rec__label { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
+.rec__value { font-size: 24px; line-height: 32px; font-weight: 600; }
+.book { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-32); align-items: start; }
+.cal__head { display: flex; align-items: center; justify-content: space-between; margin: var(--s-12) 0 var(--s-8); }
+.cal__month { font-size: 16px; line-height: 24px; font-weight: 600; }
+.cal__navs { display: flex; gap: var(--s-8); }
+.cal__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: var(--s-4); }
+.cal__dow { padding: var(--s-4) 0; text-align: center; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
+.cal__cell { display: grid; place-items: center; }
+.cal__day { width: 44px; height: 44px; border: 0; border-radius: 50%; background: none; color: var(--text-2); font: inherit; font-size: 14px; line-height: 20px; cursor: default; }
+.cal__day:not(:disabled) { background: var(--blue-tint); color: var(--ink); font-weight: 600; cursor: pointer; }
+.cal__day:not(:disabled):hover { box-shadow: inset 0 0 0 2px var(--blue); }
+.cal__day[aria-pressed="true"] { background: var(--blue-text); color: var(--on-dark); box-shadow: none; }
+.times { display: flex; flex-direction: column; gap: var(--s-8); margin-top: var(--s-12); }
+.time {
+  position: relative; display: flex; align-items: center; justify-content: space-between; gap: var(--s-8);
+  height: 48px; padding: 0 var(--s-20); border: 1px solid var(--border); border-radius: var(--r-pill);
+  background: var(--surface); cursor: pointer; font-size: 14px; line-height: 20px; font-weight: 600;
 }
-.wday:hover:not(:disabled) { box-shadow: inset 0 0 0 2px var(--blue); }
-.wday__dow { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
-.wday__num { font-size: 24px; line-height: 32px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.wday__meta { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--blue-text); }
-.wday:disabled { background: var(--page); color: var(--text-2); cursor: default; }
-.wday:disabled .wday__meta { color: var(--text-2); font-weight: 400; }
-.wday[aria-pressed="true"] { background: var(--blue-text); color: var(--on-dark); }
-.wday[aria-pressed="true"] .wday__dow, .wday[aria-pressed="true"] .wday__meta { color: var(--on-dark); }
-.wk__legend { display: flex; align-items: center; gap: var(--s-8); margin-top: var(--s-12); }
-.wk__swatch { width: 12px; height: 12px; border-radius: 50%; background: var(--blue-tint); box-shadow: inset 0 0 0 1px var(--blue); flex: none; }
-.wins__empty { display: flex; align-items: center; gap: var(--s-8); margin-top: var(--s-12); padding: var(--s-16); border-radius: var(--r-inner); background: var(--page); font-size: 14px; line-height: 20px; color: var(--text-2); }
-.wins__empty .i { color: var(--blue); }
-.empty-state { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-16); padding: var(--s-20); border-radius: var(--r-inner); background: var(--blue-faint); box-shadow: inset 0 0 0 1px var(--blue-tint-2); }
-.empty-state__row { display: flex; align-items: flex-start; gap: var(--s-12); }
-.empty-state__row > .i { color: var(--blue-text); margin-top: 2px; }
-.phones { display: flex; flex-wrap: wrap; gap: var(--s-8) var(--s-24); }
+.time:hover { border-color: var(--blue); background: var(--blue-tint); }
+.time input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.time .i { width: 16px; height: 16px; color: var(--blue-text); opacity: 0; }
+.time:has(input:checked) { background: var(--blue-tint); border-color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); }
+.time:has(input:checked) .i { opacity: 1; }
+.time:has(input:focus-visible) { outline: 2px solid var(--blue-text); outline-offset: 2px; }
+.times__empty { display: flex; align-items: center; gap: var(--s-8); padding: var(--s-12) 0; font-size: 14px; line-height: 20px; color: var(--text-2); }
+.times__empty .i { color: var(--blue); }
+.phones { display: flex; flex-wrap: wrap; gap: var(--s-8) var(--s-32); margin-top: var(--s-12); }
 .phone { display: flex; flex-direction: column; }
-.phone__num { font-size: 16px; line-height: 24px; font-weight: 600; font-variant-numeric: tabular-nums; user-select: all; }
+.phone__num { font-size: 20px; line-height: 28px; font-weight: 600; font-variant-numeric: tabular-nums; user-select: all; }
 
-/* ---------- Summary rail ---------- */
+/* Summary rail */
 .sum { display: flex; flex-direction: column; gap: var(--s-16); margin-top: var(--s-16); }
-.sum__row { display: flex; flex-direction: column; gap: var(--s-4); }
+.sum__row { display: flex; flex-direction: column; gap: 2px; }
 .sum__label { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
 .sum__val { font-size: 16px; line-height: 24px; font-weight: 600; }
 .sum__sub { display: block; font-size: 14px; line-height: 20px; font-weight: 400; color: var(--text-2); }
-.sum__empty { font-size: 14px; line-height: 20px; color: var(--text-2); }
-.sum__home { display: flex; align-items: flex-start; gap: var(--s-8); }
-.sum__home .i { margin-top: 2px; color: var(--slate); }
-.sum__list { display: flex; flex-direction: column; gap: var(--s-8); }
-.sum__list li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-12); font-size: 14px; line-height: 20px; }
-.sum__list li span:last-child { flex: none; color: var(--text-2); font-variant-numeric: tabular-nums; }
-.ledger { margin-top: var(--s-16); padding-top: var(--s-8); border-top: 1px solid var(--border); }
-.ledger__row { display: flex; justify-content: space-between; gap: var(--s-16); padding: var(--s-8) 0; font-size: 14px; line-height: 20px; }
-.ledger__row dt { color: var(--text-2); }
-.ledger__row dd { font-weight: 600; font-variant-numeric: tabular-nums; }
-.ledger__row--total { margin-top: var(--s-4); padding-top: var(--s-12); border-top: 2px solid var(--ink); font-size: 16px; line-height: 24px; }
-.ledger__row--total dt { color: var(--ink); font-weight: 600; }
+.sum__empty { font-size: 14px; line-height: 20px; font-weight: 400; color: var(--text-2); }
+.sum__plan { display: flex; align-items: center; gap: var(--s-8); color: var(--blue-text); }
+.ledger { margin-top: var(--s-20); padding-top: var(--s-16); border-top: 2px solid var(--ink); display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-12); }
+.ledger__label { font-weight: 600; }
+.ledger__amt { font-size: 32px; line-height: 40px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .ledger__foot { margin-top: var(--s-4); font-size: 14px; line-height: 20px; color: var(--text-2); }
-.ledger__foot s { text-decoration-thickness: 1px; }
 
-/* ---------- Review ---------- */
-.rvw__row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: var(--s-12); align-items: start; padding: var(--s-16) 0; border-top: 1px solid var(--border); }
-.rvw__row:first-child { padding-top: 0; border-top: 0; }
-.rvw__k { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
-.rvw__v { font-size: 16px; line-height: 24px; font-weight: 600; overflow-wrap: anywhere; }
-.rvw__s { font-size: 14px; line-height: 20px; color: var(--text-2); }
-.rvw__row .link { min-height: 24px; margin-top: 16px; }
-.rvw__price { margin-top: var(--s-8); padding: var(--s-16) var(--s-20); border-radius: var(--r-inner); background: var(--page); }
-.rvw__price .ledger { margin-top: 0; padding-top: 0; border-top: 0; }
-
-/* ---------- Results: visit cards, next steps ---------- */
-.vcards { display: flex; flex-direction: column; gap: var(--s-16); }
-.vcard { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: var(--s-16); padding: var(--s-20); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); }
-.vcard__tile { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 72px; height: 80px; border-radius: var(--r-inner); background: var(--blue-tint); color: var(--blue-text); }
+/* Results: visit card */
+.vcard { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: var(--s-20); padding: var(--s-24); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); }
+.vcard__tile { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 80px; height: 88px; border-radius: var(--r-inner); background: var(--blue-tint); color: var(--blue-text); }
 .vcard__mon { font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: .06em; }
-.vcard__day { font-size: 32px; line-height: 36px; font-weight: 600; color: var(--ink); }
-.vcard__eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-8); font-size: 14px; line-height: 20px; font-weight: 600; color: var(--blue-text); }
-.vcard__chip { padding: 0 var(--s-8); border-radius: var(--r-pill); background: var(--blue-tint); font-size: 12px; line-height: 20px; font-weight: 600; color: var(--blue-text); }
-.vcard__when { margin-top: var(--s-4); font-size: 20px; line-height: 28px; font-weight: 600; }
-.vcard__time { font-size: 16px; line-height: 24px; }
+.vcard__day { font-size: 36px; line-height: 40px; font-weight: 600; color: var(--ink); }
+.vcard__eyebrow { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--blue-text); }
+.vcard__when { margin-top: var(--s-4); font-size: 24px; line-height: 32px; font-weight: 600; }
+.vcard__time { font-size: 18px; line-height: 26px; }
 .vcard__rows { grid-column: 1 / -1; display: flex; flex-direction: column; gap: var(--s-12); padding-top: var(--s-16); border-top: 1px solid var(--border); }
-.vcard__row { display: flex; align-items: flex-start; gap: var(--s-12); font-size: 16px; line-height: 24px; font-weight: 600; overflow-wrap: anywhere; }
-.vcard__row--quiet { font-weight: 400; color: var(--text-2); }
+.vcard__row { display: flex; align-items: flex-start; gap: var(--s-12); overflow-wrap: anywhere; }
+.vcard__row strong { font-weight: 600; }
 .vcard__ic { display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; color: var(--slate); }
-.vcard__acts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--s-12); }
-.result__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-20); margin-top: var(--s-24); }
-.result__actions .link { min-height: 24px; }
-.srm { margin-top: var(--s-16); padding: var(--s-20); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); }
-.srm__row { display: flex; align-items: center; gap: var(--s-12); margin-top: var(--s-12); }
-.srm .btn { margin-top: var(--s-16); }
-.rows { display: flex; flex-direction: column; margin-top: var(--s-8); }
-.row { display: flex; align-items: flex-start; gap: var(--s-12); padding: var(--s-16) 0; border-top: 1px solid var(--border); }
-.row:first-child { border-top: 0; padding-top: var(--s-8); }
-.row__main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.next { display: flex; flex-direction: column; gap: var(--s-12); margin-top: var(--s-16); }
-.next li { display: flex; align-items: flex-start; gap: var(--s-12); }
-.next .d-icon { width: 32px; height: 32px; border-radius: 50%; font-size: 14px; line-height: 20px; font-weight: 600; background: var(--blue-tint); color: var(--blue-text); }
-.mg__bar { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); margin-top: var(--s-24); padding-top: var(--s-20); border-top: 1px solid var(--border); }
-.mg__status { font-size: 14px; line-height: 20px; color: var(--text-2); }
+.result__note { margin-top: var(--s-16); }
+.result__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-16); margin-top: var(--s-24); }
 
-/* ---------- Dashboard (context only) ---------- */
-.dlist { display: flex; flex-direction: column; margin-top: var(--s-8); }
-.ditem { display: flex; align-items: center; gap: var(--s-12); min-height: 64px; padding: var(--s-12) 0; border-top: 1px solid var(--border); text-decoration: none; }
-.ditem:first-child { border-top: 0; }
-.ditem__main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.ditem:hover .t-strong { color: var(--blue-text); }
+/* Dashboard (context only) */
+.skel { display: flex; flex-direction: column; gap: var(--s-12); margin-top: var(--s-12); }
+.skel__row { display: flex; align-items: center; gap: var(--s-12); }
+.skel__dot { width: 40px; height: 40px; flex: none; border-radius: 12px; background: var(--skel); }
+.skel__lines { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.skel__line { height: 12px; border-radius: 6px; background: var(--skel); }
 .promo { padding: 0; overflow: hidden; }
 .promo__art { display: block; width: 100%; height: auto; max-width: 100%; }
-.promo__body { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-8); padding: var(--s-20); }
-.promo__body .btn { margin-top: var(--s-8); }
+.promo__body { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-8); padding: var(--s-24); }
+.promo__body .btn { margin-top: var(--s-12); }
 .art-bg { fill: var(--blue-tint); }
 .art-wall { fill: var(--surface); }
 .art-line { fill: none; stroke: var(--border); stroke-width: 2; }
 .art-ink { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; }
 .art-unit { fill: var(--surface); }
-.art-grille { fill: var(--blue-faint); }
+.art-grille { fill: var(--blue-tint); }
 .art-slate { fill: none; stroke: var(--slate); stroke-width: 2; }
 .art-blade { fill: var(--blue); }
 .art-hub { fill: var(--ink); }
 .art-pad { fill: var(--border); }
 .art-pipe { fill: none; stroke: var(--slate); stroke-width: 4; stroke-linecap: round; }
-.art-air { fill: none; stroke: var(--blue); stroke-width: 3; stroke-linecap: round; }
 .art-sun { fill: var(--yellow); }
 
-/* ---------- Sign in ---------- */
-.field { display: flex; flex-direction: column; }
-.field + .field { margin-top: var(--s-16); }
-.field label { font-size: 14px; line-height: 20px; font-weight: 600; }
-.tf {
-  width: 100%; height: 48px; margin-top: var(--s-8); padding: 0 var(--s-16); border: 1px solid var(--slate); border-radius: var(--r-inner);
-  background: var(--surface); color: var(--ink); font: inherit; font-size: 16px; line-height: 24px; letter-spacing: var(--track);
-}
-.tf:hover { border-color: var(--blue); }
-.tf:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; border-color: var(--blue-text); }
-.auth__go { margin-top: var(--s-24); }
-.auth__foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-8) var(--s-16); margin-top: var(--s-16); }
-
-/* ---------- Mobile dock ---------- */
 .fdock { display: none; }
+.m-only { display: none !important; }
+.message.m-only + * { margin-top: 0; }
 
 /* ---------- Prototype panel (not part of the design) ---------- */
-.proto { position: fixed; z-index: 80; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; align-items: flex-end; gap: var(--s-8); font-family: var(--font); }
+.proto { position: fixed; z-index: 80; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; align-items: flex-end; gap: var(--s-8); }
 .proto__toggle { display: inline-flex; align-items: center; gap: var(--s-8); height: 40px; padding: 0 var(--s-16); border: 0; border-radius: var(--r-pill); background: var(--proto); color: var(--on-dark); cursor: pointer; font-size: 12px; line-height: 16px; font-weight: 600; }
 .proto__toggle .i { width: 16px; height: 16px; }
-.proto__panel { width: 296px; max-height: calc(100vh - 96px); overflow-y: auto; padding: var(--s-16); background: var(--surface); border: 1px solid var(--proto); border-radius: var(--r-inner); }
-.proto__title { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); margin-bottom: var(--s-8); }
-.proto__url { margin-bottom: var(--s-12); padding: var(--s-8) var(--s-12); border-radius: 10px; background: var(--page); font-size: 12px; line-height: 16px; overflow-wrap: anywhere; }
-.proto__url strong { font-weight: 600; }
+.proto__panel { width: 280px; max-height: calc(100vh - 96px); overflow-y: auto; padding: var(--s-16); background: var(--surface); border: 1px solid var(--proto); border-radius: var(--r-inner); }
+.proto__title { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); margin: var(--s-12) 0 var(--s-4); }
+.proto__title:first-child { margin-top: 0; }
 .proto__opt { display: flex; align-items: center; justify-content: space-between; gap: var(--s-12); padding: var(--s-8) 0; font-size: 14px; line-height: 20px; cursor: pointer; }
 .proto__opt + .proto__opt { border-top: 1px solid var(--border); }
 .switch { position: relative; width: 40px; height: 24px; flex: none; }
@@ -526,72 +338,54 @@ legend { padding: 0; }
 .switch input:checked + .switch__track { background: var(--blue-text); }
 .switch input:checked + .switch__track::after { transform: translateX(16px); }
 .switch input:focus-visible + .switch__track { outline: 2px solid var(--blue-text); outline-offset: 2px; }
-.proto__go { display: flex; flex-direction: column; margin-top: var(--s-8); padding-top: var(--s-12); border-top: 1px solid var(--border); }
+.proto__go { display: flex; flex-direction: column; margin-top: var(--s-8); padding-top: var(--s-8); border-top: 1px solid var(--border); }
 .proto__link { display: flex; align-items: center; min-height: 34px; padding: 0; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; font-size: 14px; line-height: 20px; }
 .proto__link:hover { color: var(--blue-text); }
 .proto__link[aria-current="true"] { font-weight: 600; color: var(--blue-text); }
 .proto__link--quiet { color: var(--slate); text-decoration: underline; text-underline-offset: 3px; }
 
-/* Phone frame */
 body.frame-mobile { background: var(--frame); }
 body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
 
-/* ---------- Mobile: the same container query the HomeHub sample uses ---------- */
+/* ---------- Mobile ---------- */
 @container app (max-width: 767px) {
   .wrap-x { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
   .topbar__inner { height: 64px; gap: var(--s-12); }
   .brand__product, .nav, .topbar__actions { display: none; }
-  .topbar__mobile { display: flex; align-items: center; gap: var(--s-8); margin-left: auto; }
+  .topbar__mobile { display: flex; margin-left: auto; }
   .mnav { display: flex; flex-direction: column; padding: var(--s-8) var(--s-16) var(--s-16); border-top: 1px solid var(--border); background: var(--surface); }
-  .mnav__link { display: flex; align-items: center; gap: var(--s-12); min-height: 48px; padding: 0 var(--s-12); border-radius: 12px; text-decoration: none; font-size: 16px; line-height: 24px; }
+  .mnav__link { display: flex; align-items: center; min-height: 48px; padding: 0 var(--s-12); border-radius: 12px; text-decoration: none; }
   .mnav__link.is-active { background: var(--blue-tint); font-weight: 600; }
-  .mnav__link--quiet { color: var(--slate); }
-  .mnav__sep { height: 1px; margin: var(--s-8) 0; background: var(--border); }
 
   .page { padding-block: var(--s-16) var(--s-40); }
   .back { margin-bottom: var(--s-16); }
   .back .link { min-height: 44px; }
   .steps { margin-bottom: var(--s-16); }
   .fhead { margin-bottom: var(--s-16); }
-  .t-display { font-size: 24px; line-height: 32px; }
-  .layout, .layout--single, .layout--narrow { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
+  .t-display { font-size: 26px; line-height: 34px; }
+  .layout, .layout--single { display: flex; flex-direction: column; align-items: stretch; gap: var(--s-16); }
   .rail { position: static; }
-  body[data-screen="home"] .rail, body[data-screen="tuneup"] .rail, body[data-screen="time"] .rail { display: none; }
+  body[data-screen="time"] .rail { display: none; }
   body[data-screen="dashboard"] .rail { order: -1; }
   .card { padding: var(--s-16); }
-
-  .opts { grid-template-columns: minmax(0, 1fr); }
-  .hopt { flex-wrap: wrap; padding: var(--s-16); }
-  .hopt__main { flex-basis: calc(100% - 40px); }
-  .hopt__side { width: 100%; align-items: flex-start; padding-left: 32px; }
+  .opt { padding: var(--s-16); }
   .tcards { grid-template-columns: minmax(0, 1fr); }
-  .tcard { padding: var(--s-16); }
-  .cmp .c { width: 92px; }
-  .cmp th.c { font-size: 12px; line-height: 16px; }
-  .seg { width: 100%; }
-  .seg__opt { flex: 1; padding: 0 var(--s-8); }
-  .sys__main { min-width: 0; flex-basis: calc(100% - 52px); }
-  .sys__chip { margin-left: 52px; }
-  .wk { gap: var(--s-4); }
-  .wday { min-height: 80px; border-radius: 12px; }
-  .wday__num { font-size: 20px; line-height: 28px; }
-  .wday__meta { font-size: 11px; }
-  .rvw__row { grid-template-columns: 40px minmax(0, 1fr); }
-  .rvw__row .link { grid-column: 2; margin-top: 0; min-height: 44px; }
-  .rvw__price { padding: var(--s-16); }
-  .vcard { grid-template-columns: 56px minmax(0, 1fr); padding: var(--s-16); gap: var(--s-12); }
-  .vcard__tile { width: 56px; height: 64px; }
-  .vcard__day { font-size: 24px; line-height: 28px; }
-  .vcard__when { font-size: 18px; line-height: 26px; }
-  .vcard__acts .btn { flex: 1 1 100%; }
-  .result__actions { flex-direction: column; align-items: stretch; gap: var(--s-12); }
+  .tcard__amt { font-size: 32px; line-height: 40px; }
+  .total { padding: var(--s-16); }
+  .total__amt { font-size: 28px; line-height: 36px; }
+  .book { grid-template-columns: minmax(0, 1fr); gap: var(--s-24); }
+  .cal__day { width: min(44px, 100%); border-radius: 22px; }
+  .vcard { grid-template-columns: 64px minmax(0, 1fr); padding: var(--s-16); gap: var(--s-16); }
+  .vcard__tile { width: 64px; height: 72px; }
+  .vcard__day { font-size: 28px; line-height: 32px; }
+  .vcard__when { font-size: 20px; line-height: 28px; }
+  .vcard__time { font-size: 16px; line-height: 24px; }
+  .result__actions { flex-direction: column; align-items: stretch; }
   .result__actions .btn { width: 100%; }
-  .result__actions .link { min-height: 44px; justify-content: center; }
-  .mg__bar { flex-direction: column-reverse; align-items: stretch; text-align: center; }
-  .mg__bar .btn { width: 100%; }
-  .srm .btn { width: 100%; }
 
   .factions { display: none; }
+  .m-only { display: flex !important; }
+  .message.m-only { margin-bottom: var(--s-16); }
   .fdock {
     display: flex; flex-direction: column; gap: var(--s-8); position: sticky; bottom: 0; z-index: 30;
     padding: var(--s-12) max(16px, env(safe-area-inset-right, 0px)) calc(var(--s-12) + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
@@ -602,129 +396,88 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
   .fdock__status { font-size: 14px; line-height: 20px; color: var(--text-2); text-align: center; }
   .fdock__status strong { color: var(--ink); font-weight: 600; }
   .fdock__status:empty { display: none; }
-
-  .footer__inner { flex-direction: column; align-items: flex-start; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { transition: none !important; }
-}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
 </style>
 </head>
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="ri-add-line" viewBox="0 0 24 24"><path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z"/></symbol><symbol id="ri-arrow-down-s-line" viewBox="0 0 24 24"><path d="M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z"/></symbol><symbol id="ri-arrow-left-line" viewBox="0 0 24 24"><path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"/></symbol><symbol id="ri-arrow-left-s-line" viewBox="0 0 24 24"><path d="M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z"/></symbol><symbol id="ri-arrow-right-s-line" viewBox="0 0 24 24"><path d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z"/></symbol><symbol id="ri-bank-card-line" viewBox="0 0 24 24"><path d="M3.00488 2.99979H21.0049C21.5572 2.99979 22.0049 3.4475 22.0049 3.99979V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979ZM20.0049 10.9998H4.00488V18.9998H20.0049V10.9998ZM20.0049 8.99979V4.99979H4.00488V8.99979H20.0049ZM14.0049 14.9998H18.0049V16.9998H14.0049V14.9998Z"/></symbol><symbol id="ri-brush-line" viewBox="0 0 24 24"><path d="M15.4565 9.67503L15.3144 9.53297C14.6661 8.90796 13.8549 8.43369 12.9235 8.18412C10.0168 7.40527 7.22541 9.05273 6.43185 12.0143C6.38901 12.1742 6.36574 12.3537 6.3285 12.8051C6.17423 14.6752 5.73449 16.0697 4.5286 17.4842C6.78847 18.3727 9.46572 18.9986 11.5016 18.9986C13.9702 18.9986 16.1644 17.3394 16.8126 14.9202C17.3306 12.9869 16.7513 11.0181 15.4565 9.67503ZM13.2886 6.21301L18.2278 2.37142C18.6259 2.0618 19.1922 2.09706 19.5488 2.45367L22.543 5.44787C22.8997 5.80448 22.9349 6.37082 22.6253 6.76891L18.7847 11.7068C19.0778 12.8951 19.0836 14.1721 18.7444 15.4379C17.8463 18.7897 14.8142 20.9986 11.5016 20.9986C8 20.9986 3.5 19.4967 1 17.9967C4.97978 14.9967 4.04722 13.1865 4.5 11.4967C5.55843 7.54658 9.34224 5.23935 13.2886 6.21301ZM16.7015 8.09161C16.7673 8.15506 16.8319 8.21964 16.8952 8.28533L18.0297 9.41984L20.5046 6.23786L18.7589 4.4921L15.5769 6.96698L16.7015 8.09161Z"/></symbol><symbol id="ri-calendar-event-line" viewBox="0 0 24 24"><path d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM11 13V17H6V13H11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"/></symbol><symbol id="ri-check-line" viewBox="0 0 24 24"><path d="M9.9997 15.1709L19.1921 5.97852L20.6063 7.39273L9.9997 17.9993L3.63574 11.6354L5.04996 10.2212L9.9997 15.1709Z"/></symbol><symbol id="ri-checkbox-circle-line" viewBox="0 0 24 24"><path d="M4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12ZM12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM17.4571 9.45711L16.0429 8.04289L11 13.0858L8.20711 10.2929L6.79289 11.7071L11 15.9142L17.4571 9.45711Z"/></symbol><symbol id="ri-close-line" viewBox="0 0 24 24"><path d="M11.9997 10.5865L16.9495 5.63672L18.3637 7.05093L13.4139 12.0007L18.3637 16.9504L16.9495 18.3646L11.9997 13.4149L7.04996 18.3646L5.63574 16.9504L10.5855 12.0007L5.63574 7.05093L7.04996 5.63672L11.9997 10.5865Z"/></symbol><symbol id="ri-door-lock-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 12.792C10.117 12.4062 9.5 11.5252 9.5 10.5C9.5 9.11929 10.6193 8 12 8C13.3807 8 14.5 9.11929 14.5 10.5C14.5 11.5252 13.883 12.4062 13 12.792V16H11V12.792Z"/></symbol><symbol id="ri-drop-line" viewBox="0 0 24 24"><path d="M12 3.09723L7.05025 8.04697C4.31658 10.7806 4.31658 15.2128 7.05025 17.9465C9.78392 20.6801 14.2161 20.6801 16.9497 17.9465C19.6834 15.2128 19.6834 10.7806 16.9497 8.04697L12 3.09723ZM12 0.268799L18.364 6.63276C21.8787 10.1475 21.8787 15.846 18.364 19.3607C14.8492 22.8754 9.15076 22.8754 5.63604 19.3607C2.12132 15.846 2.12132 10.1475 5.63604 6.63276L12 0.268799Z"/></symbol><symbol id="ri-equalizer-line" viewBox="0 0 24 24"><path d="M6.17071 18C6.58254 16.8348 7.69378 16 9 16C10.3062 16 11.4175 16.8348 11.8293 18H22V20H11.8293C11.4175 21.1652 10.3062 22 9 22C7.69378 22 6.58254 21.1652 6.17071 20H2V18H6.17071ZM12.1707 11C12.5825 9.83481 13.6938 9 15 9C16.3062 9 17.4175 9.83481 17.8293 11H22V13H17.8293C17.4175 14.1652 16.3062 15 15 15C13.6938 15 12.5825 14.1652 12.1707 13H2V11H12.1707ZM6.17071 4C6.58254 2.83481 7.69378 2 9 2C10.3062 2 11.4175 2.83481 11.8293 4H22V6H11.8293C11.4175 7.16519 10.3062 8 9 8C7.69378 8 6.58254 7.16519 6.17071 6H2V4H6.17071ZM9 6C9.55228 6 10 5.55228 10 5C10 4.44772 9.55228 4 9 4C8.44772 4 8 4.44772 8 5C8 5.55228 8.44772 6 9 6ZM15 13C15.5523 13 16 12.5523 16 12C16 11.4477 15.5523 11 15 11C14.4477 11 14 11.4477 14 12C14 12.5523 14.4477 13 15 13ZM9 20C9.55228 20 10 19.5523 10 19C10 18.4477 9.55228 18 9 18C8.44772 18 8 18.4477 8 19C8 19.5523 8.44772 20 9 20Z"/></symbol><symbol id="ri-error-warning-fill" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM11 15V17H13V15H11ZM11 7V13H13V7H11Z"/></symbol><symbol id="ri-fridge-line" viewBox="0 0 24 24"><path d="M18.998 1C19.5503 1 19.998 1.44772 19.998 2V22C19.998 22.5523 19.5503 23 18.998 23H4.99805C4.44576 23 3.99805 22.5523 3.99805 22V2C3.99805 1.44772 4.44576 1 4.99805 1H18.998ZM17.998 12H5.99805V21H17.998V12ZM9.99805 14V18H7.99805V14H9.99805ZM17.998 3H5.99805V10H17.998V3ZM9.99805 5V8H7.99805V5H9.99805Z"/></symbol><symbol id="ri-hammer-line" viewBox="0 0 24 24"><path d="M20 2C20.5523 2 21 2.44772 21 3V8C21 8.55228 20.5523 9 20 9H15V22C15 22.5523 14.5523 23 14 23H10C9.44772 23 9 22.5523 9 22V9H3.5C2.94772 9 2.5 8.55228 2.5 8V5.61803C2.5 5.23926 2.714 4.893 3.05279 4.72361L8.5 2H20ZM15 4H8.97214L4.5 6.23607V7H11V21H13V7H15V4ZM19 4H17V7H19V4Z"/></symbol><symbol id="ri-home-4-fill" viewBox="0 0 24 24"><path d="M20 20C20 20.5523 19.5523 21 19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20ZM11 13V19H13V13H11Z"/></symbol><symbol id="ri-home-4-line" viewBox="0 0 24 24"><path d="M19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20C20 20.5523 19.5523 21 19 21ZM13 19H18V9.15745L12 3.7029L6 9.15745V19H11V13H13V19Z"/></symbol><symbol id="ri-home-gear-line" viewBox="0 0 24 24"><path d="M19 21H5C4.44772 21 4 20.5523 4 20V11L1 11L11.3273 1.6115C11.7087 1.26475 12.2913 1.26475 12.6727 1.6115L23 11L20 11V20C20 20.5523 19.5523 21 19 21ZM6 19H18V9.15745L12 3.7029L6 9.15745V19ZM8.59117 13.8089C8.52937 13.5486 8.49666 13.277 8.49666 12.9978C8.49666 12.7186 8.52936 12.4471 8.59115 12.1868L7.60001 11.6145L8.59952 9.88333L9.59136 10.456C9.98427 10.0843 10.4633 9.80273 10.9954 9.64436V8.49998H12.9945V9.64436C13.5266 9.80272 14.0056 10.0843 14.3985 10.4559L15.3904 9.88323L16.39 11.6144L15.3987 12.1867C15.4605 12.447 15.4932 12.7186 15.4932 12.9978C15.4932 13.277 15.4605 13.5485 15.3988 13.8088L16.39 14.381L15.3905 16.1122L14.3986 15.5396C14.0057 15.9112 13.5267 16.1928 12.9946 16.3512V17.4956H10.9955V16.3512C10.4634 16.1929 9.98437 15.9114 9.59144 15.5397L8.59957 16.1123L7.60001 14.3811L8.59117 13.8089ZM11.995 14.4971C12.823 14.4971 13.4942 13.8258 13.4942 12.9978C13.4942 12.1698 12.823 11.4985 11.995 11.4985C11.1669 11.4985 10.4957 12.1698 10.4957 12.9978C10.4957 13.8258 11.1669 14.4971 11.995 14.4971Z"/></symbol><symbol id="ri-information-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z"/></symbol><symbol id="ri-lightbulb-line" viewBox="0 0 24 24"><path d="M9.97308 18H11V13H13V18H14.0269C14.1589 16.7984 14.7721 15.8065 15.7676 14.7226C15.8797 14.6006 16.5988 13.8564 16.6841 13.7501C17.5318 12.6931 18 11.385 18 10C18 6.68629 15.3137 4 12 4C8.68629 4 6 6.68629 6 10C6 11.3843 6.46774 12.6917 7.31462 13.7484C7.40004 13.855 8.12081 14.6012 8.23154 14.7218C9.22766 15.8064 9.84103 16.7984 9.97308 18ZM10 20V21H14V20H10ZM5.75395 14.9992C4.65645 13.6297 4 11.8915 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10C20 11.8925 19.3428 13.6315 18.2443 15.0014C17.624 15.7748 16 17 16 18.5V21C16 22.1046 15.1046 23 14 23H10C8.89543 23 8 22.1046 8 21V18.5C8 17 6.37458 15.7736 5.75395 14.9992Z"/></symbol><symbol id="ri-logout-box-r-line" viewBox="0 0 24 24"><path d="M5 22C4.44772 22 4 21.5523 4 21V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V6H18V4H6V20H18V18H20V21C20 21.5523 19.5523 22 19 22H5ZM18 16V13H11V11H18V8L23 12L18 16Z"/></symbol><symbol id="ri-menu-line" viewBox="0 0 24 24"><path d="M3 4H21V6H3V4ZM3 11H21V13H3V11ZM3 18H21V20H3V18Z"/></symbol><symbol id="ri-message-3-line" viewBox="0 0 24 24"><path d="M2 8.99374C2 5.68349 4.67654 3 8.00066 3H15.9993C19.3134 3 22 5.69478 22 8.99374V21H8.00066C4.68659 21 2 18.3052 2 15.0063V8.99374ZM20 19V8.99374C20 6.79539 18.2049 5 15.9993 5H8.00066C5.78458 5 4 6.78458 4 8.99374V15.0063C4 17.2046 5.79512 19 8.00066 19H20ZM14 11H16V13H14V11ZM8 11H10V13H8V11Z"/></symbol><symbol id="ri-phone-line" viewBox="0 0 24 24"><path d="M9.36556 10.6821C10.302 12.3288 11.6712 13.698 13.3179 14.6344L14.2024 13.3961C14.4965 12.9845 15.0516 12.8573 15.4956 13.0998C16.9024 13.8683 18.4571 14.3353 20.0789 14.4637C20.599 14.5049 21 14.9389 21 15.4606V19.9234C21 20.4361 20.6122 20.8657 20.1022 20.9181C19.5723 20.9726 19.0377 21 18.5 21C9.93959 21 3 14.0604 3 5.5C3 4.96227 3.02742 4.42771 3.08189 3.89776C3.1343 3.38775 3.56394 3 4.07665 3H8.53942C9.0611 3 9.49513 3.40104 9.5363 3.92109C9.66467 5.54288 10.1317 7.09764 10.9002 8.50444C11.1427 8.9484 11.0155 9.50354 10.6039 9.79757L9.36556 10.6821ZM6.84425 10.0252L8.7442 8.66809C8.20547 7.50514 7.83628 6.27183 7.64727 5H5.00907C5.00303 5.16632 5 5.333 5 5.5C5 12.9558 11.0442 19 18.5 19C18.667 19 18.8337 18.997 19 18.9909V16.3527C17.7282 16.1637 16.4949 15.7945 15.3319 15.2558L13.9748 17.1558C13.4258 16.9425 12.8956 16.6915 12.3874 16.4061L12.3293 16.373C10.3697 15.2587 8.74134 13.6303 7.627 11.6707L7.59394 11.6126C7.30849 11.1044 7.05754 10.5742 6.84425 10.0252Z"/></symbol><symbol id="ri-question-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM13 13.3551V14H11V12.5C11 11.9477 11.4477 11.5 12 11.5C12.8284 11.5 13.5 10.8284 13.5 10C13.5 9.17157 12.8284 8.5 12 8.5C11.2723 8.5 10.6656 9.01823 10.5288 9.70577L8.56731 9.31346C8.88637 7.70919 10.302 6.5 12 6.5C13.933 6.5 15.5 8.067 15.5 10C15.5 11.5855 14.4457 12.9248 13 13.3551Z"/></symbol><symbol id="ri-ruler-line" viewBox="0 0 24 24"><path d="M6.34323 14.728L3.5148 17.5565L7.05033 21.092L20.4854 7.65696L16.9498 4.12143L14.8285 6.24275L16.2427 7.65696L14.8285 9.07118L13.4143 7.65696L11.293 9.77828L13.4143 11.8996L12.0001 13.3138L9.87876 11.1925L7.75744 13.3138L9.17165 14.728L7.75744 16.1422L6.34323 14.728ZM17.6569 2.00011L22.6067 6.94986C22.9972 7.34038 22.9972 7.97354 22.6067 8.36407L7.75744 23.2133C7.36692 23.6038 6.73375 23.6038 6.34323 23.2133L1.39348 18.2636C1.00295 17.873 1.00295 17.2399 1.39348 16.8494L16.2427 2.00011C16.6332 1.60958 17.2664 1.60958 17.6569 2.00011Z"/></symbol><symbol id="ri-search-line" viewBox="0 0 24 24"><path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"/></symbol><symbol id="ri-send-plane-line" viewBox="0 0 24 24"><path d="M21.7267 2.95694L16.2734 22.0432C16.1225 22.5716 15.7979 22.5956 15.5563 22.1126L11 13L1.9229 9.36919C1.41322 9.16532 1.41953 8.86022 1.95695 8.68108L21.0432 2.31901C21.5716 2.14285 21.8747 2.43866 21.7267 2.95694ZM19.0353 5.09647L6.81221 9.17085L12.4488 11.4255L15.4895 17.5068L19.0353 5.09647Z"/></symbol><symbol id="ri-shield-check-line" viewBox="0 0 24 24"><path d="M12 1L20.2169 2.82598C20.6745 2.92766 21 3.33347 21 3.80217V13.7889C21 15.795 19.9974 17.6684 18.3282 18.7812L12 23L5.6718 18.7812C4.00261 17.6684 3 15.795 3 13.7889V3.80217C3 3.33347 3.32553 2.92766 3.78307 2.82598L12 1ZM12 3.04879L5 4.60434V13.7889C5 15.1263 5.6684 16.3752 6.7812 17.1171L12 20.5963L17.2188 17.1171C18.3316 16.3752 19 15.1263 19 13.7889V4.60434L12 3.04879ZM16.4524 8.22183L17.8666 9.63604L11.5026 16L7.25999 11.7574L8.67421 10.3431L11.5019 13.1709L16.4524 8.22183Z"/></symbol><symbol id="ri-sofa-line" viewBox="0 0 24 24"><path d="M9.00065 3C5.68694 3 3.00065 5.68629 3.00065 9V9.35115C1.47959 10.0975 0.633328 11.916 1.2667 13.6578L1.5792 14.5172C1.85802 15.2839 2.00065 16.0935 2.00065 16.9094V19.5C2.00065 20.3284 2.67222 21 3.50065 21H20.5006C21.3291 21 22.0006 20.3284 22.0006 19.5V16.9094C22.0006 16.0935 22.1433 15.2839 22.4221 14.5172L22.7346 13.6578C23.368 11.916 22.5217 10.0975 21.0006 9.35115V9C21.0006 5.68629 18.3144 3 15.0006 3H9.00065ZM19.0006 9.03175C17.3064 9.2618 16.0006 10.7141 16.0006 12.4715L16.0006 14H8.00065V12.4715C8.00065 10.7141 6.69488 9.2618 5.00065 9.03175V9C5.00065 6.79086 6.79151 5 9.00065 5H15.0006C17.2098 5 19.0006 6.79086 19.0006 9V9.03175ZM16.0006 16L16.0006 17H18.0006V12.4715C18.0006 11.6588 18.6595 11 19.4721 11C20.4933 11 21.204 12.0147 20.855 12.9743L20.5425 13.8337C20.184 14.8195 20.0006 15.8604 20.0006 16.9094V19H4.00065V16.9094C4.00065 15.8604 3.81727 14.8195 3.45879 13.8337L3.14629 12.9743C2.79732 12.0147 3.50802 11 4.52917 11C5.34185 11 6.00065 11.6588 6.00065 12.4715V17H8.00065V16H16.0006Z"/></symbol><symbol id="ri-subtract-line" viewBox="0 0 24 24"><path d="M5 11V13H19V11H5Z"/></symbol><symbol id="ri-timer-flash-line" viewBox="0 0 24 24"><path d="M6.38231 5.9681C7.92199 4.73647 9.87499 4 12 4C14.125 4 16.078 4.73647 17.6177 5.9681L19.0711 4.51472L20.4853 5.92893L19.0319 7.38231C20.2635 8.92199 21 10.875 21 13C21 17.9706 16.9706 22 12 22C7.02944 22 3 17.9706 3 13C3 10.875 3.73647 8.92199 4.9681 7.38231L3.51472 5.92893L4.92893 4.51472L6.38231 5.9681ZM12 20C15.866 20 19 16.866 19 13C19 9.13401 15.866 6 12 6C8.13401 6 5 9.13401 5 13C5 16.866 8.13401 20 12 20ZM13 12H16L11 18.5V14H8L13 7.4952V12ZM8 1H16V3H8V1Z"/></symbol><symbol id="ri-tools-line" viewBox="0 0 24 24"><path d="M5.32943 3.27158C6.56252 2.8332 7.9923 3.10749 8.97927 4.09446C10.1002 5.21537 10.3019 6.90741 9.5843 8.23385L20.293 18.9437L18.8788 20.3579L8.16982 9.64875C6.84325 10.3669 5.15069 10.1654 4.02952 9.04421C3.04227 8.05696 2.7681 6.62665 3.20701 5.39332L5.44373 7.63C6.02952 8.21578 6.97927 8.21578 7.56505 7.63C8.15084 7.04421 8.15084 6.09446 7.56505 5.50868L5.32943 3.27158ZM15.6968 5.15512L18.8788 3.38736L20.293 4.80157L18.5252 7.98355L16.7574 8.3371L14.6361 10.4584L13.2219 9.04421L15.3432 6.92289L15.6968 5.15512ZM8.97927 13.2868L10.3935 14.7011L5.09018 20.0044C4.69966 20.3949 4.06649 20.3949 3.67597 20.0044C3.31334 19.6417 3.28744 19.0699 3.59826 18.6774L3.67597 18.5902L8.97927 13.2868Z"/></symbol><symbol id="ri-user-line" viewBox="0 0 24 24"><path d="M4 22C4 17.5817 7.58172 14 12 14C16.4183 14 20 17.5817 20 22H18C18 18.6863 15.3137 16 12 16C8.68629 16 6 18.6863 6 22H4ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM12 11C14.21 11 16 9.21 16 7C16 4.79 14.21 3 12 3C9.79 3 8 4.79 8 7C8 9.21 9.79 11 12 11Z"/></symbol><symbol id="ri-window-line" viewBox="0 0 24 24"><path d="M21 3C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21ZM20 11H4V19H20V11ZM20 5H4V9H20V5ZM11 6V8H9V6H11ZM7 6V8H5V6H7Z"/></symbol><symbol id="ri-snowy-line" viewBox="0 0 24 24"><path d="M13 16.268L14.9641 15.134L15.9641 16.866L14 18L15.9641 19.134L14.9641 20.866L13 19.732V22H11V19.732L9.0359 20.866L8.0359 19.134L10 18L8.0359 16.866L9.0359 15.134L11 16.268V14H13V16.268ZM17 18V16H17.5C19.433 16 21 14.433 21 12.5C21 10.567 19.433 9 17.5 9C16.5205 9 15.6351 9.40232 14.9998 10.0507C14.9999 10.0338 15 10.0169 15 10C15 6.68629 12.3137 4 9 4C5.68629 4 3 6.68629 3 10C3 12.6124 4.66962 14.8349 7 15.6586V17.748C3.54955 16.8599 1 13.7277 1 10C1 5.58172 4.58172 2 9 2C12.3949 2 15.2959 4.11466 16.4576 7.09864C16.7951 7.0339 17.1436 7 17.5 7C20.5376 7 23 9.46243 23 12.5C23 15.5376 20.5376 18 17.5 18H17Z"/></symbol><symbol id="ri-temp-cold-line" viewBox="0 0 24 24"><path d="M8 5C8 2.79086 9.79086 1 12 1C14.2091 1 16 2.79086 16 5V10.2547C17.8135 11.5196 19 13.6213 19 16C19 19.866 15.866 23 12 23C8.13401 23 5 19.866 5 16C5 13.6213 6.18652 11.5196 8 10.2547V5ZM9.1442 11.8951C7.80943 12.8261 7 14.3432 7 16C7 18.7614 9.23858 21 12 21C14.7614 21 17 18.7614 17 16C17 14.3432 16.1906 12.8261 14.8558 11.8951L14 11.2981V5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5V11.2981L9.1442 11.8951ZM8 16H16C16 18.2091 14.2091 20 12 20C9.79086 20 8 18.2091 8 16Z"/></symbol><symbol id="ri-windy-line" viewBox="0 0 24 24"><path d="M10.5 17H4V15H10.5C12.433 15 14 16.567 14 18.5C14 20.433 12.433 22 10.5 22C8.99957 22 7.71966 21.0559 7.22196 19.7293L9.09513 19.0268C9.30843 19.5954 9.85696 20 10.5 20C11.3284 20 12 19.3284 12 18.5C12 17.6716 11.3284 17 10.5 17ZM5 11H18.5C20.433 11 22 12.567 22 14.5C22 16.433 20.433 18 18.5 18C16.9996 18 15.7197 17.0559 15.222 15.7293L17.0951 15.0268C17.3084 15.5954 17.857 16 18.5 16C19.3284 16 20 15.3284 20 14.5C20 13.6716 19.3284 13 18.5 13H5C3.34315 13 2 11.6569 2 10C2 8.34315 3.34315 7 5 7H13.5C14.3284 7 15 6.32843 15 5.5C15 4.67157 14.3284 4 13.5 4C12.857 4 12.3084 4.40463 12.0951 4.97317L10.222 4.27073C10.7197 2.94414 11.9996 2 13.5 2C15.433 2 17 3.567 17 5.5C17 7.433 15.433 9 13.5 9H5C4.44772 9 4 9.44772 4 10C4 10.5523 4.44772 11 5 11Z"/></symbol><symbol id="ri-fire-line" viewBox="0 0 24 24"><path d="M12 23C16.1421 23 19.5 19.6421 19.5 15.5C19.5 14.6345 19.2697 13.8032 19 13.0296C17.3333 14.6765 16.0667 15.5 15.2 15.5C19.1954 8.5 17 5.5 11 1.5C11.5 6.49951 8.20403 8.77375 6.86179 10.0366C5.40786 11.4045 4.5 13.3462 4.5 15.5C4.5 19.6421 7.85786 23 12 23ZM12.7094 5.23498C15.9511 7.98528 15.9666 10.1223 13.463 14.5086C12.702 15.8419 13.6648 17.5 15.2 17.5C15.8884 17.5 16.5841 17.2992 17.3189 16.9051C16.6979 19.262 14.5519 21 12 21C8.96243 21 6.5 18.5376 6.5 15.5C6.5 13.9608 7.13279 12.5276 8.23225 11.4932C8.35826 11.3747 8.99749 10.8081 9.02477 10.7836C9.44862 10.4021 9.7978 10.0663 10.1429 9.69677C11.3733 8.37932 12.2571 6.91631 12.7094 5.23498Z"/></symbol><symbol id="ri-mail-line" viewBox="0 0 24 24"><path d="M3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3ZM20 7.23792L12.0718 14.338L4 7.21594V19H20V7.23792ZM4.51146 5L12.0619 11.662L19.501 5H4.51146Z"/></symbol><symbol id="ri-lock-line" viewBox="0 0 24 24"><path d="M19 10H20C20.5523 10 21 10.4477 21 11V21C21 21.5523 20.5523 22 20 22H4C3.44772 22 3 21.5523 3 21V11C3 10.4477 3.44772 10 4 10H5V9C5 5.13401 8.13401 2 12 2C15.866 2 19 5.13401 19 9V10ZM5 12V20H19V12H5ZM11 14H13V18H11V14ZM17 10V9C17 6.23858 14.7614 4 12 4C9.23858 4 7 6.23858 7 9V10H17Z"/></symbol><symbol id="ri-time-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM13 12H17V14H11V7H13V12Z"/></symbol><symbol id="ri-calendar-check-line" viewBox="0 0 24 24"><path d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 10H4V19H20V10ZM15.0355 11.136L16.4497 12.5503L11.5 17.5L7.96447 13.9645L9.37868 12.5503L11.5 14.6716L15.0355 11.136ZM7 5H4V8H20V5H17V6H15V5H9V6H7V5Z"/></symbol><symbol id="ri-history-line" viewBox="0 0 24 24"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12H4C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C9.25022 4 6.82447 5.38734 5.38451 7.50024L8 7.5V9.5H2V3.5H4L3.99989 5.99918C5.82434 3.57075 8.72873 2 12 2ZM13 7L12.9998 11.585L16.2426 14.8284L14.8284 16.2426L10.9998 12.413L11 7H13Z"/></symbol><symbol id="ri-price-tag-3-line" viewBox="0 0 24 24"><path d="M10.9042 2.10025L20.8037 3.51446L22.2179 13.414L13.0255 22.6063C12.635 22.9969 12.0019 22.9969 11.6113 22.6063L1.71184 12.7069C1.32131 12.3163 1.32131 11.6832 1.71184 11.2926L10.9042 2.10025ZM11.6113 4.22157L3.83316 11.9997L12.3184 20.485L20.0966 12.7069L19.036 5.28223L11.6113 4.22157ZM13.7327 10.5855C12.9516 9.80448 12.9516 8.53815 13.7327 7.7571C14.5137 6.97606 15.78 6.97606 16.5611 7.7571C17.3421 8.53815 17.3421 9.80448 16.5611 10.5855C15.78 11.3666 14.5137 11.3666 13.7327 10.5855Z"/></symbol><symbol id="ri-arrow-right-line" viewBox="0 0 24 24"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"/></symbol><symbol id="ri-sun-line" viewBox="0 0 24 24"><path d="M12 18C8.68629 18 6 15.3137 6 12C6 8.68629 8.68629 6 12 6C15.3137 6 18 8.68629 18 12C18 15.3137 15.3137 18 12 18ZM12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16ZM11 1H13V4H11V1ZM11 20H13V23H11V20ZM3.51472 4.92893L4.92893 3.51472L7.05025 5.63604L5.63604 7.05025L3.51472 4.92893ZM16.9497 18.364L18.364 16.9497L20.4853 19.0711L19.0711 20.4853L16.9497 18.364ZM19.0711 3.51472L20.4853 4.92893L18.364 7.05025L16.9497 5.63604L19.0711 3.51472ZM5.63604 16.9497L7.05025 18.364L4.92893 20.4853L3.51472 19.0711L5.63604 16.9497ZM23 11V13H20V11H23ZM4 11V13H1V11H4Z"/></symbol><symbol id="ri-sun-cloudy-line" viewBox="0 0 24 24"><path d="M9.98392 5.05991C11.1323 3.22236 13.1734 2 15.5 2C19.0899 2 22 4.91015 22 8.5C22 9.58031 21.7365 10.5991 21.2701 11.4955C22.3351 12.4985 23 13.9216 23 15.5C23 18.5376 20.5376 21 17.5 21H9C4.58172 21 1 17.4183 1 13C1 8.58172 4.58172 5 9 5C9.33312 5 9.66149 5.02036 9.98392 5.05991ZM12.0554 5.60419C14.0675 6.43637 15.6662 8.06578 16.4576 10.0986C16.7951 10.0339 17.1436 10 17.5 10C18.2351 10 18.9366 10.1442 19.5776 10.4059C19.8486 9.82719 20 9.18128 20 8.5C20 6.01472 17.9853 4 15.5 4C14.1177 4 12.8809 4.6233 12.0554 5.60419ZM17.5 19C19.433 19 21 17.433 21 15.5C21 13.567 19.433 12 17.5 12C16.5205 12 15.6351 12.4023 14.9998 13.0507C14.9999 13.0338 15 13.0169 15 13C15 9.68629 12.3137 7 9 7C5.68629 7 3 9.68629 3 13C3 16.3137 5.68629 19 9 19H17.5Z"/></symbol><symbol id="ri-mail-check-line" viewBox="0 0 24 24"><path d="M22 14H20V7.23792L12.0718 14.338L4 7.21594V19H14V21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V14ZM4.51146 5L12.0619 11.662L19.501 5H4.51146ZM19 22L15.4645 18.4645L16.8787 17.0503L19 19.1716L22.5355 15.636L23.9497 17.0503L19 22Z"/></symbol><symbol id="ri-eye-line" viewBox="0 0 24 24"><path d="M12.0003 3C17.3924 3 21.8784 6.87976 22.8189 12C21.8784 17.1202 17.3924 21 12.0003 21C6.60812 21 2.12215 17.1202 1.18164 12C2.12215 6.87976 6.60812 3 12.0003 3ZM12.0003 19C16.2359 19 19.8603 16.052 20.7777 12C19.8603 7.94803 16.2359 5 12.0003 5C7.7646 5 4.14022 7.94803 3.22278 12C4.14022 16.052 7.7646 19 12.0003 19ZM12.0003 16.5C9.51498 16.5 7.50026 14.4853 7.50026 12C7.50026 9.51472 9.51498 7.5 12.0003 7.5C14.4855 7.5 16.5003 9.51472 16.5003 12C16.5003 14.4853 14.4855 16.5 12.0003 16.5ZM12.0003 14.5C13.381 14.5 14.5003 13.3807 14.5003 12C14.5003 10.6193 13.381 9.5 12.0003 9.5C10.6196 9.5 9.50026 10.6193 9.50026 12C9.50026 13.3807 10.6196 14.5 12.0003 14.5Z"/></symbol><symbol id="ri-eye-off-line" viewBox="0 0 24 24"><path d="M17.8827 19.2968C16.1814 20.3755 14.1638 21.0002 12.0003 21.0002C6.60812 21.0002 2.12215 17.1204 1.18164 12.0002C1.61832 9.62282 2.81932 7.5129 4.52047 5.93457L1.39366 2.80777L2.80788 1.39355L22.6069 21.1925L21.1927 22.6068L17.8827 19.2968ZM5.9356 7.3497C4.60673 8.56015 3.6378 10.1672 3.22278 12.0002C4.14022 16.0521 7.7646 19.0002 12.0003 19.0002C13.5997 19.0002 15.112 18.5798 16.4243 17.8384L14.396 15.8101C13.7023 16.2472 12.8808 16.5002 12.0003 16.5002C9.51498 16.5002 7.50026 14.4854 7.50026 12.0002C7.50026 11.1196 7.75317 10.2981 8.19031 9.60442L5.9356 7.3497ZM12.9139 14.328L9.67246 11.0866C9.5613 11.3696 9.50026 11.6777 9.50026 12.0002C9.50026 13.3809 10.6196 14.5002 12.0003 14.5002C12.3227 14.5002 12.6309 14.4391 12.9139 14.328ZM20.8068 16.5925L19.376 15.1617C20.0319 14.2268 20.5154 13.1586 20.7777 12.0002C19.8603 7.94818 16.2359 5.00016 12.0003 5.00016C11.1544 5.00016 10.3329 5.11773 9.55249 5.33818L7.97446 3.76015C9.22127 3.26959 10.5793 3.00016 12.0003 3.00016C17.3924 3.00016 21.8784 6.87992 22.8189 12.0002C22.5067 13.6998 21.8038 15.2628 20.8068 16.5925ZM11.7229 7.50857C11.8146 7.50299 11.9071 7.50016 12.0003 7.50016C14.4855 7.50016 16.5003 9.51488 16.5003 12.0002C16.5003 12.0933 16.4974 12.1858 16.4919 12.2775L11.7229 7.50857Z"/></symbol><symbol id="ri-megaphone-line" viewBox="0 0 24 24"><path d="M9 17C9 17 16 18 19 21H20C20.5523 21 21 20.5523 21 20V13.937C21.8626 13.715 22.5 12.9319 22.5 12C22.5 11.0681 21.8626 10.285 21 10.063V4C21 3.44772 20.5523 3 20 3H19C16 6 9 7 9 7H5C3.89543 7 3 7.89543 3 9V15C3 16.1046 3.89543 17 5 17H6L7 22H9V17ZM11 8.6612C11.6833 8.5146 12.5275 8.31193 13.4393 8.04373C15.1175 7.55014 17.25 6.77262 19 5.57458V18.4254C17.25 17.2274 15.1175 16.4499 13.4393 15.9563C12.5275 15.6881 11.6833 15.4854 11 15.3388V8.6612ZM5 9H9V15H5V9Z"/></symbol><symbol id="ri-forbid-line" viewBox="0 0 24 24"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM8.52313 7.10891L16.8911 15.4769C16.6997 15.7454 16.4836 16.0017 16.2426 16.2426C16.0017 16.4836 15.7454 16.6997 15.4769 16.8911L7.10891 8.52313C7.30029 8.25459 7.51644 7.99828 7.75736 7.75736C7.99828 7.51644 8.25459 7.30029 8.52313 7.10891Z"/></symbol><symbol id="ri-pencil-line" viewBox="0 0 24 24"><path d="M15.7279 9.57627L14.3137 8.16206L5 17.4758V18.89H6.41421L15.7279 9.57627ZM17.1421 8.16206L18.5563 6.74785L17.1421 5.33363L15.7279 6.74785L17.1421 8.16206ZM7.24264 20.89H3V16.6473L16.435 3.21231C16.8256 2.82179 17.4587 2.82179 17.8492 3.21231L20.6777 6.04074C21.0682 6.43126 21.0682 7.06443 20.6777 7.45495L7.24264 20.89Z"/></symbol><symbol id="ri-hourglass-line" viewBox="0 0 24 24"><path d="M6 4H4V2H20V4H18V6C18 7.61543 17.1838 8.91468 16.1561 9.97667C15.4532 10.703 14.598 11.372 13.7309 12C14.598 12.628 15.4532 13.297 16.1561 14.0233C17.1838 15.0853 18 16.3846 18 18V20H20V22H4V20H6V18C6 16.3846 6.81616 15.0853 7.8439 14.0233C8.54682 13.297 9.40202 12.628 10.2691 12C9.40202 11.372 8.54682 10.703 7.8439 9.97667C6.81616 8.91468 6 7.61543 6 6V4ZM8 4V6C8 6.88457 8.43384 7.71032 9.2811 8.58583C10.008 9.33699 10.9548 10.0398 12 10.7781C13.0452 10.0398 13.992 9.33699 14.7189 8.58583C15.5662 7.71032 16 6.88457 16 6V4H8ZM12 13.2219C10.9548 13.9602 10.008 14.663 9.2811 15.4142C8.43384 16.2897 8 17.1154 8 18V20H16V18C16 17.1154 15.5662 16.2897 14.7189 15.4142C13.992 14.663 13.0452 13.9602 12 13.2219Z"/></symbol><symbol id="ri-refresh-line" viewBox="0 0 24 24"><path d="M5.46257 4.43262C7.21556 2.91688 9.5007 2 12 2C17.5228 2 22 6.47715 22 12C22 14.1361 21.3302 16.1158 20.1892 17.7406L17 12H20C20 7.58172 16.4183 4 12 4C9.84982 4 7.89777 4.84827 6.46023 6.22842L5.46257 4.43262ZM18.5374 19.5674C16.7844 21.0831 14.4993 22 12 22C6.47715 22 2 17.5228 2 12C2 9.86386 2.66979 7.88416 3.8108 6.25944L7 12H4C4 16.4183 7.58172 20 12 20C14.1502 20 16.1022 19.1517 17.5398 17.7716L18.5374 19.5674Z"/></symbol><symbol id="ri-dashboard-3-line" viewBox="0 0 24 24"><path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM15.8329 7.33748C16.0697 7.17128 16.3916 7.19926 16.5962 7.40381C16.8002 7.60784 16.8267 7.92955 16.6587 8.16418C14.479 11.2095 13.2796 12.8417 13.0607 13.0607C12.4749 13.6464 11.5251 13.6464 10.9393 13.0607C10.3536 12.4749 10.3536 11.5251 10.9393 10.9393C11.3126 10.5661 12.9438 9.36549 15.8329 7.33748ZM17.5 11C18.0523 11 18.5 11.4477 18.5 12C18.5 12.5523 18.0523 13 17.5 13C16.9477 13 16.5 12.5523 16.5 12C16.5 11.4477 16.9477 11 17.5 11ZM6.5 11C7.05228 11 7.5 11.4477 7.5 12C7.5 12.5523 7.05228 13 6.5 13C5.94772 13 5.5 12.5523 5.5 12C5.5 11.4477 5.94772 11 6.5 11ZM8.81802 7.40381C9.20854 7.79433 9.20854 8.4275 8.81802 8.81802C8.4275 9.20854 7.79433 9.20854 7.40381 8.81802C7.01328 8.4275 7.01328 7.79433 7.40381 7.40381C7.79433 7.01328 8.4275 7.01328 8.81802 7.40381ZM12 5.5C12.5523 5.5 13 5.94772 13 6.5C13 7.05228 12.5523 7.5 12 7.5C11.4477 7.5 11 7.05228 11 6.5C11 5.94772 11.4477 5.5 12 5.5Z"/></symbol><symbol id="ri-thermometer-line" viewBox="0 0 24 24"><path d="M20.5565 3.44367C22.1186 5.00576 22.1186 7.53842 20.5565 9.10052L12.3563 17.3008C11.714 17.943 10.8723 18.3476 9.96957 18.4479L6.59094 18.8221L4.29304 21.1213C3.90252 21.5119 3.26936 21.5119 2.87883 21.1213C2.48831 20.7308 2.48831 20.0976 2.87883 19.7071L5.17694 17.4081L5.55231 14.0306C5.65261 13.1279 6.05716 12.2862 6.69942 11.6439L14.8996 3.44367C16.4617 1.88157 18.9944 1.88157 20.5565 3.44367ZM16.3139 4.85788L8.11363 13.0581C7.7925 13.3792 7.59023 13.8001 7.54008 14.2515L7.264 16.7362L9.74871 16.4601C10.2001 16.4099 10.6209 16.2077 10.9421 15.8865L11.3639 15.4641L9.9499 14.0503L11.3641 12.6361L12.7779 14.0501L14.1919 12.6361L12.7783 11.2218L14.1925 9.80763L15.6069 11.2221L17.0209 9.8071L15.6068 8.39341L17.021 6.9792L18.4349 8.39309L19.1423 7.68631C19.9233 6.90526 19.9233 5.63893 19.1423 4.85788C18.3612 4.07683 17.0949 4.07683 16.3139 4.85788Z"/></symbol><symbol id="ri-flashlight-line" viewBox="0 0 24 24"><path d="M13 9H21L11 24V15H4L13 0V9ZM11 11V7.22063L7.53238 13H13V17.3944L17.263 11H11Z"/></symbol></svg>
 
 <div class="app" id="app">
-
-  <header class="topbar" id="topbar">
+  <header class="topbar">
     <div class="topbar__inner wrap-x">
       <a class="brand" href="#dashboard" aria-label="PreFix HomeHub">
         <span class="brand__mark"><svg class="i" aria-hidden="true"><use href="#ri-home-4-fill"/></svg></span>
         <span class="brand__name">PreFix</span>
         <span class="brand__product">HomeHub</span>
       </a>
-
-      <nav class="nav when-in" aria-label="Main">
+      <nav class="nav" aria-label="Main">
         <a class="nav__link" href="#dashboard" data-nav="dashboard">Dashboard</a>
         <a class="nav__link" href="#" data-toast="Opens Appointments">Appointments</a>
-        <a class="nav__link" href="#" data-toast="Opens Recommendations">Recommendations <span class="count count--red">4</span></a>
+        <a class="nav__link" href="#" data-toast="Opens Recommendations">Recommendations <span class="count">4</span></a>
         <a class="nav__link" href="#" data-toast="Opens Appliances">Appliances</a>
         <a class="nav__link" href="#" data-toast="Opens Timeline">Timeline</a>
       </nav>
-
-      <div class="topbar__actions when-in">
+      <div class="topbar__actions">
         <div class="menu-wrap">
           <button class="avatar-btn" type="button" id="acct-btn" aria-expanded="false" aria-controls="acct-menu" aria-label="Account menu">SM</button>
           <div class="menu" id="acct-menu" hidden>
-            <div class="menu__who">
-              <p class="t-strong">Sarah Mitchell</p>
-              <p class="t-meta">sarah.mitchell@example.com</p>
-            </div>
+            <div class="menu__who"><p class="t-strong">Sarah Mitchell</p><p class="t-meta">sarah.mitchell@example.com</p></div>
             <div class="menu__sep"></div>
-            <a class="menu__item" href="#" data-toast="Opens Account"><svg class="i" aria-hidden="true"><use href="#ri-user-line"/></svg>Account</a>
-            <a class="menu__item" href="#" data-toast="Opens Membership and billing"><svg class="i" aria-hidden="true"><use href="#ri-bank-card-line"/></svg>Membership and billing</a>
-            <a class="menu__item" href="#" data-toast="Opens Get help"><svg class="i" aria-hidden="true"><use href="#ri-question-line"/></svg>Get help</a>
-            <button class="menu__item" type="button" data-signout><svg class="i" aria-hidden="true"><use href="#ri-logout-box-r-line"/></svg>Sign out</button>
+            <a class="menu__item" href="#" data-toast="Opens Account">Account</a>
+            <a class="menu__item" href="#" data-toast="Opens Membership and billing">Membership and billing</a>
+            <a class="menu__item" href="#" data-toast="Signs out">Sign out</a>
           </div>
         </div>
       </div>
-
-      <div class="topbar__out when-out">
-        <a class="link" href="#" data-toast="Opens the Help center"><svg class="i" aria-hidden="true"><use href="#ri-question-line"/></svg>Get help</a>
-      </div>
-
-      <div class="topbar__mobile when-in">
+      <div class="topbar__mobile">
         <button class="icon-btn" type="button" id="mnav-btn" aria-expanded="false" aria-controls="mnav" aria-label="Menu">
           <svg class="i icon-when-closed" aria-hidden="true"><use href="#ri-menu-line"/></svg>
           <svg class="i icon-when-open" aria-hidden="true"><use href="#ri-close-line"/></svg>
         </button>
       </div>
     </div>
-
-    <nav class="mnav when-in" id="mnav" aria-label="Main" hidden>
+    <nav class="mnav" id="mnav" aria-label="Main" hidden>
       <a class="mnav__link" href="#dashboard" data-nav="dashboard">Dashboard</a>
       <a class="mnav__link" href="#" data-toast="Opens Appointments">Appointments</a>
-      <a class="mnav__link" href="#" data-toast="Opens Recommendations">Recommendations <span class="count count--red">4</span></a>
+      <a class="mnav__link" href="#" data-toast="Opens Recommendations">Recommendations</a>
       <a class="mnav__link" href="#" data-toast="Opens Appliances">Appliances</a>
       <a class="mnav__link" href="#" data-toast="Opens Timeline">Timeline</a>
-      <div class="mnav__sep"></div>
-      <a class="mnav__link mnav__link--quiet" href="#" data-toast="Opens Membership and billing"><svg class="i" aria-hidden="true"><use href="#ri-bank-card-line"/></svg>Membership and billing</a>
-      <a class="mnav__link mnav__link--quiet" href="#" data-toast="Opens Get help"><svg class="i" aria-hidden="true"><use href="#ri-question-line"/></svg>Get help</a>
-      <button class="mnav__link mnav__link--quiet" type="button" data-signout style="border:0;background:none;cursor:pointer;text-align:left;width:100%"><svg class="i" aria-hidden="true"><use href="#ri-logout-box-r-line"/></svg>Sign out</button>
     </nav>
   </header>
 
   <main class="page" id="main">
     <div class="wrap-x">
-
       <div class="back" id="back" hidden>
         <button class="link" type="button" id="back-btn"><svg class="i" aria-hidden="true"><use href="#ri-arrow-left-line"/></svg><span id="back-label">Back</span></button>
       </div>
-
       <ol class="steps" id="steps" aria-label="Tune-up booking progress" hidden></ol>
-
       <section class="fhead" aria-label="Page title">
-        <div class="fhead__text">
-          <span class="result__icon" id="f-icon" hidden><svg class="i" aria-hidden="true"><use id="f-icon-use" href="#ri-checkbox-circle-line"/></svg></span>
-          <h1 class="t-display" id="h1" tabindex="-1">Schedule your HVAC tune-up</h1>
-          <p class="t-desc" id="sub"></p>
-        </div>
+        <span class="result__icon" id="f-icon" hidden><svg class="i" aria-hidden="true"><use id="f-icon-use" href="#ri-checkbox-circle-line"/></svg></span>
+        <h1 class="t-display" id="h1" tabindex="-1">Schedule your HVAC tune-up</h1>
+        <p class="t-desc" id="sub"></p>
       </section>
-
       <div class="layout" id="layout">
         <div class="main">
           <div data-view="dashboard" hidden></div>
-          <section class="card" data-view="signin" aria-label="Sign in" hidden></section>
           <section class="card" data-view="home" aria-label="Choose a home" hidden></section>
-          <section class="card" data-view="tuneup" aria-label="Choose your tune-up" hidden></section>
+          <section class="card" data-view="tuneup" aria-label="Choose a tune-up" hidden></section>
           <section class="card" data-view="time" aria-label="Pick a time" hidden></section>
-          <section class="card" data-view="review" aria-label="Review and confirm" hidden></section>
           <section class="card plain" data-view="booked" aria-label="Tune-up booked" hidden></section>
-          <section class="card plain" data-view="manage" aria-label="Your booked tune-up" hidden></section>
-          <section class="card" data-view="notdue" aria-label="Not due yet" hidden></section>
-          <section class="card" data-view="sent" aria-label="Scheduling request sent" hidden></section>
-          <section class="card" data-view="notinterested" aria-label="Not interested" hidden></section>
+          <section class="card plain" data-view="already" aria-label="Tune-up already booked" hidden></section>
+          <section class="card plain" data-view="notdue" aria-label="Not due yet" hidden></section>
         </div>
-
-        <aside class="rail" id="rail" aria-label="Details">
+        <aside class="rail" id="rail" aria-label="Summary">
           <section class="card" id="r-summary" aria-labelledby="sum-title" hidden></section>
           <section class="card promo" id="r-promo" aria-labelledby="promo-title" hidden></section>
-          <section class="card" id="r-help" aria-labelledby="help-title" hidden></section>
         </aside>
       </div>
     </div>
   </main>
 
   <footer class="footer">
-    <div class="footer__inner wrap-x">
-      <p class="t-meta">&copy; 2026 PreFix, Inc. &middot; Austin &middot; Dallas &middot; Houston &middot; San Antonio &middot; Denver</p>
-      <nav class="footer__links" aria-label="Footer">
-        <a class="link" href="#" data-toast="Opens the Help center">Help center</a>
-        <a class="link" href="#" data-toast="Opens Privacy">Privacy</a>
-        <a class="link" href="#" data-toast="Opens Terms">Terms</a>
-      </nav>
-    </div>
+    <div class="footer__inner wrap-x"><p class="t-meta">&copy; 2026 PreFix, Inc.</p></div>
   </footer>
 
   <div class="fdock" id="fdock" hidden>
@@ -735,37 +488,30 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
 
 <div class="toast" id="toast" role="status" hidden><svg class="i" aria-hidden="true"><use href="#ri-information-line"/></svg><span id="toast-text"></span></div>
 
-<!-- Prototype only: member states and screen jumps -->
+<!-- Prototype only -->
 <div class="proto" id="proto">
   <div class="proto__panel" id="proto-panel" hidden>
-    <p class="proto__title">Every entry point opens one URL</p>
-    <p class="proto__url"><strong>member.prefixinc.com/tune-ups</strong><br>HubSpot email, Campaign Monitor email and the portal promotion all link here.</p>
     <p class="proto__title">Member</p>
-    <label class="proto__opt">Signed in<span class="switch"><input type="checkbox" id="ps-signedIn" data-state="signedIn"><span class="switch__track"></span></span></label>
     <label class="proto__opt">Has 3 homes<span class="switch"><input type="checkbox" id="ps-multi" data-state="multi"><span class="switch__track"></span></span></label>
     <label class="proto__opt">On the HVAC Plan<span class="switch"><input type="checkbox" id="ps-onPlan" data-state="onPlan"><span class="switch__track"></span></span></label>
-    <label class="proto__opt">Unfinished tune-up at Mueller Blvd<span class="switch"><input type="checkbox" id="ps-unfinished" data-state="unfinished"><span class="switch__track"></span></span></label>
-    <label class="proto__opt"><span id="ps-recent-label">Recent tune-up at Elm Ridge Dr</span><span class="switch"><input type="checkbox" id="ps-recent" data-state="recent"><span class="switch__track"></span></span></label>
-    <p class="proto__title" style="margin-top:12px">Calendar</p>
+    <label class="proto__opt">Started a tune-up, no time yet<span class="switch"><input type="checkbox" id="ps-unfinished" data-state="unfinished"><span class="switch__track"></span></span></label>
+    <label class="proto__opt">Tune-up in the last 6 months<span class="switch"><input type="checkbox" id="ps-recent" data-state="recent"><span class="switch__track"></span></span></label>
+    <p class="proto__title">Calendar</p>
     <label class="proto__opt">No open times<span class="switch"><input type="checkbox" id="ps-noSlots" data-state="noSlots"><span class="switch__track"></span></span></label>
-    <label class="proto__opt">Chosen window gets taken<span class="switch"><input type="checkbox" id="ps-taken" data-state="taken"><span class="switch__track"></span></span></label>
-    <p class="proto__title" style="margin-top:12px">View</p>
+    <label class="proto__opt">Chosen time gets taken<span class="switch"><input type="checkbox" id="ps-taken" data-state="taken"><span class="switch__track"></span></span></label>
+    <p class="proto__title">View</p>
     <label class="proto__opt">Phone frame (390px)<span class="switch"><input type="checkbox" id="ps-phone" data-state="phone"><span class="switch__track"></span></span></label>
     <label class="proto__opt">Show build notes<span class="switch"><input type="checkbox" id="ps-notes" data-state="notes"><span class="switch__track"></span></span></label>
     <div class="proto__go" role="group" aria-label="Jump to screen">
       <p class="proto__title">Jump to screen</p>
-      <button class="proto__link" type="button" data-jump="tune-ups">Email link: open /tune-ups</button>
-      <button class="proto__link" type="button" data-jump="dashboard">Portal promotion (dashboard)</button>
-      <button class="proto__link" type="button" data-jump="signin">Sign in</button>
+      <button class="proto__link" type="button" data-jump="tune-ups">Email link: /tune-ups</button>
+      <button class="proto__link" type="button" data-jump="dashboard">Portal promotion</button>
       <button class="proto__link" type="button" data-jump="home">1 &middot; Choose a home</button>
-      <button class="proto__link" type="button" data-jump="tuneup">2 &middot; Tune-up and systems</button>
+      <button class="proto__link" type="button" data-jump="tuneup">2 &middot; Choose a tune-up</button>
       <button class="proto__link" type="button" data-jump="time">3 &middot; Pick a time</button>
-      <button class="proto__link" type="button" data-jump="review">4 &middot; Review</button>
       <button class="proto__link" type="button" data-jump="booked">Booked</button>
-      <button class="proto__link" type="button" data-jump="manage">Already booked</button>
-      <button class="proto__link" type="button" data-jump="notdue">Not due yet (6-month rule)</button>
-      <button class="proto__link" type="button" data-jump="sent">No open times: request sent</button>
-      <button class="proto__link" type="button" data-jump="notinterested">Email &ldquo;Not Interested&rdquo; link</button>
+      <button class="proto__link" type="button" data-jump="already">Already booked</button>
+      <button class="proto__link" type="button" data-jump="notdue">Not due yet</button>
       <button class="proto__link proto__link--quiet" type="button" data-reset>Reset prototype</button>
     </div>
   </div>
@@ -775,8 +521,6 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
 <script>
 (function () {
   "use strict";
-
-  /* ---------- Helpers ---------- */
   var body = document.body;
   function $(s, r) { return (r || document).querySelector(s); }
   function $all(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
@@ -786,872 +530,440 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
   function parse(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
   function fmt(d, o) { return d.toLocaleDateString("en-US", o); }
   function longDate(d) { return fmt(d, { weekday: "long", month: "long", day: "numeric" }); }
-  function longDateY(d) { return fmt(d, { weekday: "long", month: "long", day: "numeric", year: "numeric" }); }
   function shortDate(d) { return fmt(d, { weekday: "short", month: "short", day: "numeric" }); }
-  function monDay(d) { return fmt(d, { month: "long", day: "numeric" }); }
+  function monthName(y, m) { return new Date(y, m, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" }); }
+  function t12(min) { var h = Math.floor(min / 60), m = min % 60, ap = h >= 12 ? "pm" : "am", hh = h % 12 || 12; return hh + ":" + pad(m) + ap; }
+  function range(start, len) { return t12(start) + "–" + t12(start + len); }
+  function hoursText(min) { var h = min / 60; return h + (h === 1 ? " hour" : " hours"); }
   function money(n) { return "$" + n; }
+  function bnote(html) { return '<div class="bnote" role="note"><span class="bnote__tag">Build note</span><span>' + html + '</span></div>'; }
   var MON3 = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-  function bnote(text) { return '<div class="bnote" role="note"><span class="bnote__tag">Build note</span><span>' + text + '</span></div>'; }
-  function factions(id, label, status) {
-    return '<div class="factions"><span class="factions__status" id="st-' + id + '" aria-live="polite">' + (status || "") + '</span>' +
-      '<button class="btn btn--primary btn--lg" type="button" data-next>' + label + '</button></div>';
-  }
 
-  /* ---------- Sample data (illustrative) ---------- */
-  var TODAY = new Date(2026, 10, 3);
-  var THIS_YEAR = 2026;
-  var PRICE = { standard: 29, comprehensive: 79 };
-  var RETAIL = { standard: 125, comprehensive: 250 };
-  var TNAME = { standard: "Standard", comprehensive: "Comprehensive" };
-  var WIN = {
-    am: { name: "Morning", range: "8:00–11:30am", icon: "ri-sun-line" },
-    pm: { name: "Afternoon", range: "12:00–5:30pm", icon: "ri-sun-cloudy-line" }
+  /* ---------- Data. Prices, task lengths and per-system tasks follow PFX-590 / PFX-593. Homes are sample data. ---------- */
+  var TYPES = {
+    standard: { name: "Standard", price: 29, retail: 125, min: 60, desc: "Recommended for all systems." },
+    comprehensive: { name: "Comprehensive", price: 79, retail: 250, min: 120, desc: "Adds evaporator coil cleaning. Recommended every 3 years for systems over 5 years old." }
   };
-  var MEMBER = { first: "Sarah", email: "sarah.mitchell@example.com", card: "Visa ending 4242" };
   var HOMES = {
-    mueller: { addr: "4817 Mueller Blvd", city: "Austin, TX 78723", systems: [{ name: "Upstairs", year: 2016 }, { name: "Downstairs", year: 2021 }] },
-    elm: { addr: "1206 Elm Ridge Dr", city: "Round Rock, TX 78664", systems: [{ name: "Main system", year: 2019 }] },
-    arcadia: { addr: "715 Arcadia Pl", city: "San Antonio, TX 78209", systems: [{ name: "Main system", year: 2012 }] }
+    mueller: { addr: "4817 Mueller Blvd", city: "Austin, TX 78723", systems: 2 },
+    elm: { addr: "1206 Elm Ridge Dr", city: "Round Rock, TX 78664", systems: 1 },
+    arcadia: { addr: "715 Arcadia Pl", city: "San Antonio, TX 78209", systems: 1 }
   };
   var ORDER = ["mueller", "elm", "arcadia"];
-  var LAST_TUNEUP = new Date(2026, 4, 20);
-  var NEXT_OK = new Date(2026, 10, 20);
-  var STARTED = new Date(2026, 9, 28);
-  var ARCADIA_BOOKING = { date: "2026-11-16", win: "am", items: ["comprehensive"] };
-  var SAMPLE_DATE = "2026-11-12";
+  var ARCADIA = { date: "2026-11-16", start: 480, type: "comprehensive", systems: 1 };
+  var LAST_TUNEUP = new Date(2026, 4, 20), NEXT_OK = new Date(2026, 10, 20);
 
-  /* Calendar: Monday to Friday, booking opens two days out. */
-  var FIRST_OPEN = new Date(2026, 10, 5);
-  var CLOSED = { "2026-11-26": "Closed" };
-  var FULL = { "2026-11-05": "a", "2026-11-09": "ap", "2026-11-10": "p", "2026-11-13": "a", "2026-11-16": "p", "2026-11-18": "ap", "2026-11-24": "a", "2026-11-27": "ap", "2026-12-02": "p" };
-  var WEEKS = [0, 1, 2, 3, 4].map(function (i) { return new Date(2026, 10, 2 + i * 7); });
+  var TODAY = new Date(2026, 10, 3);
+  var FIRST_OPEN = new Date(2026, 10, 4), LAST_DAY = new Date(2026, 11, 31);
+  var FIRST_MONTH = { y: 2026, m: 10 }, LAST_MONTH = { y: 2026, m: 11 };
+  var CLOSED = { "2026-11-26": 1, "2026-11-27": 1, "2026-12-24": 1, "2026-12-25": 1 };
+  var FULL = { "2026-11-09": 1, "2026-11-18": 1, "2026-12-02": 1, "2026-12-10": 1 };
+  var STARTS = [480, 570, 660, 780, 870];
+  var DAY_END = 1050;
 
-  /* ---------- State ---------- */
   function fresh() {
     return {
-      signedIn: true, multi: true, onPlan: true, unfinished: false, recent: false,
-      noSlots: false, taken: false, phone: false, notes: false,
-      home: null, mode: "same", type: "standard", per: {}, count: {}, showCount: false, showIncl: false,
-      date: null, win: null, week: 0, takenHit: false, takenKeys: {}, timeErr: null,
-      resumed: false, resched: null, booked: {}, last: null, err: null, why: null, view: null
+      multi: true, onPlan: true, unfinished: false, recent: false, noSlots: false, taken: false, phone: false, notes: false,
+      home: null, type: "standard", date: null, time: null, month: { y: 2026, m: 10 },
+      takenHit: false, takenKeys: {}, timeErr: false, resumed: false, booked: {}, last: null, err: null, view: null
     };
   }
   var S = fresh();
 
   function homeIds() { return S.multi ? ORDER : ["mueller"]; }
   function recentHome() { return S.multi ? "elm" : "mueller"; }
-  function bookingOf(id) { return S.booked[id] || (id === "arcadia" && S.multi ? ARCADIA_BOOKING : null); }
+  function bookingOf(id) { return S.booked[id] || (id === "arcadia" && S.multi ? ARCADIA : null); }
   function status(id) {
-    var b = bookingOf(id);
-    if (b) return { k: "scheduled", b: b };
-    if (S.recent && id === recentHome()) return { k: "notdue" };
-    if (S.unfinished && id === "mueller") return { k: "unscheduled" };
-    return { k: "ready" };
+    if (bookingOf(id)) return "booked";
+    if (S.recent && id === recentHome()) return "notdue";
+    if (S.unfinished && id === "mueller") return "ready";
+    return "open";
   }
-  function selectable(id) { var k = status(id).k; return k === "ready" || k === "unscheduled"; }
+  function selectable(id) { var k = status(id); return k === "open" || k === "ready"; }
+  function systems() { return HOMES[S.home].systems; }
+  function duration() { return TYPES[S.type].min * systems(); }
+  function total() { return TYPES[S.type].price * systems(); }
+  function systemsWord(n) { return n + (n === 1 ? " HVAC system" : " HVAC systems"); }
+  function bookingText(type, n) { return TYPES[type].name + " tune-up · " + n + (n === 1 ? " system" : " systems"); }
 
-  function systemsFor(id) {
-    var rec = HOMES[id].systems, n = S.count[id] || rec.length, out = [];
-    for (var i = 0; i < n; i++) out.push(rec[i] ? { name: rec[i].name, year: rec[i].year, onFile: true } : { name: "System " + (i + 1), year: null, onFile: false });
-    return out;
+  function dayOpen(d) {
+    if (d < FIRST_OPEN || d > LAST_DAY || d.getDay() === 0 || d.getDay() === 6) return false;
+    return slotsFor(iso(d)).length > 0;
   }
-  function suggested(sys) { return !!sys.year && (THIS_YEAR - sys.year) > 5; }
-  function typeAt(id, i) { return S.mode === "per" ? (S.per[id + ":" + i] || S.type) : S.type; }
-  function items() {
-    if (S.resched) return bookingOf(S.resched).items.slice();
-    return systemsFor(S.home).map(function (s, i) { return typeAt(S.home, i); });
-  }
-  function tally(list) { var c = { standard: 0, comprehensive: 0 }; list.forEach(function (t) { c[t]++; }); return c; }
-  function total(list) { return list.reduce(function (a, t) { return a + PRICE[t]; }, 0); }
-  function retail(list) { return list.reduce(function (a, t) { return a + RETAIL[t]; }, 0); }
-  function systemsWord(n) { return n + (n === 1 ? " system" : " systems"); }
-  function itemsText(list) {
-    var c = tally(list), n = list.length;
-    if (c.standard === n) return "Standard tune-up" + (n > 1 ? " · " + systemsWord(n) : "");
-    if (c.comprehensive === n) return "Comprehensive tune-up" + (n > 1 ? " · " + systemsWord(n) : "");
-    return "Comprehensive × " + c.comprehensive + ", Standard × " + c.standard;
-  }
-
-  function slots(d) {
-    var k = iso(d);
-    if (d < FIRST_OPEN) return { past: true, am: false, pm: false };
-    if (CLOSED[k]) return { closed: true, am: false, pm: false };
-    if (S.noSlots) return { am: false, pm: false };
-    var f = FULL[k] || "";
-    return { am: f.indexOf("a") < 0 && !S.takenKeys[k + ":am"], pm: f.indexOf("p") < 0 && !S.takenKeys[k + ":pm"] };
-  }
-  function weekLabel(start) {
-    var end = new Date(start); end.setDate(start.getDate() + 4);
-    var a = fmt(start, { month: "long", day: "numeric" });
-    var b = start.getMonth() === end.getMonth() ? String(end.getDate()) : fmt(end, { month: "long", day: "numeric" });
-    return a + " – " + b + ", " + end.getFullYear();
+  function slotsFor(key) {
+    var d = parse(key);
+    if (S.noSlots || CLOSED[key] || FULL[key] || d < FIRST_OPEN) return [];
+    var n = d.getDate(), len = duration();
+    return STARTS.filter(function (s, i) { return (n + i) % 3 !== 0 && s + len <= DAY_END && !S.takenKeys[key + ":" + s]; });
   }
 
   /* ---------- Views ---------- */
-  var FLOW_IN = { home: 1, tuneup: 1, time: 1, review: 1 };
-  function flow() { return S.resched ? ["time", "review"] : (S.multi ? ["home", "tuneup", "time", "review"] : ["tuneup", "time", "review"]); }
-  var STEP_LABEL = { home: "Home", tuneup: "Tune-up", time: "Pick a time", review: "Review" };
-
+  function flow() { return S.multi ? ["home", "tuneup", "time"] : ["tuneup", "time"]; }
+  var STEP = { home: "Home", tuneup: "Tune-up", time: "Pick a time" };
   var VIEWS = {
-    dashboard: {
-      h1: function () { return "Good morning, " + MEMBER.first; },
-      sub: function () { return "Here is what’s coming up at your homes."; },
-      rail: "promo"
-    },
-    signin: {
-      h1: function () { return "Sign in to book your tune-up"; },
-      sub: function () { return "You’ll come right back to scheduling after you sign in."; },
-      out: true, layout: "narrow", icon: "ri-lock-line"
-    },
+    dashboard: { h1: function () { return "Good morning, Sarah"; }, rail: "promo" },
     home: {
-      h1: function () { return "Schedule your HVAC tune-up"; },
-      sub: function () { return "Choose the home for this tune-up."; },
-      back: function () { return ["dashboard", "Back to dashboard"]; },
-      rail: "summary", cta: "Continue"
+      h1: function () { return "Which home is this tune-up for?"; },
+      back: ["dashboard", "Back to dashboard"], layout: "single", cta: "Continue"
     },
     tuneup: {
-      h1: function () { return S.multi ? "Choose your tune-up" : "Schedule your HVAC tune-up"; },
-      sub: function () { var h = HOMES[S.home]; return h.addr + " · " + h.city; },
+      h1: function () { return "Choose your tune-up"; },
+      sub: function () { var h = HOMES[S.home]; return h.addr + ", " + h.city; },
       back: function () { return S.multi ? ["home", "Back"] : ["dashboard", "Back to dashboard"]; },
-      rail: "summary", cta: "Continue to scheduling"
+      layout: "single", cta: "Continue to scheduling"
     },
     time: {
-      h1: function () { return S.resched ? "Pick a new time" : "Pick a time"; },
-      sub: function () { return "Choose a day, then an arrival window. Times are in Central Time."; },
-      back: function () { return S.resched ? ["manage", "Back to your tune-up"] : ["tuneup", "Back"]; },
-      rail: "summary", cta: "Continue to review"
-    },
-    review: {
-      h1: function () { return "Review and confirm"; },
-      sub: function () { return "Check the details, then confirm your tune-up."; },
-      back: function () { return ["time", "Back"]; },
-      layout: "single", cta: "Confirm tune-up"
+      h1: function () { return "Pick a time"; },
+      back: ["tuneup", "Back"], rail: "summary", cta: "Confirm booking"
     },
     booked: {
-      h1: function () { return S.last && S.last.resched ? "Your tune-up is rescheduled" : "Your tune-up is booked"; },
-      sub: function () { return "We sent the details to " + MEMBER.email + "."; },
-      icon: "ri-checkbox-circle-line", rail: "help"
+      h1: function () { return "Your tune-up is booked"; },
+      sub: function () { return "We sent a confirmation by email and text."; },
+      icon: "ri-checkbox-circle-line", layout: "single"
     },
-    manage: {
-      h1: function () { return "This home already has a tune-up booked"; },
-      sub: function () { var h = HOMES[S.home]; return h.addr + " · " + h.city; },
-      back: function () { return S.multi ? ["home", "Back to your homes"] : ["dashboard", "Back to dashboard"]; },
-      icon: "ri-calendar-check-line", layout: "single"
+    already: {
+      h1: function () { return "Your tune-up is already booked"; },
+      back: function () { return S.multi ? ["home", "Back"] : null; }, layout: "single"
     },
     notdue: {
-      h1: function () { return "Your next tune-up opens " + monDay(NEXT_OK); },
-      sub: function () { var h = HOMES[S.home]; return h.addr + " · " + h.city; },
-      back: function () { return S.multi ? ["home", "Back to your homes"] : ["dashboard", "Back to dashboard"]; },
-      icon: "ri-hourglass-line", layout: "single"
-    },
-    sent: {
-      h1: function () { return "We’ll find you a time"; },
-      sub: function () { return "Your request is with our HVAC team."; },
-      icon: "ri-send-plane-line", layout: "single"
-    },
-    notinterested: {
-      h1: function () { return "Thanks for letting us know"; },
-      sub: function () { return "We won’t email you about the PreFix HVAC Plan again this season."; },
-      out: true, icon: "ri-mail-check-line", layout: "single"
+      h1: function () { return "Your next tune-up opens " + fmt(NEXT_OK, { month: "long", day: "numeric" }); },
+      sub: function () { return "Your last tune-up was on " + fmt(LAST_TUNEUP, { month: "long", day: "numeric" }) + ". Tune-ups are at least 6 months apart."; },
+      back: function () { return S.multi ? ["home", "Back"] : null; }, icon: "ri-hourglass-line", layout: "single"
     }
   };
 
-  /* ---------- Rendering: each view ---------- */
-  function planMessage() {
+  function planMessage(cls) {
     if (S.onPlan) return "";
-    return '<div class="message" role="note"><span class="message__icon">' + ic("ri-shield-check-line") + '</span>' +
-      '<p class="message__text"><strong>Your complimentary HVAC Plan starts when you book.</strong> It adds priority HVAC service and discounted off-season tune-ups, with no cost to activate.</p></div>';
+    return '<div class="message' + (cls ? " " + cls : "") + '" role="note"><span class="message__icon">' + ic("ri-shield-check-line") + '</span>' +
+      '<p class="message__text"><strong>Includes your free HVAC Plan</strong>Booking starts your complimentary plan: priority HVAC service and discounted off-season tune-ups.</p></div>';
+  }
+  function factions(label, status) {
+    return '<div class="factions"><span class="factions__status" id="st" aria-live="polite">' + (status || "") + '</span>' +
+      '<button class="btn btn--primary btn--lg" type="button" data-next>' + label + '</button></div>';
   }
 
   function renderDashboard(sec) {
-    sec.innerHTML =
-      '<div class="main">' +
-      '<section class="card" aria-labelledby="d-up"><div class="d-head"><h2 class="t-title" id="d-up">Upcoming</h2><a class="link d-head__link" href="#" data-toast="Opens Appointments">See all</a></div>' +
-      '<div class="dlist">' +
-      '<a class="ditem" href="#" data-toast="Opens this visit"><span class="d-icon d-icon--tint">' + ic("ri-calendar-event-line") + '</span><span class="ditem__main"><span class="t-strong">Home Manager visit</span><span class="d-meta">Monday, November 9 · 9:00–11:00am · 4817 Mueller Blvd</span></span>' + ic("ri-arrow-right-s-line", "d-chev") + '</a>' +
-      '</div></section>' +
-      '<section class="card" aria-labelledby="d-rec"><div class="d-head"><h2 class="t-title" id="d-rec">Recommendations</h2><span class="count count--red">4</span><a class="link d-head__link" href="#" data-toast="Opens Recommendations">See all</a></div>' +
-      '<div class="dlist">' +
-      '<a class="ditem" href="#" data-toast="Opens this recommendation"><span class="d-icon">' + ic("ri-windy-line") + '</span><span class="ditem__main"><span class="t-strong">Replace HVAC air filters</span><span class="d-meta">Upstairs and Downstairs · Due this month</span></span>' + ic("ri-arrow-right-s-line", "d-chev") + '</a>' +
-      '<a class="ditem" href="#" data-toast="Opens this recommendation"><span class="d-icon">' + ic("ri-fire-line") + '</span><span class="ditem__main"><span class="t-strong">Clean the dryer vent</span><span class="d-meta">Recommended once a year</span></span>' + ic("ri-arrow-right-s-line", "d-chev") + '</a>' +
-      '<a class="ditem" href="#" data-toast="Opens this recommendation"><span class="d-icon">' + ic("ri-drop-line") + '</span><span class="ditem__main"><span class="t-strong">Flush the water heater</span><span class="d-meta">Last done March 2025</span></span>' + ic("ri-arrow-right-s-line", "d-chev") + '</a>' +
-      '</div></section>' +
-      bnote("Dashboard content is simplified for context. The tune-up promotion sits in the right rail (top of the page on phones) and links to the same /tune-ups URL as the emails. Show it only when the member has a home ready for a tune-up.") +
-      '</div>';
+    function skel(title, rows) {
+      var r = ""; for (var i = 0; i < rows; i++) r += '<div class="skel__row"><span class="skel__dot"></span><span class="skel__lines"><span class="skel__line" style="width:' + (60 - i * 12) + '%"></span><span class="skel__line" style="width:' + (40 - i * 6) + '%"></span></span></div>';
+      return '<section class="card"><h2 class="t-title">' + title + '</h2><div class="skel" aria-hidden="true">' + r + '</div></section>';
+    }
+    sec.innerHTML = '<div class="main">' + skel("Upcoming", 1) + skel("Recommendations", 3) +
+      bnote("Existing dashboard content is shown as placeholders. The promotion links to the same <code>/tune-ups</code> URL as the emails.") + '</div>';
   }
-
   function renderPromo() {
-    var card = $("#r-promo");
-    card.innerHTML =
-      '<svg class="promo__art" viewBox="0 0 380 176" role="img" aria-label="Illustration of an outdoor air conditioning unit beside a house">' +
-      '<rect class="art-bg" x="0" y="0" width="380" height="176"/>' +
-      '<circle class="art-sun" cx="332" cy="38" r="16"/>' +
-      '<rect class="art-wall" x="0" y="0" width="112" height="176"/>' +
-      '<path class="art-line" d="M0 34H112M0 64H112M0 94H112M0 124H112M0 154H112"/>' +
-      '<path class="art-ink" d="M112 0V176"/>' +
-      '<rect class="art-pad" x="146" y="150" width="166" height="12" rx="4"/>' +
-      '<path class="art-pipe" d="M112 112H136Q146 112 146 102V96"/>' +
-      '<rect class="art-unit art-ink" x="150" y="44" width="156" height="106" rx="12"/>' +
-      '<path class="art-slate" d="M276 62V132M286 62V132M266 62V132"/>' +
-      '<circle class="art-grille art-ink" cx="208" cy="97" r="38"/>' +
-      '<circle class="art-slate" cx="208" cy="97" r="27"/>' +
-      '<circle class="art-slate" cx="208" cy="97" r="16"/>' +
-      '<g transform="translate(208 97)"><ellipse class="art-blade" rx="8" ry="20" transform="rotate(0) translate(0 -14)"/><ellipse class="art-blade" rx="8" ry="20" transform="rotate(120) translate(0 -14)"/><ellipse class="art-blade" rx="8" ry="20" transform="rotate(240) translate(0 -14)"/></g>' +
-      '<circle class="art-hub" cx="208" cy="97" r="5"/>' +
-      '<path class="art-air" d="M184 30q8 -8 16 0t16 0M214 18q8 -8 16 0t16 0M246 30q8 -8 16 0"/>' +
-      '</svg>' +
-      '<div class="promo__body">' +
-      '<span class="badge badge--included">' + ic("ri-shield-check-line") + 'PreFix HVAC Plan</span>' +
-      '<h2 class="t-title" id="promo-title">Time for your seasonal tune-up</h2>' +
-      '<p class="t-meta">' + (S.onPlan
-        ? 'Members pay $29 per system for a Standard tune-up (retail $125). Pick your home and book a time in about a minute.'
-        : 'Add the complimentary HVAC Plan and book a $29 Standard tune-up (retail $125). No cost to activate the plan.') + '</p>' +
-      '<a class="btn btn--primary btn--lg" href="#tune-ups">Schedule my tune-up</a>' +
-      '</div>';
-  }
-
-  function renderSignin(sec) {
-    sec.innerHTML =
-      '<form id="signin-form" novalidate>' +
-      '<div class="field"><label for="si-email">Email</label><input class="tf" id="si-email" type="email" autocomplete="username" value="' + MEMBER.email + '"></div>' +
-      '<div class="field"><label for="si-pass">Password</label><input class="tf" id="si-pass" type="password" autocomplete="current-password" value="prototype"></div>' +
-      '<button class="btn btn--primary btn--lg btn--block auth__go" type="submit">Sign in</button>' +
-      '<div class="auth__foot"><a class="link" href="#" data-toast="Opens password reset">Forgot password?</a><span class="t-meta">Use the email on your PreFix membership.</span></div>' +
-      '</form>' +
-      bnote("Standard HomeHub sign-in. The /tune-ups link is kept, so the member lands back in the tune-up flow after signing in.");
+    $("#r-promo").innerHTML =
+      '<svg class="promo__art" viewBox="0 0 380 160" role="img" aria-label="Outdoor air conditioning unit">' +
+      '<rect class="art-bg" width="380" height="160"/><circle class="art-sun" cx="334" cy="36" r="15"/>' +
+      '<rect class="art-wall" width="108" height="160"/><path class="art-line" d="M0 32H108M0 62H108M0 92H108M0 122H108"/><path class="art-ink" d="M108 0V160"/>' +
+      '<rect class="art-pad" x="142" y="138" width="166" height="11" rx="4"/><path class="art-pipe" d="M108 104H132Q142 104 142 94V88"/>' +
+      '<rect class="art-unit art-ink" x="146" y="36" width="156" height="102" rx="12"/><path class="art-slate" d="M272 54V120M282 54V120M262 54V120"/>' +
+      '<circle class="art-grille art-ink" cx="204" cy="87" r="36"/><circle class="art-slate" cx="204" cy="87" r="24"/>' +
+      '<g transform="translate(204 87)"><ellipse class="art-blade" rx="8" ry="19" transform="translate(0 -13)"/><ellipse class="art-blade" rx="8" ry="19" transform="rotate(120) translate(0 -13)"/><ellipse class="art-blade" rx="8" ry="19" transform="rotate(240) translate(0 -13)"/></g>' +
+      '<circle class="art-hub" cx="204" cy="87" r="5"/></svg>' +
+      '<div class="promo__body"><h2 class="t-title" id="promo-title">Time for your HVAC tune-up</h2>' +
+      '<p class="t-desc">From <strong class="t-strong" style="color:var(--ink)">$29</strong> per system for members.</p>' +
+      '<a class="btn btn--primary btn--lg" href="#tune-ups">Schedule my tune-up</a></div>';
   }
 
   function renderHome(sec) {
-    var ids = homeIds(), any = ids.some(selectable);
+    var ids = homeIds();
     var list = ids.map(function (id) {
-      var h = HOMES[id], st = status(id), n = h.systems.length, sel = selectable(id);
-      var facts = '<span class="hopt__facts"><span class="hopt__fact">' + ic("ri-snowy-line") + n + (n === 1 ? " HVAC system on file" : " HVAC systems on file") + '</span></span>';
-      var badge = "", line = "";
-      if (st.k === "ready") badge = '<span class="badge badge--included">Ready to book</span>';
-      if (st.k === "unscheduled") {
-        badge = '<span class="badge badge--blue">Pick a time to finish</span>';
-        line = '<span class="hopt__line">You started this tune-up on ' + longDate(STARTED) + '. It just needs a time.</span>';
+      var h = HOMES[id], k = status(id), side = "";
+      var main = '<span class="opt__main"><span class="opt__title">' + h.addr + '</span><span class="t-meta">' + h.city + ' · ' + systemsWord(h.systems) + '</span></span>';
+      if (k === "ready") side = '<span class="badge badge--blue">Pick a time</span>';
+      if (k === "booked") { var b = bookingOf(id); side = '<span class="badge badge--tint">' + ic("ri-calendar-check-line") + 'Booked ' + shortDate(parse(b.date)) + '</span>'; }
+      if (k === "notdue") side = '<span class="badge badge--quiet">Opens ' + fmt(NEXT_OK, { month: "short", day: "numeric" }) + '</span>';
+      if (selectable(id)) {
+        return '<label class="opt"><input type="radio" name="home" value="' + id + '"' + (S.home === id ? " checked" : "") + '><span class="opt__radio" aria-hidden="true"></span>' + main + side + '</label>';
       }
-      if (st.k === "scheduled") {
-        var bd = parse(st.b.date);
-        badge = '<span class="badge badge--status">' + ic("ri-calendar-check-line") + 'Booked ' + fmt(bd, { month: "short", day: "numeric" }) + '</span>';
-        line = '<span class="hopt__line">' + longDate(bd) + ', ' + WIN[st.b.win].name.toLowerCase() + ' arrival. <button class="link" type="button" data-manage="' + id + '">View or change</button></span>';
-      }
-      if (st.k === "notdue") {
-        badge = '<span class="badge badge--neutral">Opens ' + fmt(NEXT_OK, { month: "short", day: "numeric" }) + '</span>';
-        line = '<span class="hopt__line">Last tune-up ' + fmt(LAST_TUNEUP, { month: "long", day: "numeric" }) + '. Tune-ups are at least 6 months apart. <button class="link" type="button" data-notdue="' + id + '">Details</button></span>';
-      }
-      var main = '<span class="hopt__main"><span class="opt__title">' + h.addr + '</span><span class="opt__meta">' + h.city + '</span>' + facts + line + '</span>';
-      if (sel) {
-        return '<label class="opt hopt"><input type="radio" name="home" value="' + id + '"' + (S.home === id ? " checked" : "") + '>' +
-          '<span class="opt__radio" aria-hidden="true"></span>' + main + '<span class="hopt__side">' + badge + '</span></label>';
-      }
-      return '<div class="opt hopt is-off">' + ic(st.k === "scheduled" ? "ri-calendar-check-line" : "ri-hourglass-line", "hopt__ic") + main + '<span class="hopt__side">' + badge + '</span></div>';
+      return '<div class="opt is-off">' + ic(k === "booked" ? "ri-calendar-check-line" : "ri-hourglass-line", "opt__ic") + main + side + '</div>';
     }).join("");
+    var any = ids.some(selectable);
     sec.innerHTML = planMessage() +
-      '<fieldset class="fsec"><legend class="t-strong">Your homes</legend>' +
-      '<p class="t-meta">Book one home at a time. You can add another home after you book.</p>' +
-      '<div class="homes" role="radiogroup" aria-label="Your homes">' + list + '</div>' +
-      (S.err === "home" ? '<p class="error" role="alert">' + ic("ri-error-warning-fill") + '<span>Choose a home to continue.</span></p>' : "") +
-      (any ? "" : '<div class="note" role="status">' + ic("ri-information-line") + '<span><strong>Every home is booked or not due yet.</strong> You can change a booked tune-up from its home above.</span></div>') +
-      '</fieldset>' +
-      bnote("Every entry point (HubSpot email, Campaign Monitor email, portal promotion) opens member.prefixinc.com/tune-ups. Home statuses come from the new tune-up API: ready, booked, ready to schedule (booking created, no time yet) and not due (tune-up in the last 6 months).") +
-      factions("home", any ? "Continue" : "Back to dashboard", homeStatusText());
-  }
-  function homeStatusText() { return S.home && selectable(S.home) ? "<strong>" + HOMES[S.home].addr + "</strong>" : ""; }
-
-  function cmpTable() {
-    var rows = [
-      ["Inspect and test system components", 1, 1],
-      ["Clear drain lines with CO2 or nitrogen", 1, 1],
-      ["Clean furnace burners", 1, 1],
-      ["Check refrigerant levels and pressures", 1, 1],
-      ["Verify thermostat calibration", 1, 1],
-      ["Check airflow, inspect ducts and review collars", 1, 1],
-      ["Clean the evaporator coil<span class=\"cmp__sub\">Recommended every 3 years</span>", 0, 1]
-    ];
-    return '<div class="cmp-wrap"><table class="cmp"><thead><tr><th scope="col">What we do</th><th scope="col" class="c">Standard</th><th scope="col" class="c">Comprehensive</th></tr></thead><tbody>' +
-      rows.map(function (r) {
-        return '<tr><td>' + r[0] + '</td>' + [r[1], r[2]].map(function (v) {
-          return '<td class="c">' + (v ? '<svg class="i" role="img" aria-label="Included"><use href="#ri-check-line"/></svg>' : '<svg class="i is-no" role="img" aria-label="Not included"><use href="#ri-subtract-line"/></svg>') + '</td>';
-        }).join("") + '</tr>';
-      }).join("") + '</tbody></table></div>';
+      '<fieldset><legend class="sr-only">Your homes</legend><div class="homes">' + list + '</div></fieldset>' +
+      (S.err === "home" ? '<p class="error" role="alert">' + ic("ri-error-warning-fill") + 'Choose a home to continue.</p>' : "") +
+      bnote("One card per active subscription. Systems = <code>Subscription.plan.allowed_hvac_count</code>. “Pick a time” = a tune-up booking in READY; “Booked” = BOOKED (PFX-593, PFX-595). “Opens Nov 20” uses the 6-month rule from the call, which isn’t defined in PFX-590 yet.") +
+      factions(any ? "Continue" : "Back to dashboard", S.home && selectable(S.home) ? "<strong>" + HOMES[S.home].addr + "</strong>" : "");
   }
 
   function renderTuneup(sec) {
-    var h = HOMES[S.home], per = S.mode === "per";
-    var sys = systemsFor(S.home), sug = sys.filter(suggested);
-    var recLine = sug.length
-      ? '<span class="tcard__rec">' + ic("ri-information-line") + '<span>Suggested for ' + (sys.length === 1 ? "your system" : sug.map(function (s) { return s.name; }).join(" and ")) + ' (installed ' + sug.map(function (s) { return s.year; }).join(", ") + ')</span></span>'
-      : "";
-    function tcard(t, desc, extra) {
-      return '<label class="tcard"><input type="radio" name="ttype" value="' + t + '"' + (S.type === t && !per ? " checked" : "") + (per ? " disabled" : "") + '>' +
-        '<span class="tcard__top"><span class="opt__radio" aria-hidden="true"></span><span class="tcard__name">' + TNAME[t] + ' Tune-Up</span></span>' +
-        '<span class="tcard__price"><span class="tcard__amt">' + money(PRICE[t]) + '</span><span class="tcard__per">per system</span><span class="tcard__retail">Retail <s>' + money(RETAIL[t]) + '</s></span></span>' +
-        '<span class="tcard__desc">' + desc + '</span>' + (extra || "") + '</label>';
+    var n = systems();
+    function card(t) {
+      var T = TYPES[t];
+      return '<label class="opt tcard"><input type="radio" name="ttype" value="' + t + '"' + (S.type === t ? " checked" : "") + '>' +
+        '<span class="tcard__top"><span class="opt__radio" aria-hidden="true"></span><span class="opt__title">' + T.name + '</span></span>' +
+        '<span class="tcard__price"><span class="tcard__amt">' + money(T.price) + '</span><span class="tcard__per">per system</span><span class="tcard__retail">Retail <s>' + money(T.retail) + '</s></span></span>' +
+        '<span class="tcard__desc">' + T.desc + '</span></label>';
     }
     sec.innerHTML = planMessage() +
-      '<div class="fsec"><fieldset><legend class="t-strong">Which tune-up?</legend>' +
-      '<p class="t-meta" id="tt-hint">' + (per ? "You’re choosing a tune-up for each system below." : "Standard is right for most systems. Prices are per HVAC system.") + '</p>' +
-      '<div class="tcards' + (per ? " is-info" : "") + '" id="tcards">' +
-      tcard("standard", "Recommended for all systems. A full check and clean of your system.") +
-      tcard("comprehensive", "Everything in Standard, plus evaporator coil cleaning. For systems over 5 years old, every 3 years.", recLine) +
-      '</div></fieldset>' +
-      '<div class="incl"><button class="link" type="button" id="incl-btn" aria-expanded="' + S.showIncl + '" aria-controls="incl">' + ic("ri-add-line", "i--turn") + 'What’s included</button>' +
-      '<div id="incl"' + (S.showIncl ? "" : " hidden") + '>' + cmpTable() + '</div></div>' +
-      '</div>' +
-      '<div class="fsec">' +
-      '<div class="sel__head"><h2 class="t-strong">HVAC systems at this home</h2><span class="t-meta t-num" id="sys-count"></span></div>' +
-      '<p class="t-meta" id="sys-hint"></p>' +
-      '<ul class="syss" id="syss"></ul>' +
-      '<div class="sys__tools">' +
-      (sys.length > 1 || per ? '<button class="link" type="button" id="mode-btn">' + (per ? "Use one tune-up for all systems" : "Choose a different tune-up for each system") + '</button>' : "") +
-      '<button class="link" type="button" id="count-btn" aria-expanded="' + S.showCount + '" aria-controls="countbox">Wrong number of systems?</button>' +
-      '</div>' +
-      '<div class="countbox" id="countbox"' + (S.showCount ? "" : " hidden") + '>' +
-      '<p class="t-label" id="qty-label">How many HVAC systems does this home have?</p>' +
-      '<p class="t-meta" id="qty-hint">Most homes have one system per floor. Your technician confirms the count at the visit.</p>' +
-      '<div class="qty" role="group" aria-labelledby="qty-label" aria-describedby="qty-hint">' +
-      '<button class="qty__btn" type="button" id="qty-minus" aria-label="One fewer system">' + ic("ri-subtract-line") + '</button>' +
-      '<input class="qty__val" id="qty-val" type="text" inputmode="numeric" aria-label="Number of HVAC systems" value="' + sys.length + '" readonly>' +
-      '<button class="qty__btn" type="button" id="qty-plus" aria-label="One more system">' + ic("ri-add-line") + '</button>' +
-      '</div></div>' +
-      '</div>' +
-      bnote("System names, count and install year come from the home’s records; the member can correct the count. Continue to scheduling creates the tune-up booking as ready to schedule, then opens the calendar. Opening /tune-ups again resumes that booking instead of creating a second one.") +
-      factions("tuneup", "Continue to scheduling", "");
-    drawSystems();
+      '<fieldset><legend class="sr-only">Tune-up type</legend><div class="tcards">' + card("standard") + card("comprehensive") + '</div></fieldset>' +
+      '<div class="total" aria-live="polite"><div><p class="total__label">This home has</p><p class="total__what">' + systemsWord(n) + '</p></div>' +
+      '<p class="total__amt" id="tot-amt">' + money(total()) + '<small>' + (n > 1 ? money(TYPES[S.type].price) + " × " + n + " · " : "") + 'billed after your visit</small></p></div>' +
+      bnote("Continue creates the booking in READY: the OFFSEASON Standard or Comprehensive service type, one task per system, <code>adjusted_total</code> = price × systems (PFX-593). The final bill comes from the Housecall Pro invoice, so the technician can adjust the system count (PFX-596).") +
+      factions("Continue to scheduling", "");
   }
-
-  function drawSystems() {
-    var host = $("#syss"); if (!host) return;
-    var sys = systemsFor(S.home), per = S.mode === "per", onFile = HOMES[S.home].systems.length;
-    $("#sys-count").textContent = systemsWord(sys.length);
-    $("#sys-hint").textContent = sys.length === onFile
-      ? "We have " + systemsWord(onFile) + " on file for " + HOMES[S.home].addr + ". Pricing is per system."
-      : "You changed this from " + systemsWord(onFile) + " on file. Pricing is per system.";
-    host.innerHTML = sys.map(function (s, i) {
-      var t = typeAt(S.home, i);
-      var meta = s.onFile ? "Installed " + s.year : "Not on file yet";
-      var hint = suggested(s) ? '<span class="sys__hint">' + ic("ri-information-line") + 'Over 5 years old: Comprehensive suggested</span>' : "";
-      var right = per
-        ? '<span class="seg" role="radiogroup" aria-label="Tune-up for ' + s.name + '">' +
-          ["standard", "comprehensive"].map(function (k) {
-            return '<label class="seg__opt"><input type="radio" name="per-' + i + '" value="' + k + '" data-per="' + i + '"' + (t === k ? " checked" : "") + '>' + TNAME[k] + ' ' + money(PRICE[k]) + '</label>';
-          }).join("") + '</span>'
-        : '<span class="sys__chip">' + TNAME[t] + ' · ' + money(PRICE[t]) + '</span>';
-      return '<li class="sys"><span class="d-icon">' + ic("ri-snowy-line") + '</span><span class="sys__main"><span class="t-strong">' + s.name + '</span><span class="t-meta">' + meta + '</span>' + hint + '</span>' + right + '</li>';
-    }).join("");
-    var minus = $("#qty-minus"), plus = $("#qty-plus"), val = $("#qty-val");
-    if (val) { val.value = sys.length; minus.disabled = sys.length <= 1; plus.disabled = sys.length >= 6; }
+  function drawTotal() {
+    var n = systems(), el = $("#tot-amt");
+    if (el) el.innerHTML = money(total()) + '<small>' + (n > 1 ? money(TYPES[S.type].price) + " × " + n + " · " : "") + 'billed after your visit</small>';
     updateSide();
   }
 
   function renderTime(sec) {
     var top = "";
-    if (S.timeErr === "taken") top += '<div class="message message--alert" role="alert"><span class="message__icon">' + ic("ri-error-warning-fill") + '</span><p class="message__text"><strong>That window was just booked by another member.</strong> Pick another day or window.</p></div>';
-    if (S.resumed) top += '<div class="note" role="status" style="margin:0 0 24px">' + ic("ri-information-line") + '<span>You started this tune-up on ' + longDate(STARTED) + '. Pick a time to finish booking. <button class="link" type="button" data-goto="tuneup">Change tune-up</button></span></div>';
-    if (S.resched) {
-      var b = bookingOf(S.resched);
-      top += '<div class="note" role="status" style="margin:0 0 24px">' + ic("ri-information-line") + '<span>Your current time, ' + longDate(parse(b.date)) + ' ' + WIN[b.win].name.toLowerCase() + ', stays booked until you confirm a new one.</span></div>';
-    }
+    if (S.timeErr) top += '<div class="message message--alert" role="alert"><span class="message__icon">' + ic("ri-error-warning-fill") + '</span><p class="message__text"><strong>That time was just taken</strong>Please pick another time.</p></div>';
+    if (!S.timeErr && !S.noSlots) top += planMessage("m-only");
+    if (!S.timeErr && S.resumed) top += '<div class="message" role="status"><span class="message__icon">' + ic("ri-information-line") + '</span><p class="message__text"><strong>Your tune-up is saved</strong>Pick a time to finish booking.</p></div>';
     if (S.noSlots) {
       sec.innerHTML = top +
-        '<div class="empty-state">' +
-        '<div class="empty-state__row">' + ic("ri-calendar-event-line") + '<div><p class="t-strong">No open windows in the next 5 weeks</p><p class="t-meta">Send us a scheduling request and our HVAC team will find you a time. Your tune-up choice is saved.</p></div></div>' +
-        '<button class="btn btn--secondary" type="button" data-goto="sent">' + ic("ri-send-plane-line") + 'Send a scheduling request</button>' +
-        '<div class="empty-state__row">' + ic("ri-phone-line") + '<div><p class="t-meta">Or call PreFix</p><div class="phones"><span class="phone"><span class="t-meta">Austin</span><span class="phone__num">512.831.4390</span></span><span class="phone"><span class="t-meta">San Antonio</span><span class="phone__num">210.970.7959</span></span></div></div></div>' +
-        '</div>' +
-        bnote("Fallback when the Housecall Pro calendar has no open windows. The booking stays ready to schedule and Ops gets a scheduling request.");
+        '<div class="message" role="status"><span class="message__icon">' + ic("ri-phone-line") + '</span><p class="message__text"><strong>No open times right now</strong>Call us and we’ll book a time for you.</p></div>' +
+        '<div class="phones"><span class="phone"><span class="t-meta">Austin</span><span class="phone__num">512.831.4390</span></span><span class="phone"><span class="t-meta">San Antonio</span><span class="phone__num">210.970.7959</span></span></div>' +
+        bnote("No slot is free in both PreFix and Housecall Pro. Long visits (4–5 systems, 8–10 hours) often won’t fit; per PFX-590, Ops schedules those by hand.");
       return;
     }
     sec.innerHTML = top +
-      '<div class="fsec">' +
-      '<h2 class="t-strong" id="day-title">Pick a day</h2>' +
-      '<p class="t-meta">Tune-ups run Monday to Friday. Highlighted days have open windows.</p>' +
-      '<div class="wk__head"><p class="wk__range" id="wk-range" aria-live="polite"></p><div class="wk__navs">' +
-      '<button class="icon-btn" type="button" id="wk-prev" aria-label="Previous week">' + ic("ri-arrow-left-s-line") + '</button>' +
-      '<button class="icon-btn" type="button" id="wk-next" aria-label="Next week">' + ic("ri-arrow-right-s-line") + '</button></div></div>' +
-      '<div class="wk" id="wk" role="group" aria-labelledby="day-title"></div>' +
+      '<div class="rec"><span class="rec__icon">' + ic("ri-time-line") + '</span><div><p class="rec__label">Visit length</p><p class="rec__value">' + hoursText(duration()) + '</p></div></div>' +
+      '<div class="book">' +
+      '<div><h2 class="t-strong" id="cal-title">Select the date</h2>' +
+      '<div class="cal__head"><p class="cal__month" id="cal-month" aria-live="polite"></p><div class="cal__navs">' +
+      '<button class="icon-btn" type="button" id="cal-prev" aria-label="Previous month">' + ic("ri-arrow-left-s-line") + '</button>' +
+      '<button class="icon-btn" type="button" id="cal-next" aria-label="Next month">' + ic("ri-arrow-right-s-line") + '</button></div></div>' +
+      '<div class="cal__grid" id="cal-grid" role="group" aria-labelledby="cal-title"></div></div>' +
+      '<div><h2 class="t-strong" id="times-title">Pick the time</h2><p class="t-meta" id="times-meta"></p>' +
+      '<div class="times" id="times" role="radiogroup" aria-labelledby="times-title"></div></div>' +
       '</div>' +
-      '<div class="fsec"><fieldset><legend class="t-strong" id="win-title">Pick an arrival window</legend>' +
-      '<p class="t-meta" id="win-meta"></p><div id="wins"></div></fieldset>' +
-      (S.err === "time" ? '<p class="error" role="alert">' + ic("ri-error-warning-fill") + '<span>Pick a day and an arrival window to continue.</span></p>' : "") +
-      '</div>' +
-      bnote("Days and windows come from the Housecall Pro calendar. The windows match today’s form: mornings 8:00–11:30am and afternoons 12:00–5:30pm, Monday to Friday.") +
-      factions("time", S.resched ? "Review new time" : "Continue to review", "");
-    drawWeek(); drawWins();
+      (S.err === "time" ? '<p class="error" role="alert">' + ic("ri-error-warning-fill") + 'Pick a date and time to continue.</p>' : "") +
+      bnote("The existing member scheduling page (PFX-590: “the same scheduling page as for every other booking”). Start times are on a 15-minute grid and only free in both PreFix and Housecall Pro (PFX-594). Length: 60 min Standard or 120 min Comprehensive, per system.") +
+      factions("Confirm booking", "");
+    drawCal(); drawTimes();
   }
-
-  function drawWeek() {
-    var start = WEEKS[S.week];
-    $("#wk-range").textContent = weekLabel(start);
-    $("#wk-prev").disabled = S.week === 0;
-    $("#wk-next").disabled = S.week === WEEKS.length - 1;
-    var html = "";
-    for (var i = 0; i < 5; i++) {
-      var d = new Date(start); d.setDate(start.getDate() + i);
-      var sl = slots(d), n = (sl.am ? 1 : 0) + (sl.pm ? 1 : 0), key = iso(d);
-      var meta = sl.past ? (key < iso(TODAY) ? "Past" : key === iso(TODAY) ? "Today" : "Not open") : sl.closed ? "Closed" : n ? n + (n === 1 ? " window" : " windows") : "Full";
-      var label = longDate(d) + ", " + (sl.past ? "not available" : sl.closed ? "closed" : n ? n + " open " + (n === 1 ? "window" : "windows") : "full");
-      html += '<button type="button" class="wday" data-date="' + key + '"' + (n ? "" : " disabled") + ' aria-pressed="' + (S.date === key) + '" aria-label="' + label + '">' +
-        '<span class="wday__dow">' + fmt(d, { weekday: "short" }) + '</span><span class="wday__num">' + d.getDate() + '</span><span class="wday__meta">' + meta + '</span></button>';
+  function drawCal() {
+    var y = S.month.y, m = S.month.m;
+    $("#cal-month").textContent = monthName(y, m);
+    $("#cal-prev").disabled = y === FIRST_MONTH.y && m === FIRST_MONTH.m;
+    $("#cal-next").disabled = y === LAST_MONTH.y && m === LAST_MONTH.m;
+    var html = ["S", "M", "T", "W", "T", "F", "S"].map(function (l) { return '<span class="cal__dow" aria-hidden="true">' + l + '</span>'; }).join("");
+    var first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
+    for (var b = 0; b < first.getDay(); b++) html += '<span class="cal__cell"></span>';
+    for (var n = 1; n <= days; n++) {
+      var d = new Date(y, m, n), open = dayOpen(d), key = iso(d);
+      html += '<span class="cal__cell"><button type="button" class="cal__day" data-date="' + key + '"' + (open ? "" : " disabled") +
+        ' aria-pressed="' + (S.date === key) + '" aria-label="' + longDate(d) + (open ? ", open times" : ", no open times") + '">' + n + '</button></span>';
     }
-    $("#wk").innerHTML = html;
+    $("#cal-grid").innerHTML = html;
   }
-
-  function drawWins() {
-    var host = $("#wins"), meta = $("#win-meta");
-    if (!S.date) {
-      meta.textContent = "Your technician arrives during the window you choose.";
-      host.innerHTML = '<p class="wins__empty">' + ic("ri-calendar-event-line") + 'Pick a day to see its windows.</p>';
-      updateSide(); return;
-    }
-    var d = parse(S.date), sl = slots(d);
-    meta.textContent = longDate(d) + ". Your technician arrives during the window you choose.";
-    host.innerHTML = '<div class="opts">' + ["am", "pm"].map(function (w) {
-      var open = sl[w], W = WIN[w];
-      return '<label class="opt' + (open ? "" : " is-full") + '"><input type="radio" name="win" value="' + w + '"' + (S.win === w ? " checked" : "") + (open ? "" : " disabled") + '>' +
-        '<span class="opt__radio" aria-hidden="true"></span><span class="opt__main"><span class="opt__title">' + W.name + '</span><span class="opt__meta">' + W.range + (open ? " arrival" : " · Full") + '</span></span>' +
-        '<span class="d-icon">' + ic(W.icon) + '</span></label>';
-    }).join("") + '</div>';
+  function drawTimes() {
+    var box = $("#times"), meta = $("#times-meta");
+    if (!S.date) { meta.textContent = "Times are in Central Time."; box.innerHTML = '<p class="times__empty">' + ic("ri-calendar-event-line") + 'Choose a date to see open times.</p>'; updateSide(); return; }
+    meta.textContent = longDate(parse(S.date)) + ". Times are in Central Time.";
+    box.innerHTML = slotsFor(S.date).map(function (s) {
+      return '<label class="time"><input type="radio" name="slot" value="' + s + '"' + (S.time === s ? " checked" : "") + '><span>' + t12(s) + '</span>' + ic("ri-check-line") + '</label>';
+    }).join("");
     updateSide();
   }
 
-  function renderReview(sec) {
-    var h = HOMES[S.home], list = items(), d = parse(S.date), W = WIN[S.win], sys = S.resched ? [] : systemsFor(S.home);
-    var breakdown = S.resched ? systemsWord(list.length) : sys.map(function (s, i) { return s.name + ": " + TNAME[list[i]]; }).join(" · ");
-    var c = tally(list);
-    var ledger = '<dl class="ledger">' +
-      ["standard", "comprehensive"].filter(function (t) { return c[t]; }).map(function (t) {
-        return '<div class="ledger__row"><dt>' + TNAME[t] + ' tune-up × ' + c[t] + '</dt><dd>' + money(PRICE[t] * c[t]) + '</dd></div>';
-      }).join("") +
-      (S.onPlan ? "" : '<div class="ledger__row"><dt>HVAC Plan activation</dt><dd>$0</dd></div>') +
-      '<div class="ledger__row ledger__row--total"><dt>Total</dt><dd>' + money(total(list)) + '</dd></div></dl>' +
-      '<p class="ledger__foot">Billed to your ' + MEMBER.card + ' after your visit. Retail price <s>' + money(retail(list)) + '</s>.</p>';
-    function row(icon, k, v, s, go) {
-      return '<li class="rvw__row"><span class="d-icon">' + ic(icon) + '</span><div><p class="rvw__k">' + k + '</p><p class="rvw__v">' + v + '</p><p class="rvw__s">' + s + '</p></div>' +
-        (go ? '<button class="link" type="button" data-goto="' + go + '">Change<span class="sr-only"> ' + k.toLowerCase() + '</span></button>' : '<span></span>') + '</li>';
-    }
-    sec.innerHTML =
-      '<ul class="rvw">' +
-      row("ri-home-4-line", "Home", h.addr, h.city, S.multi && !S.resched ? "home" : null) +
-      row("ri-snowy-line", "Tune-up", itemsText(list), breakdown, S.resched ? null : "tuneup") +
-      row("ri-calendar-event-line", "When", longDate(d), W.name + " arrival, " + W.range + " · Central Time", "time") +
-      '</ul>' +
-      '<div class="rvw__price">' + ledger + '</div>' +
-      (S.onPlan ? "" : '<div class="note" role="note">' + ic("ri-shield-check-line") + '<span><strong>Confirming also starts your complimentary PreFix HVAC Plan.</strong> You get priority HVAC service and discounted off-season tune-ups. There is no cost to activate.</span></div>') +
-      '<div class="note" role="note">' + ic("ri-information-line") + '<span>You can reschedule or cancel from Appointments in HomeHub.</span></div>' +
-      bnote("For members not on the HVAC Plan, confirming also activates the plan, with no separate step. Payment uses the card on file and is charged after the visit.") +
-      factions("review", S.resched ? "Confirm new time" : "Confirm tune-up", "<strong>" + money(total(list)) + "</strong> billed after your visit");
+  function renderSummary() {
+    var h = HOMES[S.home], n = systems();
+    var when = S.date && S.time !== null
+      ? longDate(parse(S.date)) + '<span class="sum__sub">' + range(S.time, duration()) + '</span>'
+      : '<span class="sum__empty">Pick a date and time</span>';
+    $("#r-summary").innerHTML =
+      '<div class="d-head"><h2 class="t-title" id="sum-title">Your tune-up</h2></div><dl class="sum">' +
+      '<div class="sum__row"><dt class="sum__label">When</dt><dd class="sum__val">' + when + '</dd></div>' +
+      '<div class="sum__row"><dt class="sum__label">Tune-up</dt><dd class="sum__val">' + TYPES[S.type].name + '<span class="sum__sub">' + systemsWord(n) + '</span></dd></div>' +
+      '<div class="sum__row"><dt class="sum__label">Home</dt><dd class="sum__val">' + h.addr + '<span class="sum__sub">' + h.city + '</span></dd></div>' +
+      (S.onPlan ? "" : '<div class="sum__row"><dt class="sum__label">HVAC Plan</dt><dd class="sum__val sum__plan">' + ic("ri-shield-check-line") + 'Free, starts with this booking</dd></div>') +
+      '</dl><div class="ledger"><span class="ledger__label">Estimated total</span><span class="ledger__amt">' + money(total()) + '</span></div>' +
+      '<p class="ledger__foot">Billed after your visit.</p>';
   }
 
-  function visitCard(homeId, b, mode) {
-    var h = HOMES[homeId], d = parse(b.date), W = WIN[b.win];
-    var chip = b.resched ? '<span class="vcard__chip">Rescheduled</span>' : "";
-    return '<li class="vcard"><div class="vcard__tile"><span class="vcard__mon">' + MON3[d.getMonth()] + '</span><span class="vcard__day">' + d.getDate() + '</span></div>' +
-      '<div><p class="vcard__eyebrow">HVAC tune-up' + chip + '</p><p class="vcard__when">' + longDate(d) + '</p><p class="vcard__time">' + W.name + ' arrival · ' + W.range + '</p></div>' +
+  function visitCard(homeId, b) {
+    var h = HOMES[homeId], d = parse(b.date), len = TYPES[b.type].min * b.systems;
+    return '<div class="vcard"><div class="vcard__tile"><span class="vcard__mon">' + MON3[d.getMonth()] + '</span><span class="vcard__day">' + d.getDate() + '</span></div>' +
+      '<div><p class="vcard__eyebrow">HVAC tune-up</p><p class="vcard__when">' + longDate(d) + '</p><p class="vcard__time">' + range(b.start, len) + '</p></div>' +
       '<ul class="vcard__rows">' +
-      '<li class="vcard__row"><span class="vcard__ic">' + ic("ri-snowy-line") + '</span><span>' + itemsText(b.items) + '</span></li>' +
-      '<li class="vcard__row vcard__row--quiet"><span class="vcard__ic">' + ic("ri-home-4-line") + '</span><span>' + h.addr + ', ' + h.city + '</span></li>' +
-      '<li class="vcard__row vcard__row--quiet"><span class="vcard__ic">' + ic("ri-bank-card-line") + '</span><span>' + money(total(b.items)) + ', billed to your ' + MEMBER.card + ' after your visit</span></li>' +
-      '</ul>' +
-      (mode === "manage" ? '<div class="vcard__acts"><button class="btn btn--secondary" type="button" data-resched="' + homeId + '">' + ic("ri-calendar-event-line") + 'Reschedule</button><button class="btn btn--secondary btn--danger" type="button" data-toast="Opens the cancel confirmation">Cancel tune-up</button></div>' : "") +
-      '</li>';
+      '<li class="vcard__row"><span class="vcard__ic">' + ic("ri-snowy-line") + '</span><span>' + bookingText(b.type, b.systems) + '</span></li>' +
+      '<li class="vcard__row"><span class="vcard__ic">' + ic("ri-home-4-line") + '</span><span>' + h.addr + ', ' + h.city + '</span></li>' +
+      '<li class="vcard__row"><span class="vcard__ic">' + ic("ri-bank-card-line") + '</span><span><strong>' + money(TYPES[b.type].price * b.systems) + '</strong> estimated, billed after your visit</span></li>' +
+      '</ul></div>';
   }
-
-  function nextReadyHome(except) {
-    return homeIds().filter(function (id) { return id !== except && selectable(id); })[0] || null;
-  }
+  function nextReady(except) { return homeIds().filter(function (id) { return id !== except && selectable(id); })[0] || null; }
 
   function renderBooked(sec) {
-    var L = S.last, other = L.resched ? null : nextReadyHome(L.home);
-    sec.innerHTML =
-      '<ul class="vcards">' + visitCard(L.home, L, "plain") + '</ul>' +
-      (L.enrolled ? '<div class="note" role="status">' + ic("ri-shield-check-line") + '<span><strong>Your PreFix HVAC Plan is active.</strong> You now get priority HVAC service and discounted off-season tune-ups.</span></div>' : "") +
-      (other ? '<section class="srm" aria-labelledby="srm-t"><h2 class="t-strong" id="srm-t">Another home is ready for a tune-up</h2>' +
-        '<div class="srm__row"><span class="d-icon">' + ic("ri-home-4-line") + '</span><div><p class="t-strong">' + HOMES[other].addr + '</p><p class="t-meta">' + HOMES[other].city + ' · ' + systemsWord(HOMES[other].systems.length) + '</p></div></div>' +
-        '<button class="btn btn--secondary" type="button" data-another="' + other + '">Schedule ' + HOMES[other].addr + '</button></section>' : "") +
-      '<div class="result__actions">' +
-      '<a class="btn btn--primary btn--lg" href="#dashboard">Back to dashboard</a>' +
-      '<button class="link" type="button" data-toast="Added to your calendar">' + ic("ri-calendar-check-line") + 'Add to calendar</button>' +
-      '<button class="link" type="button" data-manage="' + L.home + '">Reschedule or cancel</button>' +
-      '</div>' +
-      bnote("One home per booking. The “another home” card only shows when one of the member’s other homes is ready.");
+    var L = S.last, other = nextReady(L.home);
+    sec.innerHTML = visitCard(L.home, L) +
+      (L.enrolled ? '<div class="message result__note" role="status"><span class="message__icon">' + ic("ri-shield-check-line") + '</span><p class="message__text"><strong>Your HVAC Plan is active</strong>Priority HVAC service and discounted off-season tune-ups are now on.</p></div>' : "") +
+      '<div class="result__actions"><a class="btn btn--primary btn--lg" href="#dashboard">Back to dashboard</a>' +
+      (other ? '<button class="btn btn--secondary btn--lg" type="button" data-another="' + other + '">Book ' + HOMES[other].addr + '</button>' : "") + '</div>' +
+      bnote("PreFix sends its usual booked email and text (PFX-590). For members not on the plan, confirming sets <code>PFUser.hvac_subscriber</code> to true, which syncs to HubSpot.");
   }
-
-  function renderHelp() {
-    $("#r-help").innerHTML =
-      '<div class="d-head"><h2 class="t-title" id="help-title">Questions?</h2></div>' +
-      '<p class="t-meta">Our HVAC team can help with anything about your tune-up.</p>' +
-      '<div class="rows">' +
-      '<div class="row"><span class="d-icon">' + ic("ri-phone-line") + '</span><div class="row__main"><span class="t-meta">Call PreFix in Austin</span><span class="phone__num">512.831.4390</span></div></div>' +
-      '<div class="row"><span class="d-icon">' + ic("ri-phone-line") + '</span><div class="row__main"><span class="t-meta">Call PreFix in San Antonio</span><span class="phone__num">210.970.7959</span></div></div>' +
-      '<div class="row"><span class="d-icon">' + ic("ri-message-3-line") + '</span><div class="row__main"><span class="t-strong">Message us in HomeHub</span><span class="t-meta">We reply during business hours.</span></div><button class="icon-btn" type="button" data-toast="Opens Messages" aria-label="Message us">' + ic("ri-arrow-right-s-line") + '</button></div>' +
-      '</div>';
-  }
-
-  function renderManage(sec) {
-    var b = bookingOf(S.home);
-    sec.innerHTML =
-      '<div class="note" role="note" style="margin:0 0 16px">' + ic("ri-information-line") + '<span>Each home gets one tune-up at a time. You can change the time or cancel this one.</span></div>' +
-      '<ul class="vcards">' + visitCard(S.home, b, "manage") + '</ul>' +
-      '<div class="mg__bar"><span class="mg__status">Booked for ' + shortDate(parse(b.date)) + '</span>' +
-      (S.multi && nextReadyHome(S.home) ? '<a class="btn btn--primary btn--lg" href="#home">Book another home</a>' : '<a class="btn btn--primary btn--lg" href="#dashboard">Done</a>') + '</div>';
-  }
-
-  function renderNotdue(sec) {
-    sec.innerHTML =
-      '<div class="rows">' +
-      '<div class="row"><span class="d-icon">' + ic("ri-history-line") + '</span><div class="row__main"><span class="t-meta">Last tune-up</span><span class="t-strong">' + longDateY(LAST_TUNEUP) + '</span><span class="t-meta">Standard tune-up</span></div></div>' +
-      '<div class="row"><span class="d-icon d-icon--tint">' + ic("ri-calendar-event-line") + '</span><div class="row__main"><span class="t-meta">You can book again from</span><span class="t-strong">' + longDateY(NEXT_OK) + '</span><span class="t-meta">Tune-ups are at least 6 months apart.</span></div></div>' +
-      '</div>' +
-      '<div class="note" role="note">' + ic("ri-mail-line") + '<span>We’ll email you when it’s time to book. The link in that email brings you right back here.</span></div>' +
-      '<div class="result__actions">' +
-      (S.multi && nextReadyHome(S.home) ? '<a class="btn btn--primary btn--lg" href="#home">Choose another home</a>' : '<a class="btn btn--primary btn--lg" href="#dashboard">Back to dashboard</a>') +
-      '<button class="link" type="button" data-toast="Opens a service request">HVAC not working right? Request service</button>' +
-      '</div>' +
-      bnote("The 6-month rule comes from the call. Still to confirm: whether it applies per home or per system.");
-  }
-
-  function renderSent(sec) {
-    sec.innerHTML =
-      '<div class="d-head"><h2 class="t-title">What happens next</h2></div>' +
-      '<ol class="next">' +
-      '<li><span class="d-icon">1</span><div><p class="t-strong">Our HVAC team gets your request</p><p class="d-meta">Your home and tune-up choice come with it, so you won’t need to repeat anything.</p></div></li>' +
-      '<li><span class="d-icon">2</span><div><p class="t-strong">We contact you with a time</p><p class="d-meta">By phone or email, using the details on your account.</p></div></li>' +
-      '</ol>' +
-      '<div class="note" role="note">' + ic("ri-phone-line") + '<span>Prefer to call? Austin <strong class="t-num">512.831.4390</strong> · San Antonio <strong class="t-num">210.970.7959</strong></span></div>' +
+  function renderAlready(sec) {
+    sec.innerHTML = visitCard(S.home, bookingOf(S.home)) +
       '<div class="result__actions"><a class="btn btn--primary btn--lg" href="#dashboard">Back to dashboard</a></div>' +
-      bnote("Creates a scheduling request for Ops. The tune-up booking stays ready to schedule.");
+      bnote("Shown when /tune-ups opens for a home that already has a BOOKED tune-up. Rescheduling stays in Appointments.");
+  }
+  function renderNotdue(sec) {
+    sec.innerHTML = '<div class="result__actions"><a class="btn btn--primary btn--lg" href="#dashboard">Back to dashboard</a></div>' +
+      bnote("The 6-month rule came up on the call; it isn’t in PFX-590. Confirm the rule before building.");
   }
 
-  function renderNotinterested(sec) {
-    var why = S.why;
-    var chips = ["I already have an HVAC plan", "I don’t need a tune-up right now", "My home doesn’t have central HVAC", "I’m renting my home", "Something else"];
-    sec.innerHTML =
-      '<fieldset><legend class="t-strong">Mind telling us why? <span class="t-meta">(optional)</span></legend>' +
-      '<div class="chips">' + chips.map(function (c, i) {
-        return '<button class="chip" type="button" data-why="' + i + '" aria-pressed="' + (why === i) + '">' + c + '</button>';
-      }).join("") + '</div></fieldset>' +
-      (why === 0 ? '<div class="note" role="status">' + ic("ri-information-line") + '<span><strong>You can keep your current plan.</strong> Many members keep theirs during its commitment period and add PreFix’s HVAC Plan at no extra cost.</span></div>' : "") +
-      (why !== null && why !== undefined ? '<p class="t-meta" role="status" style="margin-top:12px">Thanks, we’ve passed that on.</p>' : "") +
-      '<div class="result__actions">' +
-      '<a class="btn btn--secondary btn--lg" href="#tune-ups">Changed your mind? Schedule a tune-up</a>' +
-      '<a class="link" href="#dashboard">Go to HomeHub</a>' +
-      '</div>' +
-      bnote("Linked from the enrollment email’s Not Interested button. No sign-in needed. The confirmation copy depends on what the opt-out does in HubSpot.");
-  }
-
-  /* ---------- Summary rail and dock ---------- */
-  function renderSummary() {
-    var card = $("#r-summary"), v = S.view;
-    var h = S.home ? HOMES[S.home] : null;
-    var html = '<div class="d-head"><h2 class="t-title" id="sum-title">Your tune-up</h2></div><dl class="sum">';
-    html += '<div class="sum__row"><dt class="sum__label">Home</dt><dd class="sum__val">' +
-      (h && (v !== "home" || selectable(S.home)) ? '<span class="sum__home">' + ic("ri-home-4-line") + '<span>' + h.addr + '<span class="sum__sub">' + h.city + '</span></span></span>' : '<span class="sum__empty">Choose a home</span>') + '</dd></div>';
-    if (v === "home") {
-      html += '<div class="sum__row"><dt class="sum__label">Member prices</dt><dd class="sum__val"><ul class="sum__list">' +
-        '<li><span>Standard tune-up</span><span>$29 per system</span></li><li><span>Comprehensive tune-up</span><span>$79 per system</span></li></ul></dd></div>';
-    }
-    var list = null;
-    if (v === "tuneup" || v === "time") {
-      list = items();
-      var sys = S.resched ? null : systemsFor(S.home);
-      html += '<div class="sum__row"><dt class="sum__label">Tune-up</dt><dd class="sum__val"><ul class="sum__list">' +
-        list.map(function (t, i) { return '<li><span>' + (sys ? sys[i].name : "System " + (i + 1)) + ' · ' + TNAME[t] + '</span><span>' + money(PRICE[t]) + '</span></li>'; }).join("") +
-        '</ul></dd></div>';
-      if (v === "time") {
-        html += '<div class="sum__row"><dt class="sum__label">When</dt><dd class="sum__val">' +
-          (S.date && S.win ? longDate(parse(S.date)) + '<span class="sum__sub">' + WIN[S.win].name + ' arrival, ' + WIN[S.win].range + '</span>' : S.date ? longDate(parse(S.date)) + '<span class="sum__sub">Pick a window</span>' : '<span class="sum__empty">Pick a day and window</span>') + '</dd></div>';
-      }
-      if (!S.onPlan) html += '<div class="sum__row"><dt class="sum__label">HVAC Plan</dt><dd class="sum__val">Starts when you book<span class="sum__sub">No cost to activate</span></dd></div>';
-    }
-    html += '</dl>';
-    if (list) {
-      html += '<dl class="ledger"><div class="ledger__row ledger__row--total"><dt>Total</dt><dd>' + money(total(list)) + '</dd></div></dl>' +
-        '<p class="ledger__foot">Billed to your card on file after your visit. Retail price <s>' + money(retail(list)) + '</s>.</p>';
-    }
-    card.innerHTML = html;
-  }
-
+  /* ---------- Rail, dock ---------- */
   function statusText() {
     var v = S.view;
-    if (v === "home") return homeStatusText();
-    if (v === "tuneup") { var l = items(); return "<strong>" + money(total(l)) + "</strong> · " + itemsText(l); }
-    if (v === "time") return S.date && S.win ? "<strong>" + shortDate(parse(S.date)) + "</strong> · " + WIN[S.win].name + ", " + WIN[S.win].range : "Pick a day and an arrival window";
-    if (v === "review") return "<strong>" + money(total(items())) + "</strong> billed after your visit";
+    if (v === "home") return S.home && selectable(S.home) ? "<strong>" + HOMES[S.home].addr + "</strong>" : "";
+    if (v === "tuneup") return "<strong>" + money(total()) + "</strong> · " + bookingText(S.type, systems());
+    if (v === "time") return S.date && S.time !== null ? "<strong>" + shortDate(parse(S.date)) + ", " + t12(S.time) + "</strong> · " + money(total()) + " estimated" : "Pick a date and time";
     return "";
   }
-
   function updateSide() {
-    var v = S.view;
-    if (VIEWS[v] && VIEWS[v].rail === "summary") renderSummary();
-    var st = $("#st-" + v); if (st) st.innerHTML = statusText();
+    if (S.view === "time" && !S.noSlots) renderSummary();
+    var st = $('[data-view="' + S.view + '"] #st'); if (st) st.innerHTML = (S.view === "time" || S.view === "tuneup") ? "" : statusText();
     drawDock();
   }
-
   function drawDock() {
-    var v = VIEWS[S.view], dock = $("#fdock"), btn = $("#dock-btn");
-    var src = $('[data-view="' + S.view + '"] [data-next]');
-    var show = !!(v && v.cta && src);
-    dock.hidden = !show;
-    if (show) { btn.textContent = src.textContent; $("#dock-status").innerHTML = statusText(); }
-    placeProto();
-  }
-
-  function isPhone() { return $("#app").clientWidth < 768; }
-  function placeProto() {
-    var p = $("#proto"), dock = $("#fdock");
-    p.style.bottom = (!dock.hidden && isPhone()) ? "calc(" + (dock.offsetHeight + 16) + "px + env(safe-area-inset-bottom, 0px))" : "";
+    var V = VIEWS[S.view], src = $('[data-view="' + S.view + '"] [data-next]'), dock = $("#fdock");
+    dock.hidden = !(V && V.cta && src);
+    if (!dock.hidden) { $("#dock-btn").textContent = src.textContent; $("#dock-status").innerHTML = statusText(); }
+    var p = $("#proto"), phone = $("#app").clientWidth < 768;
+    p.style.bottom = !dock.hidden && phone ? "calc(" + (dock.offsetHeight + 16) + "px + env(safe-area-inset-bottom, 0px))" : "";
   }
 
   /* ---------- Navigation ---------- */
   function entry() {
-    if (!S.signedIn) return "signin";
     if (S.multi) return "home";
     S.home = "mueller";
-    var k = status("mueller").k;
-    if (k === "scheduled") return "manage";
+    var k = status("mueller");
+    if (k === "booked") return "already";
     if (k === "notdue") return "notdue";
-    if (k === "unscheduled") { resume(); return "time"; }
+    if (k === "ready") { S.resumed = true; return "time"; }
     return "tuneup";
   }
-  function resume() { S.mode = "same"; S.type = "standard"; S.count = {}; S.resumed = true; }
-
   function firstSelectable() { return homeIds().filter(selectable)[0] || "mueller"; }
-
-  /* Fill in sample choices so any screen can be opened directly from the prototype panel. */
   function ensure(view) {
-    if (view === "tuneup" || view === "time" || view === "review") {
-      if (!S.resched && (!S.home || !selectable(S.home) || homeIds().indexOf(S.home) < 0)) S.home = firstSelectable();
+    if ((view === "tuneup" || view === "time") && (!S.home || homeIds().indexOf(S.home) < 0 || !selectable(S.home))) S.home = firstSelectable();
+    if (view === "booked" && !S.last) { var id = S.home && homeIds().indexOf(S.home) >= 0 ? S.home : "mueller"; S.last = { home: id, date: "2026-11-12", start: 570, type: "standard", systems: HOMES[id].systems }; }
+    if (view === "already" && (!S.home || !bookingOf(S.home) || homeIds().indexOf(S.home) < 0)) {
+      if (S.multi) S.home = "arcadia"; else { S.home = "mueller"; S.booked.mueller = { date: "2026-11-12", start: 570, type: "standard", systems: 2 }; }
     }
-    if (view === "review" && (!S.date || !S.win)) {
-      if (S.noSlots) { S.noSlots = false; syncPanel(); }
-      S.date = SAMPLE_DATE; S.win = "am"; S.week = 1;
-    }
-    if (view === "booked" && !S.last) {
-      var id = S.home && homeIds().indexOf(S.home) >= 0 ? S.home : "mueller";
-      S.last = { home: id, date: SAMPLE_DATE, win: "am", items: systemsFor(id).map(function () { return "standard"; }), enrolled: false, resched: false };
-    }
-    if (view === "manage") {
-      if (!S.home || !bookingOf(S.home) || homeIds().indexOf(S.home) < 0) {
-        if (S.multi) S.home = "arcadia";
-        else { S.home = "mueller"; if (!S.booked.mueller) S.booked.mueller = { date: SAMPLE_DATE, win: "am", items: ["standard", "standard"] }; }
-      }
-    }
-    if (view === "notdue") {
-      if (!S.recent) { S.recent = true; syncPanel(); }
-      S.home = recentHome();
-      if (bookingOf(S.home) && S.booked[S.home]) delete S.booked[S.home];
-    }
-    if (view === "sent" && !S.home) S.home = firstSelectable();
+    if (view === "notdue") { if (!S.recent) { S.recent = true; sync(); } S.home = recentHome(); delete S.booked[S.home]; }
   }
-
   function guard(view) {
     if (!VIEWS[view]) return entry();
-    if (!S.signedIn && !VIEWS[view].out) return "signin";
-    if (S.signedIn && view === "signin") return entry();
     if (view === "home" && !S.multi) return entry();
-    if ((view === "tuneup") && S.resched) S.resched = null;
     return view;
   }
-
-  var firstRender = true;
+  var first = true;
   function route() {
     var name = (location.hash || "").replace(/^#/, "") || "tune-ups";
     var target = name === "tune-ups" ? entry() : guard(name);
     if (target !== name) { location.replace("#" + target); return; }
-    if (target === "tuneup" || target === "home") S.resumed = target === "tuneup" ? S.resumed : false;
-    ensure(target);
-    render(target);
+    ensure(target); render(target);
   }
-  function go(view) {
-    if (location.hash === "#" + view) route(); else location.hash = view;
-  }
+  function go(v) { if (location.hash === "#" + v) route(); else location.hash = v; }
 
   function render(view) {
     var V = VIEWS[view];
-    if (S.view !== view) { S.err = null; if (view !== "time") S.timeErr = null; }
+    if (S.view !== view) { S.err = null; if (view !== "time") { S.timeErr = false; S.resumed = view === "tuneup" ? false : S.resumed; } }
     S.view = view;
     body.setAttribute("data-screen", view);
-    body.classList.toggle("is-out", !!V.out);
-    body.classList.toggle("is-narrow-head", V.layout === "narrow");
     $all("[data-view]", $("#layout")).forEach(function (el) { el.hidden = el.getAttribute("data-view") !== view; });
     $all("[data-nav]").forEach(function (a) { a.classList.toggle("is-active", a.getAttribute("data-nav") === view); });
-
-    var b = V.back ? V.back() : null;
+    var b = typeof V.back === "function" ? V.back() : V.back;
     $("#back").hidden = !b;
     if (b) { $("#back-label").textContent = b[1]; $("#back-btn").setAttribute("data-goto", b[0]); }
-
-    var steps = $("#steps"), fl = flow(), idx = fl.indexOf(view);
-    steps.hidden = !FLOW_IN[view] || idx < 0;
-    if (!steps.hidden) {
+    var fl = flow(), idx = fl.indexOf(view), steps = $("#steps");
+    steps.hidden = idx < 0;
+    if (idx >= 0) {
       steps.style.setProperty("--n", fl.length);
       steps.innerHTML = fl.map(function (s, i) {
-        var cls = i < idx ? "is-done" : i === idx ? "is-current" : "";
-        return '<li class="step ' + cls + '"' + (i === idx ? ' aria-current="step"' : "") + '><span class="step__label">' + ic("ri-check-line") + '<span>' + (i + 1) + '</span>' + STEP_LABEL[s] + '</span><span class="step__bar"></span></li>';
+        return '<li class="step ' + (i < idx ? "is-done" : i === idx ? "is-current" : "") + '"' + (i === idx ? ' aria-current="step"' : "") + '><span class="step__label">' + ic("ri-check-line") + (i + 1) + ' ' + STEP[s] + '</span><span class="step__bar"></span></li>';
       }).join("");
     }
-
     $("#h1").textContent = V.h1();
-    $("#sub").textContent = V.sub ? V.sub() : "";
-    $("#f-icon").hidden = !V.icon;
-    if (V.icon) $("#f-icon-use").setAttribute("href", "#" + V.icon);
-
-    var layout = $("#layout");
-    layout.className = "layout" + (V.layout ? " layout--" + V.layout : "");
-    $("#r-summary").hidden = V.rail !== "summary";
+    var sub = V.sub ? V.sub() : ""; $("#sub").textContent = sub; $("#sub").hidden = !sub;
+    $("#f-icon").hidden = !V.icon; if (V.icon) $("#f-icon-use").setAttribute("href", "#" + V.icon);
+    $("#layout").className = "layout" + (V.layout ? " layout--" + V.layout : "");
+    $("#r-summary").hidden = !(V.rail === "summary" && !S.noSlots);
+    if (view === "time" && S.noSlots) $("#layout").className = "layout layout--single";
     $("#r-promo").hidden = V.rail !== "promo";
-    $("#r-help").hidden = V.rail !== "help";
     if (V.rail === "promo") renderPromo();
-    if (V.rail === "help") renderHelp();
-
-    var sec = $('[data-view="' + view + '"]', layout);
-    ({
-      dashboard: renderDashboard, signin: renderSignin, home: renderHome, tuneup: renderTuneup, time: renderTime, review: renderReview,
-      booked: renderBooked, manage: renderManage, notdue: renderNotdue, sent: renderSent, notinterested: renderNotinterested
-    })[view](sec);
+    var sec = $('[data-view="' + view + '"]', $("#layout"));
+    ({ dashboard: renderDashboard, home: renderHome, tuneup: renderTuneup, time: renderTime, booked: renderBooked, already: renderAlready, notdue: renderNotdue })[view](sec);
     updateSide();
-
     $all("[data-jump]").forEach(function (j) { j.setAttribute("aria-current", String(j.getAttribute("data-jump") === view)); });
-    closeMenus();
-    if (!firstRender) {
-      window.scrollTo(0, 0);
-      $("#h1").focus({ preventScroll: true });
-    }
-    firstRender = false;
+    $("#acct-menu").hidden = true; $("#mnav").hidden = true; $("#mnav-btn").setAttribute("aria-expanded", "false");
+    if (!first) { window.scrollTo(0, 0); $("#h1").focus({ preventScroll: true }); }
+    first = false;
   }
 
-  /* ---------- Actions ---------- */
   function next() {
     var v = S.view;
     if (v === "home") {
       if (!homeIds().some(selectable)) { go("dashboard"); return; }
-      if (!S.home || !selectable(S.home)) { S.err = "home"; renderHome($('[data-view="home"]')); updateSide(); var e = $('[data-view="home"] .error'); if (e) e.scrollIntoView({ block: "center" }); return; }
-      if (status(S.home).k === "unscheduled") { resume(); go("time"); return; }
-      S.resumed = false; go("tuneup"); return;
+      if (!S.home || !selectable(S.home)) { S.err = "home"; render("home"); return; }
+      if (status(S.home) === "ready") { S.resumed = true; go("time"); return; }
+      go("tuneup"); return;
     }
-    if (v === "tuneup") { go("time"); return; }
+    if (v === "tuneup") { S.resumed = false; S.date = null; S.time = null; go("time"); return; }
     if (v === "time") {
-      if (!S.date || !S.win) { S.err = "time"; renderTime($('[data-view="time"]')); updateSide(); var e2 = $('[data-view="time"] .error'); if (e2) e2.scrollIntoView({ block: "center" }); return; }
-      go("review"); return;
-    }
-    if (v === "review") {
-      if (S.taken && !S.takenHit) {
-        S.takenHit = true; S.takenKeys[S.date + ":" + S.win] = 1; S.win = null; S.timeErr = "taken"; go("time"); return;
-      }
-      var list = items(), enrolled = !S.onPlan, resched = !!S.resched;
-      var booking = { date: S.date, win: S.win, items: list, resched: resched };
-      S.booked[S.home] = booking;
-      S.last = { home: S.home, date: S.date, win: S.win, items: list, enrolled: enrolled, resched: resched };
-      if (enrolled) { S.onPlan = true; syncPanel(); }
-      S.date = null; S.win = null; S.resched = null; S.resumed = false; S.timeErr = null; S.week = 0;
+      if (!S.date || S.time === null) { S.err = "time"; render("time"); var e = $('[data-view="time"] .error'); if (e) e.scrollIntoView({ block: "center" }); return; }
+      if (S.taken && !S.takenHit) { S.takenHit = true; S.takenKeys[S.date + ":" + S.time] = 1; S.time = null; S.timeErr = true; S.err = null; render("time"); return; }
+      var enrolled = !S.onPlan;
+      S.booked[S.home] = { date: S.date, start: S.time, type: S.type, systems: systems() };
+      S.last = { home: S.home, date: S.date, start: S.time, type: S.type, systems: systems(), enrolled: enrolled };
+      if (enrolled) { S.onPlan = true; sync(); }
+      S.date = null; S.time = null; S.timeErr = false; S.resumed = false; S.month = { y: 2026, m: 10 };
       go("booked");
     }
   }
 
-  function startHome(id) {
-    S.home = id; S.mode = "same"; S.type = "standard"; S.per = {}; S.showCount = false; S.date = null; S.win = null; S.week = 0; S.resched = null;
-    if (status(id).k === "unscheduled") { resume(); go("time"); } else { S.resumed = false; go("tuneup"); }
-  }
-
-  var toastTimer = null;
-  function toast(msg) {
-    var t = $("#toast"); $("#toast-text").textContent = msg; t.hidden = false;
-    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 2200);
-  }
-  function closeMenus() {
-    $("#acct-menu").hidden = true; $("#acct-btn").setAttribute("aria-expanded", "false");
-    $("#mnav").hidden = true; $("#mnav-btn").setAttribute("aria-expanded", "false");
-  }
-  function refocus(sel) { var el = $(sel); if (el) el.focus(); }
+  var toastTimer;
+  function toast(msg) { var t = $("#toast"); $("#toast-text").textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 2000); }
 
   document.addEventListener("click", function (e) {
     if (!e.target.closest(".menu-wrap")) { $("#acct-menu").hidden = true; $("#acct-btn").setAttribute("aria-expanded", "false"); }
     var t = e.target.closest("button, a"); if (!t) return;
     if (t.hasAttribute("data-toast")) { e.preventDefault(); toast(t.getAttribute("data-toast")); return; }
-    if (t.hasAttribute("data-goto")) { e.preventDefault(); var g = t.getAttribute("data-goto"); if (g === "tuneup" && S.resumed) S.resumed = false; go(g); return; }
+    if (t.hasAttribute("data-goto")) { e.preventDefault(); go(t.getAttribute("data-goto")); return; }
     if (t.hasAttribute("data-next") || t.id === "dock-btn") { e.preventDefault(); next(); return; }
-    if (t.hasAttribute("data-manage")) { S.home = t.getAttribute("data-manage"); go("manage"); return; }
-    if (t.hasAttribute("data-notdue")) { S.home = t.getAttribute("data-notdue"); go("notdue"); return; }
-    if (t.hasAttribute("data-resched")) { var id = t.getAttribute("data-resched"); S.home = id; S.resched = id; S.date = null; S.win = null; S.week = 0; go("time"); return; }
-    if (t.hasAttribute("data-another")) { startHome(t.getAttribute("data-another")); return; }
-    if (t.hasAttribute("data-why")) { var w = +t.getAttribute("data-why"); S.why = S.why === w ? null : w; renderNotinterested($('[data-view="notinterested"]')); refocus('[data-why="' + w + '"]'); return; }
-    if (t.hasAttribute("data-signout")) { S.signedIn = false; syncPanel(); go("signin"); return; }
+    if (t.hasAttribute("data-another")) { S.home = t.getAttribute("data-another"); S.type = "standard"; S.date = null; S.time = null; S.resumed = false; go(status(S.home) === "ready" ? "time" : "tuneup"); return; }
     if (t.hasAttribute("data-date")) {
       S.date = t.getAttribute("data-date"); S.err = null;
-      var sl = slots(parse(S.date)); if (S.win && !sl[S.win]) S.win = null;
-      drawWeek(); drawWins(); refocus('[data-date="' + S.date + '"]'); return;
+      if (S.time !== null && slotsFor(S.date).indexOf(S.time) < 0) S.time = null;
+      drawCal(); drawTimes(); var f = $('[data-date="' + S.date + '"]'); if (f) f.focus(); return;
     }
     switch (t.id) {
-      case "wk-prev": if (S.week > 0) { S.week--; drawWeek(); refocus(S.week === 0 ? "#wk-next" : "#wk-prev"); } return;
-      case "wk-next": if (S.week < WEEKS.length - 1) { S.week++; drawWeek(); refocus(S.week === WEEKS.length - 1 ? "#wk-prev" : "#wk-next"); } return;
-      case "incl-btn": S.showIncl = !S.showIncl; t.setAttribute("aria-expanded", String(S.showIncl)); $("#incl").hidden = !S.showIncl; return;
-      case "count-btn": S.showCount = !S.showCount; t.setAttribute("aria-expanded", String(S.showCount)); $("#countbox").hidden = !S.showCount; return;
-      case "mode-btn":
-        if (S.mode === "same") { var n = systemsFor(S.home).length; for (var i = 0; i < n; i++) S.per[S.home + ":" + i] = S.type; S.mode = "per"; }
-        else { S.mode = "same"; }
-        renderTuneup($('[data-view="tuneup"]')); refocus("#mode-btn"); return;
-      case "qty-minus": case "qty-plus":
-        var cur = systemsFor(S.home).length, nn = Math.max(1, Math.min(6, cur + (t.id === "qty-plus" ? 1 : -1)));
-        S.count[S.home] = nn; renderTuneup($('[data-view="tuneup"]')); refocus("#" + t.id); return;
+      case "cal-prev": S.month = { y: 2026, m: 10 }; drawCal(); $("#cal-next").focus(); return;
+      case "cal-next": S.month = { y: 2026, m: 11 }; drawCal(); $("#cal-prev").focus(); return;
       case "acct-btn": var m = $("#acct-menu"); m.hidden = !m.hidden; t.setAttribute("aria-expanded", String(!m.hidden)); return;
       case "mnav-btn": var mn = $("#mnav"); mn.hidden = !mn.hidden; t.setAttribute("aria-expanded", String(!mn.hidden)); return;
       case "proto-toggle": var p = $("#proto-panel"); p.hidden = !p.hidden; t.setAttribute("aria-expanded", String(!p.hidden)); return;
     }
-    if (t.hasAttribute("data-jump")) {
-      var j = t.getAttribute("data-jump");
-      if (j === "signin") { S.signedIn = false; }
-      else if (j !== "notinterested") { S.signedIn = true; }
-      if (j === "sent" || j === "time") { if (j === "sent") { S.noSlots = true; } }
-      if (j === "review" || j === "time" || j === "tuneup") { S.resched = null; }
-      if (j === "booked") { S.last = null; }
-      syncPanel(); go(j); return;
-    }
-    if (t.hasAttribute("data-reset")) {
-      var keepPhone = S.phone, keepNotes = S.notes;
-      S = fresh(); S.phone = keepPhone; S.notes = keepNotes; syncPanel(); go("tune-ups"); return;
-    }
+    if (t.hasAttribute("data-jump")) { var j = t.getAttribute("data-jump"); if (j === "booked") S.last = null; if (j === "time" && S.noSlots === false) S.resumed = false; go(j); return; }
+    if (t.hasAttribute("data-reset")) { var ph = S.phone, nt = S.notes; S = fresh(); S.phone = ph; S.notes = nt; sync(); go("tune-ups"); }
   });
 
   document.addEventListener("change", function (e) {
     var t = e.target;
-    if (t.name === "home") { S.home = t.value; S.err = null; S.mode = "same"; S.per = {}; S.showCount = false; S.date = null; S.win = null; var er = $('[data-view="home"] .error'); if (er) er.remove(); updateSide(); return; }
-    if (t.name === "ttype") { S.type = t.value; drawSystems(); return; }
-    if (t.hasAttribute("data-per")) { S.per[S.home + ":" + t.getAttribute("data-per")] = t.value; drawSystems(); refocus('input[name="' + t.name + '"][value="' + t.value + '"]'); return; }
-    if (t.name === "win") { S.win = t.value; S.err = null; S.timeErr = null; var er2 = $('[data-view="time"] .error'); if (er2) er2.remove(); var al = $('[data-view="time"] .message--alert'); if (al) al.remove(); updateSide(); return; }
+    if (t.name === "home") { S.home = t.value; S.err = null; S.type = "standard"; var er = $('[data-view="home"] .error'); if (er) er.remove(); updateSide(); return; }
+    if (t.name === "ttype") { S.type = t.value; drawTotal(); return; }
+    if (t.name === "slot") { S.time = +t.value; S.err = null; S.timeErr = false; var a = $('[data-view="time"] .message--alert'); if (a) a.remove(); var er2 = $('[data-view="time"] .error'); if (er2) er2.remove(); updateSide(); return; }
     if (t.hasAttribute("data-state")) {
       var k = t.getAttribute("data-state"); S[k] = t.checked;
       if (k === "phone") { body.classList.toggle("frame-mobile", S.phone); setTimeout(drawDock, 0); return; }
       if (k === "notes") { body.classList.toggle("show-notes", S.notes); return; }
-      if (k === "multi") { S.home = null; S.resched = null; S.last = null; syncPanel(); go("tune-ups"); return; }
-      if (k === "taken") { S.takenHit = false; }
-      if (k === "noSlots" && !S.noSlots && S.view === "sent") { go("time"); return; }
-      syncPanel();
-      var v = S.view;
-      if (k === "signedIn") { go(S.signedIn ? "tune-ups" : "signin"); return; }
-      if (k === "unfinished" || k === "recent") { if (v === "booked" || v === "manage" || v === "notdue" || v === "tuneup" || v === "time" || v === "review") { go("tune-ups"); return; } }
+      if (k === "taken") S.takenHit = false;
+      if (k === "multi" || k === "unfinished" || k === "recent") { S.home = null; S.last = null; S.date = null; S.time = null; go("tune-ups"); return; }
       route();
     }
   });
-
-  document.addEventListener("submit", function (e) {
-    if (e.target.id === "signin-form") { e.preventDefault(); S.signedIn = true; syncPanel(); go("tune-ups"); }
-  });
-
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") { closeMenus(); var p = $("#proto-panel"); if (!p.hidden) { p.hidden = true; $("#proto-toggle").setAttribute("aria-expanded", "false"); $("#proto-toggle").focus(); } }
+    if (e.key === "Escape") { $("#acct-menu").hidden = true; var p = $("#proto-panel"); if (!p.hidden) { p.hidden = true; $("#proto-toggle").setAttribute("aria-expanded", "false"); $("#proto-toggle").focus(); } }
   });
 
-  function syncPanel() {
-    ["signedIn", "multi", "onPlan", "unfinished", "recent", "noSlots", "taken", "phone", "notes"].forEach(function (k) { var el = $("#ps-" + k); if (el) el.checked = !!S[k]; });
-    $("#ps-recent-label").textContent = "Recent tune-up at " + HOMES[recentHome()].addr.replace(/^\d+\s/, "");
-  }
-
+  function sync() { ["multi", "onPlan", "unfinished", "recent", "noSlots", "taken", "phone", "notes"].forEach(function (k) { var el = $("#ps-" + k); if (el) el.checked = !!S[k]; }); }
   window.addEventListener("hashchange", route);
-  if (window.ResizeObserver) new ResizeObserver(function () { placeProto(); }).observe($("#app"));
-  syncPanel();
-  route();
+  if (window.ResizeObserver) new ResizeObserver(drawDock).observe($("#app"));
+  sync(); route();
 })();
 </script>
 
