@@ -148,14 +148,6 @@ h1[tabindex="-1"]:focus { outline: none; }
 .back { margin-bottom: var(--s-24); }
 .fhead { display: flex; align-items: center; gap: var(--s-24); margin-bottom: var(--s-24); }
 .fhead__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--s-8); }
-.fhead__art { display: none; flex: none; width: 220px; }
-.fhead__art svg { display: block; width: 100%; height: auto; border-radius: var(--r-inner); }
-.fhead.is-hero { padding: var(--s-24) var(--s-24) var(--s-24) var(--s-32); border-radius: var(--r-card); background: var(--blue-tint); }
-.fhead.is-hero .fhead__art { display: block; }
-.fhead.is-hero .t-desc { color: var(--ink); }
-.fhead.is-hero .result__icon { background: var(--surface); }
-.eyebrow { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--blue-text); }
-.eyebrow .i { width: 18px; height: 18px; }
 .result__icon { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--blue-tint); color: var(--blue-text); margin-bottom: var(--s-8); }
 .result__icon .i { width: 28px; height: 28px; }
 
@@ -243,23 +235,19 @@ legend { padding: 0; }
 .perk { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--r-pill); background: var(--surface); color: var(--ink); font-size: 14px; line-height: 20px; font-weight: 600; }
 .perk .i { width: 16px; height: 16px; color: var(--blue-text); }
 .message--plan { align-items: flex-start; padding: var(--s-20); }
-.total__left { display: flex; align-items: center; gap: var(--s-12); }
-.total__left .tile { background: var(--surface); }
-.sum-card { padding: 0; overflow: hidden; }
-.sum-card__art { background: var(--blue-tint); }
-.sum-card__art svg { display: block; width: 100%; height: 120px; }
-.sum-card__body { padding: var(--s-24); }
+.tile--tint { background: var(--blue-tint); }
+.factions--total { align-items: flex-end; border-top: 2px solid var(--ink); }
+.ftotal { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ftotal__label { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
+.ftotal__row { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s-8); }
+.ftotal__amt { font-size: 28px; line-height: 36px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ftotal__sub { font-size: 14px; line-height: 20px; color: var(--text-2); }
 .tcard__per { font-size: 14px; line-height: 20px; }
 .tcard__retail { font-size: 14px; line-height: 20px; color: var(--text-2); }
 .tcard__retail s { text-decoration-thickness: 1px; }
 .tcard__desc { font-size: 14px; line-height: 20px; color: var(--text-2); }
 .opt:has(input:checked) .tcard__desc { color: var(--ink); }
 
-.total { display: flex; align-items: center; justify-content: space-between; gap: var(--s-16); margin-top: var(--s-24); padding: var(--s-20); border-radius: var(--r-inner); background: var(--page); }
-.total__label { font-size: 14px; line-height: 20px; color: var(--text-2); }
-.total__what { font-size: 16px; line-height: 24px; font-weight: 600; }
-.total__amt { font-size: 32px; line-height: 40px; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
-.total__amt small { display: block; font-size: 14px; line-height: 20px; font-weight: 400; color: var(--text-2); }
 
 /* Step 3: calendar and times (reference pattern) */
 .rec { display: flex; align-items: center; gap: var(--s-16); margin-bottom: var(--s-24); padding: var(--s-16) var(--s-20); border-radius: var(--r-inner); background: var(--blue-tint); }
@@ -330,21 +318,8 @@ legend { padding: 0; }
 .skel__lines { flex: 1; display: flex; flex-direction: column; gap: 8px; }
 .skel__line { height: 12px; border-radius: 6px; background: var(--skel); }
 .promo { padding: 0; overflow: hidden; }
-.promo__art { display: block; width: 100%; height: auto; max-width: 100%; }
 .promo__body { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-8); padding: var(--s-24); }
 .promo__body .btn { margin-top: var(--s-12); }
-.art-bg { fill: var(--blue-tint); }
-.art-wall { fill: var(--surface); }
-.art-line { fill: none; stroke: var(--border); stroke-width: 2; }
-.art-ink { fill: none; stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; }
-.art-unit { fill: var(--surface); }
-.art-grille { fill: var(--blue-tint); }
-.art-slate { fill: none; stroke: var(--slate); stroke-width: 2; }
-.art-blade { fill: var(--blue); }
-.art-hub { fill: var(--ink); }
-.art-pad { fill: var(--border); }
-.art-pipe { fill: none; stroke: var(--slate); stroke-width: 4; stroke-linecap: round; }
-.art-sun { fill: var(--yellow); }
 
 .fdock { display: none; }
 .m-only { display: none !important; }
@@ -399,12 +374,6 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
   .opt { padding: var(--s-16); }
   .tcards { grid-template-columns: minmax(0, 1fr); }
   .tcard__amt { font-size: 26px; line-height: 34px; }
-  .fhead.is-hero { padding: var(--s-16) var(--s-16) var(--s-16) var(--s-20); gap: var(--s-12); }
-  .fhead__art { width: 112px; }
-  .fhead.is-hero .t-display { font-size: 22px; line-height: 30px; }
-  .sum-card__body { padding: var(--s-16); }
-  .total { padding: var(--s-16); }
-  .total__amt { font-size: 28px; line-height: 36px; }
   .book { grid-template-columns: minmax(0, 1fr); gap: var(--s-24); }
   .cal__day { width: min(44px, 100%); border-radius: 22px; }
   .vcard { grid-template-columns: 64px minmax(0, 1fr); padding: var(--s-16); gap: var(--s-16); }
@@ -488,11 +457,9 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
       <section class="fhead" id="fhead" aria-label="Page title">
         <div class="fhead__text">
           <span class="result__icon" id="f-icon" hidden><svg class="i" aria-hidden="true"><use id="f-icon-use" href="#ri-checkbox-circle-line"/></svg></span>
-          <span class="eyebrow" id="eyebrow" hidden><svg class="i" aria-hidden="true"><use href="#ri-snowy-line"/></svg>HVAC tune-up</span>
           <h1 class="t-display" id="h1" tabindex="-1">Schedule your HVAC tune-up</h1>
           <p class="t-desc" id="sub"></p>
         </div>
-        <div class="fhead__art" id="fhead-art" aria-hidden="true"></div>
       </section>
       <div class="layout" id="layout">
         <div class="main">
@@ -505,7 +472,7 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
           <section class="card plain" data-view="notdue" aria-label="Not due yet" hidden></section>
         </div>
         <aside class="rail" id="rail" aria-label="Summary">
-          <section class="card sum-card" id="r-summary" aria-labelledby="sum-title" hidden></section>
+          <section class="card" id="r-summary" aria-labelledby="sum-title" hidden></section>
           <section class="card promo" id="r-promo" aria-labelledby="promo-title" hidden></section>
         </aside>
       </div>
@@ -688,19 +655,9 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
     sec.innerHTML = '<div class="main">' + skel("Upcoming", 1) + skel("Recommendations", 3) +
       bnote("Existing dashboard content is shown as placeholders. The promotion links to the same <code>/tune-ups</code> URL as the emails.") + '</div>';
   }
-  function art(cls, extra) {
-    return '<svg class="' + cls + '" viewBox="0 0 380 160" ' + (extra || "") + '>' +
-      '<rect class="art-bg" width="380" height="160"/><circle class="art-sun" cx="334" cy="36" r="15"/>' +
-      '<rect class="art-wall" width="108" height="160"/><path class="art-line" d="M0 32H108M0 62H108M0 92H108M0 122H108"/><path class="art-ink" d="M108 0V160"/>' +
-      '<rect class="art-pad" x="142" y="138" width="166" height="11" rx="4"/><path class="art-pipe" d="M108 104H132Q142 104 142 94V88"/>' +
-      '<rect class="art-unit art-ink" x="146" y="36" width="156" height="102" rx="12"/><path class="art-slate" d="M272 54V120M282 54V120M262 54V120"/>' +
-      '<circle class="art-grille art-ink" cx="204" cy="87" r="36"/><circle class="art-slate" cx="204" cy="87" r="24"/>' +
-      '<g transform="translate(204 87)"><ellipse class="art-blade" rx="8" ry="19" transform="translate(0 -13)"/><ellipse class="art-blade" rx="8" ry="19" transform="rotate(120) translate(0 -13)"/><ellipse class="art-blade" rx="8" ry="19" transform="rotate(240) translate(0 -13)"/></g>' +
-      '<circle class="art-hub" cx="204" cy="87" r="5"/></svg>';
-  }
   function renderPromo() {
-    $("#r-promo").innerHTML = art("promo__art", 'role="img" aria-label="Outdoor air conditioning unit"') +
-      '<div class="promo__body"><h2 class="t-title" id="promo-title">Time for your HVAC tune-up</h2>' +
+    $("#r-promo").innerHTML =
+      '<div class="promo__body"><span class="tile tile--tint">' + ic("ri-snowy-line") + '</span><h2 class="t-title" id="promo-title">Time for your HVAC tune-up</h2>' +
       '<p class="t-desc">From <strong class="t-strong" style="color:var(--ink)">$29</strong> per system for members.</p>' +
       '<a class="btn btn--primary btn--lg" href="#tune-ups">Schedule my tune-up</a></div>';
   }
@@ -738,20 +695,17 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
     }
     sec.innerHTML = planMessage() +
       '<fieldset><legend class="sr-only">Tune-up type</legend><div class="tcards">' + card("standard") + card("comprehensive") + '</div></fieldset>' +
-      '<div class="total" aria-live="polite"><div class="total__left"><span class="tile">' + ic("ri-snowy-line") + '</span><div><p class="total__what">' + systemsWord(n) + '</p><p class="total__label">at this home</p></div></div>' +
-      '<p class="total__amt" id="tot-amt">' + totalHtml() + '</p></div>' +
       bnote("Continue creates the booking in READY: the OFFSEASON Standard or Comprehensive service type, one task per system, <code>adjusted_total</code> = price × systems (PFX-593). The final bill comes from the Housecall Pro invoice, so the technician can adjust the system count (PFX-596).") +
-      factions("Continue to scheduling", "");
+      '<div class="factions factions--total"><div class="ftotal" id="st" aria-live="polite">' + totalHtml() + '</div>' +
+      '<button class="btn btn--primary btn--lg" type="button" data-next>Continue to scheduling</button></div>';
   }
   function totalHtml() {
     var T = TYPES[S.type], n = systems();
-    return money(total()) + '<small>You save ' + money((T.retail - T.price) * n) + ' · billed after your visit</small>';
+    return '<span class="ftotal__label">Estimated total</span>' +
+      '<span class="ftotal__row"><span class="ftotal__amt">' + money(total()) + '</span><span class="save">Save ' + money((T.retail - T.price) * n) + '</span></span>' +
+      '<span class="ftotal__sub">' + systemsWord(n) + (n > 1 ? " × " + money(T.price) : "") + ' · Billed after your visit</span>';
   }
-  function drawTotal() {
-    var n = systems(), el = $("#tot-amt");
-    if (el) el.innerHTML = totalHtml();
-    updateSide();
-  }
+  function drawTotal() { updateSide(); }
 
   function renderTime(sec) {
     var top = "";
@@ -811,14 +765,14 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
     var when = S.date && S.time !== null
       ? longDate(parse(S.date)) + '<span class="sum__sub">' + range(S.time, duration()) + '</span>'
       : '<span class="sum__empty">Pick a date and time</span>';
-    $("#r-summary").innerHTML = '<div class="sum-card__art" aria-hidden="true">' + art("") + '</div><div class="sum-card__body">' +
+    $("#r-summary").innerHTML =
       '<div class="d-head"><h2 class="t-title" id="sum-title">Your tune-up</h2></div><dl class="sum">' +
       '<div class="sum__row"><dt class="sum__label">When</dt><dd class="sum__val">' + when + '</dd></div>' +
       '<div class="sum__row"><dt class="sum__label">Tune-up</dt><dd class="sum__val">' + TYPES[S.type].name + '<span class="sum__sub">' + systemsWord(n) + '</span></dd></div>' +
       '<div class="sum__row"><dt class="sum__label">Home</dt><dd class="sum__val">' + h.addr + '<span class="sum__sub">' + h.city + '</span></dd></div>' +
       (S.onPlan ? "" : '<div class="sum__row"><dt class="sum__label">HVAC Plan</dt><dd class="sum__val sum__plan">' + ic("ri-shield-check-line") + 'Free, starts with this booking</dd></div>') +
       '</dl><div class="ledger"><span class="ledger__label">Estimated total</span><span class="ledger__amt">' + money(total()) + '</span></div>' +
-      '<p class="ledger__foot">Billed after your visit.</p></div>';
+      '<p class="ledger__foot">Billed after your visit.</p>';
   }
 
   function visitCard(homeId, b) {
@@ -855,13 +809,13 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
   function statusText() {
     var v = S.view;
     if (v === "home") return S.home && selectable(S.home) ? "<strong>" + HOMES[S.home].addr + "</strong>" : "";
-    if (v === "tuneup") return "<strong>" + money(total()) + "</strong> · " + bookingText(S.type, systems());
+    if (v === "tuneup") { var n = systems(); return "<strong>" + money(total()) + "</strong> estimated · " + systemsWord(n) + (n > 1 ? " × " + money(TYPES[S.type].price) : ""); }
     if (v === "time") return S.date && S.time !== null ? "<strong>" + shortDate(parse(S.date)) + ", " + t12(S.time) + "</strong> · " + money(total()) + " estimated" : "Pick a date and time";
     return "";
   }
   function updateSide() {
     if (S.view === "time" && !S.noSlots) renderSummary();
-    var st = $('[data-view="' + S.view + '"] #st'); if (st) st.innerHTML = (S.view === "time" || S.view === "tuneup") ? "" : statusText();
+    var st = $('[data-view="' + S.view + '"] #st'); if (st) st.innerHTML = S.view === "tuneup" ? totalHtml() : S.view === "time" ? "" : statusText();
     drawDock();
   }
   function drawDock() {
@@ -926,11 +880,6 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
     $("#h1").textContent = V.h1();
     var sub = V.sub ? V.sub() : ""; $("#sub").textContent = sub; $("#sub").hidden = !sub;
     $("#f-icon").hidden = !V.icon; if (V.icon) $("#f-icon-use").setAttribute("href", "#" + V.icon);
-    var hero = view === "booked" || (idx === 0);
-    $("#fhead").classList.toggle("is-hero", hero);
-    $("#fhead").style.maxWidth = V.layout === "single" ? "760px" : "";
-    $("#eyebrow").hidden = !hero || view === "booked";
-    $("#fhead-art").innerHTML = hero ? art("") : "";
     $("#layout").className = "layout" + (V.layout ? " layout--" + V.layout : "");
     $("#r-summary").hidden = !(V.rail === "summary" && !S.noSlots);
     if (view === "time" && S.noSlots) $("#layout").className = "layout layout--single";
