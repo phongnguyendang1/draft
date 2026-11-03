@@ -7,7 +7,7 @@ Prototype: `request-flow-wizard-desktop.html` (1280) and `request-flow-wizard-mo
 Finish one job completely, then decide whether to add another. Every choice that can move you on with one tap does; a button only appears where there is something to type or confirm. There is **no separate quick-check step**: each job gets its own questions, **every question is specific to that task and answered on its own**. There are no separate "job-specific" and "general" sets. A job that fails any question is **not eligible**: the list, the review page, the summary and the confirmation page all split **Eligible for Fast Fix** from **Requires Service Request**. Eligible jobs are **always booked as Fast Fix**; jobs that are not eligible are **never** pulled into a "send everything to a service request": the service request for them is submitted automatically when the member taps the yellow button on the plan page, and the confirmation page confirms it. Eligible work past 3 hours becomes **as many separate Fast Fix visits as it takes**, booked one after another.
 
 ```
-Request type -> Fast Fix
+Request type -> Service request (one card; Account stays separate)
  1 Your jobs   Pick a job        tap a category, tap a job; or search and tap  -> moves on
                Describe it       How many? + required comment + optional photos      [Continue]
                Questions         each question on its own, Yes / No (some with Not sure)
@@ -16,6 +16,19 @@ Request type -> Fast Fix
  2 Pick a time -> Booked (one card per visit), with the Service Request module if any job was not eligible
                Reschedule or cancel  Your visits (cards with Reschedule / Cancel visit) -> pick a new time, or a Cancel visit confirmation
 ```
+
+## Single entry point (the option in Mark's deck)
+
+The deck proposes one entry instead of Fast Fix, a separate Service request and the old service request tree. It is built as the default, with a switch in "Prototype states" (**Single entry point**) that turns the classic two-card entry back on. Execs have not chosen yet.
+
+- **Entry screen:** one **Service request** card ("Tell us what needs fixing. Small jobs can be booked right away, and anything bigger goes to our team.") plus Account. The gas/911 banner stays. "Fast Fix" is no longer an entry card; it remains the name of the bookable group on the list, plan and confirmation pages.
+- **Picker:** the 10 categories, then **Specialty services** (HVAC, Carpentry, Painting) and **Other**. Each category list ends with **Other**. Specialty rows and Other are always service requests.
+- **Task types:** a task is either *Fast Fix* (has questions, can be booked) or *service request* (always goes to our team: no questions, never booked). Service request tasks are added to categories from the old tree (Locked out of the home, Garage door won't open or close, Major water leak or burst pipe, No water or no hot water, Power out or sparking outlet, Appliance stopped working, Roof or structural damage). These are **high priority**: they sit at the top of their category and the request goes in as high priority. The member never sees a "priority" label; the plan page, confirmation and sent page add "We'll reach out today." (copy to confirm with Ops).
+- **Service request tasks in the flow:** pick it, describe it (required comment, photos), no questions, straight to **Requires Service Request** with the reason "Our team handles this kind of job." The plan page and the sent page word it accordingly ("This needs a service request", "This job needs our team, so we sent it as a service request").
+- **The bottom "Submit a service request" link on the picker is removed** (Other replaces it).
+- **Confirmation:** the Service request submitted card links to **View your service request** (the Service requests page; the dashboard only lists bookings).
+- **Second switch:** **Vetting questions are blank** shows numbered placeholders ("[Question 1 to be provided by Ops]") so stakeholders have to supply the real questions.
+- **Not decided or not built:** contractor list (old flow offered "See contractor list"), after-hours behavior, standby queue, mapping each symptom to the Home Manager task, the new workbook columns (type, priority, contractor category, mapped task). The to-dos copy change and the Home Manager portal are separate.
 
 ## Screens
 

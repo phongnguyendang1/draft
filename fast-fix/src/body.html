@@ -109,7 +109,17 @@
           </div>
 
           <ul class="types" aria-label="Request types">
-            <li>
+            <li class="entry-single wizard-only">
+              <a class="type type--single" href="#/job" data-go="job">
+                <span class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-tools-line"/></svg></span>
+                <span class="type__body">
+                  <span class="type__title">Service request</span>
+                  <span class="type__desc">Tell us what needs fixing. Small jobs can be booked right away, and anything bigger goes to our team.</span>
+                </span>
+                <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
+              </a>
+            </li>
+            <li class="entry-classic">
               <a class="type type--fast" href="#/job" data-go="job">
                 <span class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-timer-flash-line"/></svg></span>
                 <span class="type__body">
@@ -119,7 +129,7 @@
                 <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
               </a>
             </li>
-            <li>
+            <li class="entry-classic">
               <a class="type" href="#" data-handoff="Service request">
                 <span class="tile-icon"><svg class="i"><use href="#ri-tools-line"/></svg></span>
                 <span class="type__body">
@@ -178,7 +188,7 @@
               </div>
               <p class="error" id="err-sel" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Select at least one job.</span></p>
               <span class="sr-only" id="search-live" aria-live="polite"></span>
-              <p class="t-meta search__none" id="search-none" hidden>No jobs match that. Try another word, or clear the search.<span class="manual-only"> Still nothing? <button class="link" type="button" data-sr-link>Submit a service request</button></span></p>
+              <p class="t-meta search__none" id="search-none" hidden>No jobs match that. Try another word, or clear the search.<span class="manual-only"> Still nothing? <button class="link" type="button" data-sr-link>Submit a service request</button></span><span class="single-only"> Still nothing? Choose Other.</span></p>
               <div class="tree" id="tree"></div>
               <p class="sr-pointer t-meta manual-only" id="sr-pointer">Can’t find your job? Fast Fix only covers the jobs listed here. <button class="link" type="button" data-sr-link>Submit a service request</button></p>
             </div>
@@ -403,6 +413,7 @@
             <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span id="srm-t">Requires Service Request</span><span class="rv__n" id="srm-n"></span></h2>
             <p class="t-meta" id="srm-sub"></p>
             <ul class="rvlist" id="srm-list"></ul>
+            <a class="link srm__track" href="#" data-toast="Opens your service requests page">View your service request</a>
           </section>
           <div class="result__actions">
             <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>
@@ -516,6 +527,8 @@
   <div class="proto__panel" data-proto-panel hidden>
     <p class="proto__title">Prototype states</p>
     <label class="proto__opt">Member has 2 homes<span class="switch"><input type="checkbox" data-state-switch="multi" checked><span class="switch__track"></span></span></label>
+    <label class="proto__opt wizard-only">Single entry point (service request + Fast Fix)<span class="switch"><input type="checkbox" data-state-switch="single" checked><span class="switch__track"></span></span></label>
+    <label class="proto__opt wizard-only">Vetting questions are blank (to be provided)<span class="switch"><input type="checkbox" data-state-switch="blankq"><span class="switch__track"></span></span></label>
     <label class="proto__opt">No open times<span class="switch"><input type="checkbox" data-state-switch="noslots"><span class="switch__track"></span></span></label>
     <label class="proto__opt">Chosen time just taken<span class="switch"><input type="checkbox" data-state-switch="taken"><span class="switch__track"></span></span></label>
     <label class="proto__opt finder-only">Matching is unavailable<span class="switch"><input type="checkbox" data-state-switch="finderdown"><span class="switch__track"></span></span></label>

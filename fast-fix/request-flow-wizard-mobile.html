@@ -487,14 +487,14 @@ h1[tabindex="-1"]:focus { outline: none; }
   transition: border-color .15s ease, background-color .15s ease;
 }
 .type:hover { border-color: var(--blue); }
-.type--fast { background: var(--blue-tint); border-color: var(--blue-tint); }
+.type--fast, .type--single { background: var(--blue-tint); border-color: var(--blue-tint); }
 .type--urgent { background: var(--red-tint); border-color: var(--red-tint); }
 .type--urgent:hover { border-color: var(--red); }
 .type .d-chev { align-self: center; }
 .type__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--s-4); }
 .type__title { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s-8); font-size: 16px; line-height: 24px; font-weight: 600; }
 .type__desc { color: var(--text-2); }
-.type--urgent .type__desc, .type--fast .type__desc { color: var(--ink); }
+.type--urgent .type__desc, .type--fast .type__desc, .type--single .type__desc { color: var(--ink); }
 .tile-icon--red { background: var(--red); color: #fff; }
 .type:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; }
 
@@ -1119,6 +1119,14 @@ body.variant-wizard[data-screen="manage"] .rail, body.variant-wizard[data-screen
 .cn__actions .btn { width: 100%; }
 @media (max-width: 480px) { .vcard { grid-template-columns: 56px minmax(0, 1fr); padding: var(--s-16); gap: var(--s-12); } .vcard__tile { width: 56px; height: 64px; } .vcard__day { font-size: 24px; line-height: 28px; } .vcard__when { font-size: 18px; line-height: 26px; } .vcard__acts .btn { flex: 1 1 100%; } }
 
+/* ---------- Single entry point (deck option): one entry card, specialty rows ---------- */
+body.is-single .entry-classic { display: none; }
+body:not(.is-single) .entry-single { display: none; }
+.pk__head--sub { margin-top: var(--s-24); }
+.srm__track { display: inline-block; margin-top: var(--s-16); min-height: 44px; line-height: 44px; }
+body.is-single #sr-pointer, body.is-single #search-none .manual-only { display: none; }
+body:not(.is-single) .single-only { display: none; }
+
 </style>
 </head>
 <body class="frame-mobile variant-wizard">
@@ -1234,7 +1242,17 @@ body.variant-wizard[data-screen="manage"] .rail, body.variant-wizard[data-screen
           </div>
 
           <ul class="types" aria-label="Request types">
-            <li>
+            <li class="entry-single wizard-only">
+              <a class="type type--single" href="#/job" data-go="job">
+                <span class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-tools-line"/></svg></span>
+                <span class="type__body">
+                  <span class="type__title">Service request</span>
+                  <span class="type__desc">Tell us what needs fixing. Small jobs can be booked right away, and anything bigger goes to our team.</span>
+                </span>
+                <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
+              </a>
+            </li>
+            <li class="entry-classic">
               <a class="type type--fast" href="#/job" data-go="job">
                 <span class="tile-icon tile-icon--tint"><svg class="i"><use href="#ri-timer-flash-line"/></svg></span>
                 <span class="type__body">
@@ -1244,7 +1262,7 @@ body.variant-wizard[data-screen="manage"] .rail, body.variant-wizard[data-screen
                 <svg class="i d-chev"><use href="#ri-arrow-right-s-line"/></svg>
               </a>
             </li>
-            <li>
+            <li class="entry-classic">
               <a class="type" href="#" data-handoff="Service request">
                 <span class="tile-icon"><svg class="i"><use href="#ri-tools-line"/></svg></span>
                 <span class="type__body">
@@ -1303,7 +1321,7 @@ body.variant-wizard[data-screen="manage"] .rail, body.variant-wizard[data-screen
               </div>
               <p class="error" id="err-sel" role="alert" hidden><svg class="i"><use href="#ri-error-warning-fill"/></svg><span>Select at least one job.</span></p>
               <span class="sr-only" id="search-live" aria-live="polite"></span>
-              <p class="t-meta search__none" id="search-none" hidden>No jobs match that. Try another word, or clear the search.<span class="manual-only"> Still nothing? <button class="link" type="button" data-sr-link>Submit a service request</button></span></p>
+              <p class="t-meta search__none" id="search-none" hidden>No jobs match that. Try another word, or clear the search.<span class="manual-only"> Still nothing? <button class="link" type="button" data-sr-link>Submit a service request</button></span><span class="single-only"> Still nothing? Choose Other.</span></p>
               <div class="tree" id="tree"></div>
               <p class="sr-pointer t-meta manual-only" id="sr-pointer">Can’t find your job? Fast Fix only covers the jobs listed here. <button class="link" type="button" data-sr-link>Submit a service request</button></p>
             </div>
@@ -1528,6 +1546,7 @@ body.variant-wizard[data-screen="manage"] .rail, body.variant-wizard[data-screen
             <h2 class="t-strong rv__h"><svg class="i" aria-hidden="true"><use href="#ri-checkbox-circle-line"/></svg><span id="srm-t">Requires Service Request</span><span class="rv__n" id="srm-n"></span></h2>
             <p class="t-meta" id="srm-sub"></p>
             <ul class="rvlist" id="srm-list"></ul>
+            <a class="link srm__track" href="#" data-toast="Opens your service requests page">View your service request</a>
           </section>
           <div class="result__actions">
             <a class="btn btn--primary" href="#" data-handoff="Dashboard">Back to dashboard</a>
@@ -1641,6 +1660,8 @@ body.variant-wizard[data-screen="manage"] .rail, body.variant-wizard[data-screen
   <div class="proto__panel" data-proto-panel hidden>
     <p class="proto__title">Prototype states</p>
     <label class="proto__opt">Member has 2 homes<span class="switch"><input type="checkbox" data-state-switch="multi" checked><span class="switch__track"></span></span></label>
+    <label class="proto__opt wizard-only">Single entry point (service request + Fast Fix)<span class="switch"><input type="checkbox" data-state-switch="single" checked><span class="switch__track"></span></span></label>
+    <label class="proto__opt wizard-only">Vetting questions are blank (to be provided)<span class="switch"><input type="checkbox" data-state-switch="blankq"><span class="switch__track"></span></span></label>
     <label class="proto__opt">No open times<span class="switch"><input type="checkbox" data-state-switch="noslots"><span class="switch__track"></span></span></label>
     <label class="proto__opt">Chosen time just taken<span class="switch"><input type="checkbox" data-state-switch="taken"><span class="switch__track"></span></span></label>
     <label class="proto__opt finder-only">Matching is unavailable<span class="switch"><input type="checkbox" data-state-switch="finderdown"><span class="switch__track"></span></span></label>
@@ -1674,6 +1695,8 @@ body.variant-wizard[data-screen="manage"] .rail, body.variant-wizard[data-screen
    ex (placeholder for the required comment), ko (placeholder knockout questions: Yes is always the right answer). */
 var CATALOG = [
   { id: "plumbing", title: "Plumbing", icon: "ri-drop-line", kw: "plumber pipe pipes water sink toilet faucet drain leak", jobs: [
+    { id: "major-water-leak-or-burst-pipe", title: "Major water leak or burst pipe", kw: "burst pipe, flooding, water everywhere, pipe leaking, water leak, ceiling leak, sewage backup, water gushing", min: 60, ex: "Example: A pipe under the kitchen sink burst and water is on the floor. I shut off the valve.", sr: true, pri: "high" },
+    { id: "no-water-or-no-hot-water", title: "No water or no hot water", kw: "no water, no hot water, water heater broken, cold shower, water outage, pilot light out, no running water", min: 60, ex: "Example: There has been no hot water in the whole house since last night.", sr: true, pri: "high" },
     { id: "running-toilet", title: "Running toilet", kw: "toilet keeps running, toilet won't stop, toilet runs, flapper, fill valve, hissing toilet, phantom flush, toilet chain, slow refill, weak flush", min: 30, ex: "Example: Upstairs toilet keeps running after flushing and I hear hissing from the tank all night.", kq: ["Is the tank free of cracks, with no water leaking onto the floor?"], kc: ["The tank has no cracks and no water is leaking onto the floor"], ko: ["Is the tank free of cracks, with no water leaking onto the floor?"], kg: {"ladder": {"q": "Is the toilet tank at normal height, so you can reach inside it from the floor?", "h": "Some old toilets have the tank high up on the wall."}, "trade": {"q": "Are you only fixing or swapping parts of this toilet, with no new water pipe to add or move?", "h": "The water line already going to the toilet stays as it is."}, "part": {"q": "Do you have a toilet repair kit or the new flapper or fill valve for your tank?", "h": "The flapper is the rubber stopper at the bottom of the tank."}} },
     { id: "replace-a-kitchen-or-bathroom-faucet", title: "Replace a kitchen or bathroom faucet", kw: "replace faucet, install faucet, new faucet, kitchen faucet, bathroom faucet, swap tap, faucet install, sink faucet, change faucet", min: 60, ex: "Example: Swap the old kitchen faucet for the new single-handle one I bought, same sink holes.", kq: ["Do the shutoff valves under the sink turn and stop the water?", "Does the new faucet use the same number of holes as your sink has now?"], kc: ["The shutoff valves under the sink turn and stop the water", "The new faucet uses the same number of holes as your sink has now"], ko: ["Do the shutoff valves under the sink turn and stop the water?"], kg: {"ladder": {"q": "Can you reach the faucet and the space under the sink from the floor, with no ladder?", "h": ""}, "trade": {"q": "Are you only swapping the old faucet, with no new water pipes or moved sink drain?", "h": "Hooking up to the water pipes already there is fine."}, "part": {"q": "Do you have the new faucet for your sink?", "h": ""}} },
     { id: "dripping-or-weak-sink-faucet", title: "Dripping or weak sink faucet", kw: "leaky faucet, dripping faucet, faucet drip, tap leak, faucet leak, cartridge, washer, O-ring, aerator, low water pressure faucet, clogged aerator", min: 60, ex: "Example: Bathroom sink faucet drips constantly from the spout even when the handle is turned off.", kq: ["Is the leak at the faucet spout or handle, not from the pipes below or the wall?"], kc: ["The leak is at the faucet spout or handle, not from the pipes below or the wall"], ko: ["Is the leak at the faucet spout or handle, not from the pipes below or the wall?"], kg: {"ladder": {"q": "Can you reach the faucet and the area under the sink from the floor, with no ladder?", "h": ""}, "trade": {"q": "Is it only repairing the faucet you have, with no new water pipe to add or move?", "h": "Fixing parts inside the faucet is fine."}, "part": {"q": "Do you have the new cartridge, washers or other part for your faucet, if it needs one?", "h": "A cartridge is the part inside the handle that controls the water."}} },
@@ -1690,6 +1713,8 @@ var CATALOG = [
     { id: "protect-pipes-and-faucets-from-freezing", title: "Protect pipes and faucets from freezing", kw: "winterize outdoor faucet, spigot cover, hose bib cover, wrap exposed pipes, pipe insulation, freeze protection, freeze prep, prevent frozen pipes, cold snap, disconnect hoses", min: 60, ex: "Example: Freeze coming this week. Need covers on two outdoor spigots and wrap on exposed garage pipes.", kq: ["Are the pipes and faucets thawed, with no leaks right now?", "Are all the pipes in a garage or open area, not an attic or crawlspace?"], kc: ["The pipes and faucets are thawed", "There are no leaks right now", "All the pipes are in a garage or open area, not an attic or crawlspace"], ko: ["Are the pipes and faucets thawed, with no leaks right now?"], kg: {"ladder": {"q": "Can you reach all the pipes and faucets you want covered from the floor or a step ladder?", "h": "Check pipes along the garage ceiling or high on the wall."}, "trade": {"q": "Are you only wrapping the pipes and faucets, with no new pipe and no new wiring for a heat cable?", "h": "Foam pipe sleeves and faucet covers are fine."}, "part": {"q": "Do you have the foam pipe sleeves, tape and faucet covers you plan to use?", "h": "Sleeves come in sizes, so match them to your pipe width."}} },
   ] },
   { id: "doors", title: "Doors & Locks", icon: "ri-door-lock-line", kw: "door lock key knob hinge latch deadbolt entry", jobs: [
+    { id: "locked-out-of-the-home", title: "Locked out of the home", kw: "locked out, lockout, lost keys, key stuck, cannot get in, locksmith, door will not unlock, keys inside", min: 60, ex: "Example: I am locked out of the front door and nobody is inside.", sr: true, pri: "high" },
+    { id: "garage-door-will-not-open-or-close", title: "Garage door won't open or close", kw: "garage door stuck, garage door broken, garage opener, garage spring, garage door off track, garage door will not close", min: 60, ex: "Example: The garage door stopped halfway and the car is stuck inside.", sr: true, pri: "high" },
     { id: "door-sticks-rubs-or-won-t-latch", title: "Door sticks, rubs or won't latch", kw: "sticking door, door rubs, door won't close, door won't latch, strike plate, squeaky door, door hinge, sagging door, misaligned door, door adjust", min: 60, ex: "Example: Bedroom door rubs at the top corner and doesn't click shut unless I push hard.", kq: ["Is the door itself in good shape, not warped or cracked?"], kc: ["The door itself is in good shape, not warped or cracked"], ko: ["Is the door itself in good shape, not warped or cracked?"], kg: {"ladder": {"q": "Can you reach the top of the door and its top hinge from the floor or a standard step ladder?", "h": "Think of extra tall doors in a room with a high ceiling."}, "trade": {"q": "Is it only fixing the door, hinges or latch you have now, with no frame to rebuild or replace?", "h": "Sanding the edge or tightening hinges is fine."}, "part": {"q": "Do you have the new latch, hinge or strike plate, if the door needs one?", "h": "The strike plate is the metal piece on the frame where the latch goes."}} },
     { id: "replace-a-deadbolt-or-entry-lock", title: "Replace a deadbolt or entry lock", kw: "replace deadbolt, change lock, door lock, entry door lock, new deadbolt, lockset, lock replacement, broken lock, swap lock", min: 60, ex: "Example: Swap the old front door deadbolt for the new one I bought, same holes in the door.", kq: ["Does the new lock fit the existing holes in the door, with no new drilling?", "Is the new lock a standard key deadbolt or lockset, not a smart lock?"], kc: ["The new lock fits the existing holes in the door, with no new drilling", "The new lock is a standard key deadbolt or lockset, not a smart lock"], ko: ["Does the new lock fit the existing holes in the door, with no new drilling?"], kg: {"ladder": {"q": "Can you reach the lock on the door from the floor or a standard step ladder?", "h": "Tall double doors sometimes have a lock set up high."}, "trade": {"q": "Are you only swapping the old lock, with no wiring or door alarm hookup to deal with?", "h": "Think of an alarm sensor or an electric latch that is wired to the door."}, "part": {"q": "Do you have the new deadbolt or lockset?", "h": "Check that the box has the keys and screws too."}} },
     { id: "draft-coming-in-around-an-outside-door", title: "Draft coming in around an outside door", kw: "weatherstripping, door sweep, draft under door, door seal, door bottom gap, stop drafts, door gasket, exterior door seal, light under door", min: 30, ex: "Example: Cold air and light come in under our front door, and the old seal is crumbling.", kq: ["Is the gap just worn seals or a loose sweep, not a warped or damaged door?"], kc: ["The gap is from worn seals or a loose sweep, not a warped or damaged door"], ko: ["Is the gap just worn seals or a loose sweep, not a warped or damaged door?"], kg: {"ladder": {"q": "Can you reach the top of the door frame from the floor or a standard step ladder?", "h": "Think of a tall door or one under a high porch ceiling."}, "trade": {"q": "Can the strip on the floor under the door, called the threshold, stay as it is?", "h": ""}, "part": {"q": "Do you have the new door seals or door sweep to put on?", "h": "A hardware store can match the old seal if you bring a piece."}} },
@@ -1724,6 +1749,7 @@ var CATALOG = [
     { id: "mount-a-towel-bar-or-toilet-paper-holder", title: "Mount a towel bar or toilet paper holder", kw: "towel bar, toilet paper holder, towel ring, robe hook, bathroom hardware, towel hook, shower rod, bath accessories, bathroom accessories", min: 30, ex: "Example: Hang a towel bar and toilet paper holder in the guest bath, plus two robe hooks.", kq: ["Is it towel or paper hardware, not a grab bar you will lean on?"], kc: ["It is towel or paper hardware, not a grab bar you will lean on"], ko: ["Is it towel or paper hardware, not a grab bar you will lean on?"], kg: {"ladder": {"q": "Can you reach the spot for the towel bar or holder from the floor or a standard step ladder?", "h": ""}, "trade": {"q": "Is it only a plain towel bar or holder, with no heated or electric parts that need wiring?", "h": "Heated towel bars plug in or are wired into the wall."}, "part": {"q": "Do you have the towel bar or toilet paper holder you want to mount?", "h": "The box should have the screws and anchors."}} },
   ] },
   { id: "electrical", title: "Lighting & Electrical Swaps", icon: "ri-lightbulb-line", kw: "light fixture outlet switch fan bulb doorbell electric plug lamp", jobs: [
+    { id: "power-out-or-sparking-outlet", title: "Power out or sparking outlet", kw: "no power, power out, breaker keeps tripping, sparking, burning smell outlet, electrical hazard, shock, lights out", min: 60, ex: "Example: Half of the house lost power and the breaker will not stay on.", sr: true, pri: "high" },
     { id: "replace-a-ceiling-fan", title: "Replace a ceiling fan", kw: "replace ceiling fan, install ceiling fan, swap fan, ceiling fan swap, new ceiling fan, fan with light, fan light kit, wobbly old fan", min: 90, ex: "Example: Swap the old fan in our living room for the new 52-inch fan I already bought.", kq: ["Is the old fan mounted solidly, with no wobble coming from the ceiling box?", "Is there already a ceiling fan (not just a light) where the new fan goes?"], kc: ["There is already a ceiling fan (not just a light) where the new fan goes", "The old fan is mounted solidly, with no wobble from the ceiling box"], ko: ["Is the old fan mounted solidly, with no wobble coming from the ceiling box?"], kg: {"ladder": {"q": "Can you reach the spot on the ceiling where the fan mounts with a standard step ladder?", "h": "Vaulted ceilings and stairwells are often too high."}, "trade": {"q": "Will the new fan connect to the wires and wall switch the old fan uses, with no new wires to add?", "h": "Wires already at the old fan are fine to use."}, "part": {"q": "Do you have the new ceiling fan and the parts that came with it?", "h": ""}} },
     { id: "replace-an-indoor-ceiling-or-wall-light", title: "Replace an indoor ceiling or wall light", kw: "replace light fixture, install light, swap light, ceiling light, vanity light, flush mount, wall light, change light fixture, new light fixture", min: 60, ex: "Example: Swap the old dome light in our hallway for a new flush-mount light I bought.", kq: ["Is the new light a simple ceiling or wall light, not a chandelier or fan?", "Is there already a light fixture where the new one will go?"], kc: ["The new light is a simple ceiling or wall light, not a chandelier or fan", "There is already a light fixture where the new one will go"], ko: ["Is the new light a simple ceiling or wall light, not a chandelier or fan?"], kg: {"ladder": {"q": "Can you reach the ceiling or wall light from the floor or with a standard step ladder?", "h": "Tall ceilings and stairway walls are often too high."}, "trade": {"q": "Are you only swapping the old light, with no new wires or new switch to add for it?", "h": "Using the wires and switch already there is fine."}, "part": {"q": "Do you have the new light fixture ready to put up?", "h": ""}} },
     { id: "install-a-smart-thermostat", title: "Install a smart thermostat", kw: "smart thermostat, Nest, ecobee, replace thermostat, thermostat install, programmable thermostat, Wi-Fi thermostat, new thermostat, set up thermostat app", min: 60, ex: "Example: Swap the old hallway thermostat for my new smart one and connect it to my phone.", kq: ["Is your system central heating or AC, not electric baseboard heaters?", "Does the maker's compatibility checker say the new thermostat works with your system?"], kc: ["Your system is central heating or AC, not electric baseboard heaters", "The maker's compatibility checker says the new thermostat works with your system"], ko: ["Is your system central heating or AC, not electric baseboard heaters?"], kg: {"ladder": {"q": "Can you reach the old thermostat on the wall from the floor or a standard step ladder?", "h": "Think of a thermostat on a high wall, like in a stairwell."}, "trade": {"q": "Will the new thermostat go in the same spot as the old one, with no new wires to run through the wall?", "h": "Using the wires already behind the old one is fine."}, "part": {"q": "Do you have the new smart thermostat at home?", "h": ""}} },
@@ -1740,6 +1766,7 @@ var CATALOG = [
     { id: "replace-a-porch-or-outdoor-wall-light", title: "Replace a porch or outdoor wall light", kw: "porch light, outdoor light, wall sconce, exterior light, entry light, garage light, replace porch light, front door light, outside light broken", min: 60, ex: "Example: Rusty porch light by the front door needs swapping for the new fixture I bought.", kq: ["Is the wiring in the box dry and free of corrosion?", "Is there already a light fixture mounted at that spot?"], kc: ["The wiring in the box is dry and free of corrosion", "There is already a light fixture mounted at that spot"], ko: ["Is the wiring in the box dry and free of corrosion?"], kg: {"ladder": {"q": "Can you reach the outdoor wall light and its box using a standard step ladder?", "h": "Think of a high entry or a light over stairs."}, "trade": {"q": "Are you only swapping the old outdoor light for the new one, with no new wires to run or switch to add?", "h": "Using the wires already at the old light is fine."}, "part": {"q": "Do you have the new porch or outdoor wall light?", "h": ""}} },
   ] },
   { id: "kitchen", title: "Kitchen & Appliances", icon: "ri-fridge-line", kw: "kitchen appliance cabinet drawer dishwasher oven fridge washer dryer", jobs: [
+    { id: "appliance-stopped-working", title: "Appliance stopped working", kw: "refrigerator not cooling, fridge broken, oven not heating, washer not working, dryer not heating, dishwasher will not run, appliance repair, stove not working", min: 60, ex: "Example: The refrigerator stopped cooling and the food is warm.", sr: true, pri: "high" },
     { id: "replace-a-garbage-disposal", title: "Replace a garbage disposal", kw: "replace garbage disposal, install disposal, disposal swap, new disposal, broken disposal, disposal leaking, kitchen sink grinder, disposer", min: 90, ex: "Example: Old disposal under the kitchen sink died, and I bought the same size to swap in.", kq: ["Is the new disposal the same type as the old one, plug-in or hardwired?", "Is there already a disposal under this sink that you are replacing?"], kc: ["There is already a disposal under this sink that you are replacing", "The new disposal is the same type as the old one, plug-in or hardwired"], ko: ["Is the new disposal the same type as the old one, plug-in or hardwired?"], kg: {"ladder": {"q": "Can you reach the disposal under the sink from the floor, without a ladder?", "h": ""}, "trade": {"q": "Are you only swapping the disposal, with no new outlet, switch wiring or drain pipes to add?", "h": "Hooking up to the power and drain already there is fine."}, "part": {"q": "Do you have the new garbage disposal in your home?", "h": ""}} },
     { id: "replace-a-dishwasher", title: "Replace a dishwasher", kw: "replace dishwasher, install dishwasher, dishwasher swap, new dishwasher, built-in dishwasher, old dishwasher, dishwasher died, hook up dishwasher", min: 120, ex: "Example: Swap my old built-in dishwasher for the new same-size one delivered yesterday; shutoff and power are already there.", kq: ["Is there already a working shutoff valve under the sink?", "Is the new dishwasher the same size and type as the old one?", "Can an adult helper be there to help lift the unit?"], kc: ["There is already a working shutoff valve under the sink", "The new dishwasher is the same size and type as the old one", "An adult helper can be there to help lift the unit"], ko: ["Is there already a working shutoff valve under the sink?"], kg: {"ladder": {"q": "Can you get to the dishwasher space and the pipes under the sink from the floor?", "h": "Think of kneeling at the open dishwasher spot."}, "trade": {"q": "Are you only swapping the old dishwasher, with no new water line, drain or electrical wiring?", "h": "Hooking to the lines already there is fine."}, "part": {"q": "Do you have the new dishwasher at your home?", "h": ""}} },
     { id: "dryer-slow-to-dry-or-lint-clogged-vent", title: "Dryer slow to dry or lint-clogged vent", kw: "dryer vent cleaning, lint, dryer duct, clean dryer vent, dryer not drying, dryer takes forever, dryer runs hot, vent hose, lint trap, lint buildup, fire risk", min: 60, ex: "Example: Dryer needs two cycles to dry a load and the room gets hot; vent exits the side wall.", kq: ["Does the dryer vent out of a nearby wall rather than through the attic or roof?"], kc: ["The dryer vents out of a nearby wall, not through the attic or roof"], ko: ["Does the dryer vent out of a nearby wall rather than through the attic or roof?"], kg: {"ladder": {"q": "Can you reach the outside dryer vent cap from the ground or a standard step ladder?", "h": "Look at where the vent pipe leaves the outside wall."}, "trade": {"q": "Is it only cleaning the dryer and its vent, with no vent line to move and no gas or wiring work?", "h": "Pulling the dryer out to clean behind it is fine."}, "part": {"q": "Is the hose behind the dryer fine as is, or do you already have a new one?", "h": "Crushed, torn or melted hoses need a new one."}} },
@@ -1784,6 +1811,7 @@ var CATALOG = [
     { id: "squeaky-floor", title: "Squeaky floor", kw: "squeaky floor, floor squeak, creaky floor, hardwood squeak, floor creaks, noisy floor, floor screws, squeak kit, loose floorboard", min: 60, ex: "Example: Hardwood floor in the upstairs hallway squeaks near the bedroom door, about three spots.", kq: ["Are there only a few squeaky spots, not the whole floor?"], kc: ["There are only a few squeaky spots, not the whole floor"], ko: ["Are there only a few squeaky spots, not the whole floor?"], kg: {"ladder": {"q": "Can you reach each squeaky spot while standing on the floor, with no ladder needed?", "h": ""}, "trade": {"q": "Is it only fastening down the floor you have, with no pipes or wires under it to open up or move?", "h": ""}, "part": {"q": "Is there nothing to buy for this, like new floorboards or flooring, to stop the squeaks?", "h": ""}} },
   ] },
   { id: "outdoors", title: "Outdoors & Other", icon: "ri-home-gear-line", kw: "outdoor outside yard garage gate fence deck patio other", jobs: [
+    { id: "roof-or-structural-damage", title: "Roof or structural damage", kw: "roof leak, hail damage, storm damage, structural damage, fallen tree, foundation crack, siding damage, broken window frame", min: 60, ex: "Example: A tree branch fell on the roof and there is a hole above the garage.", sr: true, pri: "high" },
     { id: "sagging-gate-or-broken-fence-boards", title: "Sagging gate or broken fence boards", kw: "gate latch, fence repair, fence picket, gate hinge, sagging gate, broken fence board, fence gate, gate won't close, gate drags, loose fence board, replace pickets", min: 60, ex: "Example: Backyard gate drags on the ground and will not latch; two fence boards beside it are broken.", kq: ["Is the gate post solid, not leaning or loose in the ground?", "Are only a few boards (about five or fewer) broken?"], kc: ["The gate post is solid, not leaning or loose in the ground", "Only a few boards (about five or fewer) are broken"], ko: ["Is the gate post solid, not leaning or loose in the ground?"], kg: {"ladder": {"q": "Can you reach the top of the gate and the broken boards from the ground or a step ladder?", "h": "Tall privacy fences over 8 feet are harder to reach."}, "trade": {"q": "Is it only fixing the gate and swapping boards, with no gate opener, wiring or new fence to build?", "h": "Fixing the hinges and latch you already have is fine."}, "part": {"q": "Do you have the new fence boards and any hinges or screws the gate needs?", "h": "Match the new boards to the wood you already have."}} },
     { id: "clogged-or-overflowing-gutters", title: "Clogged or overflowing gutters", kw: "clean gutters, gutter cleaning, clogged gutters, overflowing gutter, downspout extension, splash block, gutter drainage, water pooling by foundation, downspout clogged, leaves in gutters", min: 90, ex: "Example: Gutters along the front and back of my one-story house are full of leaves and overflow in rain.", kq: ["Are the gutters firmly attached, not sagging or pulling away from the house?", "Do you only need above-ground downspout extensions, with no digging?"], kc: ["The gutters are firmly attached, not sagging or pulling away", "You only need above-ground downspout extensions, with no digging"], ko: ["Are the gutters firmly attached, not sagging or pulling away from the house?"], kg: {"ladder": {"q": "Can you reach the gutters with a standard step ladder, without a taller ladder or the roof?", "h": "Think of a two-story wall or gutters above steep ground."}, "trade": {"q": "Is it only cleaning out the gutters, with no new wiring, heat cables or outdoor outlet to add?", "h": "Heat cables are wires some homes run along the gutter edge to melt ice."}, "part": {"q": "Is there nothing left for you to buy for the gutters, like brackets, screws or gutter guards?", "h": ""}} },
     { id: "garage-door-won-t-close-or-remote-fails", title: "Garage door won't close or remote fails", kw: "garage door opener, garage remote, garage keypad, safety sensor, garage door won't close, garage door reverses, blinking sensor light, bottom seal, reprogram remote, sensor misaligned, keypad not working", min: 60, ex: "Example: Garage door goes down a few inches then reverses, and the sensor light blinks.", kq: ["Is the door itself working normally, with no broken spring or snapped cable?"], kc: ["The door itself works normally, with no broken spring or snapped cable"], ko: ["Is the door itself working normally, with no broken spring or snapped cable?"], kg: {"ladder": {"q": "Can you reach the garage door opener on the ceiling with a standard step ladder?", "h": "Think of a tall garage ceiling or an opener mounted high up."}, "trade": {"q": "Is it only fixing or swapping the opener, remote or sensors, with no new outlet or wiring needed?", "h": "Using the ceiling outlet the opener already plugs into is fine."}, "part": {"q": "Do you have the new remote, sensor or opener part, if the garage door needs one?", "h": ""}} },
@@ -1792,6 +1820,12 @@ var CATALOG = [
     { id: "holes-in-exterior-siding", title: "Holes in exterior siding", kw: "siding hole, nail holes in siding, vinyl siding repair, exterior patch, cracked siding, woodpecker hole, exterior caulk, patch siding", min: 30, ex: "Example: Four small nail holes in the vinyl siding by the back door, about waist height.", kq: ["Are the holes smaller than a quarter, with solid siding around them?"], kc: ["The holes are smaller than a quarter", "The siding around the holes is solid"], ko: ["Are the holes smaller than a quarter, with solid siding around them?"], kg: {"ladder": {"q": "Can you reach all the holes in the siding from the ground or a standard step ladder?", "h": "Think of holes high on a two story wall or near the roofline."}, "trade": {"q": "Are the holes only in the siding itself, with no pipe, wire or vent sticking out of them?", "h": "Empty holes left from old cables are fine."}, "part": {"q": "Do you have the patch filler for your siding, plus paint if your siding needs it?", "h": "Vinyl, wood and metal siding each need a different filler."}} },
     { id: "rotted-trim-by-an-exterior-door-or-window", title: "Rotted trim by an exterior door or window", kw: "rotted trim, rotted wood, soft wood, exterior trim, door trim, window trim, wood rot, door frame rot, jamb repair, crumbling wood", min: 120, ex: "Example: Bottom of the front door trim is soft and crumbling, about two feet on the left side.", kq: ["Is the rot limited to about 4 feet of trim, with solid wood behind it?"], kc: ["The rot is limited to about 4 feet of trim", "The wood behind the rotted trim is solid"], ko: ["Is the rot limited to about 4 feet of trim, with solid wood behind it?"], kg: {"ladder": {"q": "Can you reach the rotted trim by the door or window from the ground or a standard step ladder?", "h": "Think of trim around a high window or a tall entry door."}, "trade": {"q": "Is it only replacing the rotted trim, with no light, doorbell or wire attached that must be moved?", "h": "Check for a porch light, doorbell or camera near the trim."}, "part": {"q": "Do you have the new outdoor trim boards, plus paint if they need to be painted?", "h": "Use trim made for outdoor use, such as treated wood or PVC."}} },
     { id: "cracks-in-a-walkway-patio-or-driveway", title: "Cracks in a walkway, patio or driveway", kw: "concrete crack, driveway crack, sidewalk crack, patio crack, crack filler, concrete patch, walkway repair, cracked pavement, seal cracks", min: 60, ex: "Example: Several thin cracks in the concrete walkway to the front door, none wider than a pencil.", kq: ["Are the cracks about 1/2 inch wide or narrower?", "Is the concrete level, with no sunken or raised slabs?"], kc: ["The cracks are about 1/2 inch wide or narrower", "The concrete is level, with no sunken or raised slabs"], ko: ["Are the cracks about 1/2 inch wide or narrower?"], kg: {"ladder": {"q": "Can you reach every crack you want fixed from the ground without a ladder?", "h": "Think about cracks on steps or along a raised edge."}, "trade": {"q": "Are you only filling the cracks in the concrete, with no new concrete and no drain or pipe to move?", "h": "Filling cracks near a drain that stays put is fine."}, "part": {"q": "Do you have the crack filler made for concrete?", "h": "Look for a filler labeled for concrete cracks at a hardware store."}} },
+  ] },
+  { id: "special", title: "Specialty services", icon: "ri-tools-line", kw: "specialty hvac carpentry painting other", hidden: true, jobs: [
+    { id: "hvac", title: "HVAC", kw: "hvac, heating, cooling, air conditioner, ac not cooling, furnace, thermostat, heat pump, no heat, no ac, ductwork, vents", min: 60, ex: "Example: The AC runs all day but the house will not cool below 80 degrees.", sr: true },
+    { id: "carpentry", title: "Carpentry", kw: "carpentry, carpenter, trim, framing, cabinets, built-ins, deck, fence, door frame, woodwork, shelving build", min: 60, ex: "Example: I want built-in shelves added in the living room alcove.", sr: true },
+    { id: "painting", title: "Painting", kw: "painting, paint room, interior paint, exterior paint, repaint, accent wall, ceiling paint, paint cabinets", min: 60, ex: "Example: I want the living room and hallway repainted, about 400 square feet.", sr: true },
+    { id: "other-not-listed", title: "Other (not listed)", kw: "other, something else, not listed, not sure, other problem, anything else", min: 60, ex: "Example: Tell us what is going on, where it is and when it started.", sr: true }
   ] }
 ];
 
@@ -1815,14 +1849,20 @@ var CATALOG = [
   /* 25 jobs (illustrative; the real list is curated with Ops). `min` is an internal estimate used only to
      recommend a booking length. It is never shown to the member. `ex` is the placeholder example. */
   /* Describe-first: the 100-job catalog (catalog.js), flattened. Each job knows its group. */
+  /* Single entry point (deck option): task types that are always a service request (sr), high priority (pri), per-category "Other" and the specialty rows only exist in the wizard */
+  if (!WIZ) { CATALOG = CATALOG.filter(function (g) { return !g.hidden; }).map(function (g) { var c = {}, k; for (k in g) c[k] = g[k]; c.jobs = g.jobs.filter(function (t) { return !(t && t.sr); }); return c; }); }
+  function isSingle() { return body.classList.contains("is-single"); }
+  function listed(j) { return !j.sr || isSingle(); }
   function catalogJobs() {
     var out = [];
     CATALOG.forEach(function (g) {
       g.jobs.forEach(function (t) {
         var o = Array.isArray(t) ? { id: t[0], title: t[1], kw: t[2], min: t[3] } : t;
         out.push({ id: o.id, title: o.title, kw: o.kw, min: o.min, icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
-          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [], kc: o.kc || [], kq: o.kq || [], kg: o.kg || null });
+          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [], kc: o.kc || [], kq: o.kq || [], kg: o.kg || null, sr: !!o.sr, pri: o.pri || "" });
       });
+      if (WIZ && !g.hidden) out.push({ id: "other-" + g.id, title: "Other (" + g.title + ")", kw: "other, something else, not listed, anything else, " + g.title.toLowerCase(), min: 60, icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
+        ex: "Example: Tell us what is going on, where it is and when it started.", ko: [], kc: [], kq: [], kg: null, sr: true, pri: "", other: true });
     });
     return out;
   }
@@ -2235,7 +2275,9 @@ var CATALOG = [
   function koFor(id) { return koItems().filter(function (k) { return k.job.id === id; })[0] || null; }
   function koList(id) { return koItems().filter(function (k) { return k.job.id === id; }); }
   function failedQs(id) { return koList(id).filter(function (k) { return state.ko[k.key] === "no" || state.ko[k.key] === "unsure"; }); }
-  function isNoFit(id) { return failedQs(id).length > 0; }
+  function isNoFit(id) { return !!(JOB[id] && JOB[id].sr) || failedQs(id).length > 0; }
+  function urgentIds() { return nofitIds().filter(function (i) { return JOB[i].pri === "high"; }); }
+  function urgentLine() { return urgentIds().length ? " We\u2019ll reach out today." : ""; }
   function allAnswered(id) { return koList(id).every(function (k) { return !!state.ko[k.key]; }); }
   function nofitIds() { return committedIds().filter(isNoFit); }
   function fitIds() { return committedIds().filter(function (i) { return !isNoFit(i); }); }
@@ -2373,8 +2415,10 @@ var CATALOG = [
   ];
   function wizQuestions(jb) {
     var out = [], i = 0;
+    if (jb.sr) return out;
     (jb.kq || []).forEach(function (q) { out.push({ key: jb.id + "-" + (i++), job: jb, q: q, type: "spec", hint: "", opts: [["yes", "Yes"], ["no", "No"]] }); });
     COMMON_Q.forEach(function (c) { var g = jb.kg && jb.kg[c.type]; out.push({ key: jb.id + "-" + (i++), job: jb, q: g ? g.q : c.q, type: c.type, hint: g ? g.h : c.hint, opts: c.opts }); });
+    if (body.classList.contains("is-blankq")) out.forEach(function (k, n) { k.q = "[Question " + (n + 1) + " to be provided by Ops]"; k.hint = ""; });
     return out;
   }
   function koItems() {
@@ -2631,9 +2675,9 @@ var CATALOG = [
   /* ---------- Wizard: pick a job with one tap (categories, then jobs; or search) ---------- */
   function pickResults(toks) {
     var gm = {};
-    CATALOG.forEach(function (g) { var h = g.title.toLowerCase(); gm[g.id] = toks.every(function (t) { return hit(h, t); }); });
-    var any = CATALOG.some(function (g) { return gm[g.id]; }) || JOBS.some(function (j) { return toks.every(function (t) { return hit(j.titleHay, t); }); });
-    return JOBS.filter(function (j) { return any ? (gm[j.group] || toks.every(function (t) { return hit(j.titleHay, t); })) : toks.every(function (t) { return hit(j.hay, t); }); });
+    CATALOG.forEach(function (g) { var h = g.title.toLowerCase(); gm[g.id] = !g.hidden && toks.every(function (t) { return hit(h, t); }); });
+    var any = CATALOG.some(function (g) { return gm[g.id]; }) || JOBS.some(function (j) { return listed(j) && toks.every(function (t) { return hit(j.titleHay, t); }); });
+    return JOBS.filter(function (j) { return listed(j) && (any ? (gm[j.group] || toks.every(function (t) { return hit(j.titleHay, t); })) : toks.every(function (t) { return hit(j.hay, t); })); });
   }
   function pkUp() {
     var b = el("button", "pk__up"); b.type = "button"; b.setAttribute("data-pk-up", "1");
@@ -2647,7 +2691,8 @@ var CATALOG = [
     if ($("#search").value !== state.q) $("#search").value = state.q;
     if (toks.length) { jobs = pickResults(toks); title = "Results"; }
     else if (state.pg) {
-      jobs = JOBS.filter(function (j) { return j.group === state.pg; });
+      jobs = JOBS.filter(function (j) { return j.group === state.pg && listed(j); });
+      jobs = jobs.filter(function (j) { return j.pri === "high"; }).concat(jobs.filter(function (j) { return j.pri !== "high"; }));   /* urgent ones first */
       title = CATALOG.filter(function (g) { return g.id === state.pg; })[0].title; sub = "Tap the job that fits.";
     }
     var none = toks.length > 0 && jobs.length === 0;
@@ -2659,21 +2704,33 @@ var CATALOG = [
       var list = el("div", "pk");
       if (!jobs) {
         CATALOG.forEach(function (g) {
+          if (g.hidden) return;
           var b = el("button", "pkb"); b.type = "button"; b.setAttribute("data-pk-group", g.id);
-          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", g.title)); m.appendChild(el("span", "pkb__meta", g.jobs.length + " jobs"));
+          var cnt = g.jobs.filter(function (t) { return !(t && t.sr) || isSingle(); }).length;
+          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", g.title)); m.appendChild(el("span", "pkb__meta", cnt + (cnt === 1 ? " job" : " jobs")));
           b.appendChild(icon(g.icon)); b.appendChild(m); b.appendChild(pkChev()); list.appendChild(b);
         });
       } else {
         jobs.forEach(function (j) {
           var done = state.order.some(function (i) { return state.jobs[i] && state.committed[i] && (JOB[i].base || i) === j.id; });
           var b = el("button", "pkb pkb--job"); b.type = "button"; b.setAttribute("data-pick", j.id);
-          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", j.title)); if (toks.length) m.appendChild(el("span", "pkb__meta", j.groupTitle));
+          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", j.other && !toks.length ? "Other" : j.title)); if (toks.length) m.appendChild(el("span", "pkb__meta", j.groupTitle));
           b.appendChild(m);
           if (done) b.appendChild(el("span", "opt__added", "Added")); b.appendChild(pkChev());
           list.appendChild(b);
         });
       }
       box.appendChild(list);
+      if (!jobs && isSingle()) {   /* specialty services and Other: all service requests */
+        var sh = el("div", "pk__head pk__head--sub"); sh.appendChild(el("h2", "t-strong", "Specialty services")); sh.appendChild(el("p", "t-meta", "Our team plans these as a service request."));
+        box.appendChild(sh);
+        var sl2 = el("div", "pk");
+        JOBS.filter(function (j) { return j.group === "special"; }).forEach(function (j) {
+          var b = el("button", "pkb pkb--job"); b.type = "button"; b.setAttribute("data-pick", j.id);
+          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", j.id === "other-not-listed" ? "Other" : j.title)); b.appendChild(m); b.appendChild(pkChev()); sl2.appendChild(b);
+        });
+        box.appendChild(sl2);
+      }
       if (inCat) { var ft = el("div", "pk__foot"); ft.appendChild(pkUp()); box.appendChild(ft); }
     }
     $("#search-none").hidden = !none;
@@ -2773,7 +2830,7 @@ var CATALOG = [
       fit.forEach(function (id) { fl.appendChild(moreRow(id)); }); nf.forEach(function (id) { sl.appendChild(moreRow(id)); });
       setText($("#ml-fit-t"), "Eligible for Fast Fix"); setText($("#ml-fit-n"), "(" + fit.length + ")");
       setText($("#ml-sr-t"), "Requires Service Request"); setText($("#ml-sr-n"), "(" + nf.length + ")");
-      setText($("#ml-sr-sub"), "These didn\u2019t pass the questions. We\u2019ll submit them as a service request when you continue.");
+      setText($("#ml-sr-sub"), "These need our team. We\u2019ll submit them as a service request when you continue.");
     }
     var full = ids.length >= MAX_TASKS, over = overLimit();
     $("#more-add").setAttribute("aria-disabled", String(full || over));
@@ -2804,7 +2861,7 @@ var CATALOG = [
     return li;
   }
   function jobLine(id) { var q = qtyOf(id); return JOB[id].title + (q > 1 ? " × " + q : ""); }
-  function whyLines(id) { return failedQs(id).map(function (k) { return (state.ko[k.key] === "unsure" ? "Not sure: " : "No: ") + k.q; }); }
+  function whyLines(id) { if (JOB[id] && JOB[id].sr) return ["Our team handles this kind of job."]; return failedQs(id).map(function (k) { return (state.ko[k.key] === "unsure" ? "Not sure: " : "No: ") + k.q; }); }
   /* The page that says plainly what is booked as Fast Fix and what goes in as a service request */
   function renderReview() {
     var fit = fitIds(), nf = nofitIds(), split = needsSplit(), pv = split ? planVisits() : null, mix = fit.length && nf.length;
@@ -2818,8 +2875,8 @@ var CATALOG = [
     setText($("#rv-visits-sub"), (pv ? pv.length : 2) + " visits, each booked on its own.");
     setText($("#rv-sr-t"), "Service request"); setText($("#rv-sr-n"), "");
     setText($("#rv-sr-sub"), mix
-      ? "We send " + (nf.length === 1 ? "this" : "these") + " to our team for you. Your notes and photos go along."
-      : "We send " + (nf.length === 1 ? "this" : "these") + " to our team as one service request. You won\u2019t need to enter anything again.");
+      ? "We send " + (nf.length === 1 ? "this" : "these") + " to our team for you. Your notes and photos go along." + urgentLine()
+      : "We send " + (nf.length === 1 ? "this" : "these") + " to our team as one service request. You won\u2019t need to enter anything again." + urgentLine());
     var fl = $("#rv-fit-list"), sl = $("#rv-sr-list"), vl = $("#rv-visits-list"); fl.innerHTML = ""; sl.innerHTML = ""; vl.innerHTML = "";
     fit.forEach(function (i) { fl.appendChild(rvRow("", jobLine(i))); });
     nf.forEach(function (i) { sl.appendChild(rvRow("", jobLine(i), whyLines(i))); });
@@ -3105,7 +3162,7 @@ var CATALOG = [
     if (screen === "booked") fillBooked();
     if (screen === "manage") renderManage();
     if (screen === "cancel") renderCancel();
-    if (screen === "sent") $("#sent-why").textContent = state.reason === "ko" && koBad().length ? (WIZ && selectedJobs().length > 1 ? "Some of your jobs don\u2019t fit Fast Fix, so our team will plan all of them together as one service request." : koBad()[0].job.title + " can\u2019t be done as a Fast Fix, so our team will plan this visit.") : (WHY[state.reason] || WHY.ladder);
+    if (screen === "sent") $("#sent-why").textContent = state.reason === "ko" && WIZ && !koBad().length ? ((nofitIds().length > 1 ? "These jobs need our team, so we sent them together as one service request." : (nofitIds()[0] && !JOB[nofitIds()[0]].other && nofitIds()[0] !== "other-not-listed" ? JOB[nofitIds()[0]].title : "This job") + " needs our team, so we sent it as a service request.") + urgentLine()) : state.reason === "ko" && koBad().length ? (WIZ && selectedJobs().length > 1 ? "Some of your jobs don\u2019t fit Fast Fix, so our team will plan all of them together as one service request." : koBad()[0].job.title + " can\u2019t be done as a Fast Fix, so our team will plan this visit.") : (WHY[state.reason] || WHY.ladder);
 
     refresh();
     if (!firstRender) { window.scrollTo(0, 0); $("#h1").focus({ preventScroll: true }); }
@@ -3181,7 +3238,7 @@ var CATALOG = [
     if (nfj.length) {
       var ml = $("#srm-list"); ml.innerHTML = "";
       setText($("#srm-t"), "Service request submitted"); setText($("#srm-n"), "");
-      setText($("#srm-sub"), "Our team will contact you to schedule " + (nfj.length === 1 ? "this job" : "these jobs") + ". Your descriptions and photos came with the request.");
+      setText($("#srm-sub"), "Our team will contact you to schedule " + (nfj.length === 1 ? "this job" : "these jobs") + ". Your descriptions and photos came with the request." + urgentLine());
       nfj.forEach(function (i) { ml.appendChild(rvRow("", jobLine(i), [JOB[i].groupTitle])); });
     }
     if (dash) { dash.classList.add("btn--primary"); dash.classList.remove("btn--secondary"); }
@@ -3481,6 +3538,7 @@ var CATALOG = [
       var name = el.getAttribute("data-state-switch");
       applySwitch(name, el.checked);
       if (name === "noslots" && state.screen === "time") render("time");
+      if (WIZ && /^(single|blankq)$/.test(name)) { if (state.screen === "job") renderPick(); if (state.screen === "question") renderWizQuestion(); }
 
     }
     refresh();
@@ -3511,8 +3569,8 @@ var CATALOG = [
   if (FIND) {
     $all(".step__n").forEach(function (n, i) { n.textContent = String(i + 1); });
     setText($('.step[data-step="job"] .step__t'), "Your jobs");
-    $('[data-go="job"]').setAttribute("data-go", "describe");
-    $('[data-go="describe"]').setAttribute("href", "#/describe");
+    $('.entry-classic [data-go="job"]').setAttribute("data-go", "describe");
+    $('.entry-classic [data-go="describe"]').setAttribute("href", "#/describe");
   } else {
     /* Pick-it-yourself order: search and groups first, the selected jobs (with optional details) below them */
     $(".step.finder-only").remove();
@@ -3531,6 +3589,7 @@ var CATALOG = [
     }
   }
   applySwitch("multi", true);
+  if (WIZ) applySwitch("single", true);
   render(fromHash());
 })();
 

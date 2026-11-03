@@ -59,14 +59,14 @@ h1[tabindex="-1"]:focus { outline: none; }
   transition: border-color .15s ease, background-color .15s ease;
 }
 .type:hover { border-color: var(--blue); }
-.type--fast { background: var(--blue-tint); border-color: var(--blue-tint); }
+.type--fast, .type--single { background: var(--blue-tint); border-color: var(--blue-tint); }
 .type--urgent { background: var(--red-tint); border-color: var(--red-tint); }
 .type--urgent:hover { border-color: var(--red); }
 .type .d-chev { align-self: center; }
 .type__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--s-4); }
 .type__title { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s-8); font-size: 16px; line-height: 24px; font-weight: 600; }
 .type__desc { color: var(--text-2); }
-.type--urgent .type__desc, .type--fast .type__desc { color: var(--ink); }
+.type--urgent .type__desc, .type--fast .type__desc, .type--single .type__desc { color: var(--ink); }
 .tile-icon--red { background: var(--red); color: #fff; }
 .type:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; }
 

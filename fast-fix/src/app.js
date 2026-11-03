@@ -18,14 +18,20 @@
   /* 25 jobs (illustrative; the real list is curated with Ops). `min` is an internal estimate used only to
      recommend a booking length. It is never shown to the member. `ex` is the placeholder example. */
   /* Describe-first: the 100-job catalog (catalog.js), flattened. Each job knows its group. */
+  /* Single entry point (deck option): task types that are always a service request (sr), high priority (pri), per-category "Other" and the specialty rows only exist in the wizard */
+  if (!WIZ) { CATALOG = CATALOG.filter(function (g) { return !g.hidden; }).map(function (g) { var c = {}, k; for (k in g) c[k] = g[k]; c.jobs = g.jobs.filter(function (t) { return !(t && t.sr); }); return c; }); }
+  function isSingle() { return body.classList.contains("is-single"); }
+  function listed(j) { return !j.sr || isSingle(); }
   function catalogJobs() {
     var out = [];
     CATALOG.forEach(function (g) {
       g.jobs.forEach(function (t) {
         var o = Array.isArray(t) ? { id: t[0], title: t[1], kw: t[2], min: t[3] } : t;
         out.push({ id: o.id, title: o.title, kw: o.kw, min: o.min, icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
-          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [], kc: o.kc || [], kq: o.kq || [], kg: o.kg || null });
+          ex: o.ex || "Example: how many, which room, or anything we should know.", ko: o.ko || [], kc: o.kc || [], kq: o.kq || [], kg: o.kg || null, sr: !!o.sr, pri: o.pri || "" });
       });
+      if (WIZ && !g.hidden) out.push({ id: "other-" + g.id, title: "Other (" + g.title + ")", kw: "other, something else, not listed, anything else, " + g.title.toLowerCase(), min: 60, icon: g.icon, group: g.id, groupTitle: g.title, groupKw: g.kw,
+        ex: "Example: Tell us what is going on, where it is and when it started.", ko: [], kc: [], kq: [], kg: null, sr: true, pri: "", other: true });
     });
     return out;
   }
@@ -438,7 +444,9 @@
   function koFor(id) { return koItems().filter(function (k) { return k.job.id === id; })[0] || null; }
   function koList(id) { return koItems().filter(function (k) { return k.job.id === id; }); }
   function failedQs(id) { return koList(id).filter(function (k) { return state.ko[k.key] === "no" || state.ko[k.key] === "unsure"; }); }
-  function isNoFit(id) { return failedQs(id).length > 0; }
+  function isNoFit(id) { return !!(JOB[id] && JOB[id].sr) || failedQs(id).length > 0; }
+  function urgentIds() { return nofitIds().filter(function (i) { return JOB[i].pri === "high"; }); }
+  function urgentLine() { return urgentIds().length ? " We\u2019ll reach out today." : ""; }
   function allAnswered(id) { return koList(id).every(function (k) { return !!state.ko[k.key]; }); }
   function nofitIds() { return committedIds().filter(isNoFit); }
   function fitIds() { return committedIds().filter(function (i) { return !isNoFit(i); }); }
@@ -576,8 +584,10 @@
   ];
   function wizQuestions(jb) {
     var out = [], i = 0;
+    if (jb.sr) return out;
     (jb.kq || []).forEach(function (q) { out.push({ key: jb.id + "-" + (i++), job: jb, q: q, type: "spec", hint: "", opts: [["yes", "Yes"], ["no", "No"]] }); });
     COMMON_Q.forEach(function (c) { var g = jb.kg && jb.kg[c.type]; out.push({ key: jb.id + "-" + (i++), job: jb, q: g ? g.q : c.q, type: c.type, hint: g ? g.h : c.hint, opts: c.opts }); });
+    if (body.classList.contains("is-blankq")) out.forEach(function (k, n) { k.q = "[Question " + (n + 1) + " to be provided by Ops]"; k.hint = ""; });
     return out;
   }
   function koItems() {
@@ -834,9 +844,9 @@
   /* ---------- Wizard: pick a job with one tap (categories, then jobs; or search) ---------- */
   function pickResults(toks) {
     var gm = {};
-    CATALOG.forEach(function (g) { var h = g.title.toLowerCase(); gm[g.id] = toks.every(function (t) { return hit(h, t); }); });
-    var any = CATALOG.some(function (g) { return gm[g.id]; }) || JOBS.some(function (j) { return toks.every(function (t) { return hit(j.titleHay, t); }); });
-    return JOBS.filter(function (j) { return any ? (gm[j.group] || toks.every(function (t) { return hit(j.titleHay, t); })) : toks.every(function (t) { return hit(j.hay, t); }); });
+    CATALOG.forEach(function (g) { var h = g.title.toLowerCase(); gm[g.id] = !g.hidden && toks.every(function (t) { return hit(h, t); }); });
+    var any = CATALOG.some(function (g) { return gm[g.id]; }) || JOBS.some(function (j) { return listed(j) && toks.every(function (t) { return hit(j.titleHay, t); }); });
+    return JOBS.filter(function (j) { return listed(j) && (any ? (gm[j.group] || toks.every(function (t) { return hit(j.titleHay, t); })) : toks.every(function (t) { return hit(j.hay, t); })); });
   }
   function pkUp() {
     var b = el("button", "pk__up"); b.type = "button"; b.setAttribute("data-pk-up", "1");
@@ -850,7 +860,8 @@
     if ($("#search").value !== state.q) $("#search").value = state.q;
     if (toks.length) { jobs = pickResults(toks); title = "Results"; }
     else if (state.pg) {
-      jobs = JOBS.filter(function (j) { return j.group === state.pg; });
+      jobs = JOBS.filter(function (j) { return j.group === state.pg && listed(j); });
+      jobs = jobs.filter(function (j) { return j.pri === "high"; }).concat(jobs.filter(function (j) { return j.pri !== "high"; }));   /* urgent ones first */
       title = CATALOG.filter(function (g) { return g.id === state.pg; })[0].title; sub = "Tap the job that fits.";
     }
     var none = toks.length > 0 && jobs.length === 0;
@@ -862,21 +873,33 @@
       var list = el("div", "pk");
       if (!jobs) {
         CATALOG.forEach(function (g) {
+          if (g.hidden) return;
           var b = el("button", "pkb"); b.type = "button"; b.setAttribute("data-pk-group", g.id);
-          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", g.title)); m.appendChild(el("span", "pkb__meta", g.jobs.length + " jobs"));
+          var cnt = g.jobs.filter(function (t) { return !(t && t.sr) || isSingle(); }).length;
+          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", g.title)); m.appendChild(el("span", "pkb__meta", cnt + (cnt === 1 ? " job" : " jobs")));
           b.appendChild(icon(g.icon)); b.appendChild(m); b.appendChild(pkChev()); list.appendChild(b);
         });
       } else {
         jobs.forEach(function (j) {
           var done = state.order.some(function (i) { return state.jobs[i] && state.committed[i] && (JOB[i].base || i) === j.id; });
           var b = el("button", "pkb pkb--job"); b.type = "button"; b.setAttribute("data-pick", j.id);
-          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", j.title)); if (toks.length) m.appendChild(el("span", "pkb__meta", j.groupTitle));
+          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", j.other && !toks.length ? "Other" : j.title)); if (toks.length) m.appendChild(el("span", "pkb__meta", j.groupTitle));
           b.appendChild(m);
           if (done) b.appendChild(el("span", "opt__added", "Added")); b.appendChild(pkChev());
           list.appendChild(b);
         });
       }
       box.appendChild(list);
+      if (!jobs && isSingle()) {   /* specialty services and Other: all service requests */
+        var sh = el("div", "pk__head pk__head--sub"); sh.appendChild(el("h2", "t-strong", "Specialty services")); sh.appendChild(el("p", "t-meta", "Our team plans these as a service request."));
+        box.appendChild(sh);
+        var sl2 = el("div", "pk");
+        JOBS.filter(function (j) { return j.group === "special"; }).forEach(function (j) {
+          var b = el("button", "pkb pkb--job"); b.type = "button"; b.setAttribute("data-pick", j.id);
+          var m = el("span", "pkb__main"); m.appendChild(el("span", "pkb__title", j.id === "other-not-listed" ? "Other" : j.title)); b.appendChild(m); b.appendChild(pkChev()); sl2.appendChild(b);
+        });
+        box.appendChild(sl2);
+      }
       if (inCat) { var ft = el("div", "pk__foot"); ft.appendChild(pkUp()); box.appendChild(ft); }
     }
     $("#search-none").hidden = !none;
@@ -976,7 +999,7 @@
       fit.forEach(function (id) { fl.appendChild(moreRow(id)); }); nf.forEach(function (id) { sl.appendChild(moreRow(id)); });
       setText($("#ml-fit-t"), "Eligible for Fast Fix"); setText($("#ml-fit-n"), "(" + fit.length + ")");
       setText($("#ml-sr-t"), "Requires Service Request"); setText($("#ml-sr-n"), "(" + nf.length + ")");
-      setText($("#ml-sr-sub"), "These didn\u2019t pass the questions. We\u2019ll submit them as a service request when you continue.");
+      setText($("#ml-sr-sub"), "These need our team. We\u2019ll submit them as a service request when you continue.");
     }
     var full = ids.length >= MAX_TASKS, over = overLimit();
     $("#more-add").setAttribute("aria-disabled", String(full || over));
@@ -1007,7 +1030,7 @@
     return li;
   }
   function jobLine(id) { var q = qtyOf(id); return JOB[id].title + (q > 1 ? " × " + q : ""); }
-  function whyLines(id) { return failedQs(id).map(function (k) { return (state.ko[k.key] === "unsure" ? "Not sure: " : "No: ") + k.q; }); }
+  function whyLines(id) { if (JOB[id] && JOB[id].sr) return ["Our team handles this kind of job."]; return failedQs(id).map(function (k) { return (state.ko[k.key] === "unsure" ? "Not sure: " : "No: ") + k.q; }); }
   /* The page that says plainly what is booked as Fast Fix and what goes in as a service request */
   function renderReview() {
     var fit = fitIds(), nf = nofitIds(), split = needsSplit(), pv = split ? planVisits() : null, mix = fit.length && nf.length;
@@ -1021,8 +1044,8 @@
     setText($("#rv-visits-sub"), (pv ? pv.length : 2) + " visits, each booked on its own.");
     setText($("#rv-sr-t"), "Service request"); setText($("#rv-sr-n"), "");
     setText($("#rv-sr-sub"), mix
-      ? "We send " + (nf.length === 1 ? "this" : "these") + " to our team for you. Your notes and photos go along."
-      : "We send " + (nf.length === 1 ? "this" : "these") + " to our team as one service request. You won\u2019t need to enter anything again.");
+      ? "We send " + (nf.length === 1 ? "this" : "these") + " to our team for you. Your notes and photos go along." + urgentLine()
+      : "We send " + (nf.length === 1 ? "this" : "these") + " to our team as one service request. You won\u2019t need to enter anything again." + urgentLine());
     var fl = $("#rv-fit-list"), sl = $("#rv-sr-list"), vl = $("#rv-visits-list"); fl.innerHTML = ""; sl.innerHTML = ""; vl.innerHTML = "";
     fit.forEach(function (i) { fl.appendChild(rvRow("", jobLine(i))); });
     nf.forEach(function (i) { sl.appendChild(rvRow("", jobLine(i), whyLines(i))); });
@@ -1308,7 +1331,7 @@
     if (screen === "booked") fillBooked();
     if (screen === "manage") renderManage();
     if (screen === "cancel") renderCancel();
-    if (screen === "sent") $("#sent-why").textContent = state.reason === "ko" && koBad().length ? (WIZ && selectedJobs().length > 1 ? "Some of your jobs don\u2019t fit Fast Fix, so our team will plan all of them together as one service request." : koBad()[0].job.title + " can\u2019t be done as a Fast Fix, so our team will plan this visit.") : (WHY[state.reason] || WHY.ladder);
+    if (screen === "sent") $("#sent-why").textContent = state.reason === "ko" && WIZ && !koBad().length ? ((nofitIds().length > 1 ? "These jobs need our team, so we sent them together as one service request." : (nofitIds()[0] && !JOB[nofitIds()[0]].other && nofitIds()[0] !== "other-not-listed" ? JOB[nofitIds()[0]].title : "This job") + " needs our team, so we sent it as a service request.") + urgentLine()) : state.reason === "ko" && koBad().length ? (WIZ && selectedJobs().length > 1 ? "Some of your jobs don\u2019t fit Fast Fix, so our team will plan all of them together as one service request." : koBad()[0].job.title + " can\u2019t be done as a Fast Fix, so our team will plan this visit.") : (WHY[state.reason] || WHY.ladder);
 
     refresh();
     if (!firstRender) { window.scrollTo(0, 0); $("#h1").focus({ preventScroll: true }); }
@@ -1384,7 +1407,7 @@
     if (nfj.length) {
       var ml = $("#srm-list"); ml.innerHTML = "";
       setText($("#srm-t"), "Service request submitted"); setText($("#srm-n"), "");
-      setText($("#srm-sub"), "Our team will contact you to schedule " + (nfj.length === 1 ? "this job" : "these jobs") + ". Your descriptions and photos came with the request.");
+      setText($("#srm-sub"), "Our team will contact you to schedule " + (nfj.length === 1 ? "this job" : "these jobs") + ". Your descriptions and photos came with the request." + urgentLine());
       nfj.forEach(function (i) { ml.appendChild(rvRow("", jobLine(i), [JOB[i].groupTitle])); });
     }
     if (dash) { dash.classList.add("btn--primary"); dash.classList.remove("btn--secondary"); }
@@ -1684,6 +1707,7 @@
       var name = el.getAttribute("data-state-switch");
       applySwitch(name, el.checked);
       if (name === "noslots" && state.screen === "time") render("time");
+      if (WIZ && /^(single|blankq)$/.test(name)) { if (state.screen === "job") renderPick(); if (state.screen === "question") renderWizQuestion(); }
 
     }
     refresh();
@@ -1714,8 +1738,8 @@
   if (FIND) {
     $all(".step__n").forEach(function (n, i) { n.textContent = String(i + 1); });
     setText($('.step[data-step="job"] .step__t'), "Your jobs");
-    $('[data-go="job"]').setAttribute("data-go", "describe");
-    $('[data-go="describe"]').setAttribute("href", "#/describe");
+    $('.entry-classic [data-go="job"]').setAttribute("data-go", "describe");
+    $('.entry-classic [data-go="describe"]').setAttribute("href", "#/describe");
   } else {
     /* Pick-it-yourself order: search and groups first, the selected jobs (with optional details) below them */
     $(".step.finder-only").remove();
@@ -1734,5 +1758,6 @@
     }
   }
   applySwitch("multi", true);
+  if (WIZ) applySwitch("single", true);
   render(fromHash());
 })();

@@ -341,3 +341,11 @@ body.variant-wizard[data-screen="manage"] .rail, body.variant-wizard[data-screen
 .cn__actions { display: flex; flex-direction: column; gap: var(--s-12); margin-top: var(--s-24); }
 .cn__actions .btn { width: 100%; }
 @media (max-width: 480px) { .vcard { grid-template-columns: 56px minmax(0, 1fr); padding: var(--s-16); gap: var(--s-12); } .vcard__tile { width: 56px; height: 64px; } .vcard__day { font-size: 24px; line-height: 28px; } .vcard__when { font-size: 18px; line-height: 26px; } .vcard__acts .btn { flex: 1 1 100%; } }
+
+/* ---------- Single entry point (deck option): one entry card, specialty rows ---------- */
+body.is-single .entry-classic { display: none; }
+body:not(.is-single) .entry-single { display: none; }
+.pk__head--sub { margin-top: var(--s-24); }
+.srm__track { display: inline-block; margin-top: var(--s-16); min-height: 44px; line-height: 44px; }
+body.is-single #sr-pointer, body.is-single #search-none .manual-only { display: none; }
+body:not(.is-single) .single-only { display: none; }
