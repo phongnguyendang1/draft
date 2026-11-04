@@ -364,6 +364,21 @@ legend { padding: 0; }
 .dsbtn--primary:disabled { background: var(--btn-off); color: var(--font-tertiary); cursor: not-allowed; }
 .sched-card .message--alert { margin-bottom: var(--s-24); }
 
+/* Sign in, stop screens, prototype selects */
+.layout--narrow { grid-template-columns: minmax(0, 480px); }
+.layout--narrow .rail { display: none; }
+body.is-out .nav, body.is-out .topbar__actions, body.is-out .topbar__mobile, body.is-out .mnav { display: none !important; }
+.field { display: flex; flex-direction: column; gap: var(--s-8); }
+.field + .field { margin-top: var(--s-16); }
+.field label { font-size: 14px; line-height: 20px; font-weight: 600; }
+.tf { width: 100%; height: 48px; padding: 0 var(--s-16); border: 1px solid var(--slate); border-radius: var(--r-inner); background: var(--surface); color: var(--ink); font: inherit; font-size: 16px; line-height: 24px; letter-spacing: var(--track); }
+.tf:hover { border-color: var(--blue); }
+.tf:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 2px; border-color: var(--blue-text); }
+.auth__go { width: 100%; margin-top: var(--s-24); }
+.stop__card { display: flex; flex-direction: column; gap: var(--s-4); }
+.stop__card .phones { margin-top: var(--s-8); }
+.proto__sel { width: 100%; height: 36px; margin: var(--s-4) 0 var(--s-8); padding: 0 var(--s-8); border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; line-height: 20px; letter-spacing: 0; }
+
 /* Summary rail */
 .sum { display: flex; flex-direction: column; gap: var(--s-16); margin-top: var(--s-16); }
 .sum__row { display: flex; flex-direction: column; gap: 2px; }
@@ -540,7 +555,6 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
       <div class="back" id="back" hidden>
         <button class="link" type="button" id="back-btn"><svg class="i" aria-hidden="true"><use href="#ri-arrow-left-line"/></svg><span id="back-label">Back</span></button>
       </div>
-      <ol class="steps" id="steps" aria-label="Tune-up booking progress" hidden></ol>
       <section class="fhead" id="fhead" aria-label="Page title">
         <div class="fhead__text">
           <span class="result__icon" id="f-icon" hidden><svg class="i" aria-hidden="true"><use id="f-icon-use" href="#ri-checkbox-circle-line"/></svg></span>
@@ -551,6 +565,8 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
       <div class="layout" id="layout">
         <div class="main">
           <div data-view="dashboard" hidden></div>
+          <section class="card" data-view="signin" aria-label="Sign in" hidden></section>
+          <section class="card plain" data-view="stop" aria-label="Tune-up unavailable" hidden></section>
           <section class="card" data-view="home" aria-label="Choose a home" hidden></section>
           <section class="card" data-view="tuneup" aria-label="Choose a tune-up" hidden></section>
           <section class="card sched-card" data-view="time" aria-label="Schedule appointment" hidden></section>
@@ -579,11 +595,34 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
 <div class="proto" id="proto">
   <div class="proto__panel" id="proto-panel" hidden>
     <p class="proto__title">Member</p>
+    <label class="proto__opt">Signed in<span class="switch"><input type="checkbox" id="ps-signedIn" data-state="signedIn"><span class="switch__track"></span></span></label>
+    <label class="proto__opt">Membership active<span class="switch"><input type="checkbox" id="ps-active" data-state="active"><span class="switch__track"></span></span></label>
     <label class="proto__opt">Has 3 homes<span class="switch"><input type="checkbox" id="ps-multi" data-state="multi"><span class="switch__track"></span></span></label>
     <label class="proto__opt">On the HVAC Plan<span class="switch"><input type="checkbox" id="ps-onPlan" data-state="onPlan"><span class="switch__track"></span></span></label>
-    <p class="proto__title">Calendar</p>
-    <label class="proto__opt">No open times<span class="switch"><input type="checkbox" id="ps-noSlots" data-state="noSlots"><span class="switch__track"></span></span></label>
-    <label class="proto__opt">Chosen time gets taken<span class="switch"><input type="checkbox" id="ps-taken" data-state="taken"><span class="switch__track"></span></span></label>
+    <p class="proto__title"><label for="ps-season">Season</label></p>
+    <select class="proto__sel" id="ps-season" data-state="season">
+      <option value="off">Off-season</option>
+      <option value="ending">Off-season ends Nov 30</option>
+      <option value="in-regular">In season: regular prices (proposal A)</option>
+      <option value="in-closed">In season: closed (proposal B)</option>
+    </select>
+    <p class="proto__title"><label for="ps-homeState">4817 Mueller Blvd tune-up</label></p>
+    <select class="proto__sel" id="ps-homeState" data-state="homeState">
+      <option value="none">Nothing booked yet</option>
+      <option value="started">Started, no time picked</option>
+      <option value="booked">Booked this season</option>
+      <option value="done">Done this season</option>
+      <option value="nosystems">No HVAC system on file</option>
+    </select>
+    <p class="proto__title"><label for="ps-cal">Scheduling</label></p>
+    <select class="proto__sel" id="ps-cal" data-state="cal">
+      <option value="ok">Times available</option>
+      <option value="empty">No open dates</option>
+      <option value="error">Calendar won’t load</option>
+      <option value="taken">Chosen time gets taken</option>
+      <option value="fail">Booking fails, then works</option>
+      <option value="seasonmid">Off-season ends mid-booking</option>
+    </select>
     <p class="proto__title">View</p>
     <label class="proto__opt">Phone frame (390px)<span class="switch"><input type="checkbox" id="ps-phone" data-state="phone"><span class="switch__track"></span></span></label>
     <label class="proto__opt">Show build notes<span class="switch"><input type="checkbox" id="ps-notes" data-state="notes"><span class="switch__track"></span></span></label>
@@ -591,10 +630,10 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
       <p class="proto__title">Jump to screen</p>
       <button class="proto__link" type="button" data-jump="tune-ups">Email link: /tune-ups</button>
       <button class="proto__link" type="button" data-jump="dashboard">Portal promotion</button>
-      <button class="proto__link" type="button" data-jump="home">1 &middot; Choose a home</button>
-      <button class="proto__link" type="button" data-jump="tuneup">2 &middot; Choose a tune-up</button>
-      <button class="proto__link" type="button" data-jump="time">3 &middot; Select the date</button>
-      <button class="proto__link" type="button" data-jump="time" data-tstep="time">3 &middot; Pick the time</button>
+      <button class="proto__link" type="button" data-jump="home">Choose a home</button>
+      <button class="proto__link" type="button" data-jump="tuneup">Choose a tune-up</button>
+      <button class="proto__link" type="button" data-jump="time">Select the date</button>
+      <button class="proto__link" type="button" data-jump="time" data-tstep="time">Pick the time</button>
       <button class="proto__link" type="button" data-jump="booked">Booked</button>
       <button class="proto__link proto__link--quiet" type="button" data-reset>Reset prototype</button>
     </div>
@@ -614,16 +653,23 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
   function parse(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
   function fmt(d, o) { return d.toLocaleDateString("en-US", o); }
   function longDate(d) { return fmt(d, { weekday: "long", month: "long", day: "numeric" }); }
-  function shortDate(d) { return fmt(d, { weekday: "short", month: "short", day: "numeric" }); }
-  function monthName(y, m) { return new Date(y, m, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" }); }
-  function t12(min) { var h = Math.floor(min / 60), m = min % 60, ap = h >= 12 ? "pm" : "am", hh = h % 12 || 12; return hh + ":" + pad(m) + ap; }
+  function t12(min) { var h = Math.floor(min / 60), m = min % 60; return (h % 12 || 12) + ":" + pad(m) + (h >= 12 ? "pm" : "am"); }
+  function tLabel(min) { var h = Math.floor(min / 60), m = min % 60; return (h % 12 || 12) + ":" + pad(m) + (h >= 12 ? " pm" : " am"); }
   function range(start, len) { return t12(start) + "–" + t12(start + len); }
-  function hoursText(min) { var h = min / 60; return h + (h === 1 ? " hour" : " hours"); }
   function money(n) { return "$" + n; }
-  function bnote(html) { return '<div class="bnote" role="note"><span class="bnote__tag">Build note</span><span>' + html + '</span></div>'; }
+  function val(x) { return typeof x === "function" ? x() : x; }
+  function bnote(html) { return html ? '<div class="bnote" role="note"><span class="bnote__tag">Build note</span><span>' + html + '</span></div>' : ""; }
+  function msg(icon, title, text, cls) {
+    return '<div class="message' + (cls ? " " + cls : "") + '" role="' + (cls === "message--alert" ? "alert" : "status") + '"><span class="message__icon">' + ic(icon) + '</span>' +
+      '<p class="message__text"><strong>' + title + '</strong>' + text + '</p></div>';
+  }
+  function phones() {
+    return '<div class="phones"><span class="phone"><span class="t-meta">Austin</span><span class="phone__num">512.831.4390</span></span>' +
+      '<span class="phone"><span class="t-meta">San Antonio</span><span class="phone__num">210.970.7959</span></span></div>';
+  }
   var MON3 = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
-  /* ---------- Data. Prices, task lengths and per-system tasks follow PFX-590 / PFX-593. Homes are sample data. ---------- */
+  /* ---------- Data. Prices, task lengths and per-system tasks follow PFX-590 / PFX-593. Homes, names and dates are sample data. ---------- */
   var TYPES = {
     standard: { name: "Standard", price: 29, retail: 125, min: 60, icon: "ri-tools-line", tag: "All systems", desc: "A full check and clean of your system." },
     comprehensive: { name: "Comprehensive", price: 79, retail: 250, min: 120, icon: "ri-windy-line", tag: "Every 3 years", desc: "Everything in Standard, plus evaporator coil cleaning. Best for systems over 5 years old." }
@@ -634,11 +680,15 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
     arcadia: { addr: "715 Arcadia Pl", city: "San Antonio, TX 78209", systems: 1 }
   };
   var ORDER = ["mueller", "elm", "arcadia"];
+  var STATE_HOME = "mueller";            /* the "4817 Mueller Blvd tune-up" prototype state applies to this home */
   var TECH = "Marcus Reyes";
+  var EXISTING = { date: "2026-11-19", start: 570, type: "standard", systems: 2, unit: 29 };
+  var LAST_DONE = new Date(2026, 9, 14);
 
   var TODAY = new Date(2026, 10, 4);
-  var FIRST_OPEN = new Date(2026, 10, 5), LAST_DAY = new Date(2026, 11, 31);
-  var FIRST_MONTH = { y: 2026, m: 10 }, LAST_MONTH = { y: 2026, m: 11 };
+  var FIRST_OPEN = new Date(2026, 10, 5);
+  var SEASON_END_SOON = new Date(2026, 10, 30);
+  var CAL_END = new Date(2026, 11, 31);
   var CLOSED = { "2026-11-26": 1, "2026-11-27": 1, "2026-12-24": 1, "2026-12-25": 1 };
   var FULL = { "2026-11-18": 1, "2026-12-02": 1, "2026-12-10": 1 };
   var SCHEDULED = { "2026-11-09": "Home Manager visit" };
@@ -647,55 +697,126 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
 
   function fresh() {
     return {
-      multi: true, onPlan: true, noSlots: false, taken: false, phone: false, notes: false, tstep: "date",
-      home: null, type: "standard", date: null, time: null, month: { y: 2026, m: 10 },
-      takenHit: false, takenKeys: {}, timeErr: false, resumed: false, booked: {}, last: null, err: null, view: null
+      signedIn: true, active: true, multi: true, onPlan: true, season: "off", homeState: "none", cal: "ok", phone: false, notes: false,
+      home: null, type: "standard", date: null, time: null, month: { y: 2026, m: 10 }, tstep: "date",
+      takenKeys: {}, hit: false, alert: null, resumed: false, booked: {}, last: null, err: null, reason: null, view: null
     };
   }
   var S = fresh();
 
   function homeIds() { return S.multi ? ORDER : ["mueller"]; }
-  function systems() { return HOMES[S.home].systems; }
+  function sysCount(id) { return id === STATE_HOME && S.homeState === "nosystems" ? 0 : HOMES[id].systems; }
+  function systems() { return sysCount(S.home); }
+  function regular() { return S.season === "in-regular"; }
+  function unit(t) { var T = TYPES[t || S.type]; return regular() ? T.retail : T.price; }
   function duration() { return TYPES[S.type].min * systems(); }
-  function total() { return TYPES[S.type].price * systems(); }
+  function total() { return unit() * systems(); }
   function systemsWord(n) { return n + (n === 1 ? " HVAC system" : " HVAC systems"); }
   function bookingText(type, n) { return TYPES[type].name + " tune-up · " + n + (n === 1 ? " system" : " systems"); }
+  function lastDay() { return S.season === "ending" ? SEASON_END_SOON : CAL_END; }
+  function lastMonth() { return S.season === "ending" ? { y: 2026, m: 10 } : { y: 2026, m: 11 }; }
+  function otherHome() { return homeIds().filter(function (id) { return id !== S.home && !S.booked[id]; })[0] || null; }
 
-  function dayOpen(d) {
-    if (d < FIRST_OPEN || d > LAST_DAY || d.getDay() === 0 || d.getDay() === 6) return false;
-    return slotsFor(iso(d)).length > 0;
-  }
   function slotsFor(key) {
     var d = parse(key);
-    if (S.noSlots || CLOSED[key] || FULL[key] || SCHEDULED[key] || d < FIRST_OPEN) return [];
+    if (S.cal === "empty" || CLOSED[key] || FULL[key] || SCHEDULED[key] || d < FIRST_OPEN || d > lastDay() || d.getDay() === 0 || d.getDay() === 6) return [];
     var n = d.getDate(), len = duration();
     return STARTS.filter(function (s, i) { return (n + i) % 3 !== 0 && s + len <= DAY_END && !S.takenKeys[key + ":" + s]; });
   }
 
+  /* ---------- Entry logic: every link opens /tune-ups and lands here ---------- */
+  function homeBlock(id) {
+    if (id !== STATE_HOME) return null;
+    if (S.homeState === "nosystems" || S.homeState === "booked" || S.homeState === "done") return S.homeState;
+    return null;
+  }
+  function startHome(id) {
+    S.home = id; S.type = "standard"; S.date = null; S.time = null; S.tstep = "date"; S.alert = null; S.month = { y: 2026, m: 10 }; S.err = null;
+    var blk = homeBlock(id);
+    if (blk) { S.reason = blk; return "stop"; }
+    S.resumed = id === STATE_HOME && S.homeState === "started";
+    return S.resumed ? "time" : "tuneup";
+  }
+  function entry() {
+    if (!S.signedIn) return "signin";
+    if (!S.active) { S.reason = "inactive"; return "stop"; }
+    if (S.season === "in-closed") { S.reason = "season"; return "stop"; }
+    if (S.multi) return "home";
+    return startHome("mueller");
+  }
+
+  /* ---------- Stop screens ---------- */
+  var SAME_RULE = "Blocking rule still to be defined (Nov 3 call): it needs the season’s dates and a lookup of this home’s tune-up bookings (BOOKED or COMPLETED). The check runs after a home is chosen, so the home cards stay free of status pills.";
+  var STOPS = {
+    inactive: {
+      icon: "ri-user-line", h1: "Your membership isn’t active",
+      sub: "HVAC tune-ups are a member benefit.",
+      body: function () { return '<div class="card stop__card"><p class="t-strong">Call us and we’ll help</p>' + phones() + '</div>'; },
+      actions: ["dashboard"],
+      note: "The member’s subscription isn’t active, so no booking can be created. Copy and next step to confirm."
+    },
+    season: {
+      icon: "ri-hourglass-line", h1: "Off-season tune-ups have ended",
+      sub: "We’ll email you when tune-ups open again.",
+      actions: ["dashboard"],
+      note: "Proposal B for old links clicked in season (decision pending, Nov 3 call). Proposal A books at regular prices instead: set Season to “In season: regular prices”."
+    },
+    seasonmid: {
+      icon: "ri-hourglass-line", h1: "Off-season tune-ups ended before you finished",
+      sub: "Your tune-up wasn’t booked.",
+      actions: ["dashboard"],
+      note: "The off-season service type’s bookable dates closed between Continue and Schedule Appointment, so the booking is refused (Integrated Calendar A21). With proposal A, offer the regular price here instead."
+    },
+    nosystems: {
+      icon: "ri-snowy-line", h1: "We don’t have an HVAC system on file for this home",
+      sub: function () { return HOMES[S.home].addr + ", " + HOMES[S.home].city; },
+      body: function () { return '<div class="card stop__card"><p class="t-strong">Call us and we’ll add it, then you can book</p>' + phones() + '</div>'; },
+      actions: ["dashboard", "home"],
+      note: "<code>Subscription.plan.allowed_hvac_count</code> is 0 or empty, so a booking would have no tune-up tasks and a $0 price."
+    },
+    booked: {
+      icon: "ri-calendar-check-line", h1: "This home already has a tune-up booked",
+      sub: "Each home gets one tune-up per season.",
+      body: function () { return visitCard(S.home, EXISTING); },
+      actions: ["appointments", "home"],
+      note: SAME_RULE + " Reschedule and cancel stay in Appointments."
+    },
+    done: {
+      icon: "ri-history-line", h1: "This home already had its tune-up this season",
+      sub: function () { return "Last tune-up: " + fmt(LAST_DONE, { month: "long", day: "numeric", year: "numeric" }) + ". You can book again next season."; },
+      actions: ["dashboard", "home"],
+      note: SAME_RULE
+    }
+  };
+
   /* ---------- Views ---------- */
-  function flow() { return S.multi ? ["home", "tuneup", "time"] : ["tuneup", "time"]; }
-  var STEP = { home: "Home", tuneup: "Tune-up", time: "Schedule" };
   var VIEWS = {
-    dashboard: { h1: function () { return "Good morning, Sarah"; }, rail: "promo" },
+    signin: {
+      h1: "Sign in to schedule your tune-up", sub: "You’ll come right back here after you sign in.",
+      layout: "narrow", out: true
+    },
+    dashboard: { h1: "Good morning, Sarah", rail: "promo" },
     home: {
-      h1: function () { return "Which home is this tune-up for?"; },
-      sub: function () { return "Tune-ups start at $29 per system."; },
+      h1: "Which home is this tune-up for?",
+      sub: function () { return "Tune-ups start at " + money(unit("standard")) + " per system."; },
       back: ["dashboard", "Back to dashboard"], layout: "single", cta: "Continue"
     },
     tuneup: {
-      h1: function () { return "Choose your tune-up"; },
+      h1: "Choose your tune-up",
       sub: function () { var h = HOMES[S.home]; return h.addr + ", " + h.city; },
       back: function () { return S.multi ? ["home", "Back"] : ["dashboard", "Back to dashboard"]; },
       layout: "single", cta: "Continue to scheduling"
     },
-    time: {
-      h1: function () { return "Schedule your tune-up"; },
-      layout: "wide"
-    },
+    time: { h1: "Schedule your tune-up", layout: "wide" },
     booked: {
-      h1: function () { return "Your tune-up is booked"; },
-      sub: function () { return "We sent a confirmation by email and text."; },
+      h1: "Your tune-up is booked", sub: "We sent a confirmation by email and text.",
       icon: "ri-checkbox-circle-line", layout: "single"
+    },
+    stop: {
+      h1: function () { return STOPS[S.reason].h1; },
+      sub: function () { return val(STOPS[S.reason].sub); },
+      icon: function () { return STOPS[S.reason].icon; },
+      layout: "single"
     }
   };
 
@@ -705,9 +826,22 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
       '<div class="message__text"><strong>Includes your free HVAC Plan</strong>It starts when you book, at no cost.' +
       '<div class="perks"><span class="perk">' + ic("ri-check-line") + 'Priority HVAC service</span><span class="perk">' + ic("ri-check-line") + 'Discounted off-season tune-ups</span></div></div></div>';
   }
+  function seasonMessage() {
+    if (S.season === "ending") return msg("ri-time-line", "Off-season prices end November 30", "Book a visit on or before that date to get them.");
+    if (S.season === "in-regular") return msg("ri-information-line", "Off-season pricing has ended", "Tune-ups are now at regular prices.");
+    return "";
+  }
   function factions(label, status, cls) {
     return '<div class="factions' + (cls ? " " + cls : "") + '"><span class="factions__status" id="st" aria-live="polite">' + (status || "") + '</span>' +
       '<button class="btn btn--primary btn--lg" type="button" data-next>' + label + '</button></div>';
+  }
+
+  function renderSignin(sec) {
+    sec.innerHTML = '<form id="signin-form" novalidate>' +
+      '<div class="field"><label for="si-email">Email</label><input class="tf" id="si-email" type="email" autocomplete="username" value="sarah.mitchell@example.com"></div>' +
+      '<div class="field"><label for="si-pass">Password</label><input class="tf" id="si-pass" type="password" autocomplete="current-password" value="prototype"></div>' +
+      '<button class="btn btn--primary btn--lg auth__go" type="submit">Sign in</button></form>' +
+      bnote("The existing HomeHub sign-in. The /tune-ups link is kept, so the member lands back in this flow.");
   }
 
   function renderDashboard(sec) {
@@ -716,55 +850,55 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
       return '<section class="card"><h2 class="t-title">' + title + '</h2><div class="skel" aria-hidden="true">' + r + '</div></section>';
     }
     sec.innerHTML = '<div class="main">' + skel("Upcoming", 1) + skel("Recommendations", 3) +
-      bnote("Existing dashboard content is shown as placeholders. The promotion links to the same <code>/tune-ups</code> URL as the emails.") + '</div>';
+      bnote(S.season === "in-closed" ? "Tune-ups are closed (proposal B), so the promotion is hidden." : "Existing dashboard content is shown as placeholders. The promotion links to the same <code>/tune-ups</code> URL as the emails.") + '</div>';
   }
   function renderPromo() {
     $("#r-promo").innerHTML =
       '<div class="promo__body"><span class="tile tile--tint">' + ic("ri-snowy-line") + '</span><h2 class="t-title" id="promo-title">Time for your HVAC tune-up</h2>' +
-      '<p class="t-desc">From <strong class="t-strong" style="color:var(--ink)">$29</strong> per system for members.</p>' +
+      '<p class="t-desc">From <strong class="t-strong" style="color:var(--ink)">' + money(unit("standard")) + '</strong> per system for members.</p>' +
       '<a class="btn btn--primary btn--lg" href="#tune-ups">Schedule my tune-up</a></div>';
   }
 
   function renderHome(sec) {
     var list = homeIds().map(function (id) {
-      var h = HOMES[id];
+      var h = HOMES[id], n = sysCount(id);
       return '<label class="opt"><input type="radio" name="home" value="' + id + '"' + (S.home === id ? " checked" : "") + '><span class="opt__radio" aria-hidden="true"></span>' +
-        '<span class="home__tile">' + ic("ri-home-4-line") + '</span><span class="opt__main"><span class="opt__title">' + h.addr + '</span><span class="t-meta">' + h.city + ' · ' + systemsWord(h.systems) + '</span></span></label>';
+        '<span class="home__tile">' + ic("ri-home-4-line") + '</span><span class="opt__main"><span class="opt__title">' + h.addr + '</span><span class="t-meta">' + h.city + ' · ' + (n ? systemsWord(n) : "No HVAC system on file") + '</span></span></label>';
     }).join("");
-    sec.innerHTML = planMessage() +
+    sec.innerHTML = seasonMessage() + planMessage() +
       '<fieldset><legend class="sr-only">Your homes</legend><div class="homes">' + list + '</div></fieldset>' +
       (S.err === "home" ? '<p class="error" role="alert">' + ic("ri-error-warning-fill") + 'Choose a home to continue.</p>' : "") +
-      bnote("One card per active subscription. Systems = <code>Subscription.plan.allowed_hvac_count</code>. No booking status on the cards (Nov 3 call).") +
+      bnote("One card per active subscription. Systems = <code>Subscription.plan.allowed_hvac_count</code>. No booking status on the cards (Nov 3 call). Continue runs the home checks: no systems on file, already booked or done this season, or a started booking to resume.") +
       factions("Continue", S.home ? "<strong>" + HOMES[S.home].addr + "</strong>" : "", "factions--plain");
   }
 
   function renderTuneup(sec) {
-    var n = systems();
     function card(t) {
       var T = TYPES[t];
       return '<label class="opt tcard"><input type="radio" name="ttype" value="' + t + '"' + (S.type === t ? " checked" : "") + '>' +
         '<span class="tcard__head"><span class="tile">' + ic(T.icon) + '</span><span class="opt__radio" aria-hidden="true"></span></span>' +
         '<span class="tcard__name"><span class="opt__title">' + T.name + '</span><span class="badge badge--quiet">' + T.tag + '</span></span>' +
-        '<span class="tcard__price"><span class="tcard__amt">' + money(T.price) + '</span><span class="tcard__per">per system</span><span class="tcard__retail"><s>' + money(T.retail) + '</s></span><span class="save">Save ' + money(T.retail - T.price) + '</span></span>' +
+        '<span class="tcard__price"><span class="tcard__amt">' + money(unit(t)) + '</span><span class="tcard__per">per system</span>' +
+        (regular() ? "" : '<span class="tcard__retail"><s>' + money(T.retail) + '</s></span><span class="save">Save ' + money(T.retail - T.price) + '</span>') + '</span>' +
         '<span class="tcard__desc">' + T.desc + '</span></label>';
     }
-    sec.innerHTML = planMessage() +
+    sec.innerHTML = seasonMessage() + planMessage() +
       '<fieldset><legend class="sr-only">Tune-up type</legend><div class="tcards">' + card("standard") + card("comprehensive") + '</div></fieldset>' +
-      bnote("Off-season prices and savings text are hard-coded in the UI (Nov 3 call). Continue creates the booking in READY: the OFFSEASON Standard or Comprehensive service type, one task per system, <code>adjusted_total</code> = price × systems (PFX-593). The final bill comes from the Housecall Pro invoice, so the technician can adjust the system count (PFX-596).") +
+      bnote(regular()
+        ? "Proposal A for the in-season state: book the regular-price service types, Standard Tune-Up $125 and Comprehensive Tune-Up $250 per system (PFX-593). Decision pending."
+        : "Off-season prices and savings text are hard-coded in the UI (Nov 3 call). Continue creates the booking in READY: the OFFSEASON service type, one task per system, <code>adjusted_total</code> = price × systems (PFX-593). The final bill comes from the Housecall Pro invoice (PFX-596).") +
       '<div class="factions factions--total"><div class="ftotal" id="st" aria-live="polite">' + totalHtml() + '</div>' +
       '<button class="btn btn--primary btn--lg" type="button" data-next>Continue to scheduling</button></div>';
   }
   function totalHtml() {
     var T = TYPES[S.type], n = systems();
     return '<span class="ftotal__label">Estimated total</span>' +
-      '<span class="ftotal__row"><span class="ftotal__amt">' + money(total()) + '</span><span class="save">Save ' + money((T.retail - T.price) * n) + '</span></span>' +
-      '<span class="ftotal__sub">' + systemsWord(n) + (n > 1 ? " × " + money(T.price) : "") + ' · Billed after your visit</span>';
+      '<span class="ftotal__row"><span class="ftotal__amt">' + money(total()) + '</span>' + (regular() ? "" : '<span class="save">Save ' + money((T.retail - T.price) * n) + '</span>') + '</span>' +
+      '<span class="ftotal__sub">' + systemsWord(n) + (n > 1 ? " × " + money(unit()) : "") + ' · Billed after your visit</span>';
   }
-  function drawTotal() { updateSide(); }
 
-  function infoRow(icon, k, v) {
-    return '<div class="info__row">' + ic(icon) + '<span class="info__k">' + k + '</span><span class="info__v">' + v + '</span></div>';
-  }
+  /* ---------- Schedule (enrollment-flow components) ---------- */
+  function infoRow(icon, k, v) { return '<div class="info__row">' + ic(icon) + '<span class="info__k">' + k + '</span><span class="info__v">' + v + '</span></div>'; }
   function renderTime(sec) {
     var h = HOMES[S.home], T = TYPES[S.type], n = systems(), dateStep = S.tstep !== "time" || !S.date;
     var side = '<div class="sched__side"><div class="info">' +
@@ -777,23 +911,32 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
       '</div>' +
       (S.onPlan ? "" : '<p class="sched__plan">' + ic("ri-shield-check-line") + '<span><strong>Includes your free HVAC Plan.</strong> It starts when you schedule.</span></p>') +
       '</div>';
-    var main;
+    var main, note;
     if (dateStep) {
-      main = '<div class="sched__main"><h2 class="sched__title" id="sched-title" tabindex="-1">1. Select the date</h2>' +
-        (S.noSlots
-          ? '<div class="sched__empty"><p class="t-strong">No open dates right now</p><p class="t-meta">Call us and we’ll schedule your tune-up.</p>' +
-            '<div class="phones" style="justify-content:center"><span class="phone"><span class="t-meta">Austin</span><span class="phone__num">512.831.4390</span></span><span class="phone"><span class="t-meta">San Antonio</span><span class="phone__num">210.970.7959</span></span></div></div>'
-          : '<div class="pcal"><div class="pcal__month">' +
-            '<button class="pcal__nav" type="button" id="cal-prev" aria-label="Previous month">' + ic("ri-arrow-left-s-line") + '</button>' +
-            '<span class="pcal__label" id="cal-month" aria-live="polite"></span>' +
-            '<button class="pcal__nav" type="button" id="cal-next" aria-label="Next month">' + ic("ri-arrow-right-s-line") + '</button></div>' +
-            '<div class="pcal__grid" id="cal-grid" role="group" aria-labelledby="sched-title"></div></div>' +
-            '<div class="legend" aria-hidden="true"><div class="legend__row">' +
-            '<span class="legend__item"><span class="legend__dot legend__dot--today"></span>- Today</span>' +
-            '<span class="legend__item"><span class="legend__dot legend__dot--open"></span>- Available slots</span>' +
-            '<span class="legend__item"><span class="legend__dot legend__dot--sel"></span>- Selected</span></div>' +
-            '<div class="legend__row legend__row--center"><span class="legend__item"><span class="legend__dot legend__dot--sched"></span>- Scheduled</span></div></div>') +
-        '</div>';
+      var body;
+      if (S.cal === "error") {
+        body = '<div class="sched__empty"><p class="t-strong">We couldn’t load available dates</p><p class="t-meta">Please try again. If it keeps happening, call us.</p>' +
+          '<button class="dsbtn dsbtn--outline" type="button" id="cal-retry">Try again</button>' + phones() + '</div>';
+        note = "The availability request failed or timed out. Housecall Pro is read live (PFX-594); the calendar must fail safely and point to manual scheduling (Integrated Calendar A16).";
+      } else if (S.cal === "empty") {
+        body = '<div class="sched__empty"><p class="t-strong">No open dates right now</p><p class="t-meta">Call us and we’ll schedule your tune-up.</p>' + phones() + '</div>';
+        note = "No slot is free in both PreFix and Housecall Pro. Long visits (4–5 systems, 8–10 hours) often won’t fit; per PFX-590, Ops schedules those by hand.";
+      } else {
+        body = '<div class="pcal"><div class="pcal__month">' +
+          '<button class="pcal__nav" type="button" id="cal-prev" aria-label="Previous month">' + ic("ri-arrow-left-s-line") + '</button>' +
+          '<span class="pcal__label" id="cal-month" aria-live="polite"></span>' +
+          '<button class="pcal__nav" type="button" id="cal-next" aria-label="Next month">' + ic("ri-arrow-right-s-line") + '</button></div>' +
+          '<div class="pcal__grid" id="cal-grid" role="group" aria-labelledby="sched-title"></div></div>' +
+          '<div class="legend" aria-hidden="true"><div class="legend__row">' +
+          '<span class="legend__item"><span class="legend__dot legend__dot--today"></span>- Today</span>' +
+          '<span class="legend__item"><span class="legend__dot legend__dot--open"></span>- Available slots</span>' +
+          '<span class="legend__item"><span class="legend__dot legend__dot--sel"></span>- Selected</span></div>' +
+          '<div class="legend__row legend__row--center"><span class="legend__item"><span class="legend__dot legend__dot--sched"></span>- Scheduled</span></div></div>';
+        note = S.season === "ending"
+          ? "Dates after November 30 aren’t offered: the off-season service type’s bookable date range ends then (Integrated Calendar A21)."
+          : "Built from the enrollment flow’s Schedule Appointment components (Figma HomeHub-WCAG). Days and start times come from the member calendar, free in both PreFix and Housecall Pro (PFX-594). Duration: 60 min Standard or 120 min Comprehensive, per system. Technician: the territory’s HVAC tune-up specialist (PFX-593).";
+      }
+      main = '<div class="sched__main"><h2 class="sched__title" id="sched-title" tabindex="-1">1. Select the date</h2>' + body + '</div>';
     } else {
       var d = parse(S.date);
       main = '<div class="sched__main"><h2 class="sched__title" id="sched-title" tabindex="-1">2. What time works best?</h2>' +
@@ -801,28 +944,33 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
         '<div class="tchips" role="radiogroup" aria-labelledby="sched-title">' + slotsFor(S.date).map(function (st) {
           return '<label class="tchip"><input type="radio" name="slot" value="' + st + '"' + (S.time === st ? " checked" : "") + '>' + tLabel(st) + '</label>';
         }).join("") + '</div></div>';
+      note = S.alert === "taken" ? "Housecall Pro is checked again when the member picks a time; a taken slot is refused like any other (PFX-595)."
+        : S.alert === "fail" ? "Housecall Pro couldn’t create the job, so the booking wasn’t saved. The page shows a plain error, not a server error (PFX-595)."
+        : "";
     }
+    var top = "";
+    if (S.alert === "taken") top = msg("ri-error-warning-fill", "That time was just taken", "Please pick another time.", "message--alert");
+    else if (S.alert === "fail") top = msg("ri-error-warning-fill", "We couldn’t book your tune-up", "Something went wrong on our end and nothing was booked. Please try again.", "message--alert");
+    else if (S.resumed && dateStep) top = msg("ri-information-line", "You started booking this tune-up", "Pick a date to finish.");
+    if (S.resumed && dateStep) note = "A READY tune-up booking already exists for this home, so the flow resumes it instead of creating a second one. Back still lets the member change the tune-up type.";
     var cta = dateStep
-      ? '<button class="dsbtn dsbtn--primary" type="button" id="view-times"' + (S.date && !S.noSlots ? "" : " disabled") + '>View Times' + ic("ri-arrow-right-line") + '</button>'
+      ? '<button class="dsbtn dsbtn--primary" type="button" id="view-times"' + (S.date && S.cal !== "empty" && S.cal !== "error" ? "" : " disabled") + '>View Times' + ic("ri-arrow-right-line") + '</button>'
       : '<button class="dsbtn dsbtn--primary" type="button" id="schedule-btn"' + (S.time !== null ? "" : " disabled") + '>Schedule Appointment' + ic("ri-arrow-right-line") + '</button>';
-    sec.innerHTML =
-      (S.timeErr ? '<div class="message message--alert" role="alert"><span class="message__icon">' + ic("ri-error-warning-fill") + '</span><p class="message__text"><strong>That time was just taken</strong>Please pick another time.</p></div>' : "") +
-      '<div class="sched">' + side + main + '</div>' +
-      '<div class="scta"><button class="dsbtn dsbtn--outline" type="button" id="sched-back">Back</button>' + cta + '</div>' +
-      bnote("Built from the enrollment flow’s Schedule Appointment components (Figma HomeHub-WCAG, nodes 1712:145556 and 1516:118811). Days and start times come from the member calendar, free in both PreFix and Housecall Pro (PFX-594). Duration: 60 min Standard or 120 min Comprehensive, per system. Technician: the territory’s HVAC tune-up specialist assigned to the booking (PFX-593).");
-    if (dateStep && !S.noSlots) drawCal();
+    sec.innerHTML = top + '<div class="sched">' + side + main + '</div>' +
+      '<div class="scta"><button class="dsbtn dsbtn--outline" type="button" id="sched-back">Back</button>' + cta + '</div>' + bnote(note);
+    if (dateStep && S.cal !== "empty" && S.cal !== "error") drawCal();
   }
-  function tLabel(min) { var h = Math.floor(min / 60), m = min % 60; return (h % 12 || 12) + ":" + pad(m) + (h >= 12 ? " pm" : " am"); }
   function drawCal() {
-    var y = S.month.y, m = S.month.m;
+    var y = S.month.y, m = S.month.m, lm = lastMonth();
+    if (y > lm.y || (y === lm.y && m > lm.m)) { S.month = { y: lm.y, m: lm.m }; y = lm.y; m = lm.m; }
     $("#cal-month").textContent = fmt(new Date(y, m, 1), { month: "long" }) + "  " + y;
-    $("#cal-prev").disabled = y === FIRST_MONTH.y && m === FIRST_MONTH.m;
-    $("#cal-next").disabled = y === LAST_MONTH.y && m === LAST_MONTH.m;
+    $("#cal-prev").disabled = y === 2026 && m === 10;
+    $("#cal-next").disabled = y === lm.y && m === lm.m;
     var html = ["S", "M", "T", "W", "T", "F", "S"].map(function (l) { return '<span class="pcal__dow" aria-hidden="true">' + l + '</span>'; }).join("");
     var first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
     for (var b = 0; b < first.getDay(); b++) html += '<span class="pcal__day" aria-hidden="true"></span>';
     for (var n = 1; n <= days; n++) {
-      var d = new Date(y, m, n), key = iso(d), open = dayOpen(d), label = longDate(d);
+      var d = new Date(y, m, n), key = iso(d), open = slotsFor(key).length > 0, label = longDate(d);
       if (open) html += '<button type="button" class="pcal__day is-open" data-date="' + key + '" aria-pressed="' + (S.date === key) + '" aria-label="' + label + ', available">' + n + '</button>';
       else if (SCHEDULED[key]) html += '<span class="pcal__day is-sched" aria-label="' + label + ', ' + SCHEDULED[key] + ' scheduled">' + n + '</span>';
       else if (key === iso(TODAY)) html += '<span class="pcal__day is-today" aria-label="' + label + ', today">' + n + '</span>';
@@ -831,6 +979,7 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
     $("#cal-grid").innerHTML = html;
   }
 
+  /* ---------- Results ---------- */
   function visitCard(homeId, b) {
     var h = HOMES[homeId], d = parse(b.date), len = TYPES[b.type].min * b.systems;
     return '<div class="vcard"><div class="vcard__tile"><span class="vcard__mon">' + MON3[d.getMonth()] + '</span><span class="vcard__day">' + d.getDate() + '</span></div>' +
@@ -838,28 +987,38 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
       '<ul class="vcard__rows">' +
       '<li class="vcard__row"><span class="vcard__ic">' + ic("ri-snowy-line") + '</span><span>' + bookingText(b.type, b.systems) + '</span></li>' +
       '<li class="vcard__row"><span class="vcard__ic">' + ic("ri-home-4-line") + '</span><span>' + h.addr + ', ' + h.city + '</span></li>' +
-      '<li class="vcard__row"><span class="vcard__ic">' + ic("ri-bank-card-line") + '</span><span><strong>' + money(TYPES[b.type].price * b.systems) + '</strong> estimated, billed after your visit</span></li>' +
+      '<li class="vcard__row"><span class="vcard__ic">' + ic("ri-bank-card-line") + '</span><span><strong>' + money(b.unit * b.systems) + '</strong> estimated, billed after your visit</span></li>' +
       '</ul></div>';
   }
-  function nextReady(except) { return homeIds().filter(function (id) { return id !== except && !S.booked[id]; })[0] || null; }
-
   function renderBooked(sec) {
-    var L = S.last, other = nextReady(L.home);
+    var L = S.last, other = otherHome();
     sec.innerHTML = visitCard(L.home, L) +
       (L.enrolled ? '<div class="message result__note" role="status"><span class="message__icon">' + ic("ri-shield-check-line") + '</span><p class="message__text"><strong>Your HVAC Plan is active</strong>Priority HVAC service and discounted off-season tune-ups are now on.</p></div>' : "") +
       '<div class="result__actions"><a class="btn btn--primary btn--lg" href="#dashboard">Back to dashboard</a>' +
       (other ? '<button class="btn btn--secondary btn--lg" type="button" data-another="' + other + '">Book ' + HOMES[other].addr + '</button>' : "") + '</div>' +
-      bnote("PreFix sends its usual booked email and text (PFX-590). For members not on the plan, confirming sets <code>PFUser.hvac_subscriber</code> to true, which syncs to HubSpot.");
+      bnote("PreFix sends its usual booked email and text (PFX-590). For members not on the plan, scheduling sets <code>PFUser.hvac_subscriber</code> to true, which syncs to HubSpot.");
   }
-  /* ---------- Rail, dock ---------- */
+  function renderStop(sec) {
+    var R = STOPS[S.reason], other = S.multi ? otherHome() : null;
+    var acts = R.actions.map(function (a, i) {
+      var cls = i === 0 ? "btn btn--primary btn--lg" : "btn btn--secondary btn--lg";
+      if (a === "dashboard") return '<a class="' + cls + '" href="#dashboard">Back to dashboard</a>';
+      if (a === "appointments") return '<button class="' + cls + '" type="button" data-toast="Opens Appointments, where the member can reschedule or cancel">Manage in Appointments</button>';
+      if (a === "home") return other ? '<a class="' + cls + '" href="#home">Choose another home</a>' : (i === 0 ? "" : '<a class="' + cls + '" href="#dashboard">Back to dashboard</a>');
+      return "";
+    }).join("");
+    sec.innerHTML = (R.body ? R.body() : "") + '<div class="result__actions">' + acts + '</div>' + bnote(R.note);
+  }
+
+  /* ---------- Dock (phone) ---------- */
   function statusText() {
-    var v = S.view;
-    if (v === "home") return S.home ? "<strong>" + HOMES[S.home].addr + "</strong>" : "";
-    if (v === "tuneup") { var n = systems(); return "<strong>" + money(total()) + "</strong> estimated · " + systemsWord(n) + (n > 1 ? " × " + money(TYPES[S.type].price) : ""); }
+    if (S.view === "home") return S.home ? "<strong>" + HOMES[S.home].addr + "</strong>" : "";
+    if (S.view === "tuneup") { var n = systems(); return "<strong>" + money(total()) + "</strong> estimated · " + systemsWord(n) + (n > 1 ? " × " + money(unit()) : ""); }
     return "";
   }
   function updateSide() {
-    var st = $('[data-view="' + S.view + '"] #st'); if (st) st.innerHTML = S.view === "tuneup" ? totalHtml() : S.view === "time" ? "" : statusText();
+    var st = $('[data-view="' + S.view + '"] #st');
+    if (st) st.innerHTML = S.view === "tuneup" ? totalHtml() : statusText();
     drawDock();
   }
   function drawDock() {
@@ -870,21 +1029,25 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
     p.style.bottom = !dock.hidden && phone ? "calc(" + (dock.offsetHeight + 16) + "px + env(safe-area-inset-bottom, 0px))" : "";
   }
 
-  /* ---------- Navigation ---------- */
-  function entry() {
-    if (S.multi) return "home";
-    S.home = "mueller";
-    return "tuneup";
-  }
-  function ensure(view) {
-    if ((view === "tuneup" || view === "time") && (!S.home || homeIds().indexOf(S.home) < 0)) S.home = homeIds()[0];
-    if (view === "time" && S.tstep === "time" && !S.date) { S.date = "2026-11-12"; S.month = { y: 2026, m: 10 }; }
-    if (view === "booked" && !S.last) { var id = S.home && homeIds().indexOf(S.home) >= 0 ? S.home : "mueller"; S.last = { home: id, date: "2026-11-12", start: 570, type: "standard", systems: HOMES[id].systems }; }
-  }
+  /* ---------- Routing ---------- */
   function guard(view) {
     if (!VIEWS[view]) return entry();
-    if (view === "home" && !S.multi) return entry();
+    if (!S.signedIn) return view === "signin" ? view : "signin";
+    if (view === "signin") return entry();
+    if (view === "dashboard" || view === "booked") return view;
+    if (!S.active || S.season === "in-closed") return entry();
+    if (view === "stop") return S.reason ? view : entry();
+    if (view === "home") return S.multi ? view : entry();
+    if (!S.home || homeIds().indexOf(S.home) < 0) return S.multi ? "home" : entry();
+    if (homeBlock(S.home)) { S.reason = homeBlock(S.home); return "stop"; }
     return view;
+  }
+  function ensure(view) {
+    if (view === "time" && S.tstep === "time" && !S.date) { S.date = "2026-11-12"; S.month = { y: 2026, m: 10 }; }
+    if (view === "booked" && !S.last) {
+      var id = S.home && homeIds().indexOf(S.home) >= 0 ? S.home : "mueller";
+      S.last = { home: id, date: "2026-11-12", start: 570, type: "standard", systems: HOMES[id].systems, unit: unit("standard") };
+    }
   }
   var first = true;
   function route() {
@@ -897,57 +1060,55 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
 
   function render(view) {
     var V = VIEWS[view];
-    if (S.view !== view) { S.err = null; if (view !== "time") S.timeErr = false; }
+    if (S.view !== view) { S.err = null; if (view !== "time") S.alert = null; }
     S.view = view;
     body.setAttribute("data-screen", view);
+    body.classList.toggle("is-out", !!V.out);
     $all("[data-view]", $("#layout")).forEach(function (el) { el.hidden = el.getAttribute("data-view") !== view; });
     $all("[data-nav]").forEach(function (a) { a.classList.toggle("is-active", a.getAttribute("data-nav") === view); });
-    var b = typeof V.back === "function" ? V.back() : V.back;
+    var b = val(V.back);
     $("#back").hidden = !b;
     if (b) { $("#back-label").textContent = b[1]; $("#back-btn").setAttribute("data-goto", b[0]); }
-    var fl = flow(), idx = fl.indexOf(view), steps = $("#steps");
-    steps.hidden = idx < 0;
-    if (idx >= 0) {
-      steps.style.setProperty("--n", fl.length);
-      steps.innerHTML = fl.map(function (s, i) {
-        return '<li class="step ' + (i < idx ? "is-done" : i === idx ? "is-current" : "") + '"' + (i === idx ? ' aria-current="step"' : "") + '><span class="step__label">' + ic("ri-check-line") + (i + 1) + ' ' + STEP[s] + '</span><span class="step__bar"></span></li>';
-      }).join("");
-    }
-    $("#h1").textContent = V.h1();
-    var sub = V.sub ? V.sub() : ""; $("#sub").textContent = sub; $("#sub").hidden = !sub;
-    $("#f-icon").hidden = !V.icon; if (V.icon) $("#f-icon-use").setAttribute("href", "#" + V.icon);
-    $("#layout").className = "layout" + (V.layout ? " layout--" + V.layout : "");
-    $("#r-promo").hidden = V.rail !== "promo";
-    if (V.rail === "promo") renderPromo();
+    $("#h1").textContent = val(V.h1);
+    var sub = val(V.sub) || ""; $("#sub").textContent = sub; $("#sub").hidden = !sub;
+    var icon = val(V.icon);
+    $("#f-icon").hidden = !icon; if (icon) $("#f-icon-use").setAttribute("href", "#" + icon);
+    var promo = V.rail === "promo" && S.season !== "in-closed";
+    $("#layout").className = "layout" + (V.layout ? " layout--" + V.layout : promo ? "" : " layout--single");
+    $("#r-promo").hidden = !promo;
+    if (promo) renderPromo();
     var sec = $('[data-view="' + view + '"]', $("#layout"));
-    ({ dashboard: renderDashboard, home: renderHome, tuneup: renderTuneup, time: renderTime, booked: renderBooked })[view](sec);
+    ({ signin: renderSignin, dashboard: renderDashboard, home: renderHome, tuneup: renderTuneup, time: renderTime, booked: renderBooked, stop: renderStop })[view](sec);
     updateSide();
-    $all("[data-jump]").forEach(function (j) { j.setAttribute("aria-current", String(j.getAttribute("data-jump") === view)); });
+    $all("[data-jump]").forEach(function (j) { j.setAttribute("aria-current", String(j.getAttribute("data-jump") === view && (view !== "time" || (j.getAttribute("data-tstep") || "date") === S.tstep))); });
     $("#acct-menu").hidden = true; $("#mnav").hidden = true; $("#mnav-btn").setAttribute("aria-expanded", "false");
     if (!first) { window.scrollTo(0, 0); $("#h1").focus({ preventScroll: true }); }
     first = false;
   }
 
+  /* ---------- Actions ---------- */
   function next() {
-    var v = S.view;
-    if (v === "home") {
+    if (S.view === "home") {
       if (!S.home) { S.err = "home"; render("home"); return; }
-      go("tuneup"); return;
+      go(startHome(S.home)); return;
     }
-    if (v === "tuneup") { S.date = null; S.time = null; S.tstep = "date"; S.month = { y: 2026, m: 10 }; go("time"); return; }
+    if (S.view === "tuneup") { S.date = null; S.time = null; S.tstep = "date"; S.alert = null; S.resumed = false; S.month = { y: 2026, m: 10 }; go("time"); }
   }
+  function rerenderTime(focusTitle) { renderTime($('[data-view="time"]')); if (focusTitle) $("#sched-title").focus(); }
   function schedule() {
-    if (S.taken && !S.takenHit) { S.takenHit = true; S.takenKeys[S.date + ":" + S.time] = 1; S.time = null; S.timeErr = true; renderTime($('[data-view="time"]')); $("#sched-title").focus(); return; }
+    if (!S.hit && S.cal === "taken") { S.hit = true; S.takenKeys[S.date + ":" + S.time] = 1; S.time = null; S.alert = "taken"; rerenderTime(true); return; }
+    if (!S.hit && S.cal === "fail") { S.hit = true; S.alert = "fail"; rerenderTime(true); return; }
+    if (!S.hit && S.cal === "seasonmid") { S.hit = true; S.reason = "seasonmid"; go("stop"); return; }
     var enrolled = !S.onPlan;
-    S.booked[S.home] = { date: S.date, start: S.time, type: S.type, systems: systems() };
-    S.last = { home: S.home, date: S.date, start: S.time, type: S.type, systems: systems(), enrolled: enrolled };
+    var rec = { home: S.home, date: S.date, start: S.time, type: S.type, systems: systems(), unit: unit(), enrolled: enrolled };
+    S.booked[S.home] = rec; S.last = rec;
     if (enrolled) { S.onPlan = true; sync(); }
-    S.date = null; S.time = null; S.timeErr = false; S.tstep = "date"; S.month = { y: 2026, m: 10 };
+    S.date = null; S.time = null; S.alert = null; S.resumed = false; S.tstep = "date"; S.month = { y: 2026, m: 10 };
     go("booked");
   }
 
   var toastTimer;
-  function toast(msg) { var t = $("#toast"); $("#toast-text").textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 2000); }
+  function toast(m) { var t = $("#toast"); $("#toast-text").textContent = m; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 2400); }
 
   document.addEventListener("click", function (e) {
     if (!e.target.closest(".menu-wrap")) { $("#acct-menu").hidden = true; $("#acct-btn").setAttribute("aria-expanded", "false"); }
@@ -955,7 +1116,7 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
     if (t.hasAttribute("data-toast")) { e.preventDefault(); toast(t.getAttribute("data-toast")); return; }
     if (t.hasAttribute("data-goto")) { e.preventDefault(); go(t.getAttribute("data-goto")); return; }
     if (t.hasAttribute("data-next") || t.id === "dock-btn") { e.preventDefault(); next(); return; }
-    if (t.hasAttribute("data-another")) { S.home = t.getAttribute("data-another"); S.type = "standard"; S.date = null; S.time = null; go("tuneup"); return; }
+    if (t.hasAttribute("data-another")) { go(startHome(t.getAttribute("data-another"))); return; }
     if (t.hasAttribute("data-date")) {
       if (S.date !== t.getAttribute("data-date")) S.time = null;
       S.date = t.getAttribute("data-date");
@@ -963,41 +1124,60 @@ body.frame-mobile .app { max-width: 390px; margin: 0 auto; border-left: 1px soli
     }
     switch (t.id) {
       case "cal-prev": S.month = { y: 2026, m: 10 }; drawCal(); $("#cal-next").focus(); return;
-      case "cal-next": S.month = { y: 2026, m: 11 }; drawCal(); $("#cal-prev").focus(); return;
-      case "view-times": if (S.date) { S.tstep = "time"; S.timeErr = false; renderTime($('[data-view="time"]')); $("#sched-title").focus(); } return;
+      case "cal-next": S.month = { y: 2026, m: 11 }; drawCal(); ($("#cal-next").disabled ? $("#cal-prev") : $("#cal-next")).focus(); return;
+      case "cal-retry": S.cal = "ok"; sync(); rerenderTime(true); toast("Available dates loaded"); return;
+      case "view-times": if (S.date) { S.tstep = "time"; S.alert = null; rerenderTime(true); } return;
       case "schedule-btn": if (S.time !== null) schedule(); return;
       case "sched-back":
-        if (S.tstep === "time") { S.tstep = "date"; S.timeErr = false; renderTime($('[data-view="time"]')); $("#sched-title").focus(); }
-        else go("tuneup");
+        if (S.tstep === "time") { S.tstep = "date"; S.alert = null; rerenderTime(true); }
+        else { S.resumed = false; go("tuneup"); }
         return;
       case "acct-btn": var m = $("#acct-menu"); m.hidden = !m.hidden; t.setAttribute("aria-expanded", String(!m.hidden)); return;
       case "mnav-btn": var mn = $("#mnav"); mn.hidden = !mn.hidden; t.setAttribute("aria-expanded", String(!mn.hidden)); return;
       case "proto-toggle": var p = $("#proto-panel"); p.hidden = !p.hidden; t.setAttribute("aria-expanded", String(!p.hidden)); return;
     }
-    if (t.hasAttribute("data-jump")) { var j = t.getAttribute("data-jump"); if (j === "booked") S.last = null; if (j === "time") { S.tstep = t.getAttribute("data-tstep") || "date"; S.timeErr = false; if (S.tstep === "date") { S.date = null; S.time = null; } } go(j); return; }
+    if (t.hasAttribute("data-jump")) {
+      var j = t.getAttribute("data-jump");
+      if (j !== "signin" && !S.signedIn) { S.signedIn = true; sync(); }
+      if (j === "booked") S.last = null;
+      if (j === "time") { S.tstep = t.getAttribute("data-tstep") || "date"; S.alert = null; S.hit = false; if (S.tstep === "date") { S.date = null; S.time = null; } }
+      if ((j === "tuneup" || j === "time") && !S.home) S.home = homeIds().filter(function (id) { return !homeBlock(id); })[0] || "mueller";
+      go(j); return;
+    }
     if (t.hasAttribute("data-reset")) { var ph = S.phone, nt = S.notes; S = fresh(); S.phone = ph; S.notes = nt; sync(); go("tune-ups"); }
   });
 
   document.addEventListener("change", function (e) {
     var t = e.target;
-    if (t.name === "home") { S.home = t.value; S.err = null; S.type = "standard"; var er = $('[data-view="home"] .error'); if (er) er.remove(); updateSide(); return; }
-    if (t.name === "ttype") { S.type = t.value; drawTotal(); return; }
-    if (t.name === "slot") { S.time = +t.value; S.timeErr = false; var a = $('[data-view="time"] .message--alert'); if (a) a.remove(); $("#schedule-btn").disabled = false; return; }
+    if (t.name === "home") { S.home = t.value; S.err = null; var er = $('[data-view="home"] .error'); if (er) er.remove(); updateSide(); return; }
+    if (t.name === "ttype") { S.type = t.value; updateSide(); return; }
+    if (t.name === "slot") { S.time = +t.value; if (S.alert === "taken") { S.alert = null; var a = $('[data-view="time"] .message--alert'); if (a) a.remove(); } $("#schedule-btn").disabled = false; return; }
     if (t.hasAttribute("data-state")) {
-      var k = t.getAttribute("data-state"); S[k] = t.checked;
+      var k = t.getAttribute("data-state");
+      S[k] = t.type === "checkbox" ? t.checked : t.value;
       if (k === "phone") { body.classList.toggle("frame-mobile", S.phone); setTimeout(drawDock, 0); return; }
       if (k === "notes") { body.classList.toggle("show-notes", S.notes); return; }
-      if (k === "taken") S.takenHit = false;
-      if (k === "multi") { S.home = null; S.last = null; S.date = null; S.time = null; S.booked = {}; go("tune-ups"); return; }
-      if (k === "noSlots" && S.view === "time") { S.tstep = "date"; S.date = null; S.time = null; }
-      route();
+      if (k === "onPlan") { route(); return; }
+      if (k === "cal") {
+        S.hit = false; S.alert = null; S.takenKeys = {};
+        if (S.view === "time") { if (S.cal === "empty" || S.cal === "error") { S.tstep = "date"; S.date = null; S.time = null; } rerenderTime(false); }
+        return;
+      }
+      /* Member, season and home states change what the link does, so replay the entry. */
+      S.home = null; S.date = null; S.time = null; S.last = null; S.reason = null; S.booked = {}; S.hit = false; S.alert = null; S.resumed = false;
+      go("tune-ups");
     }
+  });
+  document.addEventListener("submit", function (e) {
+    if (e.target.id === "signin-form") { e.preventDefault(); S.signedIn = true; sync(); go("tune-ups"); }
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") { $("#acct-menu").hidden = true; var p = $("#proto-panel"); if (!p.hidden) { p.hidden = true; $("#proto-toggle").setAttribute("aria-expanded", "false"); $("#proto-toggle").focus(); } }
   });
 
-  function sync() { ["multi", "onPlan", "noSlots", "taken", "phone", "notes"].forEach(function (k) { var el = $("#ps-" + k); if (el) el.checked = !!S[k]; }); }
+  function sync() {
+    $all("[data-state]").forEach(function (el) { var k = el.getAttribute("data-state"); if (el.type === "checkbox") el.checked = !!S[k]; else el.value = S[k]; });
+  }
   window.addEventListener("hashchange", route);
   if (window.ResizeObserver) new ResizeObserver(drawDock).observe($("#app"));
   sync(); route();
