@@ -7,158 +7,90 @@
 @font-face{font-family:'Geist Pixel';src:url(fonts/GeistPixel-Square.woff2) format('woff2')}
 @font-face{font-family:'Geist Mono';src:url(fonts/GeistMono-Variable.woff2) format('woff2');font-weight:100 900}
 @font-face{font-family:'Figtree';src:url(fonts/Figtree-Variable-latin.woff2) format('woff2');font-weight:300 900}
-:root{--ink:#000;--g:#34CF88;--gray:#6E6E78;--soft:#B6B6B9;--pill:#F0F1F6;--line:#D5D3DF;--hair:#EEEEF1;
+:root{--g:#34CF88;--gray:#6E6E78;--pill:#F0F1F6;--line:#D5D3DF;--hair:#EEEEF1;
   --grad:linear-gradient(90deg,#FCB4E8 0%,#FEB94F 30%,#24C6F3 70%,#34CE8A 100%)}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:#111;overflow:hidden}
 #stage{position:relative;width:1920px;height:1080px;background:#fff;overflow:hidden;transform-origin:0 0;
-  font-family:'Figtree',sans-serif;font-weight:500;color:var(--ink);-webkit-font-smoothing:antialiased}
-.abs{position:absolute;left:0;top:0}
+  font-family:'Figtree',sans-serif;font-weight:600;color:#000;-webkit-font-smoothing:antialiased}
+.sc{position:absolute;inset:0;overflow:hidden;background:#fff}
+.a{position:absolute}
 .px{font-family:'Geist Pixel',monospace;font-weight:400;white-space:nowrap}
-.mono{font-family:'Geist Mono',monospace;white-space:nowrap}
-.lay{position:absolute;left:0;top:0;width:100%;height:100%}
-.card{background:#fff;border-radius:28px;border:1.5px solid var(--hair);box-shadow:0 30px 70px -24px rgba(24,22,40,.16),0 6px 16px -8px rgba(24,22,40,.06);overflow:hidden}
+.mono{font-family:'Geist Mono',monospace;font-weight:500;white-space:nowrap}
+.c{display:inline-block;white-space:pre}
 .ic{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;display:block}
 .bt{background:#000;color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
 .bt svg{width:56%;height:56%}
-.bdg{width:38px;height:38px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
-.bdg svg{width:60%;height:60%;stroke-width:3.2}
-.hl{position:absolute;left:0;top:0;width:1920px;text-align:center;font-size:84px;line-height:1;display:flex;align-items:center;justify-content:center;gap:22px}
-.hl .tl{width:64px;height:64px;border-radius:15px;margin-top:-6px}
-.c{display:inline-block;white-space:pre}
-.tx{white-space:nowrap}
-.gc{position:relative;display:inline-block;padding:.07em .14em .09em;margin:0 -.02em;isolation:isolate}
-.gc>i{position:absolute;inset:0;background:var(--grad);border-radius:.22em;z-index:-1;transform-origin:0 50%}
-.ln{position:absolute;left:0;top:0;height:3px;transform-origin:0 50%;border-radius:2px}
-.gry{background:var(--line)} .grn{background:var(--g)} .blk{background:#000}
-.lbl{width:400px;text-align:center}
-.chk{position:absolute}
+.card{background:#fff;border-radius:30px;border:1.5px solid var(--hair);box-shadow:0 34px 80px -28px rgba(24,22,40,.18),0 6px 16px -8px rgba(24,22,40,.06)}
+.app{background:#fff;border-radius:26%;border:1.5px solid var(--hair);box-shadow:0 26px 50px -20px rgba(24,22,40,.2),0 4px 12px -6px rgba(24,22,40,.08);display:flex;align-items:center;justify-content:center}
+.app>svg{width:50%;height:50%}
+.bdg{border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.bdg svg{width:58%;height:58%;stroke-width:3.4}
+.gc{position:relative;display:inline-block;padding:.06em .13em .1em;isolation:isolate}
+.gc>i{position:absolute;inset:0;background:var(--grad);border-radius:.2em;z-index:-1;transform-origin:0 50%}
+.hl{position:absolute;left:0;width:1920px;top:44px;height:84px;font-size:84px;line-height:84px;display:flex;align-items:center;justify-content:center;gap:24px}
+.hl .bt{width:66px;height:66px;border-radius:15px;margin-top:-4px}
+.ctr{position:absolute;left:0;width:1920px;text-align:center}
+.lock{display:flex;align-items:center;justify-content:center}
+.o{border-radius:50%;border:3.5px solid #DDDCE3;display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
+.o svg{width:58%;height:58%;stroke-width:3.4}
+.cap{position:absolute;width:300px;margin-left:-150px;text-align:center}
 
-/* icon field */
-#grid{width:1920px;height:1080px}
+/* S1 */
 #grid svg{position:absolute;width:54px;height:54px;stroke-width:2.2;color:#E7E6ED}
-
-/* terminal */
-#term{width:700px;height:280px;background:#111013;border-radius:26px;box-shadow:0 50px 90px -30px rgba(17,16,19,.55),0 10px 30px -10px rgba(17,16,19,.3);overflow:hidden;transform-origin:50% 50%}
-#term .bar{height:62px;border-bottom:1.5px solid #1E1D20;display:flex;align-items:center;gap:13px;padding-left:28px}
-#term .bar b{width:17px;height:17px;border-radius:50%}
-#term .row{position:absolute;left:34px;top:104px;display:flex;align-items:center;gap:20px;font-size:40px;color:#fff}
-#term .row svg{width:54px;height:42px;flex:none}
-#term .sub{position:absolute;left:34px;top:196px;font-size:22px;color:#8E8E9A}
-#term .car{display:inline-block;width:5px;height:42px;background:var(--g);margin-left:6px;vertical-align:-7px}
-
-/* app tiles */
-.app{background:#fff;border-radius:38px;border:1.5px solid var(--hair);box-shadow:0 26px 50px -20px rgba(24,22,40,.2),0 4px 12px -6px rgba(24,22,40,.08);display:flex;align-items:center;justify-content:center}
-.app>svg{width:46%;height:46%;stroke-width:1.9}
-
-/* sign-up form */
-#form{background:#fff;border:3px solid #000;overflow:hidden}
-#form .in{position:absolute;left:0;top:0;width:380px;height:440px;padding:28px 30px}
-#form h4{font-family:'Geist Pixel';font-weight:400;font-size:34px;margin-bottom:18px;white-space:nowrap}
-#form .fd{margin-bottom:14px}
-#form .fd span{display:block;font-size:19px;color:var(--gray);margin-bottom:6px}
-#form .fd div{height:48px;border-radius:14px;background:var(--pill)}
-#form .btn{height:56px;border-radius:16px;background:#000;color:#fff;font-size:22px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:22px}
-
-/* progress */
-#prog{width:0;height:0}
-#prog .base,#prog .fill{position:absolute;left:-550px;top:-1.5px;height:3px;width:1100px;transform-origin:0 50%;border-radius:2px}
-#prog .fill{background:var(--g);height:5px;top:-2.5px}
-#prog .nd{position:absolute;top:-22px;width:44px;height:44px;margin-left:-22px;border-radius:50%;border:3.5px solid #000;background:#fff;display:flex;align-items:center;justify-content:center;color:#fff}
-#prog .nd svg{width:26px;height:26px;stroke-width:3.4}
-#prog .lb{position:absolute;top:44px;width:400px;margin-left:-200px;text-align:center;font-size:56px}
-
-/* discover */
-#search{background:var(--pill);overflow:hidden}
-#search .in{position:absolute;left:0;top:0;width:640px;height:64px;display:flex;align-items:center;padding:0 26px;gap:14px;font-size:30px;font-weight:600}
-#search svg{width:26px;height:26px;stroke-width:2.6}
-#search .car{display:inline-block;width:3px;height:32px;background:#000;vertical-align:-6px;margin-left:3px}
-.fchip{height:64px;border-radius:32px;border:2px solid #E6E5EB;background:#fff;padding:0 24px;display:flex;align-items:center;gap:12px;font-size:26px;font-weight:600;white-space:nowrap}
+/* S2 */
+#wall .t{position:absolute;width:214px;height:296px;border-radius:20px;overflow:hidden}
+#wall .t svg{position:absolute;left:38px;top:54px;width:138px;height:108px}
+#wall .t div{position:absolute;left:18px;bottom:16px;font-size:27px;color:#fff}
+/* S3 terminal */
+#T{left:-20px;top:315px;width:1960px;height:490px;background:#111013;border-radius:38px;box-shadow:0 70px 120px -40px rgba(17,16,19,.6),0 14px 40px -14px rgba(17,16,19,.35);overflow:hidden}
+#T .bar{height:84px;border-bottom:2px solid #1E1D20;display:flex;align-items:center;gap:18px;padding-left:44px}
+#T .bar b{width:26px;height:26px;border-radius:50%}
+.g3{border-radius:22px;border:1.5px solid var(--hair);background:#fff;box-shadow:0 14px 26px -12px rgba(24,22,40,.22);display:flex;align-items:center;justify-content:center;width:72px;height:72px}
+.g3 svg{width:38px;height:38px;stroke-width:2.1}
+/* S4 */
+.step{width:440px;height:104px;border-radius:24px;background:#fff;border:2px solid var(--hair);box-shadow:0 18px 40px -18px rgba(24,22,40,.18);display:flex;align-items:center;gap:20px;padding:0 24px}
+.step .o{width:46px;height:46px}
+.step .px{font-size:40px;line-height:1}
+.step span{font-size:23px;color:var(--gray);display:block;margin-top:4px;white-space:nowrap}
+.res{height:92px;border-radius:22px;background:#fff;border:3px solid var(--g);display:flex;align-items:center;gap:16px;padding:0 26px 0 16px;font-size:32px;white-space:nowrap;box-shadow:0 18px 40px -14px rgba(52,207,136,.5)}
+.res .bt{width:60px;height:60px;border-radius:15px}
+/* S5 */
+.lr{position:absolute;left:0;width:860px;height:96px;display:flex;align-items:center}
+.lr .app{width:62px;height:62px;border-radius:17px;box-shadow:0 8px 16px -8px rgba(24,22,40,.2)}
+.lr .n{position:absolute;left:86px;font-size:37px;color:#000;white-space:nowrap}
+.lr .d{position:absolute;left:446px;font-size:37px;color:#5A5A63;white-space:nowrap}
+.lr .bdg{position:absolute;right:16px;width:42px;height:42px}
+/* S6 */
+.w{position:absolute;left:562px;top:502px;font-size:72px;line-height:76px;transform-origin:0 50%}
+.dm{position:absolute;left:884px;top:150px;width:1000px;height:780px}
+.fchip{height:72px;border-radius:36px;border:2px solid #E6E5EB;background:#fff;padding:0 26px;display:flex;align-items:center;gap:12px;font-size:28px;white-space:nowrap}
 .fchip u{text-decoration:none;font-size:15px;color:#77767F}
-#list .hd{position:absolute;left:0;top:0;width:100%;height:84px;border-bottom:1.5px solid #F3F3F5}
-#list .hd .px{position:absolute;left:30px;top:20px;font-size:44px}
-#list .hd .s{position:absolute;left:262px;top:33px;font-size:25px;color:var(--gray);font-weight:600}
-#list .hd .mono{position:absolute;top:36px;font-size:16px;letter-spacing:.08em;color:#9A99A3}
-#list .rk{position:absolute;left:34px;font-size:44px;color:#8B8F8F}
-#list .sep{position:absolute;left:0;width:100%;height:1.5px;background:#F3F3F5}
-.orow{position:absolute;left:0;top:0;width:1160px;height:128px}
-.orow .bt{position:absolute;left:108px;top:26px;width:76px;height:76px;border-radius:18px}
-.orow .nm{position:absolute;left:208px;top:41px;font-size:36px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
-.orow .pc{position:absolute;left:520px;top:36px;height:56px;min-width:104px;padding:0 18px;border-radius:14px;background:#F2F7F4;color:var(--g);font-size:34px;display:flex;align-items:center;justify-content:center}
-.orow .pc u{text-decoration:none;opacity:.3}
-.orow .v{position:absolute;top:44px;font-size:30px;font-weight:600;color:#3C3C44;white-space:nowrap}
-#s3{font-size:34px;font-weight:600;color:var(--gray);justify-content:center}
-
-/* onboard */
-.reqc{position:absolute;left:0;top:0;width:520px;height:420px;padding:32px 34px}
-.reqc .mono{font-size:16px;letter-spacing:.08em;color:#9A99A3}
-.reqc .ttl{font-size:46px;margin:10px 0 22px}
-.reqc .row{display:flex;align-items:center;justify-content:space-between;height:84px;border-top:1.5px solid #F3F3F5;font-size:25px;font-weight:600;color:var(--gray)}
-.reqc .row b{font-weight:600;color:#000;background:var(--pill);padding:9px 16px;border-radius:12px}
-.reqc .sg{display:flex;align-items:center;gap:12px;height:70px;border-top:1.5px solid #F3F3F5;font-size:24px;font-weight:600;color:var(--g)}
-.reqc .sg .bdg{width:30px;height:30px}
-#wal .appr{padding:32px 34px}
-#wal .hd{display:flex;align-items:center;gap:16px;font-size:36px}
-#wal .hd .bt{width:56px;height:56px;border-radius:14px}
-#wal .q{font-size:39px;margin:44px 0 12px}
-#wal .t2{font-size:24px;font-weight:600;color:var(--gray)}
-#wal .btns{position:absolute;left:34px;right:34px;bottom:34px;display:flex;gap:14px}
-#wal .btns div{flex:1;height:68px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:600}
-#wal .no{background:var(--pill);color:#55555E}
-#wal .yes{background:#000;color:#fff}
-#wal .ok{position:absolute;left:34px;right:34px;bottom:34px}
-#wal .ok .mono{font-size:16px;letter-spacing:.08em;color:#9A99A3;text-align:center;margin-bottom:12px}
-#wal .ok .bar{height:68px;border-radius:18px;background:var(--g);color:#fff;font-size:36px;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 16px 34px -12px rgba(52,207,136,.6)}
-#wal .ok .bar svg{width:30px;height:30px;stroke-width:3.2}
-#wal .vault,#wal .wt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
-#wal .vault .bt{width:150px;height:150px;border-radius:36px}
-#wal .vault .px{font-size:36px}
-#wal .wt svg{width:46%;height:46%;stroke-width:1.9}
-.tok{height:56px;padding:0 22px;border-radius:14px;background:#000;color:#fff;display:flex;align-items:center;gap:12px;font-size:22px;box-shadow:0 14px 28px -10px rgba(0,0,0,.45)}
-.tok b{color:#EFBE55;font-weight:500}
-
-/* rules */
-.rule .in{position:absolute;left:0;top:0;width:400px;height:280px;padding:30px 32px}
-.rule .mono{font-size:16px;letter-spacing:.08em;color:#9A99A3}
-.rule .rw{display:flex;align-items:center;justify-content:space-between;margin-top:26px;font-size:38px}
-.rule .rw .o{width:38px;height:38px;border-radius:50%;border:3px solid #DDDCE3;display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
-.rule .rw .o svg{width:60%;height:60%;stroke-width:3.2}
-.rule .bar{height:14px;border-radius:7px;background:var(--pill);margin-top:34px;overflow:hidden}
-.rule .bar i{display:block;height:100%;width:58%;background:#000;border-radius:7px}
-.rule .dts{display:flex;gap:10px;margin-top:34px}
-.rule .dts i{flex:1;height:14px;border-radius:7px;background:#000}
-.rule .dts i+i{opacity:.5}.rule .dts i+i+i{opacity:.2}
-#pol{display:flex;align-items:center;justify-content:center;gap:16px;font-size:38px}
-
-/* pay */
-.sel .in{position:absolute;inset:0;display:flex;align-items:center;padding:0 18px 0 30px;gap:14px}
-.sel .mono{flex:1;font-size:17px;letter-spacing:.08em;color:#9A99A3}
-.opt{width:250px;height:58px;border-radius:15px;background:#F2F7F4;color:#000;display:flex;align-items:center;justify-content:center;font-size:34px}
-#pay{width:34px;height:34px;border-radius:50%;background:var(--g);box-shadow:0 0 0 9px rgba(52,207,136,.22)}
-#badge{background:var(--g);color:#fff;height:76px;border-radius:20px;padding:0 30px 0 24px;display:flex;align-items:center;gap:14px;font-size:42px;box-shadow:0 22px 44px -14px rgba(52,207,136,.7)}
-#badge svg{width:36px;height:36px;stroke-width:3.4}
-
-/* output */
-#out .doc{padding:20px}
-#out .doc i{display:block;height:11px;border-radius:6px;background:#E3E2EA;margin-bottom:12px}
-#out .tb{position:absolute;left:0;top:0;width:1000px;height:560px}
-#out .th{height:92px;border-bottom:1.5px solid #F3F3F5;display:flex;align-items:baseline;gap:18px;padding:22px 34px 0}
-#out .th .px{font-size:48px}
-#out .th span{font-size:26px;font-weight:600;color:var(--gray)}
-#out .r{display:flex;align-items:center;gap:22px;height:76px;border-bottom:1.5px solid #F3F3F5;padding:0 34px}
-#out .r .av{width:40px;height:40px;border-radius:12px;background:#E3E2EA}
-#out .r i{height:14px;border-radius:7px;background:#E3E2EA}
-#out .r .bdg{margin-left:auto;width:36px;height:36px}
-
-#integ{font-size:44px;padding:.1em .3em .14em;border-radius:14px;background:var(--grad)}
-#lock{display:flex;align-items:center;gap:26px;font-size:110px;line-height:1;transform-origin:0 0}
-#lock .bt{width:110px;height:110px;border-radius:26px}
-#endh{font-size:190px}
-#endsub{font-size:72px;gap:0}
-#endsub span{display:inline-block;margin:0 .22em}
-#cta{width:620px;height:96px;border-radius:18px;background:#000;color:#fff;font-size:34px;display:flex;align-items:center;justify-content:center;gap:18px}
-#cta i{width:16px;height:16px;border-radius:50%;background:var(--g)}
-#tag{width:1920px;text-align:right;padding-right:56px;font-size:15px;letter-spacing:.08em;color:#C4C3CB}
+.row5{position:absolute;left:0;width:1000px;height:104px}
+.row5 .rk{position:absolute;left:30px;top:26px;font-size:50px;color:#8B8F8F}
+.row5 .bt{position:absolute;left:116px;top:16px;width:72px;height:72px;border-radius:17px}
+.row5 .nm{position:absolute;left:214px;top:16px;font-size:38px;white-space:nowrap}
+.row5 .at{position:absolute;left:214px;top:64px;font-size:21px;color:#9A99A3}
+.row5 .pc{position:absolute;right:26px;top:22px;height:60px;min-width:150px;padding:0 20px;border-radius:15px;background:#F2F7F4;color:var(--g);font-size:36px;display:flex;align-items:center;justify-content:center}
+.sep{position:absolute;left:0;width:100%;height:1.5px;background:#F3F3F5}
+.ln{position:absolute;height:5px;border-radius:3px;transform-origin:0 50%;background:var(--line)}
+.ln i{position:absolute;inset:0;background:var(--g);border-radius:3px;transform-origin:0 50%}
+.rule{position:absolute;top:60px;width:480px;height:420px;padding:36px 38px}
+.rule .mono{font-size:19px;letter-spacing:.08em;color:#9A99A3}
+.rule .rw{display:flex;align-items:center;justify-content:space-between;margin-top:34px;font-size:44px}
+.rule .rw .o{width:46px;height:46px}
+.rule .bar{height:16px;border-radius:8px;background:var(--pill);margin-top:22px;overflow:hidden}
+.rule .bar i{display:block;height:100%;background:#000;border-radius:8px}
+.sel{position:absolute;left:190px;width:620px;height:108px;display:flex;align-items:center;padding:0 20px 0 30px;gap:14px}
+.sel .mono{flex:1;font-size:19px;letter-spacing:.08em;color:#9A99A3}
+.opt{width:206px;height:66px;border-radius:17px;background:#F2F7F4;display:flex;align-items:center;justify-content:center;font-size:35px}
+.solid{background:var(--g);color:#fff;border-radius:24px;display:flex;align-items:center;justify-content:center;gap:16px;box-shadow:0 26px 50px -16px rgba(52,207,136,.7)}
+/* S7 */
+#rowz .app{position:absolute;top:0;width:140px;height:140px;border-radius:36px}
+#rowz .dot{position:absolute;top:-6px;right:-6px;width:28px;height:28px;border-radius:50%;background:var(--g)}
+#tog{width:188px;height:94px;border-radius:47px;position:relative;flex:none}
+#tog b{position:absolute;top:9px;left:9px;width:76px;height:76px;border-radius:50%;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,.18)}
+#tog span{position:absolute;left:22px;top:26px;font-size:32px;color:#fff;font-weight:700}
 #ui{position:fixed;left:0;right:0;bottom:0;padding:10px 16px;color:#bbb;font:13px 'Geist Mono',monospace;display:flex;gap:14px;align-items:center}
 #ui input{flex:1}
 </style>
@@ -166,16 +98,9 @@ html,body{background:#111;overflow:hidden}
 <body>
 <svg width="0" height="0" style="position:absolute"><defs>
   <symbol id="logo" viewBox="0 0 400 400"><path fill="currentColor" stroke="none" d="M60 400H0V360V340L340 0H400V60L60 400ZM400 400H160L240 320H320V240L400 160V400ZM0 0V240L80 160V80H160L240 0H0Z"/></symbol>
-  <symbol id="bot" viewBox="0 0 9 7"><path fill="#34CF88" d="M2 0h1v1h-1zM6 0h1v1h-1zM1 1h7v1h-7zM1 2h1v1h-1zM3 2h3v1h-3zM7 2h1v1h-1zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM3 6h3v1h-3z"/></symbol>
+  <symbol id="bot" viewBox="0 0 9 7"><path fill="currentColor" stroke="none" d="M2 0h1v1h-1zM6 0h1v1h-1zM1 1h7v1h-7zM1 2h1v1h-1zM3 2h3v1h-3zM7 2h1v1h-1zM0 3h9v1h-9zM1 4h7v1h-7zM2 5h5v1h-5zM3 6h3v1h-3z"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
-  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></symbol>
-  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 8a3 3 0 0 1 3-3h11v3"/><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M16 14h2"/></symbol>
-  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15.5" r="4"/><path d="M11 12.5 20 3.5M17 6.5l3 3M14 9.5l2 2"/></symbol>
-  <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.2a3.2 3.2 0 0 1 0 5.6M21 20c0-2.6-1.6-4.8-4-5.6"/></symbol>
-  <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9v11h16V9"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9"/><path d="M10 20v-5h4v5"/></symbol>
-  <symbol id="g-a" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/></symbol>
-  <symbol id="g-b" viewBox="0 0 24 24"><rect x="5.5" y="5.5" width="13" height="13" rx="2"/></symbol>
-  <symbol id="g-c" viewBox="0 0 24 24"><path d="M12 5l7.5 13h-15z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M3 12h17M13 5l7 7-7 7"/></symbol>
   <symbol id="f0" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></symbol>
   <symbol id="f1" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
   <symbol id="f2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M4 18l5-5 4 4 3-3 4 4"/></symbol>
@@ -188,402 +113,334 @@ html,body{background:#111;overflow:hidden}
   <symbol id="f9" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></symbol>
   <symbol id="f10" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 5l-3 14"/></symbol>
   <symbol id="f11" viewBox="0 0 24 24"><path d="M3 4h2.5l2.3 11h10.4L20 7.5H7"/><circle cx="9.5" cy="19" r="1.6"/><circle cx="16.5" cy="19" r="1.6"/></symbol>
+  <symbol id="f12" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="f13" viewBox="0 0 24 24"><path d="M3 8a3 3 0 0 1 3-3h11v3"/><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M16 14h2"/></symbol>
+  <symbol id="f14" viewBox="0 0 24 24"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9v11h16V9"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.7 2.7 0 0 0 20 9"/><path d="M10 20v-5h4v5"/></symbol>
+  <symbol id="f15" viewBox="0 0 24 24"><circle cx="8" cy="15.5" r="4"/><path d="M11 12.5 20 3.5M17 6.5l3 3M14 9.5l2 2"/></symbol>
+  <symbol id="f16" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6 15h4"/></symbol>
+  <symbol id="f17" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.800 9.200c-.6-1-1.600-1.500-2.800-1.500-1.700 0-3 .9-3 2.200 0 3 6 1.400 6 4.300 0 1.300-1.300 2.200-3 2.200-1.300 0-2.500-.6-3-1.600M12 5.500v2.200M12 16.400v2.100"/></symbol>
+  <symbol id="f18" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.500 8-8 9-4.500-1-8-4-8-9V6z"/><path d="M8.500 12l2.500 2.500 4.500-4.500"/></symbol>
+  <symbol id="f19" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.200"/><path d="M3 20c0-3.300 2.700-6 6-6s6 2.700 6 6"/><path d="M16 5.200a3.200 3.200 0 0 1 0 5.600M21 20c0-2.600-1.600-4.800-4-5.600"/></symbol>
+  <symbol id="f20" viewBox="0 0 24 24"><path d="M3 10l9-6 9 6M5 10v9M19 10v9M9 10v9M15 10v9M3 20h18"/></symbol>
 </defs></svg>
 
 <div id="stage">
-  <div id="grid" class="abs"></div>
-
-  <div id="ln1" class="ln gry"></div>
-  <div id="ln5" class="ln gry"></div>
-  <div id="ln6" class="ln grn" style="height:5px"></div>
-  <div id="ln4" class="ln gry"></div>
-  <div id="ln4g" class="ln grn" style="height:5px"></div>
-  <div id="ln8" class="ln grn" style="height:5px"></div>
-
-  <!-- S1 service -->
-  <div id="svc1" class="abs app"><svg class="ic"><use href="#i-people"/></svg></div>
-  <div id="svc1L" class="abs lbl"><div class="px" style="font-size:40px">Contact data</div><div style="font-size:24px;font-weight:600;color:var(--gray);margin-top:8px">External service</div></div>
-
-  <div id="form" class="abs"><div class="in">
-    <h4>Create account</h4>
-    <div class="fd"><span>Work email</span><div></div></div>
-    <div class="fd"><span>Password</span><div></div></div>
-    <div class="fd"><span>Company</span><div></div></div>
-    <div class="btn">Create account</div></div></div>
-
-  <!-- S8 tiles -->
-  <div id="bw" class="abs app"><svg class="ic"><use href="#i-wallet"/></svg></div>
-  <div id="bwL" class="abs lbl" style="height:60px"><div id="bwA" class="px lay" style="font-size:50px">Wallet</div><div id="bwB" class="px lay" style="font-size:50px">Buyer Wallet</div></div>
-  <div id="sg" class="abs app"><svg class="ic"><use href="#i-store"/></svg></div>
-  <div id="sgL" class="abs lbl" style="height:60px"><div id="sgA" class="px lay" style="font-size:50px">Service</div><div id="sgB" class="px lay" style="font-size:50px">Seller Gateway</div></div>
-  <div id="integ" class="abs px">Integrate once.</div>
-
-  <!-- discover -->
-  <div id="search" class="abs"><div class="in" id="searchIn"><svg class="ic"><use href="#i-search"/></svg><div><span id="qt"></span><span class="car" id="qc"></span></div></div></div>
-  <div id="chip1" class="abs fchip">Price: low to high <u>▼</u></div>
-  <div id="chip2" class="abs fchip">x402 / MPP <u>▼</u></div>
-  <div id="list" class="abs card">
-    <div class="hd"><div class="px">Offerings</div><div class="s">3 results</div>
-      <div class="mono" style="left:520px">PRICE</div><div class="mono" style="left:690px">PROTOCOL</div><div class="mono" style="left:900px">PAYMENT METHOD</div></div>
-    <div class="rk px" style="top:124px">1</div><div class="rk px" style="top:252px">2</div><div class="rk px" style="top:380px">3</div>
-    <div class="sep" style="top:212px"></div><div class="sep" style="top:340px"></div>
+<!-- S1 title -->
+<div class="sc" id="S1">
+  <div id="grid" class="a" style="inset:0"></div>
+  <div id="s1w" class="a" style="inset:0">
+    <div class="ctr lock px" style="top:296px;height:150px;font-size:150px;line-height:150px;gap:34px"><div class="bt" id="s1t" style="width:124px;height:124px;border-radius:29px"><svg><use href="#logo"/></svg></div><span id="s1n">InFlow</span></div>
+    <div class="ctr" style="top:476px;height:268px"><div id="s1c" style="display:inline-block;position:relative;height:268px;padding:0 44px;overflow:hidden">
+      <i id="s1g" style="position:absolute;inset:0;background:var(--grad);transform-origin:0 50%"></i>
+      <div id="s1h" class="px" style="position:relative;font-size:204px;line-height:268px">Sell to AI agents</div></div></div>
   </div>
-  <div id="ofB" class="abs"></div>
-  <div id="ofC" class="abs"></div>
-
-  <!-- wallet card / vault / tile -->
-  <div id="wal" class="abs card">
-    <div class="lay appr" id="walA">
-      <div class="hd px"><div class="bt"><svg class="ic"><use href="#i-wallet"/></svg></div>Wallet</div>
-      <div class="q px">Approve this sign-up?</div>
-      <div class="t2">Offering A · Contact enrichment</div>
-      <div class="btns" id="walBt"><div class="no">Decline</div><div class="yes" id="walYes">Approve</div></div>
-      <div class="ok" id="walOk"><div class="mono">OWNER APPROVAL</div><div class="bar px"><svg class="ic"><use href="#i-check"/></svg>Approved</div></div>
-    </div>
-    <div class="lay vault" id="walV"><div class="bt" id="vaultT"><svg class="ic" id="vaultK"><use href="#i-key"/></svg></div><div class="px">Credential vault</div></div>
-    <div class="lay wt" id="walT"><svg class="ic"><use href="#i-wallet"/></svg></div>
-  </div>
-  <div id="walL" class="abs lbl"><div class="px" style="font-size:40px">Wallet</div><div class="mono" style="font-size:19px;color:var(--g);margin-top:8px">credential stored</div></div>
-  <div id="walB" class="abs bdg"><svg class="ic"><use href="#i-check"/></svg></div>
-
-  <!-- service tile -->
-  <div id="svc" class="abs app"><svg class="ic"><use href="#g-a"/></svg></div>
-  <div id="svcL" class="abs lbl"><div class="px" style="font-size:40px">Offering A</div><div class="mono" id="svcSt" style="font-size:19px;margin-top:8px"></div></div>
-  <div id="svcB" class="abs bdg"><svg class="ic"><use href="#i-check"/></svg></div>
-
-  <!-- selected offering -> request panel -->
-  <div id="card" class="abs card">
-    <div id="cardO"></div>
-    <div class="reqc" id="cardR">
-      <div class="mono">SIGN-UP REQUEST</div>
-      <div class="ttl px">Offering A</div>
-      <div class="row" id="rr1"><span>Requested identity</span><b>Agent ID</b></div>
-      <div class="row" id="rr2"><span>Service access</span><b>Contact enrichment</b></div>
-      <div class="sg" id="rr3"><div class="bdg"><svg class="ic"><use href="#i-check"/></svg></div>Signed by wallet</div>
-    </div>
-  </div>
-
-  <!-- rules -->
-  <div id="bp" class="abs card rule">
-    <div class="in" id="bpIn"><div class="mono">BUYER RULES</div>
-      <div class="rw px">Spend limit<div class="o" id="bpC"><svg class="ic"><use href="#i-check"/></svg></div></div>
-      <div class="bar"><i></i></div></div>
-    <div class="lay px" id="pol"><div class="bdg"><svg class="ic"><use href="#i-check"/></svg></div>Policy checks passed</div>
-  </div>
-  <div id="sp" class="abs card rule">
-    <div class="in" id="spIn"><div class="mono">SELLER RULES</div>
-      <div class="rw px" style="font-size:29px">Access requirements<div class="o" id="spC"><svg class="ic"><use href="#i-check"/></svg></div></div>
-      <div class="dts"><i></i><i></i><i></i></div></div>
-  </div>
-
-  <!-- pay -->
-  <div id="vln" class="abs" style="width:5px;background:var(--g);transform-origin:50% 0;border-radius:3px"></div>
-  <div id="rowP" class="abs card sel"><div class="in"><div class="mono">PROTOCOL</div><div class="opt px" id="o1">x402</div><div class="opt px" id="o2">MPP</div></div></div>
-  <div id="rowM" class="abs card sel"><div class="in"><div class="mono">PAYMENT METHOD</div><div class="opt px" id="o3">Stablecoin</div><div class="opt px" id="o4">Card</div></div></div>
-  <div id="badge" class="abs px"><svg class="ic"><use href="#i-check"/></svg>Payment verified</div>
-
-  <!-- output / table -->
-  <div id="out" class="abs card">
-    <div class="lay doc" id="outD"><i style="width:60%"></i><i></i><i style="width:82%"></i><i style="width:70%"></i></div>
-    <div class="tb" id="outT"><div class="th"><div class="px">Qualified prospects</div><span>50 rows</span></div><div id="rows"></div></div>
-  </div>
-
-  <div id="term" class="abs">
+</div>
+<!-- S2 typed cut-ins -->
+<div class="sc" id="S2">
+  <div class="a" id="s2a" style="inset:0;background:#fff"><div class="ctr px ty" id="s2t1" style="top:486px;font-size:108px;line-height:108px">Your next customer</div></div>
+  <div class="a" id="s2b" style="inset:0;background:#000"><div class="ctr px ty" id="s2t2" style="top:486px;font-size:108px;line-height:108px;color:#fff">is an</div></div>
+  <div class="a" id="s2c" style="inset:0;background:#070708"><div id="wall" class="a" style="left:0;top:0"></div><div class="a" style="inset:0;background:rgba(0,0,0,.7)"></div>
+    <div class="ctr px ty" id="s2t3" style="top:455px;font-size:170px;line-height:170px;color:#fff">AI agent</div></div>
+</div>
+<!-- S3 terminal -->
+<div class="sc" id="S3">
+  <div id="wave" class="a" style="left:-600px;top:-700px;width:520px;height:2600px;background:linear-gradient(90deg,rgba(52,207,136,0),rgba(52,207,136,.2) 50%,rgba(52,207,136,0));transform-origin:50% 50%"></div>
+  <div id="tiles" class="a" style="inset:0"></div>
+  <div id="T" class="a">
     <div class="bar"><b style="background:#FF5E57"></b><b style="background:#FBBD2E"></b><b style="background:#26C73F"></b></div>
-    <div class="row px" id="tR1"><svg><use href="#bot"/></svg><span><span id="tTxt"></span><span class="car" id="tCar"></span></span></div>
-    <div class="row px" id="tR2"><div class="bdg" style="width:44px;height:44px"><svg class="ic"><use href="#i-check"/></svg></div><span>50 qualified prospects ready.</span></div>
-    <div class="sub mono" id="tSub">agent · task in progress</div>
+    <div class="a" style="left:54px;top:136px;display:flex;align-items:center;gap:40px;color:#fff"><svg style="width:98px;height:76px;color:var(--g)"><use href="#bot"/></svg><div class="px" style="font-size:80px;line-height:90px"><span id="tq"></span><span id="tcar" style="display:inline-block;width:8px;height:78px;background:var(--g);margin-left:8px;vertical-align:-12px"></span></div></div>
+    <div class="a" id="tl2" style="left:50px;top:262px;display:flex;align-items:center;gap:30px;color:#fff"><div class="bt" style="width:84px;height:84px;border-radius:20px;border:2.5px solid #3a3a40;transform:rotate(-8deg)"><svg><use href="#logo"/></svg></div><div class="px" style="font-size:62px">inflow · discover <span id="tdots" style="color:#77767F"></span></div></div>
+    <div class="a mono" id="tl3" style="left:164px;top:376px;font-size:40px;color:#8E8E9A"></div>
   </div>
-
-  <div id="sig" class="abs tok mono"><svg class="ic" style="width:24px;height:24px;color:#EFBE55"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>signed request</div>
-  <div id="key" class="abs tok mono"><svg class="ic" style="width:24px;height:24px;color:#EFBE55"><use href="#i-key"/></svg>credential</div>
-  <div id="mk" class="abs" style="width:34px;height:34px;border-radius:50%;background:var(--g);box-shadow:0 0 0 9px rgba(52,207,136,.22)"></div>
-  <div id="pay" class="abs"></div>
-
-  <!-- copy -->
-  <div id="h1" class="hl px" style="font-size:96px;gap:0">Your next customer is an&nbsp;<span class="gc"><i id="h1hi"></i>AI agent.</span></div>
-  <div id="h2" class="hl px" data-t>Let agents become <span class="gc"><i></i>paying customers.</span></div>
-  <div id="h3" class="hl px" data-t data-tile>Find the right service.</div>
-  <div id="s3" class="hl">300+ services. 28 categories.</div>
-  <div id="h4" class="hl px" data-t data-tile>Sign up in one signed exchange.</div>
-  <div id="h5" class="hl px" data-t data-tile>Both sides set the rules.</div>
-  <div id="h6" class="hl px" data-t data-tile>Pay inside the request.</div>
-  <div id="h7" class="hl px" data-t data-tile>Service delivered. Task completed.</div>
-  <div id="h8" class="hl px" data-t>One commerce channel. <span class="gc"><i></i>Both sides.</span></div>
-
-  <div id="prog" class="abs">
-    <div class="base" id="pgBase"></div><div class="fill" id="pgFill"></div>
-    <div class="nd" id="n0" style="left:-400px"><svg class="ic"><use href="#i-check"/></svg></div>
-    <div class="nd" id="n1" style="left:0"><svg class="ic"><use href="#i-check"/></svg></div>
-    <div class="nd" id="n2" style="left:400px"><svg class="ic"><use href="#i-check"/></svg></div>
-    <div class="lb px" id="l0" style="left:-400px">Discover</div>
-    <div class="lb px" id="l1" style="left:0">Onboard</div>
-    <div class="lb px" id="l2" style="left:400px">Pay</div>
+  <div id="dot3" class="a" style="left:940px;top:540px;width:40px;height:40px;border-radius:50%;background:var(--g)"></div>
+  <div id="pick" class="a" style="inset:0"></div>
+</div>
+<!-- S4 every purchase -->
+<div class="sc" id="S4">
+  <div class="hl px ty" id="h4" data-tile>InFlow runs every <span class="gc"><i></i>purchase.</span></div>
+  <div id="s4" class="a" style="inset:0"></div>
+  <div id="tray" class="a" style="left:230px;top:812px;width:1460px;height:156px;border-radius:34px;border:2.5px dashed #DAD9E2;background:#FAFAFC"></div>
+  <div id="scan" class="a" style="left:0;top:0;width:1920px;height:0">
+    <div class="a" style="left:96px;top:-2.5px;width:1770px;height:5px;background:#E84FC0;border-radius:3px;box-shadow:0 0 22px 3px rgba(232,79,192,.45)"></div>
+    <div class="a bt" style="left:24px;top:-33px;width:66px;height:66px;border-radius:16px;background:#E84FC0;box-shadow:0 0 0 7px rgba(232,79,192,.18)"><svg><use href="#logo"/></svg></div></div>
+  <div id="resw" class="a" style="inset:0"></div>
+</div>
+<!-- S5 one wallet -->
+<div class="sc" id="S5">
+  <div class="a px ty" id="s5a" style="left:140px;top:262px;font-size:124px;line-height:128px">One wallet.</div>
+  <div class="a px ty" id="s5b" style="left:140px;top:390px;font-size:124px;line-height:128px">Any <span class="gc" style="padding:.02em .12em .08em"><i></i>service.</span></div>
+  <div class="a lock px" id="s5l" style="left:140px;top:584px;font-size:66px;gap:20px"><div class="bt" style="width:72px;height:72px;border-radius:17px"><svg><use href="#logo"/></svg></div>InFlow</div>
+  <div class="a" style="left:930px;top:110px;width:860px;height:800px;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 16%,#000 78%,transparent 100%)"><div id="lst" class="a" style="left:0;top:0;width:860px"></div></div>
+  <div class="a" id="s5f" style="left:930px;top:934px;font-size:36px;color:#5A5A63">…300+ services across 28 categories.</div>
+</div>
+<!-- S6 wheel -->
+<div class="sc" id="S6">
+  <div class="a px ty" id="s6a" style="left:64px;top:438px;font-size:88px;line-height:92px">One flow</div>
+  <div class="a bt" id="s6t" style="left:70px;top:562px;width:78px;height:78px;border-radius:18px"><svg><use href="#logo"/></svg></div>
+  <svg class="ic a" id="s6r" style="left:446px;top:502px;width:70px;height:70px;stroke-width:2.6"><use href="#i-arrow"/></svg>
+  <div id="wheel"></div>
+  <!-- Discover -->
+  <div class="dm" id="d0">
+    <div class="a" style="left:0;top:30px;width:420px;height:72px;border-radius:36px;background:var(--pill);display:flex;align-items:center;gap:14px;padding:0 26px;font-size:32px"><svg class="ic" style="width:28px;height:28px;stroke-width:2.8"><use href="#f0"/></svg><span id="d0q"></span></div>
+    <div class="a fchip" id="d0c0" style="left:440px;top:30px">x402 <u>▼</u></div><div class="a fchip" id="d0c1" style="left:600px;top:30px">Stablecoin <u>▼</u></div><div class="a fchip" id="d0c2" style="left:826px;top:30px">Price ↑ <u>▼</u></div>
+    <div class="a card" id="d0card" style="left:0;top:134px;width:1000px;height:624px"><div class="a px" style="left:30px;top:22px;font-size:50px">Results</div><div class="a" style="left:230px;top:38px;font-size:27px;color:var(--gray)">typed attributes · same terms for every seller</div><div class="sep" style="top:100px"></div><div id="d0rows"></div></div>
   </div>
-
-  <div id="lock" class="abs px"><div class="bt"><svg><use href="#logo"/></svg></div><span>InFlow</span></div>
-  <div id="endh" class="hl px" style="gap:0">Sell to&nbsp;<span class="gc" style="padding:.02em .1em .06em"><i id="endhi" style="border-radius:0"></i>AI agents.</span></div>
-  <div id="endsub" class="hl px"><span id="e0">Discover.</span><span id="e1">Onboard.</span><span id="e2">Pay.</span></div>
-  <div id="cta" class="abs mono"><i></i>Available now.</div>
-  <div id="tag" class="abs mono">ILLUSTRATIVE INTERFACE</div>
+  <!-- Onboard -->
+  <div class="dm" id="d1"></div>
+  <!-- Policy -->
+  <div class="dm" id="d2">
+    <div class="card rule" style="left:0"><div class="mono">BUYER RULES</div><div class="rw px">Spend limit<div class="o" id="p0"><svg class="ic"><use href="#i-check"/></svg></div></div><div class="bar"><i style="width:58%"></i></div><div class="rw px">Auto-approve<div class="o" id="p1"><svg class="ic"><use href="#i-check"/></svg></div></div><div class="bar"><i style="width:34%"></i></div></div>
+    <div class="card rule" style="left:520px"><div class="mono">SELLER RULES</div><div class="rw px">Access<div class="o" id="p2"><svg class="ic"><use href="#i-check"/></svg></div></div><div class="bar"><i style="width:76%"></i></div><div class="rw px">Payment cap<div class="o" id="p3"><svg class="ic"><use href="#i-check"/></svg></div></div><div class="bar"><i style="width:46%"></i></div></div>
+    <div class="a px" id="ppill" style="left:0;top:540px;width:1000px;height:124px;border-radius:62px;background:#fff;display:flex;align-items:center;justify-content:center;gap:22px;font-size:56px;box-shadow:0 0 0 5px #34CF88,0 34px 70px -18px rgba(52,207,136,.6)"><div class="bdg" style="width:56px;height:56px"><svg class="ic"><use href="#i-check"/></svg></div>Policy checks passed</div>
+  </div>
+  <!-- Pay -->
+  <div class="dm" id="d3">
+    <div class="ln" style="left:150px;top:387.500px;width:700px"><i id="payl"></i></div>
+    <div class="a" id="payv" style="left:497.500px;top:258px;width:5px;height:264px;background:var(--g);border-radius:3px;transform-origin:50% 0"></div>
+    <div class="a app" style="left:0;top:315px;width:150px;height:150px"><svg class="ic"><use href="#f13"/></svg></div><div class="cap px" style="left:75px;top:486px;font-size:40px">Wallet</div>
+    <div class="a app" style="left:850px;top:315px;width:150px;height:150px"><svg class="ic"><use href="#f14"/></svg></div><div class="cap px" style="left:925px;top:486px;font-size:40px">Seller</div>
+    <div class="card sel" id="selP" style="top:150px"><div class="mono">PROTOCOL</div><div class="opt px" id="o1">x402</div><div class="opt px" id="o2">MPP</div></div>
+    <div class="card sel" id="selM" style="top:522px"><div class="mono">RAIL</div><div class="opt px" id="o3">Stablecoin</div><div class="opt px" id="o4">Card</div></div>
+    <div class="a" id="paydot" style="left:0;top:371px;width:38px;height:38px;border-radius:50%;background:var(--g);box-shadow:0 0 0 10px rgba(52,207,136,.22)"></div>
+    <div class="a solid px" id="payb" style="left:232px;top:340px;width:536px;height:100px;font-size:50px"><svg class="ic" style="width:44px;height:44px;stroke-width:3.4"><use href="#i-check"/></svg>Payment verified</div>
+  </div>
+  <!-- Payouts -->
+  <div class="dm" id="d4"><div class="a card" style="left:0;top:70px;width:1000px;height:560px"><div class="a px" style="left:30px;top:22px;font-size:50px">Payouts</div><div class="a" style="left:240px;top:38px;font-size:27px;color:var(--gray)">daily · weekly · monthly · manual</div><div class="sep" style="top:100px"></div><div id="d4rows"></div></div></div>
+</div>
+<!-- S7 any agent row + toggle -->
+<div class="sc" id="S7">
+  <div id="rowz" class="a" style="left:0;top:518px;width:1920px;height:140px;transform-origin:960px 70px"></div>
+  <div class="ctr lock px" id="s7l" style="top:752px;height:96px;font-size:86px;gap:26px"><span class="ty" id="s7a">Start</span><div id="tog"><span>Auto</span><b id="knob"></b></div><span class="ty" id="s7b">selling to AI agents.</span></div>
+</div>
+<!-- S8 end card -->
+<div class="sc" id="S8">
+  <div class="ctr lock px" style="top:186px;height:96px;font-size:104px;line-height:96px;gap:26px"><div class="bt" id="s8t" style="width:92px;height:92px;border-radius:22px"><svg><use href="#logo"/></svg></div><span id="s8n">InFlow</span></div>
+  <div class="ctr" style="top:338px;height:186px;overflow:hidden"><div class="px" id="s8a" style="font-size:176px;line-height:186px">Sell to</div></div>
+  <div class="ctr" style="top:530px;height:190px"><div style="display:inline-block;position:relative;height:190px;padding:0 30px;overflow:hidden"><i id="s8g" style="position:absolute;inset:0;background:var(--grad);transform-origin:0 50%"></i><div class="px" id="s8b" style="position:relative;font-size:176px;line-height:190px">AI agents</div></div></div>
+  <div class="a mono" id="cta" style="left:230px;top:772px;width:1460px;height:136px;border-radius:18px;background:#000;color:#fff;font-size:44px;display:flex;align-items:center;justify-content:center"><span style="color:#EFBE55;margin-right:26px">$</span><span id="ctat"></span><span id="ctac" style="display:inline-block;width:14px;height:48px;background:#fff;margin-left:8px"></span></div>
+  <div class="ctr" id="s8f" style="top:942px;font-size:32px;color:#5A5A63">Available now across coding agents, personal agents, and any MCP client.</div>
+</div>
 </div>
 
-<div id="ui"><span id="fno">000</span><input id="scrub" type="range" min="0" max="899" value="0"><span>space = play/pause</span></div>
+<div id="ui"><span id="fno">0000</span><input id="scrub" type="range" min="0" max="2699" value="0"><span>space = play/pause</span></div>
 
 <script>
-const TOTAL=900, FPS=30;
+const FPS=60, DUR=45, TOTAL=FPS*DUR, HOLD_FROM=Math.round(43.85*FPS);
+window.FILM={fps:FPS,total:TOTAL,holdFrom:HOLD_FROM};
 const $=id=>document.getElementById(id);
 const EZ={lin:t=>t,io:t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,out:t=>1-Math.pow(1-t,3),in:t=>t*t*t,
-  o5:t=>1-Math.pow(1-t,5),back:t=>{const c=1.5;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}};
-function k(f,ks){if(f<=ks[0][0])return ks[0][1];for(let i=1;i<ks.length;i++){if(f<=ks[i][0]){const a=ks[i-1],b=ks[i];
-  return a[1]+(b[1]-a[1])*EZ[b[2]||'io']((f-a[0])/(b[0]-a[0]))}}return ks[ks.length-1][1]}
-const fin=(f,a,b)=>k(f,[[a,0],[b,1,'out']]);
-const fio=(f,a,b,c,d)=>Math.min(fin(f,a,b),1-k(f,[[c,0],[d,1,'io']]));
-const mix=(a,b,t)=>a+(b-a)*t;
-function P(id,p){const e=typeof id==='string'?$(id):id;const o=p.o==null?1:p.o;
-  if(o<=.004){e.style.visibility='hidden';return}
-  e.style.visibility='visible';e.style.opacity=o;
-  e.style.transform=`translate(${p.x||0}px,${p.y||0}px) scale(${p.sx==null?(p.s==null?1:p.s):p.sx},${p.sy==null?(p.s==null?1:p.s):p.sy})`;
-  e.style.filter=p.b>.05?`blur(${p.b}px)`:'';
-  if(p.w!=null)e.style.width=p.w+'px'; if(p.h!=null)e.style.height=p.h+'px'; if(p.r!=null)e.style.borderRadius=p.r+'px'}
-const O=(id,o,dy)=>{const e=$(id);e.style.opacity=o;e.style.visibility=o<=.004?'hidden':'inherit';if(dy!=null)e.style.transform=`translateY(${dy}px)`};
-const GLOW='0 0 0 4px #34CF88,0 26px 60px -14px rgba(52,207,136,.55)';
-const CARD='0 30px 70px -24px rgba(24,22,40,.16),0 6px 16px -8px rgba(24,22,40,.06)';
+  o5:t=>1-Math.pow(1-t,5),back:t=>{const c=1.6;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}};
+function k(t,ks){if(t<=ks[0][0])return ks[0][1];for(let i=1;i<ks.length;i++){if(t<=ks[i][0]){const a=ks[i-1],b=ks[i];
+  return a[1]+(b[1]-a[1])*EZ[b[2]||'io']((t-a[0])/(b[0]-a[0]))}}return ks[ks.length-1][1]}
+const fin=(t,a,d=.3)=>k(t,[[a,0],[a+d,1,'out']]);
+const pop=(t,a,d=.3)=>k(t,[[a,0],[a+d,1,'back']]);
+const mix=(a,b,t)=>a+(b-a)*t, cl=x=>Math.max(0,Math.min(1,x));
+function X(e,p){e=typeof e==='string'?$(e):e;const o=p.o==null?1:p.o;
+  if(o<=.004){e.style.visibility='hidden';return} e.style.visibility='inherit';e.style.opacity=o;
+  e.style.transform=`translate(${p.x||0}px,${p.y||0}px) rotate(${p.r||0}deg) scale(${p.sx==null?(p.s==null?1:p.s):p.sx},${p.sy==null?(p.s==null?1:p.s):p.sy})`;
+  e.style.filter=p.b>.05?`blur(${p.b}px)`:''}
+const IN=(e,t,a,d=.4,dy=30)=>{const i=k(t,[[a,0],[a+d,1,'o5']]);X(e,{y:(1-i)*dy,o:cl(i*1.8),b:(1-i)*10});return i};
+const ic=(n,st='')=>`<svg class="ic" style="${st}"><use href="#${n}"/></svg>`;
+const CHK=ic('i-check');
+const PAL=['#F06CC4','#F7A531','#1FB9F2','#34CF88','#000000','#7B61FF','#FF5E57','#2D6BFF'];
 
-/* ---- build ---- */
-// typed headlines: split into characters (reference types copy in, glyph by glyph)
-document.querySelectorAll('[data-t]').forEach(h=>{
+/* typed copy: glyphs drop in one by one, as in the reference */
+document.querySelectorAll('.ty').forEach(h=>{
   const walk=n=>{[...n.childNodes].forEach(c=>{
     if(c.nodeType===3){const fr=document.createDocumentFragment();[...c.textContent].forEach(ch=>{const s=document.createElement('span');s.className='c';s.textContent=ch;fr.appendChild(s)});n.replaceChild(fr,c)}
     else if(c.tagName!=='I')walk(c)})};
   walk(h);
-  const tx=document.createElement('span');tx.className='tx';while(h.firstChild)tx.appendChild(h.firstChild);h.appendChild(tx);
-  if(h.hasAttribute('data-tile')){const t=document.createElement('div');t.className='bt tl';t.innerHTML='<svg><use href="#logo"/></svg>';h.prepend(t)}
-  h._c=[...h.querySelectorAll('.c')]; h._g=h.querySelector('.gc>i'); h._gi=h._g?h._c.indexOf(h._g.parentNode.querySelector('.c')):-1; h._t=h.querySelector('.tl');
-});
-function HL(id,f,a,c,cy=86){const h=$(id),o=c==null?1:1-fin(f,c,c+8);
-  P(h,{y:cy-42,o:f<a?0:o,b:(1-o)*14});
-  if(f<a||o<=.004)return; const n=h._c.length,rate=Math.min(.55,13/n);
-  h._c.forEach((s,i)=>{const t=Math.max(0,Math.min(1,(f-a-i*rate)/3.5));s.style.opacity=t;s.style.transform=`translateY(${(1-t)*14}px)`});
-  if(h._g)h._g.style.transform=`scaleX(${k(f,[[a+h._gi*rate,0],[a+h._gi*rate+9,1,'out']])})`;
-  if(h._t){const t=k(f,[[a-3,0],[a+6,1,'back']]);h._t.style.transform=`scale(${t})`;h._t.style.opacity=Math.min(1,t*2)}}
+  if(h.hasAttribute('data-tile')){const tx=document.createElement('span');while(h.firstChild)tx.appendChild(h.firstChild);h.appendChild(tx);
+    const t=document.createElement('div');t.className='bt';t.innerHTML='<svg><use href="#logo"/></svg>';h.prepend(t);h._t=t}
+  h._c=[...h.querySelectorAll('.c')];h._g=h.querySelector('.gc>i');h._gi=h._g?h._c.indexOf(h._g.parentNode.querySelector('.c')):-1});
+function TY(id,t,a,cps=34){const h=$(id);
+  h._c.forEach((s,i)=>{const u=cl((t-a-i/cps)/.11);s.style.opacity=u;s.style.transform=`translateY(${(u-1)*-18}px)`;s.style.filter=u<1?`blur(${(1-u)*5}px)`:''});
+  if(h._g)h._g.style.transform=`scaleX(${k(t,[[a+h._gi/cps,0],[a+h._gi/cps+.32,1,'out']])})`;
+  if(h._t){const u=pop(t,a-.08,.3);h._t.style.transform=`scale(${u})`;h._t.style.opacity=cl(u*2)}}
 
-const orow=(g,n,price,proto,pm)=>`<div class="orow"><div class="bt"><svg class="ic" style="stroke-width:2.4"><use href="#g-${g}"/></svg></div>
- <div class="nm">Offering ${n}</div><div class="pc px">${'$'.repeat(price)}<u>${'$'.repeat(3-price)}</u></div>
- <div class="v" style="left:690px">${proto}</div><div class="v" style="left:900px">${pm}</div></div>`;
-$('cardO').innerHTML=orow('a','A',1,'x402','Stablecoin');
-$('ofB').innerHTML=orow('b','B',3,'MPP','Card');
-$('ofC').innerHTML=orow('c','C',2,'x402 · MPP','Stablecoin · Card');
-$('rows').innerHTML=[[190,250,150],[230,190,180],[160,270,130],[210,220,170],[180,240,150],[220,200,140]]
-  .map(w=>`<div class="r"><div class="av"></div><i style="width:${w[0]}px"></i><i style="width:${w[1]}px"></i><i style="width:${w[2]}px"></i><div class="bdg"><svg class="ic"><use href="#i-check"/></svg></div></div>`).join('');
-const rowEls=[...document.querySelectorAll('#rows .r')];
-// icon field (staggered rows, faded, colour ripple) as in the reference title card
-const PAL=['#F06CC4','#F7A531','#1FB9F2','#34CF88','#000000'];
+/* ---------------- S1 build: icon field ---------------- */
 const cells=[];
 for(let r=0;r<9;r++)for(let c=-1;c<17;c++){const x=c*120+(r%2?76:16),y=r*120+42;
-  const el=document.createElementNS('http://www.w3.org/2000/svg','svg');el.setAttribute('class','ic');el.innerHTML=`<use href="#f${(c+r*5+24)%12}"/>`;
+  const el=document.createElementNS('http://www.w3.org/2000/svg','svg');el.setAttribute('class','ic');el.innerHTML=`<use href="#f${(c+r*5+24)%13}"/>`;
   el.style.left=x+'px';el.style.top=y+'px';$('grid').appendChild(el);
-  cells.push({el,x,y,cx:x+27,cy:y+27,col:PAL[(c*7+r*3+70)%5],ph:(x+y*1.6)/2600})}
-function GRID(f,o,w,rx,ry,cy){ if(o<=.004){$('grid').style.visibility='hidden';return} $('grid').style.visibility='visible';$('grid').style.opacity=o;
-  cells.forEach(c=>{const t=Math.max(0,1-Math.abs(w-c.ph)/.16);const dx=(c.cx-960)/rx,dy=(c.cy-cy)/ry;c.el.style.opacity=Math.max(0,Math.min(1,(Math.sqrt(dx*dx+dy*dy)-.8)/.45)); c.el.style.color=t>.5?c.col:'#E7E6ED'; c.el.style.transform=`scale(${1+t*.14})`})}
-
-const SLOT=[376,504,632];
-const Q='Contact enrichment', PT='Find 50 qualified prospects.';
-const py=f=>k(f,[[150,600],[174,992],[636,992],[662,800],[690,800],[708,830]]);
-const ps=f=>k(f,[[150,1],[174,.5],[636,.5],[662,.66],[690,.66],[708,.6]]);
-
-function render(f){
-  /* icon field: open + close */
-  GRID(f, f<400? 1-fin(f,16,40) : fin(f,782,800), f<400? k(f,[[0,-.2],[44,1.5,'lin']]) : k(f,[[782,-.2],[808,1.6,'lin']]), f<400?900:860, f<400?150:400, f<400?540:520);
-
-  /* ---------- S1 000-089 ---------- */
-  { const t=k(f,[[15,0],[38,1]]), o=1-fin(f,82,90);
-    P('h1',{y:mix(540,86,t)-48,s:mix(1,84/96,t),o,b:(1-o)*14});
-    $('h1hi').style.transform=`scaleX(${k(f,[[1,0],[12,1,'out']])})`;
-    if(f<600){ const i=k(f,[[24,0],[44,1,'o5']]), go=1-fin(f,84,94);
-      P('term',{x:80+(1-i)*60,y:400+(1-i)*150,s:mix(1.35,1,i),o:Math.min(1,i*2.4)*go,b:(1-i)*10+(1-go)*12});
-      O('tR1',1,0);O('tR2',0);O('tSub',fin(f,44,52));
-      $('tTxt').textContent=PT.slice(0,Math.round(k(f,[[29,0],[45,PT.length,'lin']])));
-      $('tCar').style.opacity=(f<46||Math.floor(f/7)%2==0)?1:0; }
-    const si=k(f,[[30,0],[46,1,'back']]), so=Math.min(1,si*2)*(1-fin(f,84,94));
-    P('svc1',{x:1560,y:440,w:170,h:170,s:mix(.7,1,si),o:so,b:(1-fin(f,84,94)<1?(fin(f,84,94))*10:0)});
-    P('svc1L',{x:1445,y:634,o:fin(f,36,48)*(1-fin(f,84,94))});
-    P('ln1',{x:780,y:523.5,w:780,sx:k(f,[[44,0],[62,1,'out']]),o:fin(f,44,47)*(1-fin(f,82,90))});
-    // sign-up form expands between agent and service, then folds into the path line
-    const g=k(f,[[62,0],[82,1,'o5']]), fold=k(f,[[90,0],[104,1]]);
-    const fw=mix(380,1100,fold), fh=mix(mix(30,440,g),3,fold), fx=mix(1170,960,fold), fy=mix(525,600,fold);
-    P('form',{x:fx-fw/2,y:fy-fh/2,w:fw,h:fh,r:mix(26,2,fold),o:f>=104.5?0:fin(f,62,66)});
-    $('form').style.background=fold>.55?'#000':'#fff'; $('form').style.borderWidth=fold>.9?'0':'3px';
-    $('form').firstElementChild.style.opacity=fin(f,70,82)*(1-fin(f,86,91));
-  }
-  /* ---------- agent marker ---------- */
-  { let x=-99,y=525,o=0,s=1;
-    if(f<104){ x=k(f,[[45,800],[64,953,'out'],[67,941],[72,953]]); o=fin(f,42,46)*(1-fin(f,86,94)); s=k(f,[[42,.3],[49,1,'back']]); }
-    else if(f<170){ const t=k(f,[[150,0],[162,1]]); x=mix(410,960-400*ps(f),t); y=py(f); o=fin(f,126,131)*(1-fin(f,158,166)); s=k(f,[[126,.3],[137,1,'back']]); }
-    else if(f>=434&&f<500){ x=k(f,[[440,372],[459,1455,'lin'],[474,1455],[486,1500]]); y=540; o=fin(f,434,440)*(1-fin(f,482,490)); }
-    P('mk',{x:x-17,y:y-17,o,s});
-    $('mk').style.zIndex=(f>=434&&f<461)?0:5;
-  }
-  /* ---------- headlines ---------- */
-  HL('h2',f,92,144); HL('h3',f,154,262); HL('h4',f,272,384); HL('h5',f,392,474);
-  HL('h6',f,482,594); HL('h7',f,602,684); HL('h8',f,692,772);
-  { const i=fin(f,238,250),o=1-fin(f,262,270); P('s3',{y:164-17+(1-i)*14,o:Math.min(i,o),b:(1-Math.min(i,o))*8}); }
-
-  /* ---------- progress path ---------- */
-  { let y=py(f),s=ps(f),o=f<104.5?0:1;
-    if(f>=690&&f<745) o=1-fin(f,690,704);
-    if(f>=745){ y=480; s=.6; o=fin(f,745,750)*(1-fin(f,774,786)); }
-    P('prog',{x:960,y,s,o,b:f>=774?fin(f,774,786)*12:0});
-    const draw=f>=745?k(f,[[745,0],[768,1]]):1;
-    const big=k(f,[[150,1],[172,0]]);
-    $('pgBase').style.background=big>.5?'#000':'#D5D3DF'; $('pgBase').style.transform=`scaleX(${draw})`;
-    const fill=f>=745?draw:k(f,[[150,0],[172,.136],[266,.136],[282,.5],[476,.5],[490,.864],[566,.864],[580,1]]);
-    $('pgFill').style.transform=`scaleX(${fill})`; $('pgFill').style.opacity=f<150?0:1;
-    const act=[fio(f,160,174,268,278),fio(f,272,284,384,392),fio(f,480,492,562,570)];
-    const done=f>=745?[1,1,1]:[fin(f,266,276),fin(f,384,392),fin(f,566,574)];
-    const pop=f>=745?[k(f,[[748,0],[757,1,'back']]),k(f,[[756,0],[765,1,'back']]),k(f,[[764,0],[773,1,'back']])]:[k(f,[[104,0],[113,1,'back']]),k(f,[[110,0],[119,1,'back']]),k(f,[[116,0],[125,1,'back']])];
-    for(let i=0;i<3;i++){ const n=$('n'+i),l=$('l'+i),d=done[i],a=act[i];
-      n.style.transform=`scale(${pop[i]*(1+a*.3)})`; n.style.opacity=Math.min(1,pop[i]*2);
-      n.style.background=d>.5?'#34CF88':'#fff';
-      n.style.borderColor=d>.5||a>.5?'#34CF88':(big>.5?'#000':'#D5D3DF');
-      n.style.boxShadow=a>.02&&d<=.5?`0 0 0 ${12*a}px rgba(52,207,136,.22)`:'none';
-      n.firstElementChild.style.opacity=d;
-      l.style.opacity=pop[i]*(f<150?1:mix(.32,1,Math.max(a,d))); l.style.transform=`translateY(${(1-pop[i])*16}px)`; }
-  }
-  /* ---------- lockup ---------- */
-  { const W=443; // measured lockup width at scale 1
-    let cy=k(f,[[150,400],[172,400],[745,330],[780,330],[796,236]]), s=k(f,[[745,.76],[780,.76],[796,.84]]);
-    let o=f<300? fio(f,124,138,150,162) : fin(f,745,760);
-    const i=f<300?fin(f,124,138):fin(f,745,760);
-    P('lock',{x:960-W*s/2,y:cy-55*s+(1-i)*18,s,o,b:(1-o)*12}); }
-
-  /* ---------- S3 150-269: discover ---------- */
-  { const g=k(f,[[150,0],[174,1,'o5']]), go=1-fin(f,262,272), o=fin(f,150,154)*go;
-    P('search',{x:mix(538,380,g),y:mix(578,206,g),w:mix(44,640,g),h:mix(44,64,g),r:32,o,b:(1-go)*10});
-    $('searchIn').style.opacity=fin(f,164,174);
-    $('qt').textContent=Q.slice(0,Math.round(k(f,[[160,0],[177,Q.length,'lin']])));
-    $('qc').style.opacity=f<200?1:0;
-    [['chip1',207,1040],['chip2',215,1318]].forEach(([id,t,x],i)=>{const c=$(id),on=f>=t,a=fin(f,190+i*5,202+i*5);
-      P(id,{x,y:206+(1-a)*14,o:a*go,s:k(f,[[t-1,1],[t+2,.93],[t+8,1,'out']]),b:(1-go)*10});
-      c.style.background=on?'#F2F7F4':'#fff'; c.style.borderColor=on?'#34CF88':'#E6E5EB'; c.style.color=on?'#1FAE6E':'#000';});
-    const li=k(f,[[172,0],[190,1,'o5']]);
-    P('list',{x:380,y:292+(1-li)*40,w:1160,h:468,o:li*go,b:(1-li)*8+(1-go)*10});
-    const rise=t=>k(f,[[t,0],[t+14,1,'o5']]);
-    const so=k(f,[[218,0],[234,1]]), rec=k(f,[[236,0],[248,1]]);
-    const rB=rise(178),rA=rise(186),rC=rise(194);
-    P('ofB',{x:380,y:mix(SLOT[0],SLOT[2],so)+(1-rB)*50,o:rB*mix(1,.3,rec)*go,b:(1-go)*10});
-    P('ofC',{x:380,y:mix(SLOT[2],SLOT[1],so)+(1-rC)*50,o:rC*mix(1,.3,rec)*go,b:(1-go)*10});
-    // offering A: row -> selected (green outline, lifted) -> sign-up request card
-    const m=k(f,[[264,0],[284,1]]), sel=k(f,[[236,0],[248,1,'out']])*(1-m);
-    const c={x:mix(380-18*sel,660,m),y:mix(mix(SLOT[1],SLOT[0],so)+(1-rA)*50-4*sel,330,m),w:mix(1160+36*sel,520,m),h:mix(128+8*sel,420,m)};
-    const ro=1-fin(f,364,376);
-    P('card',{...c,r:28,o:rA*ro,b:(1-ro)*10});
-    const cardOn=Math.max(sel,m);
-    $('card').style.background=cardOn>.02?'#fff':'transparent'; $('card').style.borderColor=cardOn>.02?'#EEEEF1':'transparent';
-    $('card').style.boxShadow=sel>.05?`0 0 0 ${4*sel}px #34CF88,0 26px 60px -14px rgba(52,207,136,${.55*sel})`:(m>.02?CARD:'none');
-    $('cardO').style.transform=`translate(${18*sel}px,${4*sel}px)`;
-    O('cardO',1-fin(f,262,270)); O('cardR',fin(f,274,286));
-    O('rr1',fin(f,278,288),(1-fin(f,278,288))*14); O('rr2',fin(f,286,296),(1-fin(f,286,296))*14); O('rr3',fin(f,334,344),(1-fin(f,334,344))*12);
-  }
-  /* ---------- service tile (S4-S6) ---------- */
-  { const i=k(f,[[266,0],[288,1,'o5']]), go=1-fin(f,598,610), o=fin(f,266,274)*go;
-    const pulse=1+.05*(fio(f,366,370,372,380)+fio(f,484,488,490,498)+fio(f,562,566,568,576));
-    P('svc',{x:mix(488,1500,i),y:mix(402,455,i),w:mix(76,170,i),h:mix(76,170,i),r:mix(18,38,i),o,s:pulse,b:(1-go)*10});
-    let st='awaiting sign-up',col='#9A99A3';
-    if(f>=384){st='customer enrolled';col='#34CF88'} if(f>=488){st='payment required';col='#000'} if(f>=566){st='paid';col='#34CF88'}
-    $('svcSt').textContent=st; $('svcSt').style.color=col;
-    P('svcL',{x:1385,y:646,o:fin(f,282,294)*go});
-    const b=k(f,[[384,0],[394,1,'back']]); P('svcB',{x:1646,y:441,s:b,o:Math.min(1,b*2)*go});
-  }
-  /* ---------- S4 270-389: onboard ---------- */
-  { const i=k(f,[[295,0],[314,1,'o5']]), c=k(f,[[388,0],[406,1]]), go=1-fin(f,598,610);
-    P('wal',{x:mix(120-70*(1-i),190,c),y:mix(330,455,c),w:mix(470,170,c),h:mix(420,170,c),r:mix(28,38,c),o:Math.min(1,i*2)*go,b:(1-i)*8+(1-go)*10});
-    O('walA',1-fin(f,364,374)); O('walV',fin(f,368,378)*(1-fin(f,388,395))); O('walT',fin(f,396,406));
-    $('walYes').style.transform=`scale(${k(f,[[320,1],[324,.93],[331,1,'out']])})`;
-    O('walBt',1-fin(f,326,332)); O('walOk',fin(f,328,338),(1-fin(f,328,338))*12);
-    $('vaultT').style.background=f>=386?'#34CF88':'#000'; $('vaultT').style.transform=`scale(${k(f,[[384,1],[388,1.1,'out'],[394,1]])})`;
-    P('walL',{x:75,y:646,o:fin(f,398,410)*go});
-    const b=k(f,[[400,0],[410,1,'back']]); P('walB',{x:336,y:441,s:b,o:Math.min(1,b*2)*go});
-    // signed request -> service (line turns green behind it)
-    const sx=k(f,[[345,1180],[369,1500]]);
-    P('ln4',{x:1180,y:538.5,w:320,sx:k(f,[[300,0],[318,1,'out']]),o:fin(f,300,304)*(1-fin(f,372,382))});
-    P('ln4g',{x:1180,y:537.5,w:320,sx:k(f,[[345,0],[369,1]]),o:fin(f,345,347)*(1-fin(f,372,382))});
-    P('sig',{x:sx-118,y:540-28,o:fio(f,343,347,366,372),s:k(f,[[343,.6],[351,1,'back']])});
-    const kx=k(f,[[370,1500],[386,355]]);
-    P('key',{x:kx-92,y:540-28,o:fio(f,369,373,383,388),s:k(f,[[383,1],[388,.5]])});
-  }
-  /* ---------- S5 390-479: both sides' rules ---------- */
-  { const j=k(f,[[460,0],[476,1]]), u=k(f,[[480,0],[500,1]]);
-    const bi=k(f,[[390,0],[410,1,'o5']]), si=k(f,[[396,0],[416,1,'o5']]), go=1-fin(f,598,608);
-    const fx=mix(470,680,u),fy=mix(498,318,u),fw=mix(980,560,u),fh=mix(84,68,u);
-    P('bp',{x:mix(470-150*(1-bi),fx,j),y:mix(400,fy,j),w:mix(400,fw,j),h:mix(280,fh,j),r:mix(28,mix(42,34,u),j),o:Math.min(1,bi*2)*go,b:(1-bi)*8+(1-go)*10});
-    P('sp',{x:mix(1050+150*(1-si),fx+fw-400,j),y:mix(400,fy,j),w:400,h:mix(280,fh,j),r:mix(28,42,j),o:Math.min(1,si*2)*(1-fin(f,462,474)),b:(1-si)*8});
-    $('bp').style.boxShadow=j>.5?GLOW:CARD;
-    O('bpIn',1-fin(f,460,467)); O('spIn',1-fin(f,460,467)); O('pol',fin(f,468,478));
-    $('pol').style.fontSize=mix(40,32,u)+'px';
-    [['bpC',446],['spC',455]].forEach(([id,t])=>{const e=$(id),on=f>=t; e.style.background=on?'#34CF88':'transparent';
-      e.style.borderColor=on?'#34CF88':'#DDDCE3'; e.style.transform=`scale(${k(f,[[t,1],[t+3,1.35,'out'],[t+10,1]])})`;});
-    P('ln5',{x:360,y:538.5,w:1140,sx:k(f,[[404,0],[430,1]]),o:fin(f,404,408)*go});
-  }
-  /* ---------- S6 480-599: pay ---------- */
-  { const go=1-fin(f,598,608);
-    const r1=k(f,[[505,0],[522,1,'o5']]), r2=k(f,[[515,0],[532,1,'o5']]);
-    P('rowP',{x:470,y:400+(1-r1)*30,w:980,h:92,r:26,o:Math.min(1,r1*2)*go,b:(1-r1)*8+(1-go)*10});
-    P('rowM',{x:470,y:588+(1-r2)*30,w:980,h:92,r:26,o:Math.min(1,r2*2)*go,b:(1-r2)*8+(1-go)*10});
-    const hl=k(f,[[534,0],[544,1]]);
-    ['o1','o3'].forEach(id=>{const e=$(id);e.style.background=hl>.5?'#34CF88':'#F2F7F4';e.style.color=hl>.5?'#fff':'#000';
-      e.style.boxShadow=hl>.5?'0 14px 28px -10px rgba(52,207,136,.7)':'none'; e.style.transform=`scale(${k(f,[[534,1],[538,1.07,'out'],[547,1]])})`;});
-    ['o2','o4'].forEach(id=>{$(id).style.opacity=mix(1,.35,hl)});
-    P('vln',{x:1038.5,y:475,h:130,sy:k(f,[[538,0],[549,1,'out']]),o:fin(f,538,541)*go});
-    const px=k(f,[[540,372],[564,1500]]);
-    P('pay',{x:px-17,y:540-17,o:fio(f,538,542,562,568),s:k(f,[[538,.3],[546,1,'back']])});
-    P('ln6',{x:360,y:537.5,w:1140,sx:k(f,[[540,.01],[564,1]]),o:fin(f,540,543)*go});
-    const b=k(f,[[566,0],[579,1,'back']]);
-    P('badge',{x:960-212,y:540-38,s:mix(.6,1,b),o:Math.min(1,b*1.8)*go,b:(1-go)*10});
-  }
-  /* ---------- output -> table -> terminal (S6 end, S7) ---------- */
-  { const e=k(f,[[574,0],[590,1,'o5']]), g=k(f,[[594,0],[618,1]]), back=k(f,[[626,0],[652,1]]);
-    let x=mix(mix(1525,1495,e),460,g), y=mix(mix(500,270,e),236,g), w=mix(mix(120,180,e),1000,g), h=mix(mix(60,130,e),560,g);
-    x=mix(x,810,back); y=mix(y,440,back); w=mix(w,300,back); h=mix(h,80,back);
-    P('out',{x,y,w,h,r:mix(22,28,g),o:fin(f,574,580)*(1-fin(f,634,650)),b:back*10});
-    O('outD',1-fin(f,596,604)); O('outT',fin(f,604,616)*(1-fin(f,626,634)));
-    rowEls.forEach((r,i)=>{const a=fin(f,606+i*3,616+i*3);r.style.opacity=a;r.style.transform=`translateY(${(1-a)*14}px)`});
-    if(f>=600){ const i=k(f,[[628,0],[650,1,'o5']]), xo=fin(f,690,704);
-      P('term',{x:610,y:330+(1-i)*40,s:mix(1.25,1.5,i)*mix(1,.92,xo),o:Math.min(1,i*2)*(1-xo),b:(1-i)*10+xo*12});
-      $('tTxt').textContent=PT; $('tCar').style.opacity=0;
-      const sw=k(f,[[655,0],[667,1]]); O('tR1',1-sw,-sw*30); O('tR2',sw,(1-sw)*30); O('tSub',1);
-      $('tSub').textContent=sw>.5?'agent · task completed':'agent · task in progress'; }
-    else $('tSub').textContent='agent · task in progress';
-  }
-  /* ---------- S8 690-779: both products ---------- */
-  { const m=k(f,[[690,0],[716,1,'o5']]), xo=fin(f,774,788), o=fin(f,690,702)*(1-xo), ex=xo*70, bl=xo*12;
-    P('bw',{x:mix(620,230,m)-ex,y:380,w:200,h:200,r:44,o,b:bl}); P('sg',{x:mix(1100,1490,m)+ex,y:380,w:200,h:200,r:44,o,b:bl});
-    P('bwL',{x:mix(520,130,m)-ex,y:606,o,b:bl}); P('sgL',{x:mix(1000,1390,m)+ex,y:606,o,b:bl});
-    const a=k(f,[[716,0],[730,1]]), b=k(f,[[726,0],[740,1]]);
-    O('bwA',1-a,-a*22); O('bwB',a,(1-a)*22); O('sgA',1-b,-b*22); O('sgB',b,(1-b)*22);
-    const c=k(f,[[760,0],[772,1,'back']]);
-    P('integ',{x:1590-190+ex,y:690,s:mix(.7,1,c),o:Math.min(1,c*1.6)*(1-xo),b:bl});
-    P('ln8',{x:430,y:477.5,w:1060,sx:0,o:0});
-  }
-  /* ---------- S9 780-899: close ---------- */
-  { const i=k(f,[[780,0],[794,1,'o5']]);
-    P('endh',{y:500-95+(1-i)*70,o:Math.min(1,i*1.6),b:(1-i)*10});
-    $('endhi').style.transform=`scaleX(${k(f,[[786,0],[802,1,'out']])})`;
-    P('endsub',{y:690-36,o:f>=795?1:0});
-    [0,1,2].forEach(n=>{const a=k(f,[[795+n*4,0],[801+n*4,1,'out']]);const e=$('e'+n);e.style.opacity=a;e.style.transform=`translateY(${(1-a)*16}px)`});
-    const c=k(f,[[798,0],[809,1,'o5']]);
-    P('cta',{x:650,y:830+(1-c)*24,o:c});
-    P('tag',{y:1034,o:fin(f,46,60)*(1-fin(f,772,782))});
-  }
+  const dx=(x+27-960)/900,dy=(y+27-520)/330;
+  cells.push({el,m:cl((Math.sqrt(dx*dx+dy*dy)-.86)/.4),col:PAL[(c*7+r*3+70)%8],ph:(x+y*1.5)/2500})}
+function S1(t){
+  X('grid',{o:fin(t,0,.5)});
+  const w=k(t,[[1.15,-.2],[2.5,1.6,'lin']]);
+  cells.forEach(c=>{const u=cl(1-Math.abs(w-c.ph)/.17);c.el.style.opacity=mix(c.m,Math.max(c.m,.9*cl(c.m*3+.25)),u);c.el.style.color=u>.45?c.col:'#E7E6ED';c.el.style.transform=`scale(${1+u*.16})`});
+  IN('s1t',t,.12,.35,0); IN('s1n',t,.26,.35,0);
+  const rise=k(t,[[.42,0],[.95,1,'o5']]); $('s1h').style.transform=`translateY(${(1-rise)*268}px)`;
+  $('s1g').style.transform=`scaleX(${k(t,[[.98,0],[1.5,1,'io']])})`;
+  const out=k(t,[[2.62,0],[3,1,'in']]); X('s1w',{o:1-out,b:out*22,s:1+out*.03}); if(out>0)$('grid').style.opacity=1-out;
 }
+/* ---------------- S2 build: wall ---------------- */
+const NAMES=['Claude Code','Codex','Cursor','GitHub Copilot','Manus','Cline','Devin Desktop','Kilo Code','Zed','Grok Bot','Instinct','Dots','Hermes','OpenClaw','Poke','Meta Muse','Manus Cue','Hark Pro'];
+{let h='',n=0;for(let c=0;c<9;c++)for(let r=0;r<5;r++){const col=PAL[(c*3+r*5)%8]==='#000000'?'#FFFFFF':PAL[(c*3+r*5)%8];
+  h+=`<div class="t" style="left:${c*228-60}px;top:${r*312-(c%2?250:90)}px;background:linear-gradient(160deg,${col}55,#17171b 70%)"><svg style="color:${col}"><use href="#bot"/></svg><div class="px">${NAMES[n++%18]}</div></div>`}
+ $('wall').innerHTML=h}
+function S2(t){
+  $('s2a').style.visibility=t<.85?'visible':'hidden'; $('s2b').style.visibility=(t>=.85&&t<1.6)?'visible':'hidden'; $('s2c').style.visibility=t>=1.6?'visible':'hidden';
+  TY('s2t1',t,.05,40); TY('s2t2',t,.9,30); TY('s2t3',t,1.68,22);
+  $('wall').style.transform=`translateY(${-(t-1.6)*46}px) scale(1.04)`;
+}
+/* ---------------- S3 build: service tiles around the terminal ---------------- */
+const PROMPT='Send 50 cold emails to qualified prospects', FILT='x402 · MPP   ·   stablecoin · card   ·   price ↑';
+const tls=[]; const PICK={'1-5':[340,190,0],'5-8':[900,190,19],'6-12':[1460,190,8]};  // row-col -> target x,y, glyph
+{const rows=[36,152,268,384,500,616,732,848,964];let h='',hp='';
+ rows.forEach((y,r)=>{for(let c=0;c<16;c++){const x=58+c*116;if(r>=2&&r<=4&&c>=2&&c<=13)continue;
+   const key=r+'-'+c,pk=PICK[key],g=pk?pk[2]:(c*5+r*3)%21,col=pk?'#000':PAL[(c+r*3)%8];
+   const s=`<div class="a g3" data-k="${key}" style="left:${x}px;top:${y}px;color:${col}">${ic('f'+g)}</div>`;
+   if(pk)hp+=s;else h+=s; tls.push({key,x,y,pk,ph:(x*.8+y*1.3)/2700})}});
+ $('tiles').innerHTML=h;$('pick').innerHTML=hp;
+ tls.forEach(o=>o.el=document.querySelector(`[data-k="${o.key}"]`))}
+function S3(t){
+  const g=pop(t,0,.28); X('dot3',{s:g*(1+fin(t,.26,.3)*7),o:1-fin(t,.3,.22)});
+  const ti=k(t,[[.24,0],[.7,1,'o5']]), z=k(t,[[2.95,0],[3.7,1,'io']]), out=k(t,[[4.75,0],[5.1,1,'in']]);
+  X('T',{s:mix(.25,1,ti)*mix(1,.71,z),y:mix(0,-140,z),o:cl(ti*2.5)*(1-out),b:(1-ti)*14+out*18});
+  $('tq').textContent=PROMPT.slice(0,Math.round(k(t,[[.75,0],[2.05,PROMPT.length,'lin']])));
+  $('tcar').style.opacity=(t<2.1||Math.floor(t*3)%2==0)&&t<2.9?1:0;
+  IN('tl2',t,2.1,.3,16); $('tdots').textContent='.'.repeat(1+Math.floor(t*5)%3);
+  $('tl3').textContent=FILT.slice(0,Math.round(k(t,[[2.35,0],[2.9,FILT.length,'lin']])));
+  const w=k(t,[[3.75,-.15],[4.65,1.2,'lin']]);
+  X('wave',{x:mix(-200,3000,k(t,[[3.75,0],[4.65,1,'lin']])),r:24,o:t>3.7&&t<4.7?1:0});
+  tls.forEach((o,i)=>{const a=pop(t,3.02+o.ph*.55,.34), hit=cl(1-Math.abs(w-o.ph)/.12), on=o.pk&&w>o.ph;
+    if(o.pk){const fly=k(t,[[4.95,0],[5.6,1,'io']]);
+      X(o.el,{x:mix(0,o.pk[0]-o.x+24,fly),y:mix(0,o.pk[1]-o.y+24,fly),s:a*mix(1+hit*.12,120/72,fly),o:cl(a*2)});
+      o.el.style.boxShadow=on?`0 0 0 ${mix(4,2.4,fly)}px #34CF88,0 16px 34px -10px rgba(52,207,136,.6)`:''; o.el.style.borderColor=on?'transparent':'#EEEEF1';
+    }else{X(o.el,{s:a*(1+hit*.14),o:cl(a*2)*(1-out),b:out*14});
+      o.el.style.boxShadow=hit>.3?'0 0 0 3px #34CF88,0 14px 26px -12px rgba(52,207,136,.5)':'';}});
+}
+/* ---------------- S4 build ---------------- */
+const COLS=[[400,'Web search','live facts',0],[960,'Enrichment','titles + contacts',19],[1520,'Email','50 emails sent',8]];
+const STEPS=[['Discover','found in one search'],['Onboard','one signed exchange'],['Pay','paid inside the request']];
+{let h='',r='';COLS.forEach(([cx,nm,res,g],c)=>{
+  h+=`<div class="a app" style="left:${cx-60}px;top:190px;width:120px;height:120px;border-radius:36px;box-shadow:0 0 0 2.4px #34CF88,0 16px 34px -10px rgba(52,207,136,.6);border-color:transparent">${ic('f'+g,'stroke-width:2.1')}</div><div class="cap px" id="c4l${c}" style="left:${cx}px;top:326px;font-size:40px">${nm}</div>`;
+  STEPS.forEach(([a,b],s)=>h+=`<div class="a step" id="st${c}${s}" style="left:${cx-220}px;top:${404+s*120}px"><div class="o" id="so${c}${s}">${CHK}</div><div><div class="px">${a}</div><span>${b}</span></div></div>`);
+  r+=`<div class="a res" id="rs${c}" style="left:${[290,700,1210][c]}px;top:844px"><div class="bt">${ic('f'+g)}</div>${res}</div>`});
+ $('s4').innerHTML=h;$('resw').innerHTML=r}
+function S4(t){
+  TY('h4',t,.1,30);
+  const sy=k(t,[[1.25,372],[3.25,772,'lin']]); X('scan',{y:sy,o:fin(t,1.05,.25)*(1-fin(t,3.3,.3))});
+  COLS.forEach((_,c)=>{X('c4l'+c,{o:fin(t,.1+c*.08,.3),y:(1-fin(t,.1+c*.08,.3))*12});
+    STEPS.forEach((_,s)=>{const e=$('st'+c+s),a=k(t,[[.35+s*.14+c*.07,0],[.85+s*.14+c*.07,1,'o5']]);
+      const ty=404+s*120+52, on=sy>=ty&&t>1.25, tOn=1.25+(ty-372)/200+c*.05, u=on?pop(t,tOn,.3):0;
+      X(e,{y:(1-a)*40,o:cl(a*2),b:(1-a)*8,s:1+(on?k(t,[[tOn,0],[tOn+.1,.035,'out'],[tOn+.4,0]]):0)});
+      e.style.borderColor=on?'#34CF88':'#EEEEF1';
+      const o=$('so'+c+s);o.style.background=u>.3?'#34CF88':'transparent';o.style.borderColor=u>.3?'#34CF88':'#DDDCE3';o.style.transform=`scale(${on?mix(1.4,1,cl(u)):1})`})});
+  X('tray',{o:fin(t,.9,.4),y:(1-fin(t,.9,.4))*30});
+  COLS.forEach((_,c)=>{const u=pop(t,3.35+c*.16,.36);X('rs'+c,{s:mix(.6,1,u),y:(1-u)*-60,o:cl(u*2)})});
+  const out=k(t,[[4.45,0],[4.8,1,'in']]); $('S4').style.filter=out>0?`blur(${out*20}px)`:'';$('S4').style.opacity=1-out;
+}
+/* ---------------- S5 build ---------------- */
+const LIST=[['Web Search','live facts',0],['Sales Intelligence','titles + contacts',19],['Email','send messages',8],['Images / Video','generate media',2],['Browser','browse the web',4],['Compute','run sandboxes',5],['Storage','keep memory',1],['Audio','voice',7],['Maps / Location','places',12],['Finance','market data',9],['Identity / Security','verification',18],['Payments','move money',16],['AI Models','inference',6]];
+$('lst').innerHTML=LIST.map(([n,d,g],i)=>`<div class="lr" id="lr${i}" style="top:${i*96}px"><div class="app" style="color:${PAL[i%8]}">${ic('f'+g)}</div><div class="n">${n}</div><div class="d">${d}</div><div class="bdg" id="lb${i}">${CHK}</div></div>`).join('');
+function S5(t){
+  TY('s5a',t,.1,26); TY('s5b',t,.5,26); IN('s5l',t,1.0,.4,20);
+  const sc=k(t,[[.15,520],[4.05,-610,'lin']]); $('lst').style.transform=`translateY(${sc}px)`;
+  LIST.forEach((_,i)=>{const y=sc+i*96+48, on=y<560, tOn=.15+(520+i*96+48-560)/((520+610)/3.9), u=on?pop(t,tOn,.3):0;
+    $('lr'+i).style.opacity=on?mix(.42,1,cl((t-tOn)/.2)):.42; X('lb'+i,{s:u,o:cl(u*2)})});
+  X('s5f',{o:fin(t,2.6,.5),y:(1-fin(t,2.6,.5))*14});
+  const out=k(t,[[3.85,0],[4.2,1,'in']]); $('S5').style.filter=out>0?`blur(${out*20}px)`:'';$('S5').style.opacity=1-out;
+}
+/* ---------------- S6 build: wheel + demos ---------------- */
+const WORDS=['Fund','Discover','Onboard','Policy','Pay','Payouts','Manage'], SEG=3.36;
+$('wheel').innerHTML=WORDS.map((w,i)=>`<div class="w px" id="w${i}">${w}</div>`).join('');
+const R0=[['Provider A',2,'x402 · MPP',3],['Provider B',3,'MPP',5],['Provider C',1,'x402',0],['Provider D',3,'x402 · MPP',9],['Provider E',2,'x402',10]];
+const ORD=[1,3,0,4,2]; // slot after price sort, by row index
+$('d0rows').innerHTML=R0.map(([n,p,a,g],i)=>`<div class="row5" id="r0${i}"><div class="bt">${ic('f'+g,'stroke-width:2.2')}</div><div class="nm">${n}</div><div class="at mono">${a} · stablecoin</div><div class="pc px" id="r0p${i}">${'$'.repeat(p)}<span style="opacity:.28">${'$'.repeat(3-p)}</span></div></div>`).join('')
+  +[0,1,2,3,4].map(i=>`<div class="rk px" style="position:absolute;left:30px;top:${126+i*104}px;font-size:50px;color:#8B8F8F">${i+1}</div>`).join('')+[1,2,3,4].map(i=>`<div class="sep" style="top:${100+i*104}px"></div>`).join('');
+const NODES=[[150,140,'401','claims required',1],[500,70,ic('f8'),'email',0],[850,140,ic('f19'),'name',0],[850,600,ic('f18'),'KYC / KYB',0],[150,600,ic('f13'),'owner approves',0],[500,670,ic('f15'),'credential → vault',1]];
+$('d1').innerHTML=NODES.map(([x,y],i)=>{const dx=x-500,dy=y-370,L=Math.hypot(dx,dy),an=Math.atan2(dy,dx)*180/Math.PI;
+   return `<div class="ln" style="left:500px;top:367.500px;width:${L}px;transform:rotate(${an}deg)"><i id="nl${i}"></i></div>`}).join('')
+  +NODES.map(([x,y,c,cap,dark],i)=>`<div class="a app" id="nn${i}" style="left:${x-60}px;top:${y-60}px;width:120px;height:120px;${dark?'background:#000;color:#fff;border-color:#000;':''}">${dark&&c==='401'?'<span class="mono" style="font-size:40px">401</span>':c}</div><div class="a bdg" id="nb${i}" style="left:${x+30}px;top:${y-74}px;width:42px;height:42px">${CHK}</div><div class="cap ${i%5==0?'mono':'px'}" id="nc${i}" style="left:${x}px;top:${y+70}px;font-size:${i%5==0?24:34}px">${cap}</div>`).join('')
+  +`<div class="a" id="ag" style="left:410px;top:280px;width:180px;height:180px;border-radius:50%;background:#111013;box-shadow:0 0 0 6px #fff,0 0 0 11px #34CF88,0 24px 50px -14px rgba(52,207,136,.6);display:flex;align-items:center;justify-content:center;color:#34CF88"><svg style="width:104px;height:82px"><use href="#bot"/></svg></div>`;
+const PO=[['Crypto wallet','withdraw stablecoin',17,'daily'],['Bank account','off-ramp',20,'weekly'],['Stripe','card revenue',16,'manual']];
+$('d4rows').innerHTML=PO.map(([n,s,g,ch],i)=>`<div class="row5" id="r4${i}" style="top:${118+i*146}px;height:130px"><div class="bt" style="left:34px;top:22px;width:86px;height:86px;border-radius:20px">${ic('f'+g,'stroke-width:2.1')}</div><div class="nm" style="left:150px;top:22px;font-size:46px">${n}</div><div class="at mono" style="left:150px;top:80px;font-size:24px">${s}</div>
+  <svg class="a ic" viewBox="0 0 200 60" style="left:560px;top:32px;width:200px;height:60px;stroke-width:3.5;color:#34CF88"><path id="sp${i}" pathLength="1" d="M4 ${50-i*3}C60 ${48-i*2} 110 ${44} 150 ${26+i*4}S190 8 196 6"/></svg>
+  <div class="pc px" style="top:35px">${ch}</div><div class="a bdg" id="r4b${i}" style="left:100px;top:10px;width:36px;height:36px">${CHK}</div></div>`).join('')+[1,2].map(i=>`<div class="sep" style="top:${100+i*146+6}px"></div>`).join('');
+const SETO=(id,on)=>{const e=$(id);e.style.background=on?'#34CF88':'transparent';e.style.borderColor=on?'#34CF88':'#DDDCE3'};
+function S6(t){
+  TY('s6a',t,.1,22); const a=pop(t,.45,.35); X('s6t',{s:a,o:cl(a*2)}); IN('s6r',t,.55,.35,0);
+  $('s6r').style.transform=`translateX(${(1-fin(t,.55,.35))*-30}px)`;
+  const idx=Math.min(4,Math.floor(t/SEG)), u=t-idx*SEG;
+  const turn=idx<4?k(u,[[SEG-.5,0],[SEG,1,'io']]):0, cur=1+idx+turn, spin=Math.sin(turn*Math.PI);
+  WORDS.forEach((_,i)=>{const p=i-cur,ap=Math.abs(p),wi=fin(t,.7+ap*.08,.4);
+    X('w'+i,{y:p*132+Math.sign(p)*Math.min(ap,1)*8,r:p*11,s:1-Math.min(ap,2)*.1,o:(ap<.5?1:ap<1.5?mix(1,.34,cl((ap-.5)/.5)):mix(.34,0,cl((ap-1.5)/.8)))*wi,b:Math.min(ap,2.2)*4.2+spin*7})});
+  for(let d=0;d<5;d++){const e=$('d'+d);if(d!==idx){e.style.visibility='hidden';continue}
+    const i=k(u,[[d==0?.75:.05,0],[d==0?1.2:.5,1,'o5']]),o=k(u,[[SEG-.42,0],[SEG-.1,1,'in']]);
+    X(e,{y:(1-i)*46,o:cl(i*2)*(1-o),b:(1-i)*12+o*16,s:1-o*.03}); DEMO[d](u-(d==0?.75:0))}
+  const out=k(t,[[16.45,0],[16.8,1,'in']]); $('S6').style.filter=out>0?`blur(${out*20}px)`:'';$('S6').style.opacity=1-out;
+}
+const DEMO=[
+ u=>{ const Q='web search API'; $('d0q').textContent=Q.slice(0,Math.round(k(u,[[.3,0],[.85,Q.length,'lin']])));
+   [.95,1.1,1.25].forEach((t0,i)=>{const e=$('d0c'+i),on=u>=t0;e.style.background=on?'#F2F7F4':'#fff';e.style.borderColor=on?'#34CF88':'#E6E5EB';e.style.color=on?'#1FAE6E':'#000';e.style.transform=`scale(${k(u,[[t0,1],[t0+.06,.92],[t0+.24,1,'out']])})`});
+   const so=k(u,[[1.3,0],[1.75,1,'io']]), sel=k(u,[[1.85,0],[2.15,1,'out']]);
+   R0.forEach((_,i)=>{const e=$('r0'+i),a=k(u,[[.25+i*.07,0],[.6+i*.07,1,'o5']]),y=100+mix(i,ORD[i],so)*104,top=ORD[i]===0;
+     e.style.transform=`translate(${top?-22*sel:0}px,${y+(1-a)*30-(top?6*sel:0)}px)`;e.style.opacity=cl(a*2)*(top?1:mix(1,.42,sel));
+     e.style.width=(top?1000+44*sel:1000)+'px';e.style.height=(top?104+12*sel:104)+'px';e.style.paddingLeft=(top?22*sel:0)+'px';
+     e.style.background=top&&sel>.02?'#fff':'transparent';e.style.borderRadius='30px';e.style.zIndex=top?2:1;
+     e.style.boxShadow=top&&sel>.02?`0 0 0 ${5*sel}px #34CF88,0 34px 70px -18px rgba(52,207,136,${.6*sel})`:'none';
+     const p=$('r0p'+i);if(top){p.style.background=sel>.5?'#34CF88':'#F2F7F4';p.style.color=sel>.5?'#fff':'#34CF88';p.textContent=sel>.5?'best fit':'$';p.style.right=(26-22*sel)+'px';p.style.top=(22+6*sel)+'px'}});
+ },
+ u=>{ const a=pop(u,.15,.4); X('ag',{s:a,o:cl(a*2)});
+   NODES.forEach((_,i)=>{const t0=.55+i*.36,n=pop(u,.2+i*.07,.36),l=k(u,[[t0,0],[t0+.3,1,'io']]),b=pop(u,t0+.26,.3);
+     X('nn'+i,{s:n,o:cl(n*2)}); $('nl'+i).style.transform=`scaleX(${l})`; X('nb'+i,{s:b,o:cl(b*2)}); X('nc'+i,{o:fin(u,.35+i*.07,.3)})});
+   $('ag').style.transform+=` scale(${1+.05*Math.sin(cl((u-2.5)/.5)*Math.PI)})`;
+ },
+ u=>{ [.75,1.05,1.35,1.65].forEach((t0,i)=>{SETO('p'+i,u>=t0);$('p'+i).style.transform=`scale(${k(u,[[t0,1],[t0+.08,1.4,'out'],[t0+.34,1]])})`});
+   const p=pop(u,1.95,.42); X('ppill',{s:mix(.7,1,p),o:cl(p*2),y:(1-p)*20});
+ },
+ u=>{ IN('selP',u,.2,.4,24); IN('selM',u,.32,.4,24); const hl=u>=.95;
+   ['o1','o3'].forEach(id=>{const e=$(id);e.style.background=hl?'#34CF88':'#F2F7F4';e.style.color=hl?'#fff':'#000';e.style.boxShadow=hl?'0 14px 28px -10px rgba(52,207,136,.7)':'none';e.style.transform=`scale(${k(u,[[.95,1],[1.03,1.09,'out'],[1.3,1]])})`});
+   ['o2','o4'].forEach(id=>$(id).style.opacity=hl?.34:1);
+   $('payv').style.transform=`scaleY(${k(u,[[1,0],[1.3,1,'out']])})`;
+   const m=k(u,[[1.3,0],[2.05,1,'io']]); $('payl').style.transform=`scaleX(${m})`;
+   X('paydot',{x:mix(150,850,m)-19,o:u>1.25&&u<2.12?1:0,s:pop(u,1.25,.25)});
+   const b=pop(u,2.1,.42); X('payb',{s:mix(.6,1,b),o:cl(b*2)});
+ },
+ u=>{ PO.forEach((_,i)=>{const e=$('r4'+i),a=k(u,[[.25+i*.14,0],[.7+i*.14,1,'o5']]);e.style.transform=`translateY(${(1-a)*34}px)`;e.style.opacity=cl(a*2);
+     const d=k(u,[[.8+i*.3,0],[1.5+i*.3,1,'io']]);$('sp'+i).style.strokeDasharray=`${d} 1`;
+     const b=pop(u,1.45+i*.3,.32);X('r4b'+i,{s:b,o:cl(b*2)})});
+ }];
+/* ---------------- S7 build ---------------- */
+{const N=11,x0=(1920-(N*164-24))/2;let h='';for(let i=0;i<N;i++){const c=PAL[(i*3+1)%8];
+  const inner=i==5?`<svg style="width:54%;height:54%;color:#000"><use href="#logo"/></svg>`:i==4?`<span class="px" style="font-size:44px">x402</span>`:i==6?`<span class="px" style="font-size:50px">MPP</span>`:i==3?ic('f17','color:#F7A531'):i==7?ic('f16','color:#2D6BFF'):`<svg style="width:62%;height:48%;color:${c}"><use href="#bot"/></svg>`;
+  h+=`<div class="app" id="z${i}" style="left:${x0+i*164}px">${inner}<div class="dot" id="zd${i}"></div></div>`} $('rowz').innerHTML=h}
+function S7(t){
+  const z=k(t,[[1.15,0],[1.95,1,'io']]), pan=k(t,[[0,1],[1.2,-1,'io']]);
+  X('rowz',{s:mix(4.8,1,z),x:mix(pan*800,0,z),y:mix(-48,0,z),o:fin(t,0,.25),b:Math.abs(Math.cos(cl(t/1.2)*Math.PI))<.6&&t<1.2?10*(1-Math.abs(Math.cos(cl(t/1.2)*Math.PI))/.6)*.6:0});
+  for(let i=0;i<11;i++){const d=pop(t,2.0+Math.abs(i-5)*.07,.3);X('zd'+i,{s:d,o:cl(d*2)})}
+  TY('s7a',t,2.15,26); TY('s7b',t,2.4,30);
+  const tg=pop(t,2.25,.35), on=k(t,[[3.0,0],[3.25,1,'io']]);
+  X('tog',{s:tg,o:cl(tg*2)}); $('tog').style.background=on>.5?'#34CF88':'#D5D3DF'; $('knob').style.transform=`translateX(${on*94}px)`;
+  $('tog').firstElementChild.style.opacity=on;
+  const out=k(t,[[3.65,0],[4,1,'in']]); $('S7').style.filter=out>0?`blur(${out*20}px)`:'';$('S7').style.opacity=1-out;
+}
+/* ---------------- S8 ---------------- */
+const CTA='integrate — directory.inflowpay.ai/integrate';
+function S8(t){
+  IN('s8t',t,.1,.35,0); IN('s8n',t,.22,.35,0);
+  $('s8a').style.transform=`translateY(${(1-k(t,[[.35,0],[.85,1,'o5']]))*190}px)`;
+  $('s8b').style.transform=`translateY(${(1-k(t,[[.5,0],[1,1,'o5']]))*190}px)`;
+  $('s8g').style.transform=`scaleX(${k(t,[[1,0],[1.5,1,'io']])})`;
+  IN('cta',t,.9,.5,50);
+  $('ctat').textContent=CTA.slice(0,Math.round(k(t,[[1.35,0],[2.3,CTA.length,'lin']])));
+  $('ctac').style.opacity=t<2.35?1:0;
+  X('s8f',{o:fin(t,2.2,.45),y:(1-fin(t,2.2,.45))*14});
+}
+const SC=[['S1',0,3,S1],['S2',3,5.7,S2],['S3',5.7,11.3,S3],['S4',11.3,16.1,S4],['S5',16.1,20.3,S5],['S6',20.3,37.1,S6],['S7',37.1,41.1,S7],['S8',41.1,45.01,S8]];
+window.CUES=Object.fromEntries(SC.map(s=>[s[0],s[1]]));
+function render(f){const T=Math.min(f,HOLD_FROM)/FPS;
+  SC.forEach(([id,a,b,fn])=>{const on=T>=a&&T<b;$(id).style.display=on?'block':'none';if(on)fn(T-a)})}
 window.renderFrame=f=>{render(f);return true};
 
 if(location.hash!=='#render'){
   const fit=()=>{const s=Math.min(innerWidth/1920,(innerHeight-40)/1080);$('stage').style.transform=`scale(${s})`};
   fit();addEventListener('resize',fit);
   let playing=true,t0=performance.now(),f=0;
-  const loop=now=>{if(playing){f=((now-t0)/1000*FPS)%TOTAL;$('scrub').value=f;$('fno').textContent=String(Math.floor(f)).padStart(3,'0');render(f)}requestAnimationFrame(loop)};
-  $('scrub').oninput=e=>{playing=false;f=+e.target.value;$('fno').textContent=String(f).padStart(3,'0');render(f)};
+  const loop=now=>{if(playing){f=((now-t0)/1000*FPS)%TOTAL;$('scrub').value=f;$('fno').textContent=String(Math.floor(f)).padStart(4,'0');render(f)}requestAnimationFrame(loop)};
+  $('scrub').oninput=e=>{playing=false;f=+e.target.value;$('fno').textContent=String(f).padStart(4,'0');render(f)};
   addEventListener('keydown',e=>{if(e.code==='Space'){playing=!playing;t0=performance.now()-f/FPS*1000}});
   document.fonts.ready.then(()=>requestAnimationFrame(loop));
 }else{$('ui').style.display='none';document.fonts.ready.then(()=>render(0))}
